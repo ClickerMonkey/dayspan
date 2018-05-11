@@ -2,6 +2,7 @@
 
 export class Constants
 {
+  public static MILLIS_IN_SECOND: number = 1000;
   public static MILLIS_IN_MINUTE: number = 1000 * 60;
   public static MILLIS_IN_HOUR: number = 1000 * 60 * 60;
   public static MILLIS_IN_DAY: number = 1000 * 60 * 60 * 24;

@@ -92,6 +92,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 var Constants = (function () {
     function Constants() {
     }
+    Constants.MILLIS_IN_SECOND = 1000;
     Constants.MILLIS_IN_MINUTE = 1000 * 60;
     Constants.MILLIS_IN_HOUR = 1000 * 60 * 60;
     Constants.MILLIS_IN_DAY = 1000 * 60 * 60 * 24;
@@ -856,6 +857,34 @@ var Calendar_Calendar = (function () {
 }());
 
 
+// CONCATENATED MODULE: ./src/Duration.ts
+
+
+var Duration_Duration = (function () {
+    function Duration() {
+    }
+    Duration.millis = function (x) {
+        return x;
+    };
+    Duration.seconds = function (x) {
+        return x * Constants.MILLIS_IN_SECOND;
+    };
+    Duration.minutes = function (x) {
+        return x * Constants.MILLIS_IN_MINUTE;
+    };
+    Duration.hours = function (x) {
+        return x * Constants.MILLIS_IN_HOUR;
+    };
+    Duration.days = function (x) {
+        return x * Constants.MILLIS_IN_DAY;
+    };
+    Duration.weeks = function (x) {
+        return x * Constants.MILLIS_IN_WEEK;
+    };
+    return Duration;
+}());
+
+
 // CONCATENATED MODULE: ./src/Functions.ts
 
 /**
@@ -1221,12 +1250,14 @@ var Weekday = (function () {
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Constants", function() { return Constants; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Day", function() { return Day_Day; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "DaySpan", function() { return DaySpan_DaySpan; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Duration", function() { return Duration_Duration; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Functions", function() { return Functions; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Month", function() { return Month; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Parse", function() { return Parse_Parse; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Schedule", function() { return Schedule_Schedule; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Suffix", function() { return Suffix; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Weekday", function() { return Weekday; });
+
 
 
 

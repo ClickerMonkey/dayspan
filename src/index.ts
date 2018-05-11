@@ -3,6 +3,7 @@ export * from './Calendar';
 export * from './Constants';
 export * from './Day';
 export * from './DaySpan';
+export * from './Duration';
 export * from './Functions';
 export * from './Month';
 export * from './Parse';
