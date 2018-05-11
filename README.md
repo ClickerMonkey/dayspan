@@ -7,10 +7,10 @@ A date & schedule library to use for advanced calendars in TypeScript and JS.
 ```typescript
 
 // A monthly calendar around today
-let calendar = Calendar.months<string>();
+let cal = Calendar.months<string>();
 
 // Every Monday 9:00 - 9:30
-calendar.addSchedule({
+cal.addSchedule({
   event: 'Weekly Meeting',
   schedule: new Schedule({
     dayOfWeek: [Weekday.MONDAY],
@@ -20,7 +20,7 @@ calendar.addSchedule({
 });
 
 // Dr. Appointment on 01/04/2018
-calendar.addSchedule({
+cal.addSchedule({
   event: 'Dr. Appointment',
   schedule: new Schedule({
     on: Day.create(2018, Month.APRIL, 1)
@@ -28,16 +28,16 @@ calendar.addSchedule({
 });
 
 // The array of days in the month, each day has a list of the days events.
-calendar.days;
+cal.days;
 
 // Go to the next month
-calendar.next();
+cal.next();
 
 // Select this day and update the selection flags in the calendar days
-calendar.select(Day.create(2018, Month.APRIL, 12));
+cal.select(Day.create(2018, Month.APRIL, 12));
 
 // Remove the schedule
-calendar.removeSchedule('Weekly Meeting');
+cal.removeSchedule('Weekly Meeting');
 
 // A weekly calendar with custom MyEvent class
 Calendar.weeks<MyEvent>();
