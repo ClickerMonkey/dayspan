@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig",
+  "compilerOptions": {
+    "outDir": "lib-esm",
+    "target": "es2017"
+  }
+}

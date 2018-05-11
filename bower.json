@@ -1,0 +1,33 @@
+{
+  "name": "dayspan",
+  "homepage": "https://github.com/ClickerMonkey/dayspan",
+  "authors": [
+    "Philip Diffenderfer <pdiffenderfer@gmail.com>"
+  ],
+  "description": "A date & schedule library to use for advanced calendars in TypeScript and JS",
+  "main": "umd/dayspan.js",
+  "keywords": [
+    "javascript",
+    "typescript",
+    "date",
+    "schedule",
+    "calendar",
+    "timespan",
+    "timestamp",
+    "events"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "src",
+    "node_modules",
+    "bower_components",
+    "test",
+    "docs",
+    "coverage",
+    "*.tgz",
+    "package"
+  ],
+  "dependencies": {
+  }
+}

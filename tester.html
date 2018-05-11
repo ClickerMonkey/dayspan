@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.css">
+
+    <style>
+    body > .grid {
+      height: 100%;
+    }
+    body {
+      background-color: #DADADA;
+    }
+    .column {
+      max-width: 800px;
+    }
+    #unitz {
+      margin-top: 2em;
+      margin-bottom: 2em;
+    }
+    .ui.input.error>input,
+    .ui.input.error>input:focus {
+      background-color: #fff6f6;
+      border-color: #e0b4b4;
+      color: #9f3a38;
+      -webkit-box-shadow: none;
+      box-shadow: none;
+    }
+    pre {
+      overflow-x: scroll;
+    }
+    pre button,
+    pre .ui.selection.dropdown {
+      width: auto;
+      min-width: auto;
+      height: 20px;
+      font-family: Courier;
+      color: rgba(0,0,0,.6);
+    }
+    pre input {
+      border: 1px solid rgba(34,36,38,.15);
+      border-radius: .28571429rem;
+      height: 20px;
+      font-family: Courier;
+      color: rgba(0,0,0,.6);
+      width: 200px;
+    }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.js"></script>
+    <script src="umd/dayspan.js"></script>
+  </head>
+  <body>
+
+    <a href="https://github.com/ClickerMonkey/dayspan"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+
+    <!--
+    Span View
+      Month / Week / Day
+    Tabs
+      - Events
+      -
+     -->
+
+
+<!--
+
+    <div class="ui center aligned grid" id="unitz">
+      <div class="column">
+
+        <form class="ui large form">
+          <div class="ui stacked segment">
+            <div class="field">
+              <div class="ui left icon input" :class="{ error: invalid }">
+                <i class="arrow right icon"></i>
+                <input type="text" v-model="input" @keyup="parse" placeholder="1 cups, 3 tbsp, 3.4 - 5 meters">
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <div class="ui segment left aligned">
+          <div class="ui secondary pointing menu">
+            <a class="item"
+              v-for="section in sections"
+              :key="section.key"
+              :class="{ active: isActive( section.key ) }"
+              @click="setActive( section.key )">
+              {{ section.title }}
+            </a>
+          </div>
+          <div v-if="isActive('about')">
+
+            <div class="ui fluid card">
+              <div class="content">
+                <div class="header">
+                  Unitz
+                </div>
+                <div class="description">
+                  <p>
+                    <strong>Unitz</strong> is a library for parsing user entered values and units and performing actions on them.
+                  </p>
+                  <p>
+                    User input is often in many different formats using known and unknown units.
+                  </p>
+                  <p>
+                    <strong>Unitz</strong> can parse numbers (0.3), fractions (1/2 or 1 4/5), and ranges (2 - 3) with or without units.
+                  </p>
+                  <p>
+                    Units can be provided by the user in many acceptable formats - and if its not registered (1 loaf or 2 loaves of bread) <strong>Unitz</strong> can intelligbly figure them out.
+                  </p>
+                  <p>
+                    This tool allows you to experiment with your own input and see how the various methods of the library operate.
+                  </p>
+                  <p>
+                    This library should be treated as if each returned value is immutable. Each action performed generates a new value, so the previous value(s) are not affected.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="ui fluid card">
+              <div class="content">
+                <div class="header">
+                  Uses
+                </div>
+                <div class="description">
+                    <p>
+                      <strong>Unitz</strong> was created for an application which takes an item (like milk) and a quantity (like 1 pt) and allows the user to create grocery lists, recipes, and inventory lists and perform operations on them.
+                      This library allows queries to be made against these lists like:
+                      <ul>
+                        <li>Do I have the ingredients in my inventory to do recipe X?</li>
+                        <li>I have this much of ingredients Y, scale the recipe accordingly to match what I have.</li>
+                        <li>What recipes can I make based on my inventory?</li>
+                        <li>What do I need to get at the store for recipe Z for W servings based on my inventory?</li>
+                        <li>Move my gotten grocery list items into my inventory list.</li>
+                        <li>I made this recipe, remove the ingredients used from my inventory.</li>
+                      </ul>
+                    </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="ui fluid card">
+              <div class="content">
+                <div class="header">
+                  Features
+                </div>
+                <div class="description">
+                  <ul>
+                    <li><strong>Mutate</strong>: A mutation performs a simple operation on each of the values parsed. Sometimes mutations can remove values that don't fit some criteria.</li>
+                    <li><strong>Transform</strong>: A transformation a mutation that can be given some criteria. This are often used to make the user input or the results of some other actions more user friendly.</li>
+                    <li><strong>Operations</strong>: An operation is something mathematical that is done with another set of values or a number. </li>
+                    <li><strong>Sort</strong>: A sort will rearrange the values in a set optionally taking some options.</li>
+                    <li><strong>Convert</strong>: A conversion will require a unit to convert to, and it will take the sum of all the values in the set with the same class and return the value in the desired unit.</li>
+                    <li><strong>Conversions</strong>: Generates a set of equivalent values in the different units for a class. For example, if your input is <code>12in</code> a conversion to that is <code>1ft</code> or <code>1/3 yard</code>.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="ui fluid card">
+              <div class="content">
+                <div class="header">
+                  Documentation
+                </div>
+                <div class="description">
+                  <a href="https://clickermonkey.github.io/unitz-ts/docs/">
+                    https://clickermonkey.github.io/unitz-ts/docs/
+                  </a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div v-if="isActive('inspect')">
+
+            <unitz-sample
+              input="1 - 2&quot;, 5m, 3/4kb, 1in - 4ft, 0.5day"
+              @chosen="setInput"
+            ></unitz-sample>
+
+            <div class="ui fluid card" v-for="range in parsed.ranges">
+              <div class="content">
+
+                <div class="header">
+                  {{ output.range( range ) }}
+                </div>
+
+                <div class="description">
+
+                  <div class="ui blue label">
+                    Class
+                    <div class="detail" v-if="range.min.group && !range.min.group.dynamic">
+                      {{ range.min.group.parent.name }}
+                    </div>
+                    <div class="detail" v-else-if="range.min.group && range.min.group.dynamic">
+                      Dynamic
+                    </div>
+                    <div class="detail" v-else>
+                      None
+                    </div>
+                  </div>
+
+                  <div class="ui teal label" v-if="range.min.group">
+                    Group
+                    <div class="detail">
+                      <span v-if="range.min.group.unit !== range.max.group.unit">
+                        {{ range.min.group.singularLong }} - {{ range.max.group.singularLong }}
+                      </span>
+                      <span v-else>
+                        {{ range.min.group.singularLong }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="ui orange label" v-if="range.min.rateGroup">
+                    Rate
+                    <div class="detail">
+                      <span v-if="range.min.rateGroup.unit !== range.max.rateGroup.unit">
+                        {{ range.min.rateGroup.singularLong }} - {{ range.max.rateGroup.singularLong }}
+                      </span>
+                      <span v-else>
+                        {{ range.min.rateGroup.singularLong }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="ui gray label">
+                    Range
+                    <div class="detail">
+                      {{ range.isRange ? 'Yes' : 'No' }}
+                    </div>
+                  </div>
+
+                  <div class="ui green label">
+                    Valid
+                    <div class="detail">
+                      {{ range.isValid ? 'Yes' : 'No' }}
+                    </div>
+                  </div>
+
+                  <div class="ui purple label">
+                    Fractions
+                    <div class="detail">
+                      {{ range.isFraction ? 'Yes' : 'No' }}
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div v-if="isActive('mutate')">
+
+            <unitz-sample
+              input="2.3 inches, -3 - 2 METER, 0/2 tacos, 1 1/2ft"
+              @chosen="setInput"
+            ></unitz-sample>
+
+            <br><br>
+
+            <div class="ui styled fluid accordion">
+              <div class="title" @click="optionsOpen = !optionsOpen" :class="{active: optionsOpen}">
+                <i class="dropdown icon"></i>
+                Options
+              </div>
+              <div class="content" :class="{active: optionsOpen}">
+                <unitz-output :output="output"></unitz-output>
+              </div>
+            </div>
+
+            <unitz-card
+              usage="uz( input ).preferred()"
+              title="Preferred"
+              description="This mutation takes the current expression and replaces the units given by the user with the units preferred by the developer."
+              :result="preferred"
+            ></unitz-card>
+
+            <unitz-card
+              usage="uz( input ).positive()"
+              title="Positive"
+              description="This mutation only returns positive values. If a range has a negative minimum and positive minimum the minimum is changed to zero."
+              :result="positive"
+            ></unitz-card>
+
+            <unitz-card
+              usage="uz( input ).negative()"
+              title="Negative"
+              description="This mutation only returns negative values. If a range has a negative minimum and positive maximum the maximum is changed to zero."
+              :result="negative"
+            ></unitz-card>
+
+            <unitz-card
+              usage="uz( input ).nonzero()"
+              title="Non-zero"
+              description="This mutation only returns non-zero values."
+              :result="nonzero"
+            ></unitz-card>
+
+            <unitz-card
+              usage="uz( input ).min()"
+              title="Min"
+              description="This mutation only returns the minimum values specifed (if ranges are given)."
+              :result="min"
+            ></unitz-card>
+
+            <unitz-card
+              usage="uz( input ).max()"
+              title="Max"
+              description="This mutation only returns the maximum values specifed (if ranges are given)."
+              :result="max"
+            ></unitz-card>
+
+            <unitz-card
+              usage="uz( input ).fractions()"
+              title="Fractions"
+              description="This mutation tries to convert all ranges and values to fractions based on their groups valid denominators."
+              :result="fractions"
+            ></unitz-card>
+
+            <unitz-card
+              usage="uz( input ).numbers()"
+              title="Numbers"
+              description="This mutation tries to convert all ranges and values to numbers (as oppposed to fractions)."
+              :result="numbers"
+            ></unitz-card>
+
+          </div>
+          <div v-if="isActive('transform')">
+
+            <unitz-sample
+              input="24 in, 1.5ft, 0.25ft"
+              @chosen="setInput"
+            ></unitz-sample>
+
+            <unitz-sample
+              input="1 loaf, 3 loaves, 1 lb"
+              detail="shows how dynamic groups determine singular/plural"
+              @chosen="setInput"
+            ></unitz-sample>
+
+            <br><br>
+
+            <div class="ui styled fluid accordion">
+              <div class="title" @click="optionsOpen = !optionsOpen" :class="{active: optionsOpen}">
+                <i class="dropdown icon"></i>
+                Options
+              </div>
+              <div class="content" :class="{active: optionsOpen}">
+                <unitz-output :output="output"></unitz-output>
+                <unitz-transform :transform="transform"></unitz-transform>
+             </div>
+           </div>
+
+           <unitz-card
+             usage="uz( input ).normalize( options )"
+             title="Normalize"
+             description="This transform adjusts the unit of each value or range to find the best match according to the transform options."
+             :result="normalize"
+           ></unitz-card>
+
+           <unitz-card
+             usage="uz( input ).compact( options )"
+             title="Compact"
+             description="This transforms values and ranges of the same class into a single value."
+             :result="compact"
+           ></unitz-card>
+
+           <unitz-card
+             usage="uz( input ).expand( options )"
+             title="Expand"
+             description="This transforms values and ranges of the same class into as many values as needed to nicely represent the sum."
+             :result="expand"
+           ></unitz-card>
+
+           <unitz-card
+             usage="uz( input ).filter( options )"
+             title="Filter"
+             description="This transform filters out values & ranges that don't match the options."
+             :result="filter"
+           ></unitz-card>
+
+          </div>
+          <div v-if="isActive('operations')">
+
+            <div class="ui styled fluid accordion">
+              <div class="title" @click="optionsOpen = !optionsOpen" :class="{active: optionsOpen}">
+                <i class="dropdown icon"></i>
+                Options
+              </div>
+              <div class="content" :class="{active: optionsOpen}">
+                <unitz-output :output="output"></unitz-output>
+              </div>
+            </div>
+
+            <div class="ui fluid card">
+             <div class="content">
+               <div class="ui right floated label">
+                 uz( input ).add( addend, scale )
+               </div>
+               <div class="header">
+                 Add
+               </div>
+               <div class="meta">
+                 This operation adds two values together when their units match.
+               </div>
+               <br>
+               <div class="ui form">
+                <div class="inline fields">
+                  <div class="four wide field">
+                    <input type="text" v-model="input" @keyup="parse">
+                  </div>
+                  <div class="one wide field" style="font-size:18px;">+&nbsp;&nbsp;(</div>
+                  <div class="four wide field">
+                    <input type="text" v-model="addend">
+                  </div>
+                  <div class="one wide field" style="font-size:18px;">&nbsp;&nbsp;&nbsp;x</div>
+                  <div class="two wide field">
+                    <input type="number" v-model="addendScale">
+                  </div>
+                  <div class="one wide field" style="font-size:18px;">)&nbsp;&nbsp;=</div>
+                  <div class="six wide field">
+                    <input type="text" readonly :value="add">
+                  </div>
+                </div>
+              </div>
+             </div>
+            </div>
+
+            <div class="ui fluid card">
+              <div class="content">
+                <div class="ui right floated label">
+                  uz( input ).sub( addend, scale )
+                </div>
+                <div class="header">
+                  Subtract
+                </div>
+                <div class="meta">
+                  This operation subtracts one value from another when their units match.
+                </div>
+                <br>
+                <div class="ui form">
+                 <div class="inline fields">
+                   <div class="four wide field">
+                     <input type="text" v-model="input" @keyup="parse">
+                   </div>
+                   <div class="one wide field" style="font-size:18px;">-&nbsp;&nbsp;(</div>
+                   <div class="four wide field">
+                     <input type="text" v-model="subtrahend">
+                   </div>
+                   <div class="one wide field" style="font-size:18px;">&nbsp;&nbsp;&nbsp;x</div>
+                   <div class="two wide field">
+                     <input type="number" v-model="subtrahendScale">
+                   </div>
+                   <div class="one wide field" style="font-size:18px;">)&nbsp;&nbsp;=</div>
+                   <div class="six wide field">
+                     <input type="text" readonly :value="sub">
+                   </div>
+                 </div>
+               </div>
+              </div>
+            </div>
+
+            <div class="ui fluid card">
+              <div class="content">
+                <div class="ui right floated label">
+                  uz( input ).scale( amount )
+                </div>
+                <div class="header">
+                  Scale
+                </div>
+                <div class="meta">
+                  This operation multiplies the values and ranges by some number.
+                </div>
+                <br>
+                <div class="ui form">
+                 <div class="inline fields">
+                   <div class="four wide field">
+                     <input type="text" v-model="input" @keyup="parse">
+                   </div>
+                   <div class="one wide field" style="font-size:18px;">&nbsp;&nbsp;&nbsp;x</div>
+                   <div class="four wide field">
+                     <input type="number" v-model="scale">
+                   </div>
+                   <div class="one wide field" style="font-size:18px;">&nbsp;&nbsp;&nbsp;=</div>
+                   <div class="six wide field">
+                     <input type="text" readonly :value="scaled">
+                   </div>
+                 </div>
+               </div>
+              </div>
+            </div>
+
+            <div class="ui fluid card">
+              <div class="content">
+                <div class="ui right floated label">
+                  uz( input ).scaleTo( to, rangeDelta )
+                </div>
+                <div class="header">
+                  Scale To
+                </div>
+                <div class="meta">
+                  This operation takes a set of values and given a value & unit scales the entire set up to that value.
+                  For example, if you have <code>12in, 1cup</code> and you scale it to <code>18in</code> the result will be <code>18in, 1.5cup</code>.
+                  Another parameter <code>rangeDelta</code> can be given when dealing with sets that have ranges. The default value is 0.5 which means the value which is used to scale against will be equally between the minimum and maximum of the range. 0 = the minimum and 1 = the maximum.
+                  If a set contains multiple ranges which share the same class they are joined together to determine how to scale the set.
+                </div>
+                <br>
+                <div class="ui form">
+                 <div class="inline fields">
+                   <div class="six wide field">
+                     <input type="text" v-model="input" @keyup="parse">
+                   </div>
+                   <div class="two wide field" style="font-size:18px;">x to</div>
+                   <div class="four wide field">
+                     <input type="text" v-model="scaleTo">
+                   </div>
+                   <div class="one wide field" style="font-size:18px;">&nbsp;at</div>
+                   <div class="three wide field">
+                     <input type="number" v-model="rangeDelta">
+                   </div>
+                   <div class="one wide field" style="font-size:18px;">&nbsp;&nbsp;&nbsp;=</div>
+                   <div class="seven wide field">
+                     <input type="text" readonly :value="scaledTo">
+                   </div>
+                 </div>
+               </div>
+              </div>
+            </div>
+
+          </div>
+          <div v-if="isActive('sort')">
+
+            <div class="ui styled fluid accordion">
+              <div class="title" @click="optionsOpen = !optionsOpen" :class="{active: optionsOpen}">
+                <i class="dropdown icon"></i>
+                Options
+              </div>
+              <div class="content" :class="{active: optionsOpen}">
+                <unitz-sort :sort="sort"></unitz-sort>
+              </div>
+            </div>
+
+            <br>
+
+            <div class="ui fluid labeled input">
+              <div class="ui label">Output</div>
+              <input type="text" readonly :value="sorted">
+            </div>
+
+          </div>
+          <div v-if="isActive('convert')">
+
+            <div class="ui styled fluid accordion">
+              <div class="title" @click="optionsOpen = !optionsOpen" :class="{active: optionsOpen}">
+                <i class="dropdown icon"></i>
+                Options
+              </div>
+              <div class="content" :class="{active: optionsOpen}">
+                <unitz-output :output="output"></unitz-output>
+              </div>
+            </div>
+
+            <br>
+
+            <select class="ui selection dropdown" v-model="convertUnit">
+              <optgroup v-for="parent in classes" :key="parent.name" v-bind:label="parent.name">
+                <option v-for="group in parent.groups" :key="group.unit" :value="group.unit">
+                  {{ group.singularLong }}
+                </option>
+              </optgroup>
+            </select>
+
+            <select class="ui selection dropdown" v-if="hasRates" v-model="convertRate">
+              <option value>No Rate</option>
+              <optgroup v-for="parent in classes" :key="parent.name" v-bind:label="parent.name">
+                <option v-for="group in parent.groups" :key="group.unit" :value="group.unit">
+                  {{ group.singularLong }}
+                </option>
+              </optgroup>
+            </select>
+
+            <br><br>
+
+            <div class="ui fluid labeled input">
+              <div class="ui label">Output</div>
+              <input type="text" readonly :value="converted">
+            </div>
+
+          </div>
+          <div v-if="isActive('conversions')">
+
+            <div class="ui styled fluid accordion">
+              <div class="title" @click="optionsOpen = !optionsOpen" :class="{active: optionsOpen}">
+                <i class="dropdown icon"></i>
+                Options
+              </div>
+              <div class="content" :class="{active: optionsOpen}">
+                <unitz-output :output="output"></unitz-output>
+                <unitz-transform :transform="transform"></unitz-transform>
+             </div>
+           </div>
+
+           <div class="ui top attached tabular menu">
+             <a class="item"
+              v-for="(ranges, className) in conversionsByClass"
+              :key="className"
+              :class="{active: activeClass === className}"
+              @click="activeClass = className">
+              {{ className }}
+             </a>
+           </div>
+           <div class="ui bottom attached segment" v-if="conversionsByClass[ activeClass ]">
+             <div class="ui very relaxed divided list">
+               <div class="item"
+                v-for="range in conversionsByClass[ activeClass ]">
+                {{ range }}
+              </div>
+             </div>
+           </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  -->
+
+    <script type="text/template" id="template_output">
+      <pre class="ui tertiary segment"><!--
+  -->// this variable is used to modify output below
+var outputOptions = {
+  unit: <select class="ui selection dropdown" v-model="output.unit">
+  <option :value="OutputUnit.NONE">Unitz.OutputUnit.NONE</option>
+  <option :value="OutputUnit.GIVEN">Unitz.OutputUnit.GIVEN</option>
+  <option :value="OutputUnit.SHORT">Unitz.OutputUnit.SHORT</option>
+  <option :value="OutputUnit.LONG">Unitz.OutputUnit.LONG</option>
+</select>, // control the units that are displayed
+  format: <select class="ui selection dropdown" v-model="output.format">
+  <option :value="OutputFormat.GIVEN">Unitz.OutputFormat.GIVEN</option>
+  <option :value="OutputFormat.NUMBER">Unitz.OutputFormat.NUMBER</option>
+  <option :value="OutputFormat.MIXED">Unitz.OutputFormat.MIXED</option>
+  <option :value="OutputFormat.IMPROPER">Unitz.OutputFormat.IMPROPER</option>
+</select>, // control the values that are displayed
+  repeatUnit: <select class="ui selection dropdown" v-model="output.repeatUnit">
+  <option :value="true">true</option>
+  <option :value="false">false</option>
+</select>, // should the same unit be listed at the min and max of a range
+  unitSpacer: <input type="text" v-model="output.unitSpacer">,
+  rangeSpacer: <input type="text" v-model="output.rangeSpacer">,
+  fractionSpacer: <input type="text" v-model="output.fractionSpacer">,
+  mixedSpacer: <input type="text" v-model="output.mixedSpacer">,
+  rateSpacer: <input type="text" v-model="output.rateSpacer">,
+  delimiter: <input type="text" v-model="output.delimiter">,
+  significant: <input type="number" v-model.number="output.significant">
+
+};<!--
+  --></pre>
+    </script>
+
+    <script type="text/template" id="template_transform">
+      <pre class="ui tertiary segment"><!--
+   -->// this variable is used to transform
+var transformOptions = {
+  common: <select class="ui selection dropdown" v-model="transform.common">
+    <option :value="true">true</option>
+    <option :value="false">false</option>
+  </select>, // should only "common" units be used for the transformation
+  system: <select class="ui selection dropdown" v-model="transform.system">
+    <option :value="System.METRIC">Unitz.System.METRIC</option>
+    <option :value="System.US">Unitz.System.US</option>
+    <option :value="System.NONE">Unitz.System.NONE</option>
+    <option :value="System.ANY">Unitz.System.ANY</option>
+    <option :value="System.GIVEN">Unitz.System.GIVEN</option>
+  </select>, // should a specific system be used
+  min: <input type="text" v-model.number="transform.min"><button @click="transform.min=-Number.MAX_VALUE">reset</button>, // we only return values >= to this
+  max: <input type="text" v-model.number="transform.max"><button @click="transform.max=Number.MAX_VALUE">reset</button>, // we only return values <= to this
+  convertWithMax: <select class="ui selection dropdown" v-model="transform.convertWithMax">
+    <option :value="true">true</option>
+    <option :value="false">false</option>
+  </select>, // when doing conversions, do we use the min or max of a range?
+  convertUnit: <select class="ui selection dropdown" v-model="transform.convertUnit">
+    <option :value="true">true</option>
+    <option :value="false">false</option>
+  </select>, // when doing conversions, do we convert based on the main unit?
+  convertRate: <select class="ui selection dropdown" v-model="transform.convertRate">
+    <option :value="true">true</option>
+    <option :value="false">false</option>
+  </select>, // when doing conversions, do we convert based on the main unit?
+  groupless: <select class="ui selection dropdown" v-model="transform.groupless">
+    <option :value="true">true</option>
+    <option :value="false">false</option>
+  </select> // When doing transformations - should we include values without units in the result?
+};<!--
+   --></pre>
+    </script>
+
+    <script type="text/template" id="template_sort">
+      <pre class="ui tertiary segment"><!--
+  -->// options passed to uz( input ).sort( sortOptions )
+var sortOptions = {
+  ascending: <select class="ui selection dropdown" v-model="sort.ascending">
+  <option :value="true">true</option>
+  <option :value="false">false</option>
+  </select>,
+  type: <select class="ui selection dropdown" v-model="sort.type">
+  <option :value="SortType.MIN">Unitz.SortType.MIN</option>
+  <option :value="SortType.MAX">Unitz.SortType.MAX</option>
+  <option :value="SortType.AVERAGE">Unitz.SortType.AVERAGE</option>
+  </select>
+});<!--
+   --></pre>
+    </script>
+
+    <script type="text/template" id="template_card">
+      <div class="ui fluid card">
+        <div class="content">
+          <div class="ui right floated label">
+            {{ usage }}
+          </div>
+          <div class="header">
+            {{ title }}
+          </div>
+          <div class="meta">
+            {{ description }}
+          </div>
+          <div class="description">
+            <div class="ui fluid labeled input">
+              <div class="ui label">Output</div>
+              <input type="text" readonly :value="result">
+            </div>
+          </div>
+        </div>
+      </div>
+    </script>
+
+    <script type="text/template" id="template_sample">
+      <a class="ui label" @click="choose">
+        <i class="arrow up icon"></i>
+        {{ input }}
+        <div class="detail" v-if="detail" v-html="detail"></div>
+      </a>
+    </script>
+
+<!--
+    <script>
+      var Store = {
+        Watcher: function(name, deep) {
+          return {
+            deep: !!deep,
+            handler: function(newValue) {
+              localStorage.setItem(name, JSON.stringify(newValue));
+            }
+          };
+        },
+        Load: function(name, defaultValue, parser) {
+          var oldValue = localStorage.getItem(name);
+          if (!oldValue) {
+            return defaultValue;
+          }
+          var parsedValue = JSON.parse(oldValue);
+          if (parser) {
+            parsedValue = parser( parsedValue );
+          }
+          return parsedValue;
+        }
+      };
+
+      new Vue({
+        el: '#unitz',
+        data: {
+          input: Store.Load('input', ''),
+          addend: Store.Load('addend', ''),
+          addendScale: Store.Load('addendScale', 1),
+          subtrahend: Store.Load('subtrahend', ''),
+          subtrahendScale: Store.Load('subtrahendScale', 1),
+          scale: Store.Load('scale', 1),
+          scaleTo: Store.Load('scaleTo', ''),
+          rangeDelta: Store.Load('rangeDelta', 0.5),
+          optionsOpen: Store.Load('optionsOpen', false),
+          convertUnit: Store.Load('convertUnit', ''),
+          convertRate: Store.Load('convertRate', ''),
+          active: Store.Load('active', 'about'),
+          activeClass: Store.Load('activeClass', null),
+          output: Store.Load('output', new Unitz.Output({unitSpacer: ' '}), function(x) {return new Unitz.Output(x)}),
+          transform: Store.Load('transform', new Unitz.Transform(), function(x) {return new Unitz.Transform(x)}),
+          sort: Store.Load('sort', new Unitz.Sort(), function(x) {return new Unitz.Sort(x)}),
+          parsed: Unitz.uz(),
+          invalid: false,
+          classes: Unitz.Core.classes,
+          sections: [
+            {title: 'About', key: 'about'},
+            {title: 'Inspect', key: 'inspect'},
+            {title: 'Mutate', key: 'mutate'},
+            {title: 'Transform', key: 'transform'},
+            {title: 'Operations', key: 'operations'},
+            {title: 'Sort', key: 'sort'},
+            {title: 'Convert', key: 'convert'},
+            {title: 'Conversions', key: 'conversions'}
+          ]
+        },
+        watch: {
+          input: Store.Watcher('input'),
+          addend: Store.Watcher('addend'),
+          addendScale: Store.Watcher('addendScale'),
+          subtrahend: Store.Watcher('subtrahend'),
+          subtrahendScale: Store.Watcher('subtrahendScale'),
+          scale: Store.Watcher('scale'),
+          scaleTo: Store.Watcher('scaleTo'),
+          rangeDelta: Store.Watcher('rangeDelta'),
+          optionsOpen: Store.Watcher('optionsOpen'),
+          convertUnit: Store.Watcher('convertUnit'),
+          convertRate: Store.Watcher('convertRate'),
+          active: Store.Watcher('active'),
+          activeClass: Store.Watcher('activeClass'),
+          output: Store.Watcher('output', true),
+          transform: Store.Watcher('transform', true),
+          sort: Store.Watcher('sort', true)
+        },
+        computed: {
+          preferred: function() {
+            return this.parsed.preferred().output(this.output);
+          },
+          positive: function() {
+            return this.parsed.positive().output(this.output);
+          },
+          negative: function() {
+            return this.parsed.negative().output(this.output);
+          },
+          nonzero: function() {
+            return this.parsed.nonzero().output(this.output);
+          },
+          min: function() {
+            return this.parsed.min().output(this.output);
+          },
+          max: function() {
+            return this.parsed.max().output(this.output);
+          },
+          numbers: function() {
+            return this.parsed.numbers().output(this.output);
+          },
+          fractions: function() {
+            return this.parsed.fractions().output(this.output);
+          },
+          normalize: function() {
+            return this.parsed.normalize(this.transform, this.output).output(this.output);
+          },
+          compact: function() {
+            return this.parsed.compact(this.transform).output(this.output);
+          },
+          expand: function() {
+            return this.parsed.expand(this.transform).output(this.output);
+          },
+          filter: function() {
+            return this.parsed.filter(this.transform).output(this.output);
+          },
+          sorted: function() {
+            return this.parsed.sort(this.sort).output(this.output);
+          },
+          add: function() {
+            return this.parsed.add(this.addend, this.addendScale).output(this.output);
+          },
+          sub: function() {
+            return this.parsed.sub(this.subtrahend, this.subtrahendScale).output(this.output);
+          },
+          scaled: function() {
+            return this.parsed.scale(this.scale).output(this.output);
+          },
+          scaledTo: function() {
+            return this.parsed.scaleTo(this.scaleTo, this.rangeDelta).output(this.output);
+          },
+          converted: function() {
+            var units = this.convertUnit + (this.convertRate ? '/' + this.convertRate : '');
+            var result = this.parsed.convert(units);
+            return result ? this.output.range(result) : '';
+          },
+          hasRates: function() {
+            return this.parsed.hasRates;
+          },
+          conversionsByClass: function() {
+            var conversions = this.parsed.conversions(this.transform);
+            var ranges = conversions.ranges;
+            var byClass = {};
+            for (var i = 0; i < ranges.length; i++) {
+              var range = ranges[ i ];
+              var className = range.min.group ? range.min.group.parent.name : 'Classless';
+              var rateName = range.min.rateGroup ? '/' + range.min.rateGroup.parent.name : '';
+              var classKey = className + rateName;
+              var classRanges = byClass[ classKey ];
+              if (!classRanges) {
+                classRanges = byClass[ classKey ] = [];
+              }
+              classRanges.push( this.output.range( range ) );
+            }
+            return byClass;
+          }
+        },
+        created: function() {
+          Unitz.Classes.addDefaults();
+          Unitz.Translations.addDefaults();
+          Unitz.Rates.addDefaults();
+        },
+        mounted: function() {
+          this.parse();
+
+          window.app = this;
+        },
+        methods: {
+          parse: function() {
+            var parsed = Unitz.uz(this.input);
+            this.invalid = !parsed.isValid;
+            if (parsed.isValid) {
+              this.parsed = parsed;
+            }
+          },
+          setInput: function(value) {
+            this.input = value;
+            this.parse();
+          },
+          setActive: function(tab) {
+            this.active = tab;
+          },
+          isActive: function(tab) {
+            return this.active === tab;
+          }
+        },
+        components: {
+          unitzOutput: {
+            props: ['output'],
+            template: '#template_output',
+            data: function() {
+              return {
+                OutputUnit: Unitz.OutputUnit,
+                OutputFormat: Unitz.OutputFormat
+              };
+            }
+          },
+          unitzTransform: {
+            props: ['transform'],
+            template: '#template_transform',
+            data: function() {
+              return {
+                System: Unitz.System
+              };
+            }
+          },
+          unitzSort: {
+            props: ['sort'],
+            template: '#template_sort',
+            data: function() {
+              return {
+                SortType: Unitz.SortType
+              };
+            }
+          },
+          unitzCard: {
+            props: ['usage', 'title', 'description', 'result'],
+            template: '#template_card'
+          },
+          unitzSample: {
+            props: ['input', 'detail'],
+            template: '#template_sample',
+            methods: {
+              choose: function() {
+                this.$emit('chosen', this.input);
+              }
+            }
+          }
+        }
+      });
+    </script>
+  -->
+
+  </body>
+</html>
