@@ -2,7 +2,10 @@
 
 A date & schedule library to use for advanced calendars in TypeScript and JS.
 
+### TypeScript Example
+
 ```typescript
+
 // A monthly calendar around today
 let calendar = Calendar.months<string>();
 
@@ -13,6 +16,14 @@ calendar.addSchedule({
     dayOfWeek: [Weekday.MONDAY],
     hour: [9],
     duration: Duration.minutes(30)
+  })
+});
+
+// Dr. Appointment on 01/04/2018
+calendar.addSchedule({
+  event: 'Dr. Appointment',
+  schedule: new Schedule({
+    on: Day.create(2018, Month.APRIL, 1)
   })
 });
 

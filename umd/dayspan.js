@@ -1133,6 +1133,7 @@ var Schedule_Schedule = (function () {
 
 
 
+
 /**
  * The class which takes user input and parses it to specific structures.
  */
@@ -1164,10 +1165,36 @@ var Parse_Parse = (function () {
         check.input = input;
         return check;
     };
+    Parse.utc = function (input, otherwise) {
+        if (Functions.isNumber(input)) {
+            return input;
+        }
+        if (input instanceof Day_Day) {
+            return input.time;
+        }
+        return otherwise;
+    };
+    Parse.day = function (input) {
+        if (Functions.isNumber(input)) {
+            return Day_Day.utc(input);
+        }
+        if (input instanceof Day_Day) {
+            return input;
+        }
+        return null;
+    };
     Parse.schedule = function (input, out) {
         if (out === void 0) { out = new Schedule_Schedule(); }
-        out.start = Functions.coalesce(input.start, Constants.START_NONE);
-        out.end = Functions.coalesce(input.end, Constants.END_NONE);
+        var on = this.day(input.on);
+        if (on) {
+            input.start = on.start();
+            input.end = on.end(false);
+            input.year = [on.year];
+            input.month = [on.month];
+            input.dayOfMonth = [on.dayOfMonth];
+        }
+        out.start = this.utc(input.start, Constants.START_NONE);
+        out.end = this.utc(input.end, Constants.END_NONE);
         out.duration = Functions.coalesce(input.duration, Constants.DURATION_NONE);
         out.exclude = Functions.coalesce(input.exclude, []);
         out.dayOfWeek = this.frequency(input.dayOfWeek);

@@ -9,8 +9,9 @@ import { Parse } from './Parse';
 
 export interface ScheduleInput
 {
-  start?: number;
-  end?: number;
+  start?: number | Day;
+  end?: number | Day;
+  on?: number | Day;
   duration?: number;
   exclude?: number[];
   dayOfWeek?: FrequencyValue;

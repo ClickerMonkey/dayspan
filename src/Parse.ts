@@ -3,6 +3,7 @@ import { Functions as fn } from './Functions';
 import { FrequencyCheck } from './Types';
 import { Schedule, ScheduleInput } from './Schedule';
 import { Constants } from './Constants';
+import { Day } from './Day';
 
 
 /**
@@ -45,10 +46,51 @@ export class Parse
     return check;
   }
 
+  public static utc(input: any, otherwise: number): number
+  {
+    if (fn.isNumber(input))
+    {
+      return input;
+    }
+
+    if (input instanceof Day)
+    {
+      return input.time;
+    }
+
+    return otherwise;
+  }
+
+  public static day(input: any): Day
+  {
+    if (fn.isNumber(input))
+    {
+      return Day.utc( input );
+    }
+
+    if (input instanceof Day)
+    {
+      return input;
+    }
+
+    return null;
+  }
+
   public static schedule(input: ScheduleInput, out: Schedule = new Schedule()): Schedule
   {
-    out.start = fn.coalesce( input.start, Constants.START_NONE );
-    out.end = fn.coalesce( input.end, Constants.END_NONE );
+    let on = this.day( input.on );
+
+    if (on)
+    {
+      input.start = on.start();
+      input.end = on.end(false);
+      input.year = [on.year];
+      input.month = [on.month];
+      input.dayOfMonth = [on.dayOfMonth];
+    }
+
+    out.start = this.utc( input.start, Constants.START_NONE );
+    out.end = this.utc( input.end, Constants.END_NONE );
     out.duration = fn.coalesce( input.duration, Constants.DURATION_NONE );
     out.exclude = fn.coalesce( input.exclude, [] );
     out.dayOfWeek = this.frequency( input.dayOfWeek );
