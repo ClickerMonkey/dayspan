@@ -14,17 +14,23 @@ export interface ScheduleInput
   on?: number | Day;
   duration?: number;
   exclude?: number[];
+  minute?: FrequencyValue;
+  hour?: FrequencyValue;
+  month?: FrequencyValue;
+  year?: FrequencyValue;
+  week?: FrequencyValue;
   dayOfWeek?: FrequencyValue;
   dayOfMonth?: FrequencyValue;
   dayOfYear?: FrequencyValue;
-  month?: FrequencyValue;
   weekOfYear?: FrequencyValue;
+  weekspanOfYear?: FrequencyValue;
+  fullWeekOfYear?: FrequencyValue;
   weekOfMonth?: FrequencyValue;
-  year?: FrequencyValue;
-  hour?: FrequencyValue;
-  minute?: FrequencyValue;
+  weekspanOfMonth?: FrequencyValue;
+  fullWeekOfMonth?: FrequencyValue;
 }
 
+export type ScheduleExclusions = { [dayIdentifier: number]: boolean };
 
 export class Schedule
 {
@@ -32,13 +38,18 @@ export class Schedule
   public start: number;
   public end: number;
   public duration: number;
-  public exclude: number[];
+  public exclude: ScheduleExclusions;
   public dayOfWeek: FrequencyCheck;
   public dayOfMonth: FrequencyCheck;
   public dayOfYear: FrequencyCheck;
   public month: FrequencyCheck;
+  public week: FrequencyCheck;
   public weekOfYear: FrequencyCheck;
+  public weekspanOfYear: FrequencyCheck;
+  public fullWeekOfYear: FrequencyCheck;
   public weekOfMonth: FrequencyCheck;
+  public weekspanOfMonth: FrequencyCheck;
+  public fullWeekOfMonth: FrequencyCheck;
   public year: FrequencyCheck;
   public hour: FrequencyCheck;
   public minute: number;
@@ -90,16 +101,32 @@ export class Schedule
       (this.end === Constants.END_NONE || end.time < this.end + this.duration);
   }
 
+  public isExcluded(day: Day): boolean
+  {
+    return !!this.exclude[ day.dayIdentifier ];
+  }
+
+  public isIncluded(day: Day): boolean
+  {
+    return !this.exclude[ day.dayIdentifier ];
+  }
+
   public matchesDay(day: Day): boolean
   {
-    return this.matchesSpan( day ) &&
+    return this.isIncluded( day ) &&
+      this.matchesSpan( day ) &&
       this.dayOfWeek( day.dayOfWeek ) &&
       this.dayOfMonth( day.dayOfMonth ) &&
       this.dayOfYear( day.dayOfYear ) &&
+      this.year( day.year ) &&
       this.month( day.month ) &&
+      this.week( day.week ) &&
       this.weekOfYear( day.weekOfYear ) &&
+      this.weekspanOfYear( day.weekspanOfYear ) &&
+      this.fullWeekOfYear( day.fullWeekOfYear ) &&
       this.weekOfMonth( day.weekOfMonth ) &&
-      this.year( day.year );
+      this.weekspanOfMonth( day.weekspanOfMonth ) &&
+      this.fullWeekOfMonth( day.fullWeekOfMonth );
   }
 
   /**

@@ -1,5 +1,6 @@
 
 import { Day } from './Day';
+import { Op } from './Op';
 
 
 export class DaySpan {
@@ -17,7 +18,7 @@ export class DaySpan {
   }
 
   public contains(day: Day): boolean {
-    return day.time >= this.start.time && day.time < this.end.time;
+    return day.time >= this.start.time && day.time <= this.end.time;
   }
 
   public matchesDay(day: Day): boolean {
@@ -36,22 +37,44 @@ export class DaySpan {
     return this.contains( day ) || day.sameYear( this.start ) || day.sameYear( this.end );
   }
 
-  public days(partialDays: boolean = true, absolute: boolean = true, round: boolean = true): number {
-    return this.start.daysBetween(this.end, partialDays, absolute, round);
+
+  public millis(op: Op = Op.DOWN, absolute: boolean = true): number {
+    return this.start.millisBetween(this.end, op, absolute);
   }
 
-  public hours(partialHours: boolean = true, absolute: boolean = true, round: boolean = true): number {
-    return this.start.hoursBetween(this.end, partialHours, absolute, round);
+  public seconds(op: Op = Op.DOWN, absolute: boolean = true): number {
+    return this.start.secondsBetween(this.end, op, absolute);
   }
 
-  public weeks(partialWeeks: boolean = true, absolute: boolean = true, round: boolean = true): number {
-    return this.start.weeksBetween(this.end, partialWeeks, absolute, round);
+  public minutes(op: Op = Op.DOWN, absolute: boolean = true): number {
+    return this.start.minutesBetween(this.end, op, absolute);
   }
+
+  public hours(op: Op = Op.DOWN, absolute: boolean = true): number {
+    return this.start.hoursBetween(this.end, op, absolute);
+  }
+
+  public days(op: Op = Op.DOWN, absolute: boolean = true): number {
+    return this.start.daysBetween(this.end, op, absolute);
+  }
+
+  public weeks(op: Op = Op.DOWN, absolute: boolean = true): number {
+    return this.start.weeksBetween(this.end, op, absolute);
+  }
+
+  public months(op: Op = Op.DOWN, absolute: boolean = true): number {
+    return this.start.monthsBetween(this.end, op, absolute);
+  }
+
+  public years(op: Op = Op.DOWN, absolute: boolean = true): number {
+    return this.start.yearsBetween(this.end, op, absolute);
+  }
+
 
   public intersects(span: DaySpan): boolean {
     return !(
       this.end.time < span.start.time ||
-      this.start.time >= span.end.time
+      this.start.time > span.end.time
     );
   }
 
@@ -59,7 +82,7 @@ export class DaySpan {
     let start: number = Math.max(this.start.time, span.start.time);
     let end: number = Math.min(this.end.time, span.end.time);
 
-    return start >= end ? null : new DaySpan(Day.utc(start), Day.utc(end));
+    return start >= end ? null : new DaySpan(Day.unix(start), Day.unix(end));
   }
 
   public static point(day: Day): DaySpan {

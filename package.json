@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A date & schedule library to use for advanced calendars in TypeScript and JS",
   "main": "umd/dayspan.js",
+  "mainName": "ds",
   "module": "lib/index.js",
   "es2015": "lib-esm/index.js",
   "typings": "typings/index.d.ts",
@@ -71,6 +72,11 @@
       "<rootDir>/umd/",
       "<rootDir>/src/.*(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$"
     ],
+    "globals": {
+      "ts-jest": {
+        "skipBabel": true
+      }
+    },
     "coverageThreshold": {
       "global": {
         "branches": 80,
@@ -81,7 +87,8 @@
     }
   },
   "dependencies": {
-    "jest-cli": "22.4.3"
+    "jest-cli": "22.4.3",
+    "moment": "2.22.1"
   },
   "devDependencies": {
     "@types/jest": "20.0.2",
@@ -105,7 +112,7 @@
     "tslint-react": "3.0.0",
     "typedoc": "0.7.1",
     "typescript": "2.4.1",
-    "uglify-js": "git://github.com/mishoo/UglifyJS2#harmony-v2.8.22",
+    "uglify-js": "git://github.com/mishoo/UglifyJS2.git#harmony-v2.8.22",
     "uglifyjs-webpack-plugin": "0.4.5",
     "validate-commit-msg": "2.12.2",
     "webpack": "3.0.0",

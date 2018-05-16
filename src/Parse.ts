@@ -1,7 +1,7 @@
 
 import { Functions as fn } from './Functions';
 import { FrequencyCheck } from './Types';
-import { Schedule, ScheduleInput } from './Schedule';
+import { Schedule, ScheduleInput, ScheduleExclusions } from './Schedule';
 import { Constants } from './Constants';
 import { Day } from './Day';
 
@@ -65,15 +65,52 @@ export class Parse
   {
     if (fn.isNumber(input))
     {
-      return Day.utc( input );
+      return Day.unix( input );
     }
-
-    if (input instanceof Day)
+    else if (fn.isString(input))
+    {
+      return Day.parse( input );
+    }
+    else if (input instanceof Day)
     {
       return input;
     }
+    else if (fn.isArray( input ))
+    {
+      return Day.fromArray( input );
+    }
+    else if (fn.isObject( input ))
+    {
+      return Day.fromObject( input );
+    }
+    else if (input === true)
+    {
+      return Day.today();
+    }
 
     return null;
+  }
+
+  public static exclusions(input: any): ScheduleExclusions
+  {
+    let exclusions: ScheduleExclusions = {};
+
+    if (fn.isArray(input))
+    {
+      for (let dayIdentifier of input)
+      {
+        if (fn.isNumber(dayIdentifier))
+        {
+          exclusions[ dayIdentifier ] = true;
+        }
+        else if (dayIdentifier instanceof Day)
+        {
+          exclusions[ dayIdentifier.dayIdentifier ] = true;
+        }
+      }
+    }
+
+    return exclusions;
   }
 
   public static schedule(input: ScheduleInput, out: Schedule = new Schedule()): Schedule
@@ -97,13 +134,24 @@ export class Parse
     out.dayOfMonth = this.frequency( input.dayOfMonth );
     out.dayOfYear = this.frequency( input.dayOfYear );
     out.month = this.frequency( input.month );
+    out.week = this.frequency( input.week );
     out.weekOfYear = this.frequency( input.weekOfYear );
+    out.weekspanOfYear = this.frequency( input.weekspanOfYear );
+    out.fullWeekOfYear = this.frequency( input.fullWeekOfYear );
     out.weekOfMonth = this.frequency( input.weekOfMonth );
+    out.weekspanOfMonth = this.frequency( input.weekspanOfMonth );
+    out.fullWeekOfMonth = this.frequency( input.fullWeekOfMonth );
     out.year = this.frequency( input.year );
     out.hour = this.frequency( input.hour, Constants.HOURS_IN_DAY );
     out.minute = fn.coalesce( input.minute, Constants.MINUTE_MIN );
+    out.exclude = this.exclusions( input.exclude );
     out.refreshHours();
 
+    return out;
+  }
+
+  public static cron(pattern: string, out: Schedule = new Schedule()): Schedule
+  {
     return out;
   }
 

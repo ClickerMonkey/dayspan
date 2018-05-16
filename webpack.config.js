@@ -6,7 +6,7 @@ const { getIfUtils, removeEmpty } = require('webpack-config-utils')
 const packageJSON = require('./package.json')
 const packageName = normalizePackageName(packageJSON.name)
 
-const LIB_NAME = pascalCase(packageName)
+const LIB_NAME = packageJSON.mainName;
 const PATHS = {
   entryPoint: resolve(__dirname, 'src/index.ts'),
   umd: resolve(__dirname, 'umd'),
@@ -17,12 +17,12 @@ const PATHS = {
 const DEFAULT_ENV = 'dev'
 
 const EXTERNALS = {
-  // lodash: {
-  //   commonjs: "lodash",
-  //   commonjs2: "lodash",
-  //   amd: "lodash",
-  //   root: "_"
-  // }
+  moment: {
+    commonjs: "moment",
+    commonjs2: "moment",
+    amd: "moment",
+    root: "moment"
+  }
 }
 
 const RULES = {

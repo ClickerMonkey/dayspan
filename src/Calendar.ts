@@ -2,7 +2,7 @@
 import { Day } from './Day';
 import { DaySpan } from './DaySpan';
 import { Schedule } from './Schedule';
-import { Constants } from './Constants';
+import { Op } from './Op';
 
 
 export type CalendarMover = (day: Day, amount: number) => Day;
@@ -89,10 +89,12 @@ export class Calendar<T>
 {
 
   public span: DaySpan;
+  public filled: DaySpan;
   public length: number;
   public type: CalendarType;
   public size: number;
-  public mover: CalendarMover;
+  public moveStart: CalendarMover;
+  public moveEnd: CalendarMover;
   public fill: boolean;
 
   public repeatCovers: boolean = true;
@@ -103,12 +105,14 @@ export class Calendar<T>
   public days: CalendarDay<T>[] = [];
   public schedules: CalendarSchedule<T>[] = [];
 
-  public constructor(start: Day, end: Day, type: CalendarType, size: number, mover: CalendarMover, fill: boolean)
+  public constructor(start: Day, end: Day, type: CalendarType, size: number, moveStart: CalendarMover, moveEnd: CalendarMover, fill: boolean)
   {
     this.span = new DaySpan(start, end);
+    this.filled = new DaySpan(start, end);
     this.type = type;
     this.size = size;
-    this.mover = mover;
+    this.moveStart = moveStart;
+    this.moveEnd = moveEnd;
     this.fill = fill;
     this.refresh();
   }
@@ -133,19 +137,50 @@ export class Calendar<T>
     this.span.end = day;
   }
 
-  public fillStart(): Day
+/*
+  public summary(short: boolean, repeat: boolean, contextual: boolean): string
   {
-    return this.fill ? this.start.startOfWeek() : this.start;
-  }
+    let start: Day = this.start;
+    let end: Day = this.end;
 
-  public fillEnd(): Day
+    switch (this.type) {
+      case CalendarType.DAY:
+        if (this.size === 1) {
+          let format: string = short ? ()
+        }
+        break;
+      case CalendarType.WEEK:
+
+        break;
+      case CalendarType.MONTH:
+
+        break;
+      case CalendarType.YEAR:
+
+        break;
+    }
+  }
+*/
+
+  public split(by: number = 1): Calendar<T>[]
   {
-    return this.fill ? this.end.endOfWeek(false) : this.end;
+    let split: Calendar<T>[] = [];
+    let start: Day = this.start;
+    let end: Day = this.moveEnd( this.end, by - this.size );
+
+    for (let i = 0; i < this.size; i++)
+    {
+      split.push(new Calendar<T>(start, end, this.type, by, this.moveStart, this.moveEnd, this.fill));
+      start = this.moveStart( start, by );
+      end = this.moveEnd( end, by );
+    }
+
+    return split;
   }
 
   public refresh(today: Day = Day.today()): this
   {
-    this.length = this.span.days();
+    this.length = this.span.days(Op.UP, true);
     this.resetDays();
     this.refreshCurrent(today);
     this.refreshSelection();
@@ -154,33 +189,40 @@ export class Calendar<T>
     return this;
   }
 
+  public resetFilled(): this
+  {
+    this.filled.start = this.fill ? this.start.startOfWeek() : this.start;
+    this.filled.end = this.fill ? this.end.endOfWeek() : this.end;
+
+    return this;
+  }
+
   public resetDays(): this
   {
+    this.resetFilled();
+
     let days: CalendarDay<T>[] = this.days;
-    let start: Day = this.fillStart();
-    let end: Day = this.fillEnd();
-    let total: number = start.daysBetween(end);
+    let filled: DaySpan = this.filled;
+    let current: Day = filled.start;
+    let total: number = filled.days(Op.UP);
 
     if (days.length !== total)
     {
       days.length = total;
     }
 
-    let time: number = start.time;
-
     for (let i = 0; i < total; i++)
     {
       let day: CalendarDay<T> = days[ i ];
 
-      if (!day || day.time !== time)
+      if (!day || !day.sameDay( current ))
       {
-        day = new CalendarDay<T>( new Date( time ) );
-        days[ i ] = day;
+        day = days[ i ] = new CalendarDay<T>( current.date );
       }
 
       day.inCalendar = this.span.contains( day );
 
-      time += Constants.MILLIS_IN_DAY;
+      current = current.next();
     }
 
     return this;
@@ -367,8 +409,8 @@ export class Calendar<T>
 
   public move(jump: number = this.size): this
   {
-    this.start = this.mover( this.start, jump );
-    this.end = this.mover( this.end, jump );
+    this.start = this.moveStart( this.start, jump );
+    this.end = this.moveEnd( this.end, jump );
     this.refresh();
 
     return this;
@@ -387,37 +429,54 @@ export class Calendar<T>
   public static days<T>(days: number = 1, around: Day = Day.today(), focus: number = 0.4999): Calendar<T>
   {
     let start: Day = around.start().relativeDays( -Math.floor( days * focus ) );
-    let end: Day = start.relativeDays( days );
+    let end: Day = start.relativeDays( days - 1 ).end();
     let mover: CalendarMover = (day, amount) => day.relativeDays(amount);
 
-    return new Calendar(start, end, CalendarType.DAY, days, mover, false);
+    return new Calendar(start, end, CalendarType.DAY, days, mover, mover, false);
   }
 
   public static weeks<T>(weeks: number = 1, around: Day = Day.today(), focus: number = 0.4999): Calendar<T>
   {
     let start: Day = around.start().startOfWeek().relativeWeeks( -Math.floor( weeks * focus ) );
-    let end: Day = start.relativeWeeks( weeks );
+    let end: Day = start.relativeWeeks( weeks - 1 ).endOfWeek();
     let mover: CalendarMover = (day, amount) => day.relativeWeeks(amount);
 
-    return new Calendar(start, end, CalendarType.WEEK, weeks, mover, false);
+    return new Calendar(start, end, CalendarType.WEEK, weeks, mover, mover, false);
   }
 
   public static months<T>(months: number = 1, around: Day = Day.today(), focus: number = 0.4999, fill: boolean = true): Calendar<T>
   {
     let start: Day = around.start().startOfMonth().relativeMonths( -Math.floor( months * focus ) );
-    let end: Day = start.relativeMonths( months );
-    let mover: CalendarMover = (day, amount) => day.relativeMonths(amount);
+    let end: Day = start.relativeMonths( months - 1 ).endOfMonth();
+    let moveStart: CalendarMover = (day, amount) => day.relativeMonths(amount);
+    let moveEnd: CalendarMover = (day, amount) => day.startOfMonth().relativeMonths(amount).endOfMonth();
 
-    return new Calendar(start, end, CalendarType.MONTH, months, mover, fill);
+    return new Calendar(start, end, CalendarType.MONTH, months, moveStart, moveEnd, fill);
   }
 
   public static years<T>(years: number = 1, around: Day = Day.today(), focus: number = 0.4999, fill: boolean = true): Calendar<T>
   {
     let start: Day = around.start().startOfMonth().relativeMonths( -Math.floor( years * focus ) );
-    let end: Day = start.relativeMonths( years );
+    let end: Day = start.relativeMonths( years - 1 ).endOfYear();
     let mover: CalendarMover = (day, amount) => day.relativeYears(amount);
 
-    return new Calendar(start, end, CalendarType.YEAR, years, mover, fill);
+    return new Calendar(start, end, CalendarType.YEAR, years, mover, mover, fill);
   }
+
+  // [type][short]
+  public static SUMMARY_FORMATS = {
+    [CalendarType.DAY]: (short: boolean, dayOfWeek: boolean, year: boolean) => {
+      return (dayOfWeek ? (short ? 'ddd, ' : 'dddd, ') : '') + (short ? 'MMM ' : 'MMMM ') + 'Do' + (year ? ' YYYY' : '');
+    },
+    [CalendarType.WEEK]: (short: boolean, dayOfWeek: boolean, year: boolean) => {
+
+    },
+    [CalendarType.MONTH]: (short: boolean, dayOfWeek: boolean, year: boolean) => {
+      return (short ? 'MMM' : 'MMMM') + (year ? ' YYYY' : '');
+    },
+    [CalendarType.YEAR]: (short: boolean, dayOfWeek: boolean, year: boolean) => {
+      return (year ? 'YYYY' : '');
+    }
+  };
 
 }

@@ -3,8 +3,8 @@ import { Schedule } from '../Schedule';
 import { Weekday } from '../Weekday';
 import { Month } from '../Month';
 import { Day } from '../Day';
-import { Constants } from '../Constants';
 import { Calendar } from '../Calendar';
+import { Duration } from '../Duration';
 
 
 describe('Calendar', () => {
@@ -69,7 +69,7 @@ describe('Calendar', () => {
       schedule: new Schedule({
         dayOfWeek: [Weekday.MONDAY],
         hour: [9],
-        duration: Constants.MILLIS_IN_MINUTE * 30
+        duration: Duration.minutes(30)
       })
     });
 

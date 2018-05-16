@@ -20,8 +20,8 @@ describe('Day', () => {
 
   it('between day', () => {
 
-    let d0 = Day.utc(0);
-    let d1 = Day.utc(cs.MILLIS_IN_DAY);
+    let d0 = Day.unix(0);
+    let d1 = Day.unix(cs.MILLIS_IN_DAY);
 
     expect( d0.millisBetween(d1) ).toBe( cs.MILLIS_IN_DAY );
     expect( d0.daysBetween(d1) ).toBe( 1 );
@@ -31,8 +31,8 @@ describe('Day', () => {
 
   it('between week', () => {
 
-    let d0 = Day.utc(0);
-    let d1 = Day.utc(cs.MILLIS_IN_WEEK);
+    let d0 = Day.unix(0);
+    let d1 = Day.unix(cs.MILLIS_IN_WEEK);
 
     expect( d0.millisBetween(d1) ).toBe( cs.MILLIS_IN_WEEK );
     expect( d0.daysBetween(d1) ).toBe( 7 );
