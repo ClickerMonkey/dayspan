@@ -1,6 +1,7 @@
 
 import { Day } from './Day';
 import { Op } from './Op';
+import { Units } from './Units';
 
 
 export class DaySpan {
@@ -70,6 +71,33 @@ export class DaySpan {
     return this.start.yearsBetween(this.end, op, absolute);
   }
 
+  public summary(type: Units, dayOfWeek: boolean = true, short: boolean = false, repeat: boolean = false, contextual: boolean = true, delimiter: string = ' - '): string
+  {
+    let formats = DaySpan.SUMMARY_FORMATS[ type ];
+    let today: Day = Day.today();
+    let showStartYear: boolean = !contextual || !this.start.sameYear( today );
+    let showEndYear: boolean = !contextual || !this.end.sameYear( today );
+    let start: string = this.start.format( formats(short, dayOfWeek, showStartYear) );
+    let end: string = this.end.format( formats(short, dayOfWeek, showEndYear) );
+    let summary: string = start;
+
+    if (start !== end)
+    {
+      if (!repeat)
+      {
+        summary = this.start.format( formats(short, dayOfWeek, !this.start.sameYear(this.end)) );
+      }
+
+      summary += delimiter;
+      summary += end;
+    }
+    else
+    {
+      summary = start;
+    }
+
+    return summary;
+  }
 
   public intersects(span: DaySpan): boolean {
     return !(
@@ -88,5 +116,22 @@ export class DaySpan {
   public static point(day: Day): DaySpan {
     return new DaySpan( day, day );
   }
+
+
+  public static SUMMARY_FORMATS =
+  {
+    [Units.DAY]: (short: boolean, dayOfWeek: boolean, year: boolean) => {
+      return (dayOfWeek ? (short ? 'ddd, ' : 'dddd, ') : '') + (short ? 'MMM ' : 'MMMM ') + 'Do' + (year ? ' YYYY' : '');
+    },
+    [Units.WEEK]: (short: boolean, dayOfWeek: boolean, year: boolean) => {
+      return (dayOfWeek ? (short ? 'ddd, ' : 'dddd, ') : '') + (short ? 'MMM ' : 'MMMM ') + 'Do' + (year ? ' YYYY' : '');
+    },
+    [Units.MONTH]: (short: boolean, dayOfWeek: boolean, year: boolean) => {
+      return (short ? 'MMM' : 'MMMM') + (year ? ' YYYY' : '');
+    },
+    [Units.YEAR]: (short: boolean, dayOfWeek: boolean, year: boolean) => {
+      return (year ? 'YYYY' : '');
+    }
+  };
 
 }

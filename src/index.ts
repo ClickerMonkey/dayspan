@@ -11,4 +11,5 @@ export * from './Parse';
 export * from './Schedule';
 export * from './Suffix';
 export * from './Types';
+export * from './Units';
 export * from './Weekday';

@@ -32,6 +32,7 @@ export interface ScheduleInput
 
 export type ScheduleExclusions = { [dayIdentifier: number]: boolean };
 
+
 export class Schedule
 {
 
@@ -245,6 +246,33 @@ export class Schedule
       }
     }
     return spans;
+  }
+
+  public getSpanOver(day: Day): DaySpan
+  {
+    let start: Day = day.start();
+
+    if (this.isFullDay())
+    {
+      return DaySpan.point(start);
+    }
+    else
+    {
+      let behind: number = this.durationInDays();
+
+      while (behind >= 0)
+      {
+        if (this.matchesDay(day))
+        {
+          return DaySpan.point(day);
+        }
+
+        day = day.prev();
+        behind--;
+      }
+    }
+
+    return null;
   }
 
   public getSpansOn(day: Day, check: boolean = false): DaySpan[]

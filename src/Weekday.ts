@@ -11,12 +11,4 @@ export class Weekday
   public static FRIDAY: number = 5;
   public static SATURDAY: number = 6;
 
-  public static NAMES: string[] = [
-    'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
-  ];
-
-  public static CODES: string[] = [
-    'Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat'
-  ];
-  
 }

@@ -87,6 +87,70 @@ module.exports = __webpack_require__(1);
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
+// CONCATENATED MODULE: ./src/Functions.ts
+
+/**
+ * The class which contains commonly used functions by the library. These
+ * functions and variables exist in a class so they may be overridden if
+ * desired.
+ */
+var Functions = (function () {
+    function Functions() {
+    }
+    /**
+     * Determines whether the given input is an array.
+     *
+     * @param input The variable to test.
+     * @return True if the variable is an array, otherwise false.
+     */
+    Functions.isArray = function (input) {
+        return input instanceof Array;
+    };
+    /**
+     * Determines whether the given input is a string.
+     *
+     * @param input The variable to test.
+     * @return True if the variable is a string, otherwise false.
+     */
+    Functions.isString = function (input) {
+        return typeof (input) === 'string';
+    };
+    Functions.isNumber = function (input) {
+        return isFinite(input);
+    };
+    Functions.isObject = function (input) {
+        return !this.isArray(input) && typeof (input) === 'object';
+    };
+    /**
+     * Determines whether the given input is defined.
+     *
+     * @param input The variable to test.
+     * @return True if the variable is defined, otherwise false.
+     */
+    Functions.isDefined = function (input) {
+        return typeof (input) !== 'undefined';
+    };
+    Functions.isFrequencyValueEvery = function (input) {
+        return this.isObject(input) && this.isNumber(input.every);
+    };
+    Functions.isFrequencyValueOneOf = function (input) {
+        return this.isArray(input) && input.length > 0;
+    };
+    /**
+     * Returns the first argument which is defined.
+     *
+     * @param a The first argument to look at.
+     * @param b The second argument to look at.
+     * @return The first defined argument.
+     * @see [[Functions.isDefined]]
+     */
+    Functions.coalesce = function (a, b, c) {
+        return this.isDefined(a) ? a : (this.isDefined(b) ? b : c);
+    };
+    return Functions;
+}());
+
+
 // CONCATENATED MODULE: ./src/Constants.ts
 
 var Constants = (function () {
@@ -165,6 +229,7 @@ function operate(value, op, absolute) {
 
 
 
+// @ts-ignore
 
 var Day_Day = (function () {
     function Day(date) {
@@ -608,7 +673,18 @@ var Day_Day = (function () {
 }());
 
 
+// CONCATENATED MODULE: ./src/Units.ts
+
+var Units;
+(function (Units) {
+    Units[Units["DAY"] = 0] = "DAY";
+    Units[Units["WEEK"] = 1] = "WEEK";
+    Units[Units["MONTH"] = 2] = "MONTH";
+    Units[Units["YEAR"] = 3] = "YEAR";
+})(Units = Units || (Units = {}));
+
 // CONCATENATED MODULE: ./src/DaySpan.ts
+
 
 
 
@@ -679,6 +755,31 @@ var DaySpan_DaySpan = (function () {
         if (absolute === void 0) { absolute = true; }
         return this.start.yearsBetween(this.end, op, absolute);
     };
+    DaySpan.prototype.summary = function (type, dayOfWeek, short, repeat, contextual, delimiter) {
+        if (dayOfWeek === void 0) { dayOfWeek = true; }
+        if (short === void 0) { short = false; }
+        if (repeat === void 0) { repeat = false; }
+        if (contextual === void 0) { contextual = true; }
+        if (delimiter === void 0) { delimiter = ' - '; }
+        var formats = DaySpan.SUMMARY_FORMATS[type];
+        var today = Day_Day.today();
+        var showStartYear = !contextual || !this.start.sameYear(today);
+        var showEndYear = !contextual || !this.end.sameYear(today);
+        var start = this.start.format(formats(short, dayOfWeek, showStartYear));
+        var end = this.end.format(formats(short, dayOfWeek, showEndYear));
+        var summary = start;
+        if (start !== end) {
+            if (!repeat) {
+                summary = this.start.format(formats(short, dayOfWeek, !this.start.sameYear(this.end)));
+            }
+            summary += delimiter;
+            summary += end;
+        }
+        else {
+            summary = start;
+        }
+        return summary;
+    };
     DaySpan.prototype.intersects = function (span) {
         return !(this.end.time < span.start.time ||
             this.start.time > span.end.time);
@@ -691,453 +792,24 @@ var DaySpan_DaySpan = (function () {
     DaySpan.point = function (day) {
         return new DaySpan(day, day);
     };
+    DaySpan.SUMMARY_FORMATS = (DaySpan__a = {},
+        DaySpan__a[Units.DAY] = function (short, dayOfWeek, year) {
+            return (dayOfWeek ? (short ? 'ddd, ' : 'dddd, ') : '') + (short ? 'MMM ' : 'MMMM ') + 'Do' + (year ? ' YYYY' : '');
+        },
+        DaySpan__a[Units.WEEK] = function (short, dayOfWeek, year) {
+            return (dayOfWeek ? (short ? 'ddd, ' : 'dddd, ') : '') + (short ? 'MMM ' : 'MMMM ') + 'Do' + (year ? ' YYYY' : '');
+        },
+        DaySpan__a[Units.MONTH] = function (short, dayOfWeek, year) {
+            return (short ? 'MMM' : 'MMMM') + (year ? ' YYYY' : '');
+        },
+        DaySpan__a[Units.YEAR] = function (short, dayOfWeek, year) {
+            return (year ? 'YYYY' : '');
+        },
+        DaySpan__a);
     return DaySpan;
 }());
 
-
-// CONCATENATED MODULE: ./src/Calendar.ts
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-
-
-var CalendarType;
-(function (CalendarType) {
-    CalendarType[CalendarType["DAY"] = 0] = "DAY";
-    CalendarType[CalendarType["WEEK"] = 1] = "WEEK";
-    CalendarType[CalendarType["MONTH"] = 2] = "MONTH";
-    CalendarType[CalendarType["YEAR"] = 3] = "YEAR";
-})(CalendarType = CalendarType || (CalendarType = {}));
-var CalendarDay = (function (_super) {
-    __extends(CalendarDay, _super);
-    function CalendarDay() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.events = [];
-        return _this;
-    }
-    CalendarDay.prototype.updateCurrent = function (current) {
-        this.currentDay = this.sameDay(current);
-        this.currentWeek = this.sameWeek(current);
-        this.currentMonth = this.sameMonth(current);
-        this.currentYear = this.sameYear(current);
-        return this;
-    };
-    CalendarDay.prototype.updateSelected = function (selected) {
-        this.selectedDay = selected.matchesDay(this);
-        this.selectedWeek = selected.matchesWeek(this);
-        this.selectedMonth = selected.matchesMonth(this);
-        this.selectedYear = selected.matchesYear(this);
-        return this;
-    };
-    CalendarDay.prototype.clearSelected = function () {
-        this.selectedDay = this.selectedWeek = this.selectedMonth = this.selectedYear = false;
-        return this;
-    };
-    return CalendarDay;
-}(Day_Day));
-
-var CalendarEvent = (function () {
-    function CalendarEvent(event, schedule, time, actualDay) {
-        this.event = event;
-        this.schedule = schedule;
-        this.time = time;
-        this.fullDay = time.isPoint;
-        this.covers = time.start.sameDay(actualDay);
-    }
-    return CalendarEvent;
-}());
-
-var Calendar_Calendar = (function () {
-    function Calendar(start, end, type, size, moveStart, moveEnd, fill) {
-        this.repeatCovers = true;
-        this.listTimes = false;
-        this.eventsOutside = false;
-        this.selection = null;
-        this.days = [];
-        this.schedules = [];
-        this.span = new DaySpan_DaySpan(start, end);
-        this.filled = new DaySpan_DaySpan(start, end);
-        this.type = type;
-        this.size = size;
-        this.moveStart = moveStart;
-        this.moveEnd = moveEnd;
-        this.fill = fill;
-        this.refresh();
-    }
-    Object.defineProperty(Calendar.prototype, "start", {
-        get: function () {
-            return this.span.start;
-        },
-        set: function (day) {
-            this.span.start = day;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Calendar.prototype, "end", {
-        get: function () {
-            return this.span.end;
-        },
-        set: function (day) {
-            this.span.end = day;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Calendar.prototype.fillStart = function () {
-        return this.fill ? this.start.startOfWeek() : this.start;
-    };
-    Calendar.prototype.fillEnd = function () {
-        return this.fill ? this.end.endOfWeek() : this.end;
-    };
-    Calendar.prototype.refresh = function (today) {
-        if (today === void 0) { today = Day_Day.today(); }
-        this.length = this.span.days(Op.UP, true);
-        this.resetDays();
-        this.refreshCurrent(today);
-        this.refreshSelection();
-        this.refreshEvents();
-        return this;
-    };
-    Calendar.prototype.resetFilled = function () {
-        this.filled.start = this.fill ? this.start.startOfWeek() : this.start;
-        this.filled.end = this.fill ? this.end.endOfWeek() : this.end;
-        return this;
-    };
-    Calendar.prototype.resetDays = function () {
-        this.resetFilled();
-        var days = this.days;
-        var filled = this.filled;
-        var current = filled.start;
-        var total = filled.days(Op.UP);
-        if (days.length !== total) {
-            days.length = total;
-        }
-        for (var i = 0; i < total; i++) {
-            var day = days[i];
-            if (!day || !day.sameDay(current)) {
-                day = days[i] = new CalendarDay(current.date);
-            }
-            day.inCalendar = this.span.contains(day);
-            current = current.next();
-        }
-        return this;
-    };
-    Calendar.prototype.refreshCurrent = function (today) {
-        if (today === void 0) { today = Day_Day.today(); }
-        return this.iterateDays(function (d) {
-            d.updateCurrent(today);
-        });
-    };
-    Calendar.prototype.refreshSelection = function () {
-        var _this = this;
-        return this.iterateDays(function (d) {
-            if (_this.selection) {
-                d.updateSelected(_this.selection);
-            }
-            else {
-                d.clearSelected();
-            }
-        });
-    };
-    Calendar.prototype.refreshEvents = function () {
-        var _this = this;
-        return this.iterateDays(function (d) {
-            if (d.inCalendar || _this.eventsOutside) {
-                d.events = _this.eventsForDay(d, _this.listTimes, _this.repeatCovers);
-            }
-        });
-    };
-    Calendar.prototype.iterateDays = function (iterator) {
-        var days = this.days;
-        for (var i = 0; i < days.length; i++) {
-            iterator(days[i]);
-        }
-        return this;
-    };
-    Calendar.prototype.eventsForDay = function (day, getTimes, covers) {
-        if (getTimes === void 0) { getTimes = true; }
-        if (covers === void 0) { covers = true; }
-        var events = [];
-        var allDay = DaySpan_DaySpan.point(day);
-        for (var _i = 0, _a = this.schedules; _i < _a.length; _i++) {
-            var entry = _a[_i];
-            if ((covers && entry.schedule.coversDay(day)) || (!covers && entry.schedule.matchesDay(day))) {
-                if (getTimes) {
-                    var times = covers ?
-                        entry.schedule.getSpansOver(day) :
-                        entry.schedule.getSpansOn(day);
-                    for (var _b = 0, times_1 = times; _b < times_1.length; _b++) {
-                        var time = times_1[_b];
-                        events.push(new CalendarEvent(entry.event, entry.schedule, time, day));
-                    }
-                }
-                else {
-                    events.push(new CalendarEvent(entry.event, entry.schedule, allDay, day));
-                }
-            }
-        }
-        return events;
-    };
-    Calendar.prototype.findSchedule = function (input) {
-        for (var _i = 0, _a = this.schedules; _i < _a.length; _i++) {
-            var schedule = _a[_i];
-            if (schedule === input || schedule.schedule === input || schedule.event === input) {
-                return schedule;
-            }
-        }
-        return null;
-    };
-    Calendar.prototype.removeSchedules = function (schedules, delayRefresh) {
-        if (schedules === void 0) { schedules = null; }
-        if (delayRefresh === void 0) { delayRefresh = false; }
-        if (schedules) {
-            for (var _i = 0, schedules_1 = schedules; _i < schedules_1.length; _i++) {
-                var schedule = schedules_1[_i];
-                this.removeSchedule(schedule, true);
-            }
-        }
-        else {
-            this.schedules = [];
-        }
-        if (!delayRefresh) {
-            this.refreshEvents();
-        }
-        return this;
-    };
-    Calendar.prototype.removeSchedule = function (schedule, delayRefresh) {
-        if (delayRefresh === void 0) { delayRefresh = false; }
-        var found = this.findSchedule(schedule);
-        if (found) {
-            this.schedules.splice(this.schedules.indexOf(found), 1);
-            if (!delayRefresh) {
-                this.refreshEvents();
-            }
-        }
-        return this;
-    };
-    Calendar.prototype.addSchedule = function (schedule, allowDuplicates, delayRefresh) {
-        if (allowDuplicates === void 0) { allowDuplicates = false; }
-        if (delayRefresh === void 0) { delayRefresh = false; }
-        if (!allowDuplicates) {
-            var existing = this.findSchedule(schedule);
-            if (existing) {
-                return this;
-            }
-        }
-        this.schedules.push(schedule);
-        if (!delayRefresh) {
-            this.refreshEvents();
-        }
-        return this;
-    };
-    Calendar.prototype.addSchedules = function (schedules, allowDuplicates, delayRefresh) {
-        if (allowDuplicates === void 0) { allowDuplicates = false; }
-        if (delayRefresh === void 0) { delayRefresh = false; }
-        for (var _i = 0, schedules_2 = schedules; _i < schedules_2.length; _i++) {
-            var schedule = schedules_2[_i];
-            this.addSchedule(schedule, allowDuplicates, true);
-        }
-        if (!delayRefresh) {
-            this.refreshEvents();
-        }
-        return this;
-    };
-    Calendar.prototype.select = function (start, end) {
-        this.selection = end ? new DaySpan_DaySpan(start, end) : DaySpan_DaySpan.point(start);
-        this.refreshSelection();
-        return this;
-    };
-    Calendar.prototype.unselect = function () {
-        this.selection = null;
-        this.refreshSelection();
-        return this;
-    };
-    Calendar.prototype.move = function (jump) {
-        if (jump === void 0) { jump = this.size; }
-        this.start = this.moveStart(this.start, jump);
-        this.end = this.moveEnd(this.end, jump);
-        this.refresh();
-        return this;
-    };
-    Calendar.prototype.next = function (jump) {
-        if (jump === void 0) { jump = this.size; }
-        return this.move(jump);
-    };
-    Calendar.prototype.prev = function (jump) {
-        if (jump === void 0) { jump = this.size; }
-        return this.move(-jump);
-    };
-    Calendar.days = function (days, around, focus) {
-        if (days === void 0) { days = 1; }
-        if (around === void 0) { around = Day_Day.today(); }
-        if (focus === void 0) { focus = 0.4999; }
-        var start = around.start().relativeDays(-Math.floor(days * focus));
-        var end = start.relativeDays(days - 1).end();
-        var mover = function (day, amount) { return day.relativeDays(amount); };
-        return new Calendar(start, end, CalendarType.DAY, days, mover, mover, false);
-    };
-    Calendar.weeks = function (weeks, around, focus) {
-        if (weeks === void 0) { weeks = 1; }
-        if (around === void 0) { around = Day_Day.today(); }
-        if (focus === void 0) { focus = 0.4999; }
-        var start = around.start().startOfWeek().relativeWeeks(-Math.floor(weeks * focus));
-        var end = start.relativeWeeks(weeks - 1).endOfWeek();
-        var mover = function (day, amount) { return day.relativeWeeks(amount); };
-        return new Calendar(start, end, CalendarType.WEEK, weeks, mover, mover, false);
-    };
-    Calendar.months = function (months, around, focus, fill) {
-        if (months === void 0) { months = 1; }
-        if (around === void 0) { around = Day_Day.today(); }
-        if (focus === void 0) { focus = 0.4999; }
-        if (fill === void 0) { fill = true; }
-        var start = around.start().startOfMonth().relativeMonths(-Math.floor(months * focus));
-        var end = start.relativeMonths(months - 1).endOfMonth();
-        var moveStart = function (day, amount) { return day.relativeMonths(amount); };
-        var moveEnd = function (day, amount) { return day.startOfMonth().relativeMonths(amount).endOfMonth(); };
-        return new Calendar(start, end, CalendarType.MONTH, months, moveStart, moveEnd, fill);
-    };
-    Calendar.years = function (years, around, focus, fill) {
-        if (years === void 0) { years = 1; }
-        if (around === void 0) { around = Day_Day.today(); }
-        if (focus === void 0) { focus = 0.4999; }
-        if (fill === void 0) { fill = true; }
-        var start = around.start().startOfMonth().relativeMonths(-Math.floor(years * focus));
-        var end = start.relativeMonths(years - 1).endOfYear();
-        var mover = function (day, amount) { return day.relativeYears(amount); };
-        return new Calendar(start, end, CalendarType.YEAR, years, mover, mover, fill);
-    };
-    return Calendar;
-}());
-
-
-// CONCATENATED MODULE: ./src/Duration.ts
-
-
-var Duration_Duration = (function () {
-    function Duration() {
-    }
-    Duration.millis = function (x) {
-        return x;
-    };
-    Duration.seconds = function (x) {
-        return x * Constants.MILLIS_IN_SECOND;
-    };
-    Duration.minutes = function (x) {
-        return x * Constants.MILLIS_IN_MINUTE;
-    };
-    Duration.hours = function (x) {
-        return x * Constants.MILLIS_IN_HOUR;
-    };
-    Duration.days = function (x) {
-        return x * Constants.MILLIS_IN_DAY;
-    };
-    Duration.weeks = function (x) {
-        return x * Constants.MILLIS_IN_WEEK;
-    };
-    return Duration;
-}());
-
-
-// CONCATENATED MODULE: ./src/Functions.ts
-
-/**
- * The class which contains commonly used functions by the library. These
- * functions and variables exist in a class so they may be overridden if
- * desired.
- */
-var Functions = (function () {
-    function Functions() {
-    }
-    /**
-     * Determines whether the given input is an array.
-     *
-     * @param input The variable to test.
-     * @return True if the variable is an array, otherwise false.
-     */
-    Functions.isArray = function (input) {
-        return input instanceof Array;
-    };
-    /**
-     * Determines whether the given input is a string.
-     *
-     * @param input The variable to test.
-     * @return True if the variable is a string, otherwise false.
-     */
-    Functions.isString = function (input) {
-        return typeof (input) === 'string';
-    };
-    Functions.isNumber = function (input) {
-        return isFinite(input);
-    };
-    Functions.isObject = function (input) {
-        return !this.isArray(input) && typeof (input) === 'object';
-    };
-    /**
-     * Determines whether the given input is defined.
-     *
-     * @param input The variable to test.
-     * @return True if the variable is defined, otherwise false.
-     */
-    Functions.isDefined = function (input) {
-        return typeof (input) !== 'undefined';
-    };
-    Functions.isFrequencyValueEvery = function (input) {
-        return this.isObject(input) && this.isNumber(input.every);
-    };
-    Functions.isFrequencyValueOneOf = function (input) {
-        return this.isArray(input) && input.length > 0;
-    };
-    /**
-     * Returns the first argument which is defined.
-     *
-     * @param a The first argument to look at.
-     * @param b The second argument to look at.
-     * @return The first defined argument.
-     * @see [[Functions.isDefined]]
-     */
-    Functions.coalesce = function (a, b, c) {
-        return this.isDefined(a) ? a : (this.isDefined(b) ? b : c);
-    };
-    return Functions;
-}());
-
-
-// CONCATENATED MODULE: ./src/Month.ts
-
-var Month = (function () {
-    function Month() {
-    }
-    Month.JANUARY = 0;
-    Month.FEBRUARY = 1;
-    Month.MARCH = 2;
-    Month.APRIL = 3;
-    Month.MAY = 4;
-    Month.JUNE = 5;
-    Month.JULY = 6;
-    Month.AUGUST = 7;
-    Month.SEPTEMBER = 8;
-    Month.OCTOBER = 9;
-    Month.NOVEMBER = 10;
-    Month.DECEMBER = 11;
-    Month.NAMES = [
-        'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    Month.CODES = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    return Month;
-}());
-
+var DaySpan__a;
 
 // CONCATENATED MODULE: ./src/Schedule.ts
 
@@ -1278,6 +950,23 @@ var Schedule_Schedule = (function () {
         }
         return spans;
     };
+    Schedule.prototype.getSpanOver = function (day) {
+        var start = day.start();
+        if (this.isFullDay()) {
+            return DaySpan_DaySpan.point(start);
+        }
+        else {
+            var behind = this.durationInDays();
+            while (behind >= 0) {
+                if (this.matchesDay(day)) {
+                    return DaySpan_DaySpan.point(day);
+                }
+                day = day.prev();
+                behind--;
+            }
+        }
+        return null;
+    };
     Schedule.prototype.getSpansOn = function (day, check) {
         if (check === void 0) { check = false; }
         var spans = [];
@@ -1417,11 +1106,463 @@ var Parse_Parse = (function () {
         out.refreshHours();
         return out;
     };
+    Parse.calendarSchedule = function (input) {
+        if (input.schedule instanceof Schedule_Schedule) {
+            return input;
+        }
+        return {
+            schedule: this.schedule(input.schedule),
+            event: input.event
+        };
+    };
     Parse.cron = function (pattern, out) {
         if (out === void 0) { out = new Schedule_Schedule(); }
         return out;
     };
     return Parse;
+}());
+
+
+// CONCATENATED MODULE: ./src/Calendar.ts
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+
+
+
+
+var CalendarDay = (function (_super) {
+    __extends(CalendarDay, _super);
+    function CalendarDay() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.currentDay = false;
+        _this.currentWeek = false;
+        _this.currentMonth = false;
+        _this.currentYear = false;
+        _this.selectedDay = false;
+        _this.selectedWeek = false;
+        _this.selectedMonth = false;
+        _this.selectedYear = false;
+        _this.inCalendar = false;
+        _this.events = [];
+        return _this;
+    }
+    CalendarDay.prototype.updateCurrent = function (current) {
+        this.currentDay = this.sameDay(current);
+        this.currentWeek = this.sameWeek(current);
+        this.currentMonth = this.sameMonth(current);
+        this.currentYear = this.sameYear(current);
+        return this;
+    };
+    CalendarDay.prototype.updateSelected = function (selected) {
+        this.selectedDay = selected.matchesDay(this);
+        this.selectedWeek = selected.matchesWeek(this);
+        this.selectedMonth = selected.matchesMonth(this);
+        this.selectedYear = selected.matchesYear(this);
+        return this;
+    };
+    CalendarDay.prototype.clearSelected = function () {
+        this.selectedDay = this.selectedWeek = this.selectedMonth = this.selectedYear = false;
+        return this;
+    };
+    return CalendarDay;
+}(Day_Day));
+
+var CalendarEvent = (function () {
+    function CalendarEvent(event, schedule, time, actualDay) {
+        this.event = event;
+        this.schedule = schedule;
+        this.time = time;
+        this.fullDay = time.isPoint;
+        this.starting = time.start.sameDay(actualDay);
+    }
+    return CalendarEvent;
+}());
+
+var Calendar_Calendar = (function () {
+    function Calendar(start, end, type, size, moveStart, moveEnd, input) {
+        this.fill = false;
+        this.minimumSize = 0;
+        this.repeatCovers = true;
+        this.listTimes = false;
+        this.eventsOutside = false;
+        this.selection = null;
+        this.days = [];
+        this.schedules = [];
+        this.span = new DaySpan_DaySpan(start, end);
+        this.filled = new DaySpan_DaySpan(start, end);
+        this.type = type;
+        this.size = size;
+        this.moveStart = moveStart;
+        this.moveEnd = moveEnd;
+        if (Functions.isDefined(input)) {
+            this.withInput(input, false);
+        }
+        this.refresh();
+    }
+    Calendar.prototype.withInput = function (input, refresh) {
+        if (refresh === void 0) { refresh = true; }
+        this.fill = Functions.coalesce(input.fill, this.fill);
+        this.minimumSize = Functions.coalesce(input.minimumSize, this.minimumSize);
+        this.repeatCovers = Functions.coalesce(input.repeatCovers, this.repeatCovers);
+        this.listTimes = Functions.coalesce(input.listTimes, this.listTimes);
+        this.eventsOutside = Functions.coalesce(input.eventsOutside, this.eventsOutside);
+        if (Functions.isArray(input.schedules)) {
+            this.removeSchedules();
+            this.addSchedules(input.schedules, false, !refresh);
+        }
+        if (refresh) {
+            this.refresh();
+        }
+        return this;
+    };
+    Calendar.prototype.withMinimumSize = function (minimumSize) {
+        this.minimumSize = minimumSize;
+        this.refresh();
+        return this;
+    };
+    Calendar.prototype.withRepeatCovers = function (repeatCovers) {
+        this.repeatCovers = repeatCovers;
+        this.refreshEvents();
+        return this;
+    };
+    Calendar.prototype.withListTimes = function (listTimes) {
+        this.listTimes = listTimes;
+        this.refreshEvents();
+        return this;
+    };
+    Calendar.prototype.withEventsOutside = function (eventsOutside) {
+        this.eventsOutside = eventsOutside;
+        this.refreshEvents();
+        return this;
+    };
+    Object.defineProperty(Calendar.prototype, "start", {
+        get: function () {
+            return this.span.start;
+        },
+        set: function (day) {
+            this.span.start = day;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Calendar.prototype, "end", {
+        get: function () {
+            return this.span.end;
+        },
+        set: function (day) {
+            this.span.end = day;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Calendar.prototype.summary = function (dayOfWeek, short, repeat, contextual, delimiter) {
+        if (dayOfWeek === void 0) { dayOfWeek = true; }
+        if (short === void 0) { short = false; }
+        if (repeat === void 0) { repeat = false; }
+        if (contextual === void 0) { contextual = true; }
+        if (delimiter === void 0) { delimiter = ' - '; }
+        return this.span.summary(this.type, dayOfWeek, short, repeat, contextual, delimiter);
+    };
+    Calendar.prototype.split = function (by) {
+        if (by === void 0) { by = 1; }
+        var split = [];
+        var start = this.start;
+        var end = this.moveEnd(this.end, by - this.size);
+        for (var i = 0; i < this.size; i++) {
+            split.push(new Calendar(start, end, this.type, by, this.moveStart, this.moveEnd, this));
+            start = this.moveStart(start, by);
+            end = this.moveEnd(end, by);
+        }
+        return split;
+    };
+    Calendar.prototype.refresh = function (today) {
+        if (today === void 0) { today = Day_Day.today(); }
+        this.length = this.span.days(Op.UP, true);
+        this.resetDays();
+        this.refreshCurrent(today);
+        this.refreshSelection();
+        this.refreshEvents();
+        return this;
+    };
+    Calendar.prototype.resetFilled = function () {
+        this.filled.start = this.fill ? this.start.startOfWeek() : this.start;
+        this.filled.end = this.fill ? this.end.endOfWeek() : this.end;
+        return this;
+    };
+    Calendar.prototype.resetDays = function () {
+        this.resetFilled();
+        var days = this.days;
+        var filled = this.filled;
+        var current = filled.start;
+        var daysBetween = filled.days(Op.UP);
+        var total = Math.max(this.minimumSize, daysBetween);
+        for (var i = 0; i < total; i++) {
+            var day = days[i];
+            if (!day || !day.sameDay(current)) {
+                day = new CalendarDay(current.date);
+                if (i < days.length) {
+                    days.splice(i, 1, day);
+                }
+                else {
+                    days.push(day);
+                }
+            }
+            day.inCalendar = this.span.contains(day);
+            current = current.next();
+        }
+        if (days.length > total) {
+            days.splice(total, total - days.length);
+        }
+        return this;
+    };
+    Calendar.prototype.refreshCurrent = function (today) {
+        if (today === void 0) { today = Day_Day.today(); }
+        return this.iterateDays(function (d) {
+            d.updateCurrent(today);
+        });
+    };
+    Calendar.prototype.refreshSelection = function () {
+        var _this = this;
+        return this.iterateDays(function (d) {
+            if (_this.selection) {
+                d.updateSelected(_this.selection);
+            }
+            else {
+                d.clearSelected();
+            }
+        });
+    };
+    Calendar.prototype.refreshEvents = function () {
+        var _this = this;
+        return this.iterateDays(function (d) {
+            if (d.inCalendar || _this.eventsOutside) {
+                d.events = _this.eventsForDay(d, _this.listTimes, _this.repeatCovers);
+            }
+        });
+    };
+    Calendar.prototype.iterateDays = function (iterator) {
+        var days = this.days;
+        for (var i = 0; i < days.length; i++) {
+            iterator(days[i]);
+        }
+        return this;
+    };
+    Calendar.prototype.eventsForDay = function (day, getTimes, covers) {
+        if (getTimes === void 0) { getTimes = true; }
+        if (covers === void 0) { covers = true; }
+        var events = [];
+        for (var _i = 0, _a = this.schedules; _i < _a.length; _i++) {
+            var entry = _a[_i];
+            if ((covers && entry.schedule.coversDay(day)) || (!covers && entry.schedule.matchesDay(day))) {
+                if (getTimes) {
+                    var times = covers ?
+                        entry.schedule.getSpansOver(day) :
+                        entry.schedule.getSpansOn(day);
+                    for (var _b = 0, times_1 = times; _b < times_1.length; _b++) {
+                        var time = times_1[_b];
+                        events.push(new CalendarEvent(entry.event, entry.schedule, time, day));
+                    }
+                }
+                else {
+                    var over = entry.schedule.getSpanOver(day);
+                    if (over) {
+                        events.push(new CalendarEvent(entry.event, entry.schedule, over, day));
+                    }
+                }
+            }
+        }
+        return events;
+    };
+    Calendar.prototype.findSchedule = function (input) {
+        for (var _i = 0, _a = this.schedules; _i < _a.length; _i++) {
+            var schedule = _a[_i];
+            if (schedule === input || schedule.schedule === input || schedule.event === input) {
+                return schedule;
+            }
+        }
+        return null;
+    };
+    Calendar.prototype.removeSchedules = function (schedules, delayRefresh) {
+        if (schedules === void 0) { schedules = null; }
+        if (delayRefresh === void 0) { delayRefresh = false; }
+        if (schedules) {
+            for (var _i = 0, schedules_1 = schedules; _i < schedules_1.length; _i++) {
+                var schedule = schedules_1[_i];
+                this.removeSchedule(schedule, true);
+            }
+        }
+        else {
+            this.schedules = [];
+        }
+        if (!delayRefresh) {
+            this.refreshEvents();
+        }
+        return this;
+    };
+    Calendar.prototype.removeSchedule = function (schedule, delayRefresh) {
+        if (delayRefresh === void 0) { delayRefresh = false; }
+        var found = this.findSchedule(schedule);
+        if (found) {
+            this.schedules.splice(this.schedules.indexOf(found), 1);
+            if (!delayRefresh) {
+                this.refreshEvents();
+            }
+        }
+        return this;
+    };
+    Calendar.prototype.addSchedule = function (schedule, allowDuplicates, delayRefresh) {
+        if (allowDuplicates === void 0) { allowDuplicates = false; }
+        if (delayRefresh === void 0) { delayRefresh = false; }
+        var parsed = Parse_Parse.calendarSchedule(schedule);
+        if (!allowDuplicates) {
+            var existing = this.findSchedule(parsed);
+            if (existing) {
+                return this;
+            }
+        }
+        this.schedules.push(parsed);
+        if (!delayRefresh) {
+            this.refreshEvents();
+        }
+        return this;
+    };
+    Calendar.prototype.addSchedules = function (schedules, allowDuplicates, delayRefresh) {
+        if (allowDuplicates === void 0) { allowDuplicates = false; }
+        if (delayRefresh === void 0) { delayRefresh = false; }
+        for (var _i = 0, schedules_2 = schedules; _i < schedules_2.length; _i++) {
+            var schedule = schedules_2[_i];
+            this.addSchedule(schedule, allowDuplicates, true);
+        }
+        if (!delayRefresh) {
+            this.refreshEvents();
+        }
+        return this;
+    };
+    Calendar.prototype.select = function (start, end) {
+        this.selection = end ? new DaySpan_DaySpan(start, end) : DaySpan_DaySpan.point(start);
+        this.refreshSelection();
+        return this;
+    };
+    Calendar.prototype.unselect = function () {
+        this.selection = null;
+        this.refreshSelection();
+        return this;
+    };
+    Calendar.prototype.move = function (jump) {
+        if (jump === void 0) { jump = this.size; }
+        this.start = this.moveStart(this.start, jump);
+        this.end = this.moveEnd(this.end, jump);
+        this.refresh();
+        return this;
+    };
+    Calendar.prototype.next = function (jump) {
+        if (jump === void 0) { jump = this.size; }
+        return this.move(jump);
+    };
+    Calendar.prototype.prev = function (jump) {
+        if (jump === void 0) { jump = this.size; }
+        return this.move(-jump);
+    };
+    Calendar.days = function (days, around, focus, input) {
+        if (days === void 0) { days = 1; }
+        if (around === void 0) { around = Day_Day.today(); }
+        if (focus === void 0) { focus = 0.4999; }
+        var start = around.start().relativeDays(-Math.floor(days * focus));
+        var end = start.relativeDays(days - 1).end();
+        var mover = function (day, amount) { return day.relativeDays(amount); };
+        return new Calendar(start, end, Units.DAY, days, mover, mover, input);
+    };
+    Calendar.weeks = function (weeks, around, focus, input) {
+        if (weeks === void 0) { weeks = 1; }
+        if (around === void 0) { around = Day_Day.today(); }
+        if (focus === void 0) { focus = 0.4999; }
+        var start = around.start().startOfWeek().relativeWeeks(-Math.floor(weeks * focus));
+        var end = start.relativeWeeks(weeks - 1).endOfWeek();
+        var mover = function (day, amount) { return day.relativeWeeks(amount); };
+        return new Calendar(start, end, Units.WEEK, weeks, mover, mover, input);
+    };
+    Calendar.months = function (months, around, focus, input) {
+        if (months === void 0) { months = 1; }
+        if (around === void 0) { around = Day_Day.today(); }
+        if (focus === void 0) { focus = 0.4999; }
+        if (input === void 0) { input = { fill: true }; }
+        var start = around.start().startOfMonth().relativeMonths(-Math.floor(months * focus));
+        var end = start.relativeMonths(months - 1).endOfMonth();
+        var moveStart = function (day, amount) { return day.relativeMonths(amount); };
+        var moveEnd = function (day, amount) { return day.startOfMonth().relativeMonths(amount).endOfMonth(); };
+        return new Calendar(start, end, Units.MONTH, months, moveStart, moveEnd, input);
+    };
+    Calendar.years = function (years, around, focus, input) {
+        if (years === void 0) { years = 1; }
+        if (around === void 0) { around = Day_Day.today(); }
+        if (focus === void 0) { focus = 0.4999; }
+        if (input === void 0) { input = { fill: true }; }
+        var start = around.start().startOfMonth().relativeMonths(-Math.floor(years * focus));
+        var end = start.relativeMonths(years - 1).endOfYear();
+        var mover = function (day, amount) { return day.relativeYears(amount); };
+        return new Calendar(start, end, Units.YEAR, years, mover, mover, input);
+    };
+    return Calendar;
+}());
+
+
+// CONCATENATED MODULE: ./src/Duration.ts
+
+
+var Duration_Duration = (function () {
+    function Duration() {
+    }
+    Duration.millis = function (x) {
+        return x;
+    };
+    Duration.seconds = function (x) {
+        return x * Constants.MILLIS_IN_SECOND;
+    };
+    Duration.minutes = function (x) {
+        return x * Constants.MILLIS_IN_MINUTE;
+    };
+    Duration.hours = function (x) {
+        return x * Constants.MILLIS_IN_HOUR;
+    };
+    Duration.days = function (x) {
+        return x * Constants.MILLIS_IN_DAY;
+    };
+    Duration.weeks = function (x) {
+        return x * Constants.MILLIS_IN_WEEK;
+    };
+    return Duration;
+}());
+
+
+// CONCATENATED MODULE: ./src/Month.ts
+
+var Month = (function () {
+    function Month() {
+    }
+    Month.JANUARY = 0;
+    Month.FEBRUARY = 1;
+    Month.MARCH = 2;
+    Month.APRIL = 3;
+    Month.MAY = 4;
+    Month.JUNE = 5;
+    Month.JULY = 6;
+    Month.AUGUST = 7;
+    Month.SEPTEMBER = 8;
+    Month.OCTOBER = 9;
+    Month.NOVEMBER = 10;
+    Month.DECEMBER = 11;
+    return Month;
 }());
 
 
@@ -1471,18 +1612,11 @@ var Weekday = (function () {
     Weekday.THURSDAY = 4;
     Weekday.FRIDAY = 5;
     Weekday.SATURDAY = 6;
-    Weekday.NAMES = [
-        'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
-    ];
-    Weekday.CODES = [
-        'Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat'
-    ];
     return Weekday;
 }());
 
 
 // CONCATENATED MODULE: ./src/index.ts
-/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "CalendarType", function() { return CalendarType; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "CalendarDay", function() { return CalendarDay; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "CalendarEvent", function() { return CalendarEvent; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Calendar", function() { return Calendar_Calendar; });
@@ -1497,7 +1631,9 @@ var Weekday = (function () {
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Parse", function() { return Parse_Parse; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Schedule", function() { return Schedule_Schedule; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Suffix", function() { return Suffix; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Units", function() { return Units; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Weekday", function() { return Weekday; });
+
 
 
 

@@ -4,6 +4,7 @@ import { FrequencyCheck } from './Types';
 import { Schedule, ScheduleInput, ScheduleExclusions } from './Schedule';
 import { Constants } from './Constants';
 import { Day } from './Day';
+import { CalendarScheduleInput, CalendarSchedule } from './Calendar';
 
 
 /**
@@ -148,6 +149,19 @@ export class Parse
     out.refreshHours();
 
     return out;
+  }
+
+  public static calendarSchedule<T>(input: CalendarScheduleInput<T>): CalendarSchedule<T>
+  {
+    if (input.schedule instanceof Schedule)
+    {
+      return <CalendarSchedule<T>>input;
+    }
+
+    return {
+      schedule: this.schedule( input.schedule ),
+      event: input.event
+    };
   }
 
   public static cron(pattern: string, out: Schedule = new Schedule()): Schedule

@@ -1,135 +1,211 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.css">
-
-    <style>
-    body > .grid {
-      height: 100%;
-    }
-    body {
-      background-color: #DADADA;
-    }
-    .column {
-      max-width: 1000px;
-    }
-    #dayspan {
-      margin-top: 2em;
-      margin-bottom: 2em;
-    }
-    .ds-calendar {
-      width: 400px !important;
-    }
-    .ds-weekday {
-      font-weight: bold;
-    }
-    .ds-day {
-      min-height: 50px;
-      border: 1px solid rgba(0,0,0,0.1);
-      background-color: #eee;
-      user-select: none;
-    }
-    .ds-day.ds-in {
-      background-color: #fff;
-      cursor: pointer;
-    }
-    .ds-month {
-      font-size: 1.5em;
-      font-weight: bold;
-    }
-    .ds-day .floating.label {
-      top: -0.5em;
-      left: auto;
-      right: -0.5em;
-    }
-    .ds-day.ds-today.ds-thisweek {
-      background-color: #9dd5ff;
-    }
-    .ds-day.ds-thisweek {
-      background-color: #e0f2ff;
-    }
-    .ds-day.ds-selected {
-      background-color: #79f377 !important;
-    }
-    </style>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.js"></script>
-
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+    <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
     <script src="node_modules/moment/min/moment-with-locales.js"></script>
     <script src="umd/dayspan.js"></script>
-
+    <style>
+    [v-cloak] {
+      display: none;
+    }
+    </style>
   </head>
   <body>
 
-    <a href="https://github.com/ClickerMonkey/dayspan"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+    <v-app id="dayspan" v-cloak>
+      <v-navigation-drawer :clipped="$vuetify.breakpoint.lgAndUp" v-model="drawer" fixed app>
 
-    <div class="ui center aligned grid" id="dayspan">
-
-      <div class="ui seven column padded grid ds-calendar">
-        <div class="sixteen wide column">
-          <div class="ui left floated icon blue button" @click="calendar.prev()">
-            <i class="angle left icon"></i>
+        <!-- Month -->
+        <div class="pa-3">
+          <div style="display:flex" class="mb-2">
+            <div style="flex:5" class="subtitle grey--text text--darken-1 py-1 pl-2">
+              {{ monthSummary }}
+            </div>
+            <v-tooltip bottom style="flex:1; text-align:center">
+              <v-btn slot="activator" small icon depressed @click="prevMonth" class="grey--text text--darken-1 ma-0">
+                <v-icon>keyboard_arrow_left</v-icon>
+              </v-btn>
+              <span>Previous month</span>
+            </v-tooltip>
+            <v-tooltip bottom style="flex:1; text-align:center">
+              <v-btn slot="activator" small icon depressed @click="nextMonth" class="grey--text text--darken-1 ma-0">
+                <v-icon>keyboard_arrow_right</v-icon>
+              </v-btn>
+              <span>Next month</span>
+            </v-tooltip>
           </div>
-          <span class="ds-month">
-            {{ startMonth }} {{ calendar.start.year }}
-          </span>
-          <div class="ui right floated icon blue button" @click="calendar.next()">
-            <i class="angle right icon"></i>
+          <div style="display:flex; text-align:center" class="grey--text text--darken-1">
+            <div v-for="weekday in weekdays"
+              :key="weekday"
+              style="flex: 1">
+              <v-tooltip bottom>
+                <span slot="activator">{{ weekday.charAt(0) }}</span>
+                <span>{{ weekday }}</span>
+              </v-tooltip>
+            </div>
+          </div>
+          <div style="display:flex; text-align:center; flex-direction: row; flex-wrap: wrap;">
+            <div style="flex: 1 0 14%"
+              v-for="day in month.days"
+              :key="day.dayIdentifier">
+              <v-btn small icon depressed class="ma-0" @click="rebuild(day)"
+                :class="{'btn--active': day.currentDay, 'grey--text text--darken-1': !day.inCalendar}">
+                {{ day.dayOfMonth }}
+              </v-btn>
+            </div>
           </div>
         </div>
-        <div class="column ds-weekday" v-for="weekday in weekdayCodes">
-          {{ weekday }}
-        </div>
-        <ds-day v-for="day in calendar.days"
-          :key="day.dayIdentifier"
-          :day="day"
-          :day-property="dayProperty"
-          @mousedown.native="selectStart( day )"
-          @mousemove.native="selectMove( day )"
-          @mouseup.native="selectEnd( day )"
-        ></ds-day>
-      </div>
 
-      <select class="ui selection dropdown"
-        v-model="dayProperty">
-        <option v-for="(value, label) in dayProperties" :value="value">
-          {{ label }}
-        </option>
-      </select>
+      </v-navigation-drawer>
+      <v-toolbar :clipped-left="$vuetify.breakpoint.lgAndUp" color="white" app flat fixed>
 
-      <div v-for="day in calendar.days" :key="day.dayIdentifier" v-if="day.selectedDay">
-        <h5>{{ day.format('ddd MMM Do YYYY') }}</h5>
-        <div v-if="day.events.length">
-          <ul>
-            <li v-for="event in day.events" :key="event.event">
-              {{ event.event }}
-            </li>
-          </ul>
-        </div>
-        <div v-else>
-          <i>No Events on this Day</i>
-        </div>
-      </div>
+        <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
+          <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+          <span class="hidden-sm-and-down">DaySpan</span>
+        </v-toolbar-title>
 
-    </div>
+        <v-tooltip bottom>
+          <v-btn depressed @click="today" slot="activator">TODAY</v-btn>
+          <span>{{ todayDate }}</span>
+        </v-tooltip>
 
+        <v-tooltip bottom>
+          <v-btn slot="activator" icon depressed @click="prev" class="grey--text text--darken-1">
+            <v-icon>keyboard_arrow_left</v-icon>
+          </v-btn>
+          <span>Previous month</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <v-btn slot="activator" icon depressed @click="next" class="grey--text text--darken-1">
+            <v-icon>keyboard_arrow_right</v-icon>
+          </v-btn>
+          <span>Next month</span>
+        </v-tooltip>
+
+        <h1 class="title grey--text text--darken-1">
+          {{ summary }}
+        </h1>
+
+        <v-spacer></v-spacer>
+        <v-menu>
+          <v-btn flat slot="activator">
+            {{ currentType.label }}
+            <v-icon>arrow_drop_down</v-icon>
+          </v-btn>
+          <v-list>
+            <v-list-tile v-for="type in types"
+              :key="type.id"
+              @click="currentType = type">
+              <v-list-tile-content>
+                <v-list-tile-title>{{ type.label }}</v-list-tile-title>
+              </v-list-tile-content>
+              <v-list-tile-action>{{ type.shortcut }}</v-list-tile-action>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
+        <v-btn icon large href="https://github.com/ClickerMonkey/dayspan" target="_blank">
+          <v-avatar size="32px" tile>
+            <img src="https://simpleicons.org/icons/github.svg" alt="Github">
+          </v-avatar>
+        </v-btn>
+      </v-toolbar>
+      <v-content>
+        <v-container fluid fill-height class="pa-0">
+
+          <div v-if="isDay">
+            Day View Not Yet Implemented
+          </div>
+
+          <div v-if="isWeek">
+            Week View Not Yet Implemented
+          </div>
+
+          <div v-if="isMonth" class="ds-expand">
+            <div class="ds-month ds-expand">
+              <div class="ds-week-header">
+                <div class="ds-week-header-day grey--text text--darken-1 pa-1"
+                  v-for="weekday in weekdayCodes" :key="weekday">
+                  {{ weekday }}
+                </div>
+              </div>
+              <div class="ds-week" v-for="i in rows">
+                <template v-for="k in 7">
+                  <ds-day :key="k" :day="dayAtIndex(i, k)"></ds-day>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="isYear">
+            Year View Not Yet Implemented
+          </div>
+
+        </v-container>
+      </v-content>
+    </v-app>
 
     <script type="text/template" id="template_day">
-      <div class="column ds-day"
-        @click="$emit( 'selected', day )"
-        :class="{
-          'ds-in': day.inCalendar,
-          'ds-today': day.currentDay,
-          'ds-thisweek': day.currentWeek,
-          'ds-selected': day.selectedDay
+      <div class="ds-day pa-1">
+        <div :class="{'grey--text text--darken-1': !day.inCalendar}">
+          <span v-if="day.dayOfMonth === 1">
+            {{ day.format('MMM') }}
+          </span>
+          {{ day.dayOfMonth }}
+        </div>
+        <div v-for="event in day.events" class="ds-event" :style="{
+          backgroundColor: event.event.color
         }">
-        {{ day[ dayProperty ] }}
-        <div class="floating ui small blue circular label"
-          v-if="day.events.length">
-          {{ day.events.length }}
+          <span v-if="event.starting">
+            {{ event.event.name }}
+          </span>
         </div>
       </div>
     </script>
+
+    <style>
+      nav.toolbar .toolbar__content {
+        border-bottom: 1px solid rgb(224, 224, 224);
+      }
+      .ds-expand {
+        width: 100%;
+        height: 100%;
+      }
+      .ds-month {
+        display: flex;
+        flex-direction: column;
+        background-color: white;
+      }
+      .ds-week-header {
+        display: flex;
+      }
+      .ds-week-header-day {
+        flex: 1 0 20px;
+        border-right: #e0e0e0 1px solid;
+      }
+      .ds-week {
+        display: flex;
+        flex: 1;
+      }
+      .ds-day {
+        flex: 1;
+        width: 0;
+        border-right: #e0e0e0 1px solid;
+        border-bottom: #e0e0e0 1px solid;
+      }
+      .ds-event {
+        margin: 1px;
+        color: white;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding-left: 0.5em;
+        font-size: 12px;
+      }
+    </style>
 
     <script>
       var Store = {
@@ -156,10 +232,20 @@
 
       new Vue({
         el: '#dayspan',
+        props: ['source'],
         data: {
-          calendar: ds.Calendar.months(),
-          input: Store.Load('input', ''),
+          drawer: null,
+          calendar: null,
+          month: ds.Calendar.months(1, ds.Day.today(), 0, {fill: true, minimumSize: 42}),
           dayProperty: Store.Load('dayProperty', 'dayOfMonth'),
+          currentType: null,
+          types: [
+            {id: 'D', label: 'Day', shortcut: 'D', type: ds.Units.DAY, size: 1},
+            {id: 'W', label: 'Week', shortcut: 'W', type: ds.Units.WEEK, size: 1},
+            {id: 'M', label: 'Month', shortcut: 'M', type: ds.Units.MONTH, size: 1},
+            {id: 'Y', label: 'Year', shortcut: 'Y', type: ds.Units.YEAR, size: 1},
+            {id: 'X', label: '4 days', shortcut: 'X', type: ds.Units.DAY, size: 4}
+          ],
           selectionStart: null,
           dayProperties: {
             'Day Of Week': 'dayOfWeek',
@@ -173,47 +259,123 @@
             'Weekspan Of Month': 'weekspanOfMonth',
             'Full Week Of Month': 'fullWeekOfMonth'
           },
-          weekdays: ds.Weekday.NAMES,
-          weekdayCodes: ds.Weekday.CODES
+          weekdays: moment.weekdays(),
+          weekdayCodes: moment.weekdaysShort(),
+          schedules: [
+            {
+              event: {name: 'Monthly Meeting', color: '#21a700'},
+              schedule: {
+                dayOfWeek: [ds.Weekday.MONDAY],
+                hour: [9],
+                duration: ds.Duration.minutes(30)
+              }
+            },
+            {
+              event: {name: 'Mother\'s Day', color: '#4285f4'},
+              schedule: {
+                month: [ds.Month.MAY],
+                dayOfWeek: [ds.Weekday.SUNDAY],
+                weekspanOfMonth: [1]
+              }
+            },
+            {
+              event: {name: 'First Weekend of May', color: '#000000'},
+              schedule: {
+                month: [ds.Month.MAY],
+                weekspanOfMonth: [0],
+                dayOfWeek: [ds.Weekday.FRIDAY],
+                duration: ds.Duration.days(3)
+              }
+            }
+          ]
         },
         watch: {
           input: Store.Watcher('input'),
-          dayProperty: Store.Watcher('dayProperty')
-        },
-        computed: {
-          startMonth: function() {
-            return ds.Month.NAMES[ this.calendar.start.month ];
-          },
-          endMonth: function() {
-            return ds.Month.NAMES[ (this.calendar.end.month - 1) % 12 ];
-          },
-          sameMonth: function() {
-            return this.startMonth === this.endMonth;
+          dayProperty: Store.Watcher('dayProperty'),
+          currentType: function() {
+            this.rebuild();
           }
         },
-        mounted: function() {
-          // Populate
-          this.calendar.addSchedule({
-            event: 'Monthly Meeting',
-            schedule: new ds.Schedule({
-              dayOfWeek: [ds.Weekday.MONDAY],
-              hour: [9],
-              duration: ds.Duration.minutes(30)
-            })
-          });
+        computed: {
+          monthSummary: function() {
+            return this.month.summary(false, false, false, false);
+          },
+          summary: function() {
+            return this.calendar ? this.calendar.summary(false, false, false, false) : '';
+          },
+          todayDate: function() {
+            return ds.Day.today().format('dddd, MMMM D');
+          },
+          rows: function() {
+            return Math.floor( this.calendar.days.length / 7 );
+          },
+          isDay: function() {
+            return this.calendar && this.calendar.type === ds.Units.DAY;
+          },
+          isWeek: function() {
+            return this.calendar && this.calendar.type === ds.Units.WEEK;
+          },
+          isMonth: function() {
+            return this.calendar && this.calendar.type === ds.Units.MONTH;
+          },
+          isYear: function() {
+            return this.calendar && this.calendar.type === ds.Units.YEAR;
+          }
+        },
+        created: function() {
+          // Initialize types
+          if (!this.currentType) {
+            this.currentType = this.types[2];
+          }
 
-          this.calendar.addSchedule({
-            event: 'Mother\'s Day',
-            schedule: new ds.Schedule({
-              month: [ds.Month.MAY],
-              dayOfWeek: [ds.Weekday.SUNDAY],
-              weekspanOfMonth: [1]
-            })
-          });
-
+          // Export
           window.app = this;
         },
         methods: {
+          rebuild: function(aroundDay) {
+            var type = this.currentType || this.types[ 2 ];
+            var around = aroundDay || (this.calendar ? this.calendar.start : ds.Day.today());
+
+            if (this.calendar &&
+                this.calendar.type === type.type &&
+                this.calendar.size === type.size &&
+                (!around || this.calendar.span.matchesDay( around ))) {
+              return;
+            }
+
+            switch (type.type) {
+              case ds.Units.DAY:
+                this.calendar = ds.Calendar.days(type.size, around, 0, {
+                  eventsOutside: true,
+                  listTimes: true,
+                  schedules: this.schedules
+                });
+                break;
+              case ds.Units.WEEK:
+                this.calendar = ds.Calendar.weeks(type.size, around, 0, {
+                  eventsOutside: true,
+                  listTimes: true,
+                  schedules: this.schedules
+                });
+                break;
+              case ds.Units.MONTH:
+                this.calendar = ds.Calendar.months(type.size, around, 0, {
+                  eventsOutside: true,
+                  fill: true,
+                  schedules: this.schedules
+                });
+                break;
+              case ds.Units.YEAR:
+                this.calendar = ds.Calendar.years(type.size, around, 0, {
+                  eventsOutside: true,
+                  fill: true,
+                  schedules: this.schedules
+                });
+                break;
+            }
+
+            this.updateMonth();
+          },
           selectStart: function(day) {
             this.selectionStart = day;
           },
@@ -233,17 +395,44 @@
           selectEnd: function(day) {
             this.selectMove( day );
             this.selectionStart = null;
+          },
+          next: function() {
+            this.calendar.unselect().next();
+            this.updateMonth();
+          },
+          prev: function() {
+            this.calendar.unselect().prev();
+            this.updateMonth();
+          },
+          updateMonth: function() {
+            var view = this.calendar.span;
+            var month = this.month.span;
+
+            if (!view.matchesMonth(month.start)) {
+              this.month = ds.Calendar.months(1, view.start, 0, {fill: true, minimumSize: 42});
+            }
+          },
+          today: function() {
+            this.rebuild(ds.Day.today());
+          },
+          prevMonth: function() {
+            this.month.prev();
+          },
+          nextMonth: function() {
+            this.month.next();
+          },
+          dayAtIndex: function(row, cell) {
+            return this.calendar.days[ (row - 1) * 7 + (cell - 1) ];
           }
         },
         components: {
           dsDay: {
-            props: ['day', 'dayProperty'],
+            props: ['day'],
             template: '#template_day'
           }
         }
       });
     </script>
-  -->
 
   </body>
 </html>
