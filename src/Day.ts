@@ -1,12 +1,20 @@
 
 import { Constants } from './Constants';
 import { Op, operate } from './Op';
+import { Parse } from './Parse';
+import { Time } from './Time';
 // @ts-ignore
 import * as moment from 'moment';
 
 
+export type DurationInput = moment.unitOfTime.DurationConstructor;
+
+export type DayInput = number | string | Day | number[] | object | true;
+
 export class Day
 {
+
+  public static readonly LOAD_TIME: Day = Day.now();
 
   public readonly date: moment.Moment;
   public readonly time: number;
@@ -96,6 +104,10 @@ export class Day
     return this.dayIdentifier === day.dayIdentifier && this.hour === day.hour && this.minute === day.minute;
   }
 
+  public sameTime(time: Time): boolean {
+    return this.hour === time.hour && this.minute === time.minute && this.seconds === time.second && this.millis === time.millisecond;
+  }
+
   // Comparison
 
   public isBefore(day: Day, precision?: moment.unitOfTime.StartOf): boolean {
@@ -164,6 +176,10 @@ export class Day
     var d = this.toMoment();
     mutator( d );
     return new Day( d );
+  }
+
+  public add(amount: number, unit: string): Day {
+    return this.mutate(d => d.add(amount, <DurationInput>unit));
   }
 
   public relative(millis: number): Day {
@@ -294,12 +310,16 @@ export class Day
 
   // Time
 
-  public withTime(
+  public withTimes(
       hour: number = Constants.HOUR_MIN,
       minute: number = Constants.MINUTE_MIN,
       second: number = Constants.SECOND_MIN,
       millisecond: number = Constants.MILLIS_MIN): Day {
     return this.mutate(d => d.set({hour, minute, second, millisecond}));
+  }
+
+  public withTime(time: Time): Day {
+    return this.withTimes(time.hour, time.minute, time.second, time.millisecond);
   }
 
   // Start & End
@@ -490,31 +510,47 @@ export class Day
     return this.today().next();
   }
 
-  public static unix(millis: number): Day {
-    return new Day(moment(millis));
+  public static fromMoment(moment: moment.Moment): Day {
+    return moment && moment.isValid() ? new Day( moment ) : null;
   }
 
-  public static parse(input: string): Day {
-    return new Day(moment(input));
+  public static unix(millis: number): Day {
+    return this.fromMoment(moment(millis));
+  }
+
+  public static parse(input: DayInput): Day {
+    return Parse.day(input);
+  }
+
+  public static fromString(input: string): Day {
+    return this.fromMoment(moment(input));
   }
 
   public static fromFormat(input: string, formats: string | string[]): Day {
-    return new Day(moment(input, formats));
+    return this.fromMoment(moment(input, formats));
   }
 
   public static fromObject(input: object): Day {
-    return new Day(moment(input));
+    return this.fromMoment(moment(input));
   }
 
   public static fromDate(input: Date): Day {
-    return new Day(moment(input));
+    return this.fromMoment(moment(input));
   }
 
   public static fromArray(input: number[]): Day {
-    return new Day(moment(input));
+    return this.fromMoment(moment(input));
   }
 
-  public static create(year: number, month: number,
+  public static fromDayIdentifier(id: number): Day {
+    let date: number = id % 100;
+    let month: number = (Math.floor(id / 100) % 100) - 1;
+    let year: number = Math.floor(id / 10000);
+
+    return this.build(year, month, date);
+  }
+
+  public static build(year: number, month: number,
     date: number = Constants.DAY_MIN,
     hour: number = Constants.HOUR_MIN,
     minute: number = Constants.MINUTE_MIN,
@@ -523,8 +559,6 @@ export class Day
   {
     return new Day( moment({year, month, date, hour, minute, second, millisecond}) );
   }
-
-
 
 
 

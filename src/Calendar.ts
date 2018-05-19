@@ -6,6 +6,7 @@ import { Schedule, ScheduleInput } from './Schedule';
 import { Op } from './Op';
 import { Units } from './Units';
 import { Parse } from './Parse';
+import { Constants } from './Constants';
 
 
 export type CalendarMover = (day: Day, amount: number) => Day;
@@ -17,6 +18,7 @@ export class CalendarDay<T> extends Day
   public currentWeek: boolean = false;
   public currentMonth: boolean = false;
   public currentYear: boolean = false;
+  public currentOffset: number = 0;
   public selectedDay: boolean = false;
   public selectedWeek: boolean = false;
   public selectedMonth: boolean = false;
@@ -30,6 +32,7 @@ export class CalendarDay<T> extends Day
     this.currentWeek = this.sameWeek(current);
     this.currentMonth = this.sameMonth(current);
     this.currentYear = this.sameYear(current);
+    this.currentOffset = this.daysBetween(current, Op.DOWN, false);
 
     return this;
   }
@@ -55,18 +58,23 @@ export class CalendarDay<T> extends Day
 export class CalendarEvent<T>
 {
 
+  public id: number;
   public event: T;
   public schedule: Schedule;
   public time: DaySpan;
   public fullDay: boolean;
   public starting: boolean;
 
-  public constructor(event: T, schedule: Schedule, time: DaySpan, actualDay: Day) {
+  public constructor(id: number, event: T, schedule: Schedule, time: DaySpan, actualDay: Day) {
     this.event = event;
     this.schedule = schedule;
     this.time = time;
     this.fullDay = time.isPoint;
     this.starting = time.start.sameDay( actualDay );
+  }
+
+  public get scheduleId(): number {
+    return Math.floor( this.id / Constants.MAX_EVENTS_PER_DAY );
   }
 
 }
@@ -333,10 +341,16 @@ export class Calendar<T>
   public eventsForDay(day: Day, getTimes: boolean = true, covers: boolean = true): CalendarEvent<T>[]
   {
     let events: CalendarEvent<T>[] = [];
+    let entries: CalendarSchedule<T>[] = this.schedules;
 
-    for (let entry of this.schedules)
+    for (let entryIndex = 0; entryIndex < entries.length; entryIndex++)
     {
-      if ((covers && entry.schedule.coversDay(day)) || (!covers && entry.schedule.matchesDay(day)))
+      let entry: CalendarSchedule<T> = entries[ entryIndex ];
+      let schedule: Schedule = entry.schedule;
+      let event: T = entry.event;
+      let eventId: number = entryIndex * Constants.MAX_EVENTS_PER_DAY;
+
+      if ((covers && schedule.coversDay(day)) || (!covers && schedule.matchesDay(day)))
       {
         if (getTimes)
         {
@@ -344,9 +358,9 @@ export class Calendar<T>
             entry.schedule.getSpansOver(day) :
             entry.schedule.getSpansOn(day);
 
-          for (let time of times)
+          for (let timeIndex = 0; timeIndex < times.length; timeIndex++)
           {
-            events.push(new CalendarEvent<T>(entry.event, entry.schedule, time, day));
+            events.push(new CalendarEvent<T>(eventId + timeIndex, event, schedule, times[ timeIndex ], day));
           }
         }
         else
@@ -355,7 +369,7 @@ export class Calendar<T>
 
           if (over)
           {
-            events.push(new CalendarEvent<T>(entry.event, entry.schedule, over, day));
+            events.push(new CalendarEvent<T>(eventId, event, schedule, over, day));
           }
         }
       }

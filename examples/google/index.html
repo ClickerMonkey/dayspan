@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+    <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+    <script src="../../node_modules/moment/min/moment-with-locales.js"></script>
+    <script src="../../umd/dayspan.js"></script>
+    <style> [v-cloak] { display: none; } </style>
+  </head>
+  <body>
+
+    <v-app id="dayspan" v-cloak>
+      <v-navigation-drawer :clipped="$vuetify.breakpoint.lgAndUp" v-model="drawer" fixed app>
+        <div class="pa-3" v-if="calendar">
+          <ds-day-picker :span="calendar.span" @picked="rebuild"></ds-day-picker>
+        </div>
+      </v-navigation-drawer>
+      <v-toolbar :clipped-left="$vuetify.breakpoint.lgAndUp" color="white" app flat fixed>
+
+        <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
+          <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+          <span class="hidden-sm-and-down">DaySpan</span>
+        </v-toolbar-title>
+
+        <v-tooltip bottom>
+          <v-btn depressed @click="today" slot="activator">TODAY</v-btn>
+          <span>{{ todayDate }}</span>
+        </v-tooltip>
+
+        <v-tooltip bottom>
+          <v-btn slot="activator" icon depressed @click="prev" class="grey--text text--darken-1">
+            <v-icon>keyboard_arrow_left</v-icon>
+          </v-btn>
+          <span>Previous month</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <v-btn slot="activator" icon depressed @click="next" class="grey--text text--darken-1">
+            <v-icon>keyboard_arrow_right</v-icon>
+          </v-btn>
+          <span>Next month</span>
+        </v-tooltip>
+
+        <h1 class="title grey--text text--darken-1">
+          {{ summary }}
+        </h1>
+
+        <v-spacer></v-spacer>
+        <v-menu>
+          <v-btn flat slot="activator">
+            {{ currentType.label }}
+            <v-icon>arrow_drop_down</v-icon>
+          </v-btn>
+          <v-list>
+            <v-list-tile v-for="type in types"
+              :key="type.id"
+              @click="currentType = type">
+              <v-list-tile-content>
+                <v-list-tile-title>{{ type.label }}</v-list-tile-title>
+              </v-list-tile-content>
+              <v-list-tile-action>{{ type.shortcut }}</v-list-tile-action>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
+        <v-btn icon large href="https://github.com/ClickerMonkey/dayspan" target="_blank">
+          <v-avatar size="32px" tile>
+            <img src="https://simpleicons.org/icons/github.svg" alt="Github">
+          </v-avatar>
+        </v-btn>
+      </v-toolbar>
+      <v-content>
+        <v-container fluid fill-height class="pa-0">
+
+          <div v-if="isDay">
+            Day View Not Yet Implemented
+          </div>
+
+          <div v-if="isWeek" class="ds-expand ds-week-view">
+            <div class="ds-month ds-expand">
+              <div class="ds-week-header">
+                <div class="ds-week-header-day grey--text text--darken-1 pa-1"
+                  v-for="(weekday, weekdayIndex) in weekdayCodes" :key="weekday"
+                  :class="{ 'ds-week-header-today': dayAtIndex(1, weekdayIndex + 1).currentDay }">
+                  {{ weekday }}
+                </div>
+              </div>
+              <div class="ds-week" v-for="i in rows">
+                <template v-for="k in 7">
+                  <ds-day :key="k" :day="dayAtIndex(i, k)"></ds-day>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="isMonth" class="ds-expand ds-month-view">
+            <div class="ds-month ds-expand">
+              <div class="ds-week-header">
+                <div class="ds-week-header-day grey--text text--darken-1 pa-1"
+                  v-for="weekday in weekdayCodes" :key="weekday">
+                  {{ weekday }}
+                </div>
+              </div>
+              <div class="ds-week" v-for="i in rows">
+                <template v-for="k in 7">
+                  <ds-day :key="k" :day="dayAtIndex(i, k)" @edit="edit" @add="add"></ds-day>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="isYear">
+            Year View Not Yet Implemented
+          </div>
+
+          <ds-scheduler ref="scheduler"
+            @save="eventSave"
+            @remove="eventRemove"
+            @exclude="eventRemoveOccurrence"></ds-scheduler>
+
+        </v-container>
+      </v-content>
+    </v-app>
+
+    <!--
+    Time
+      - All day
+      - Once a day
+      - Multiple times a day
+    Repeat
+      - Does not repeat
+      - Daily
+      - Weekly on [dayOfWeek]
+      - Monthly on the [nth] [dayOfWeek]
+      - Annually on [month] [dayOfMonth]
+      - Every weekday (Monday to Friday)
+      - Monthly on the [nth] day
+      - Custom
+    -->
+
+    <script type="text/template" id="template_scheduler">
+      <v-dialog v-model="open" max-width="500px">
+        <v-card>
+          <v-card-title>
+            {{ header }}
+          </v-card-title>
+          <v-card-text>
+            <v-text-field
+              label="Event Title"
+              v-model="title"
+            ></v-text-field>
+            <v-select
+              :items="colors"
+              v-model="color"
+              label="Event Color">
+              <template slot="selection" slot-scope="data">
+                <div class="ds-color-option" :style="{backgroundColor: data.item.value}" v-text="data.item.text"></div>
+              </template>
+              <template slot="item" slot-scope="data">
+                <v-list-tile-content>
+                  <div class="ds-color-option" :style="{backgroundColor: data.item.value}" v-text="data.item.text"></div>
+                </v-list-tile-content>
+              </template>
+            </v-select>
+            <v-select
+              label="Repeats..."
+              :items="types"
+              v-model="type"
+              item-text="label"
+              item-value="value"
+              @change="updateType"
+            ></v-select>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn color="primary" flat @click.stop="cancel">Cancel</v-btn>
+            <v-btn v-if="canRemove" color="primary" flat right @click.stop="remove">Remove</v-btn>
+            <v-btn v-if="canExclude" color="primary" flat right @click.stop="exclude">Exclude</v-btn>
+            <v-btn :disabled="!canSave" color="primary" flat right @click.stop="save">Save</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </script>
+
+    <script type="text/template" id="template_day">
+      <div class="ds-day pa-1"
+         :class="{ 'ds-today': day.currentDay, 'grey--text text--darken-1': day.currentOffset < 0 }"
+         @click.stop="add">
+        <div :class="{'grey--text text--darken-1': !day.inCalendar}">
+          <span class="ds-first-day" v-if="day.dayOfMonth === 1">
+            {{ day.format('MMM') }}
+          </span>
+          <span class="ds-dom" :class="{ 'ds-today-dom': day.currentDay }">
+            {{ day.dayOfMonth }}
+          </span>
+        </div>
+        <template v-for="event in day.events">
+          <ds-event :event="event" :key="event.id" @edit="edit"></ds-event>
+        </template>
+      </div>
+    </script>
+
+    <script type="text/template" id="template_event">
+      <div class="ds-event" :style="style" @click.stop="edit">
+        <span v-if="event.starting">
+          <span v-if="hasStartTime">
+            {{ getStartTime }}
+          </span>
+          <strong>
+            {{ event.event.name }}
+          </strong>
+        </span>
+      </div>
+    </script>
+
+    <script type="text/template" id="template_day_picker">
+      <div class="ds-day-picker">
+        <div class="ds-week-header mb-2">
+          <div class="subtitle grey--text text--darken-1 py-1 pl-2">
+            {{ summary }}
+          </div>
+          <v-tooltip bottom style="flex:1; text-align:center">
+            <v-btn slot="activator" small icon depressed @click="prev" class="grey--text text--darken-1 ma-0">
+              <v-icon>keyboard_arrow_left</v-icon>
+            </v-btn>
+            <span>Previous month</span>
+          </v-tooltip>
+          <v-tooltip bottom style="flex:1; text-align:center">
+            <v-btn slot="activator" small icon depressed @click="next" class="grey--text text--darken-1 ma-0">
+              <v-icon>keyboard_arrow_right</v-icon>
+            </v-btn>
+            <span>Next month</span>
+          </v-tooltip>
+        </div>
+        <div class="ds-week-subheader grey--text text--darken-1">
+          <div class="ds-weekday" v-for="weekday in weekdays" :key="weekday">
+            <v-tooltip bottom>
+              <span slot="activator">{{ weekday.charAt(0) }}</span>
+              <span>{{ weekday }}</span>
+            </v-tooltip>
+          </div>
+        </div>
+        <div class="ds-week">
+          <div class="ds-day-pick" v-for="day in month.days" :key="day.dayIdentifier">
+            <v-btn small icon depressed class="ma-0"
+              @click="pick( day )"
+              :class="{
+                'btn--active': day.currentDay,
+                'grey--text text--darken-1': !day.inCalendar
+              }">
+              {{ day.dayOfMonth }}
+            </v-btn>
+          </div>
+        </div>
+      </div>
+    </script>
+
+    <script>
+      var Store = {
+        Watcher: function(name, deep) {
+          return {
+            deep: !!deep,
+            handler: function(newValue) {
+              localStorage.setItem(name, JSON.stringify(newValue));
+            }
+          };
+        },
+        Load: function(name, defaultValue, parser) {
+          var oldValue = localStorage.getItem(name);
+          if (!oldValue) {
+            return defaultValue;
+          }
+          var parsedValue = JSON.parse(oldValue);
+          if (parser) {
+            parsedValue = parser( parsedValue );
+          }
+          return parsedValue;
+        }
+      };
+
+      new Vue({
+        el: '#dayspan',
+        props: ['source'],
+        data: {
+          drawer: null,
+          calendar: null,
+          dayProperty: Store.Load('dayProperty', 'dayOfMonth'),
+          currentType: null,
+          types: [
+            {id: 'D', label: 'Day', shortcut: 'D', type: ds.Units.DAY, size: 1},
+            {id: 'W', label: 'Week', shortcut: 'W', type: ds.Units.WEEK, size: 1},
+            {id: 'M', label: 'Month', shortcut: 'M', type: ds.Units.MONTH, size: 1},
+            {id: 'Y', label: 'Year', shortcut: 'Y', type: ds.Units.YEAR, size: 1},
+            {id: 'X', label: '4 days', shortcut: 'X', type: ds.Units.DAY, size: 4}
+          ],
+          selectionStart: null,
+          dayProperties: {
+            'Day Of Week': 'dayOfWeek',
+            'Day Of Month': 'dayOfMonth',
+            'Day Of Year': 'dayOfYear',
+            'Week': 'week',
+            'Week Of Year': 'weekOfYear',
+            'Weekspan Of Year': 'weekspanOfYear',
+            'Full Week Of Year': 'fullWeekOfYear',
+            'Week Of Month': 'weekOfMonth',
+            'Weekspan Of Month': 'weekspanOfMonth',
+            'Full Week Of Month': 'fullWeekOfMonth'
+          },
+          weekdays: moment.weekdays(),
+          weekdayCodes: moment.weekdaysShort(),
+          schedules: [
+            {
+              event: {name: 'Monthly Meeting', color: '#3F51B5'},
+              schedule: {
+                dayOfWeek: [ds.Weekday.MONDAY],
+                times: [9],
+                duration: 30,
+                durationUnit: 'minutes'
+              }
+            },
+            {
+              event: {name: 'Mother\'s Day', color: '#2196F3'},
+              schedule: {
+                month: [ds.Month.MAY],
+                dayOfWeek: [ds.Weekday.SUNDAY],
+                weekspanOfMonth: [1]
+              }
+            },
+            {
+              event: {name: 'First Weekend of May', color: '#4CAF50'},
+              schedule: {
+                month: [ds.Month.MAY],
+                weekspanOfMonth: [0],
+                dayOfWeek: [ds.Weekday.FRIDAY],
+                duration: 3,
+                durationUnit: 'days'
+              }
+            }
+          ]
+        },
+        watch: {
+          input: Store.Watcher('input'),
+          dayProperty: Store.Watcher('dayProperty'),
+          currentType: function() {
+            this.rebuild();
+          }
+        },
+        computed: {
+          summary: function() {
+            return this.calendar ? this.calendar.summary(false, false, false, false) : '';
+          },
+          todayDate: function() {
+            return ds.Day.today().format('dddd, MMMM D');
+          },
+          rows: function() {
+            return Math.floor( this.calendar.days.length / 7 );
+          },
+          isDay: function() {
+            return this.calendar && this.calendar.type === ds.Units.DAY;
+          },
+          isWeek: function() {
+            return this.calendar && this.calendar.type === ds.Units.WEEK;
+          },
+          isMonth: function() {
+            return this.calendar && this.calendar.type === ds.Units.MONTH;
+          },
+          isYear: function() {
+            return this.calendar && this.calendar.type === ds.Units.YEAR;
+          }
+        },
+        created: function() {
+          // Initialize types
+          if (!this.currentType) {
+            this.currentType = this.types[2];
+          }
+
+          // Export
+          window.app = this;
+        },
+        methods: {
+          rebuild: function(aroundDay) {
+            var type = this.currentType || this.types[ 2 ];
+            var around = aroundDay || (this.calendar ? this.calendar.start : ds.Day.today());
+
+            if (this.calendar &&
+                this.calendar.type === type.type &&
+                this.calendar.size === type.size &&
+                (!around || this.calendar.span.matchesDay( around ))) {
+              return;
+            }
+
+            switch (type.type) {
+              case ds.Units.DAY:
+                this.calendar = ds.Calendar.days(type.size, around, 0, {
+                  eventsOutside: true,
+                  listTimes: true,
+                  schedules: this.schedules
+                });
+                break;
+              case ds.Units.WEEK:
+                this.calendar = ds.Calendar.weeks(type.size, around, 0, {
+                  eventsOutside: true,
+                  listTimes: true,
+                  schedules: this.schedules
+                });
+                break;
+              case ds.Units.MONTH:
+                this.calendar = ds.Calendar.months(type.size, around, 0, {
+                  eventsOutside: true,
+                  fill: true,
+                  schedules: this.schedules
+                });
+                break;
+              case ds.Units.YEAR:
+                this.calendar = ds.Calendar.years(type.size, around, 0, {
+                  eventsOutside: true,
+                  fill: true,
+                  schedules: this.schedules
+                });
+                break;
+            }
+          },
+          selectStart: function(day) {
+            this.selectionStart = day;
+          },
+          selectMove: function(day) {
+            if (!this.selectionStart) {
+              return;
+            }
+            var existing = this.calendar.selection;
+            if (existing && existing.isPoint && existing.matchesDay( day ) && day.sameDay( this.selectionStart )) {
+              this.calendar.unselect();
+            } else {
+              var min = day.min( this.selectionStart );
+              var max = day.max( this.selectionStart );
+              this.calendar.select(min, max);
+            }
+          },
+          selectEnd: function(day) {
+            this.selectMove( day );
+            this.selectionStart = null;
+          },
+          next: function() {
+            this.calendar.unselect().next();
+          },
+          prev: function() {
+            this.calendar.unselect().prev();
+          },
+          today: function() {
+            this.rebuild(ds.Day.today());
+          },
+          dayAtIndex: function(row, cell) {
+            return this.calendar.days[ (row - 1) * 7 + (cell - 1) ];
+          },
+          edit: function(eventDay) {
+            this.$refs.scheduler.edit(eventDay.day, eventDay.event);
+          },
+          add: function(day) {
+            this.$refs.scheduler.add(day);
+          },
+          eventSave: function(data) {
+            if (data.event) {
+              data.event.event.title = data.title;
+              data.event.event.color = data.color;
+              data.event.schedule.set(data.schedule);
+              this.calendar.refreshEvents();
+            } else {
+              var entry = {
+                event: {name: data.title, color: data.color},
+                schedule: data.schedule
+              };
+              this.schedules.push(entry);
+              this.calendar.addSchedule(entry);
+            }
+          },
+          eventRemove: function(event) {
+            this.calendar.removeSchedule(event);
+          },
+          eventRemoveOccurrence: function(data) {
+            data.event.schedule.exclude[ data.day.dayIdentifier ] = true;
+            this.calendar.refreshEvents();
+          }
+        }
+      });
+
+      /**
+
+       - Does not repeat
+       - Daily
+       - Weekly on [dayOfWeek]
+       - Monthly on the [nth] [dayOfWeek]
+       - Annually on [month] [dayOfMonth]
+       - Every weekday (Monday to Friday)
+       - Monthly on the [nth] day
+       - Custom
+
+       // true = presence required
+       // 1 = an array with 1 element
+       // [] = an array that matches values
+       // {every, offfset} = a matching frequency
+       // false = presense is optional
+       // undefined = presense should not exist
+
+       **/
+
+      // 'start', 'end', 'duration', 'durationUnit', 'exclude', 'times'
+      var PATTERN_PROPS = ['dayOfWeek', 'dayOfMonth', 'dayOfYear', 'month', 'week', 'year', 'weekOfYear', 'weekspanOfYear', 'fullWeekOfYear', 'weekOfMonth', 'weekspanOfMonth', 'fullWeekOfMonth'];
+      var PATTERNS = {
+        none: {
+          year: 1,
+          month: 1,
+          dayOfMonth: 1
+        },
+        daily: {
+
+        },
+        weekly: {
+          dayOfWeek: 1
+        },
+        monthlyWeek: {
+          dayOfWeek: 1,
+          weekspanOfMonth: 1
+        },
+        annually: {
+          month: 1,
+          dayOfMonth: 1
+        },
+        weekday: {
+          dayOfWeek: [ds.Weekday.MONDAY, ds.Weekday.TUESDAY, ds.Weekday.WEDNESDAY, ds.Weekday.THURSDAY, ds.Weekday.FRIDAY]
+        },
+        monthly: {
+          dayOfMonth: 1
+        },
+        custom: {
+          dayOfWeek: false,
+          dayOfMonth: false,
+          dayOfYear: false,
+          month: false,
+          week: false,
+          year: false,
+          weekOfYear: false,
+          weekspanOfYear: false,
+          fullWeekOfYear: false,
+          weekOfMonth: false,
+          weekspanOfMonth: false,
+          fullWeekOfMonth: false
+        }
+      };
+
+      Vue.component('dsScheduler', {
+        template: '#template_scheduler',
+        data: function() {
+          return {
+            open: false,
+            creating: false,
+            event: null,
+            color: null,
+            title: '',
+            input: {},
+            day: null,
+            type: '',
+            colors: [
+              { text: 'Red', value: '#F44336' },
+              { text: 'Pink', value: '#E91E63' },
+              { text: 'Purple', value: '#9C27B0' },
+              { text: 'Deep Purple', value: '#673AB7' },
+              { text: 'Indigo', value: '#3F51B5' },
+              { text: 'Blue', value: '#2196F3' },
+              { text: 'Light Blue', value: '#03A9F4' },
+              { text: 'Cyan', value: '#00BCD4' },
+              { text: 'Teal', value: '#009688' },
+              { text: 'Green', value: '#4CAF50' },
+              { text: 'Light Green', value: '#8BC34A' },
+              { text: 'Lime', value: '#CDDC39' },
+              { text: 'Yellow', value: '#FFEB3B' },
+              { text: 'Amber', value: '#FFC107' },
+              { text: 'Orange', value: '#FF9800' },
+              { text: 'Deep Orange', value: '#FF5722' },
+              { text: 'Brown', value: '#795548' },
+              { text: 'Blue Gray', value: '#607D8B' },
+              { text: 'Gray', value: '#9E9E9E' },
+              { text: 'Black', value: '#000000' }
+            ]
+          };
+        },
+        computed: {
+          canSave: function() {
+            return !!this.title;
+          },
+          header: function() {
+            return this.event ? 'Edit Event' : 'Add Event';
+          },
+          canRemove: function() {
+            return !!this.event;
+          },
+          canExclude: function() {
+            return !!this.event;
+          },
+          types: function() {
+            if (!this.day) {
+              return [];
+            }
+            return [
+              {label: 'Does not repeat', value: 'none'},
+              {label: 'Daily', value: 'daily'},
+              {label: 'Weekly on ' + this.day.format('dddd'), value: 'weekly'},
+              {label: 'Monthly on the ' + ds.Suffix.get(this.day.weekspanOfMonth + 1, true) + ' ' + this.day.format('dddd'), value: 'monthlyWeek'},
+              {label: 'Annually on ' + this.day.format('MMMM Do'), value: 'annually'},
+              {label: 'Every weekday (Monday to Friday)', value: 'weekday'},
+              {label: 'Monthly on the ' + this.day.format('Do') + 'day', value: 'monthly'},
+              {label: 'Custom', value: 'custom'}
+            ];
+          }
+        },
+        mounted: function() {
+          window.Scheduler = this;
+        },
+        methods: {
+          add: function(day) {
+            this.day = day;
+            this.event = null;
+            this.title = '';
+            this.color = this.colors[Math.floor(this.colors.length * Math.random())].value;
+            this.input = {};
+            this.type = 'none';
+            this.updateType('none');
+            this.creating = true;
+            this.open = true;
+          },
+          edit: function(onDay, event) {
+            this.day = onDay;
+            this.event = event;
+            this.title = event.event.name;
+            this.color = event.event.color;
+            this.input = event.schedule.toInput(true);
+            this.type = this.determineType();
+            this.creating = false;
+            this.open = true;
+          },
+          remove: function() {
+            this.$emit('remove', this.event);
+            this.open = false;
+          },
+          exclude: function() {
+            this.$emit('exclude', {
+              event: this.event,
+              day: this.day
+            });
+            this.open = false;
+          },
+          cancel: function() {
+            this.$emit('cancel');
+            this.open = false;
+          },
+          save: function() {
+            this.$emit('save', {
+              title: this.title,
+              color: this.color,
+              schedule: this.input,
+              event: this.event
+            });
+            this.open = false;
+          },
+          determineType: function() {
+            for (var type in PATTERNS) {
+              if (this.isPattern(PATTERNS[ type ])) {
+                return type;
+              }
+            }
+            return 'custom';
+          },
+          updateType: function(type) {
+            var pattern = PATTERNS[type];
+            if (pattern) {
+              this.applyPattern(pattern);
+            }
+          },
+          isPattern: function(pattern) {
+            var input = this.input;
+            for (var i = 0; i < PATTERN_PROPS.length; i++) {
+              var prop = PATTERN_PROPS[ i ];
+              var rule = pattern[ prop ];
+              var curr = input[ prop ];
+
+              if (rule === false) {
+                continue;
+              }
+              if (rule === true && !curr) {
+                return false;
+              }
+              if (rule === undefined && curr) {
+                return false;
+              }
+              if (isFinite(rule) && (!curr || !curr.length || curr.length !== rule)) {
+                return false;
+              }
+
+              if (rule instanceof Array) {
+                if (!(curr instanceof Array)) {
+                  return false;
+                }
+                if (rule.length !== curr.length) {
+                  return false;
+                }
+                for (var i = 0; i < rule.length; i++) {
+                  if (rule[ i ] !== curr[ i ]) {
+                    return false;
+                  }
+                }
+              } else if (typeof rule === 'object') {
+                if (typeof curr !== 'object') {
+                  return false;
+                }
+                var ruleOffset = rule.offset || 0;
+                var currOffset = curr.offset || 0;
+                if (currOffset !== ruleOffset || curr.every !== rule.every) {
+                  return false;
+                }
+              }
+            }
+            return true;
+          },
+          applyPattern: function(pattern) {
+            var input = this.input;
+            for (var i = 0; i < PATTERN_PROPS.length; i++) {
+              var prop = PATTERN_PROPS[ i ];
+              var rule = pattern[ prop ];
+
+              if (rule === 1) {
+                input[ prop ] = [this.day[ prop ]];
+              }
+              if (rule instanceof Array) {
+                input[ prop ] = rule;
+              }
+              if (rule === undefined) {
+                delete input[ prop ];
+              }
+            }
+          }
+        }
+      });
+
+      Vue.component('dsEvent', {
+        props: ['event'],
+        template: '#template_event',
+        computed: {
+          now: function() {
+            return ds.Day.now();
+          },
+          style: function() {
+            return {
+              backgroundColor: this.event.event.color,
+              opacity: this.now.isAfter(this.event.time.end) ? 0.5 : 1.0
+            };
+          },
+          hasStartTime: function() {
+            return !this.event.schedule.isFullDay() && this.event.schedule.times.length === 1;
+          },
+          getStartTime: function() {
+            return this.event.schedule.times[0].format('ha');
+          }
+        },
+        methods: {
+          edit: function() {
+            this.$emit('edit', this.event);
+          }
+        }
+      });
+
+      Vue.component('dsDay', {
+        props: ['day'],
+        template: '#template_day',
+        methods: {
+          edit: function(event) {
+            this.$emit('edit', {
+              event: event,
+              day: this.day
+            });
+          },
+          add: function() {
+            this.$emit('add', this.day);
+          }
+        }
+      });
+
+      Vue.component('dsDayPicker', {
+        props: ['span'],
+        template: '#template_day_picker',
+        data: function() {
+          return {
+            month: this.getMonth(),
+            weekdays: moment.weekdays()
+          };
+        },
+        computed: {
+          summary: function() {
+            return this.month.summary(false, false, false, false);
+          }
+        },
+        watch: {
+          span: {
+            deep: true,
+            handler: function(span) {
+              if (!span.matchesMonth(this.month.start)) {
+                this.month = this.getMonth();
+              }
+            }
+          }
+        },
+        methods: {
+          getMonth: function() {
+            return ds.Calendar.months(1, this.span.start, 0, {fill: true, minimumSize: 42});
+          },
+          pick: function(day) {
+            this.$emit('picked', day);
+          },
+          prev: function() {
+            this.month.prev();
+            this.$emit('prev', this.month);
+          },
+          next: function() {
+            this.month.next();
+            this.$emit('next', this.month);
+          }
+        }
+      });
+    </script>
+
+    <style>
+      nav.toolbar .toolbar__content {
+        border-bottom: 1px solid rgb(224, 224, 224);
+      }
+      .ds-expand {
+        width: 100%;
+        height: 100%;
+      }
+      .ds-month {
+        display: flex;
+        flex-direction: column;
+        background-color: white;
+      }
+      .ds-week-header {
+        display: flex;
+      }
+      .ds-week-header-day {
+        flex: 1 0 20px;
+        border-right: #e0e0e0 1px solid;
+      }
+      .ds-week {
+        display: flex;
+        flex: 1;
+      }
+      .ds-day {
+        flex: 1;
+        width: 0;
+        border-right: #e0e0e0 1px solid;
+        border-bottom: #e0e0e0 1px solid;
+      }
+      .ds-day .ds-today-dom {
+        margin: -4px;
+        padding: 4px;
+        border-radius: 16px;
+        background-color: #4285f4;
+        color: white;
+      }
+      .ds-event {
+        margin: 1px;
+        color: white;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding-left: 0.5em;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      .ds-day-picker .ds-week-header {
+        display: flex;
+      }
+      .ds-day-picker .ds-week-header > div {
+        flex: 1;
+      }
+      .ds-day-picker .ds-week-header .subtitle {
+        flex: 5;
+      }
+      .ds-day-picker .ds-week-subheader {
+        display: flex;
+        text-align: center
+      }
+      .ds-day-picker .ds-week {
+        display: flex;
+        text-align: center;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .ds-day-picker .ds-weekday {
+        flex: 1;
+      }
+      .ds-day-picker .ds-day-pick {
+        flex: 1 0 14%;
+      }
+      .ds-week-view .ds-first-day {
+        display: none;
+      }
+      .ds-week-view .ds-week-header-today,
+      .ds-week-view .ds-today .ds-today-dom {
+        color: #4285f4 !important;
+        margin: 0;
+        padding: 0;
+        border-radius: 0;
+        background-color: white;
+      }
+      .ds-week-view .ds-day > div:first-child {
+        margin-top: -16px;
+      }
+      .ds-week-view .ds-dom {
+        font-size: 38px;
+      }
+      .ds-week-view .ds-week-header-day {
+        padding-left: 0.5em !important;
+      }
+      .ds-color-option {
+        width: 100%;
+        color: white;
+        padding: 10px;
+      }
+    </style>
+
+
+  </body>
+</html>

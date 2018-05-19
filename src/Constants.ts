@@ -30,6 +30,9 @@ export class Constants
   public static START_NONE: number = 0;
   public static END_NONE: number = 0;
   public static DURATION_NONE: number = 0;
+  public static DURATION_DEFAULT_UNIT: string = 'minutes';
+
+  public static MAX_EVENTS_PER_DAY: number = 24;
 
   public static WEEK_OF_MONTH_MINIMUM_WEEKDAY: number = 4; // Thursday by default
 }

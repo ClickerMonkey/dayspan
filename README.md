@@ -22,7 +22,7 @@ cal.addSchedule({
 cal.addSchedule({
   event: 'Dr. Appointment',
   schedule: new Schedule({
-    on: Day.create(2018, Month.APRIL, 1)
+    on: Day.build(2018, Month.APRIL, 1)
   })
 });
 
@@ -43,7 +43,7 @@ cal.days;
 cal.next();
 
 // Select this day and update the selection flags in the calendar days
-cal.select(Day.create(2018, Month.APRIL, 12));
+cal.select(Day.build(2018, Month.APRIL, 12));
 
 // Remove the schedule
 cal.removeSchedule('Weekly Meeting');
@@ -55,7 +55,7 @@ Calendar.weeks<MyEvent>();
 Calendar.days<string>(3);
 
 // A daily calendar covering 3 days starting with given date
-Calendar.days<string>(3, Day.create(2018, Month.JUNE, 15), 0);
+Calendar.days<string>(3, Day.build(2018, Month.JUNE, 15), 0);
 ```
 
 ### JS Example
@@ -80,7 +80,7 @@ cal.addSchedule({
 cal.addSchedule({
   event: 'Dr. Appointment',
   schedule: new ds.Schedule({
-    on: ds.Day.create(2018, ds.Month.APRIL, 1)
+    on: ds.Day.build(2018, ds.Month.APRIL, 1)
   })
 });
 ```

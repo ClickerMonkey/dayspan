@@ -3,8 +3,9 @@ import { Functions as fn } from './Functions';
 import { FrequencyCheck } from './Types';
 import { Schedule, ScheduleInput, ScheduleExclusions } from './Schedule';
 import { Constants } from './Constants';
-import { Day } from './Day';
+import { Day, DayInput, DurationInput } from './Day';
 import { CalendarScheduleInput, CalendarSchedule } from './Calendar';
+import { Time } from './Time';
 
 
 /**
@@ -62,11 +63,11 @@ export class Parse
     return otherwise;
   }
 
-  public static day(input: any): Day
+  public static day(input: DayInput): Day
   {
     if (fn.isNumber(input))
     {
-      return Day.unix( input );
+      return Day.unix( <number>input );
     }
     else if (fn.isString(input))
     {
@@ -78,11 +79,11 @@ export class Parse
     }
     else if (fn.isArray( input ))
     {
-      return Day.fromArray( input );
+      return Day.fromArray( <number[]>input );
     }
     else if (fn.isObject( input ))
     {
-      return Day.fromObject( input );
+      return Day.fromObject( <object>input );
     }
     else if (input === true)
     {
@@ -90,6 +91,44 @@ export class Parse
     }
 
     return null;
+  }
+
+  public static time(input: any): Time
+  {
+    if (fn.isNumber(input))
+    {
+      return Time.fromIdentifier( <number>input );
+    }
+    if (fn.isString(input))
+    {
+      return Time.fromString( <string>input );
+    }
+    if (fn.isObject(input) && fn.isNumber(input.hour))
+    {
+      return new Time(input.hour, input.minute, input.second, input.millisecond);
+    }
+
+    return null;
+  }
+
+  public static times(input: any): Time[]
+  {
+    let times: Time[] = [];
+
+    if (fn.isArray(input))
+    {
+      for (let timeInput of input)
+      {
+        let time = this.time( timeInput );
+
+        if (time)
+        {
+          times.push( time );
+        }
+      }
+    }
+
+    return times;
   }
 
   public static exclusions(input: any): ScheduleExclusions
@@ -104,9 +143,14 @@ export class Parse
         {
           exclusions[ dayIdentifier ] = true;
         }
-        else if (dayIdentifier instanceof Day)
+        else
         {
-          exclusions[ dayIdentifier.dayIdentifier ] = true;
+          let day: Day = this.day( dayIdentifier );
+
+          if (day)
+          {
+            exclusions[ day.dayIdentifier ] = true;
+          }
         }
       }
     }
@@ -121,16 +165,17 @@ export class Parse
     if (on)
     {
       input.start = on.start();
-      input.end = on.end(false);
+      input.end = on.end();
       input.year = [on.year];
       input.month = [on.month];
       input.dayOfMonth = [on.dayOfMonth];
     }
 
-    out.start = this.utc( input.start, Constants.START_NONE );
-    out.end = this.utc( input.end, Constants.END_NONE );
     out.duration = fn.coalesce( input.duration, Constants.DURATION_NONE );
-    out.exclude = fn.coalesce( input.exclude, [] );
+    out.durationUnit = <DurationInput>fn.coalesce( input.durationUnit, Constants.DURATION_DEFAULT_UNIT );
+    out.start = this.day( input.start );
+    out.end = this.day( input.end );
+    out.endWithDuration = out.end ? out.end.add(out.duration, out.durationUnit) : null;
     out.dayOfWeek = this.frequency( input.dayOfWeek );
     out.dayOfMonth = this.frequency( input.dayOfMonth );
     out.dayOfYear = this.frequency( input.dayOfYear );
@@ -143,10 +188,9 @@ export class Parse
     out.weekspanOfMonth = this.frequency( input.weekspanOfMonth );
     out.fullWeekOfMonth = this.frequency( input.fullWeekOfMonth );
     out.year = this.frequency( input.year );
-    out.hour = this.frequency( input.hour, Constants.HOURS_IN_DAY );
-    out.minute = fn.coalesce( input.minute, Constants.MINUTE_MIN );
+    out.times = this.times( input.times );
     out.exclude = this.exclusions( input.exclude );
-    out.refreshHours();
+    out.updateDurationInDays();
 
     return out;
   }

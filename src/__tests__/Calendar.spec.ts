@@ -4,13 +4,12 @@ import { Weekday } from '../Weekday';
 import { Month } from '../Month';
 import { Day } from '../Day';
 import { Calendar } from '../Calendar';
-import { Duration } from '../Duration';
 
 
 describe('Calendar', () => {
 
   it('days 1', () => {
-    let d = Day.create(2018, Month.APRIL, 11);
+    let d = Day.build(2018, Month.APRIL, 11);
     let c = Calendar.days<string>(1, d);
 
     expect( c.length ).toBe( 1 );
@@ -28,7 +27,7 @@ describe('Calendar', () => {
   })
 
   it('days 3', () => {
-    let d = Day.create(2018, Month.APRIL, 11);
+    let d = Day.build(2018, Month.APRIL, 11);
     let c = Calendar.days<string>(3, d);
 
     expect( c.length ).toBe( 3 );
@@ -59,7 +58,7 @@ describe('Calendar', () => {
 
   it('schedule', () => {
 
-    let d = Day.create(2018, Month.MAY, 11);
+    let d = Day.build(2018, Month.MAY, 11);
     let c = Calendar.months<string>(1, d);
     c.listTimes = true;
 
@@ -68,8 +67,9 @@ describe('Calendar', () => {
       event: 'Weekly Meeting',
       schedule: new Schedule({
         dayOfWeek: [Weekday.MONDAY],
-        hour: [9],
-        duration: Duration.minutes(30)
+        times: [9],
+        duration: 30,
+        durationUnit: 'minutes'
       })
     });
 
@@ -80,8 +80,8 @@ describe('Calendar', () => {
     expect( c.days[7].events.length ).toBe( 0 );
     expect( c.days[8].events.length ).toBe( 1 );
     expect( c.days[8].events[0].event ).toBe( 'Weekly Meeting' );
-    expect( c.days[8].events[0].time.start.time ).toBe( Day.create(2018, Month.MAY, 7, 9, 0).time );
-    expect( c.days[8].events[0].time.end.time ).toBe( Day.create(2018, Month.MAY, 7, 9, 30).time );
+    expect( c.days[8].events[0].time.start.time ).toBe( Day.build(2018, Month.MAY, 7, 9, 0).time );
+    expect( c.days[8].events[0].time.end.time ).toBe( Day.build(2018, Month.MAY, 7, 9, 30).time );
     expect( c.days[9].events.length ).toBe( 0 );
     expect( c.days[15].events.length ).toBe( 1 );
   })

@@ -52,20 +52,20 @@ describe('Day', () => {
 
   it('relativeDays', () => {
 
-    let d0 = Day.create(2018, Month.APRIL, 1);
+    let d0 = Day.build(2018, Month.APRIL, 1);
     let d1 = d0.relativeDays(-3);
     let d2 = d0.relativeDays(+3);
 
     expect( d0.daysBetween(d1) ).toBe( 3 );
     expect( d0.daysBetween(d2) ).toBe( 3 );
 
-    expect( d1.time ).toBe( Day.create(2018, Month.MARCH, 29).time );
-    expect( d2.time ).toBe( Day.create(2018, Month.APRIL, 4).time );
+    expect( d1.time ).toBe( Day.build(2018, Month.MARCH, 29).time );
+    expect( d2.time ).toBe( Day.build(2018, Month.APRIL, 4).time );
   })
 
   it('withDayOfMonth', () => {
 
-    let d0 = Day.create(2018, Month.APRIL, 4);
+    let d0 = Day.build(2018, Month.APRIL, 4);
     let d1 = d0.withDayOfMonth(6);
 
     expect( d0.daysBetween(d1) ).toBe( 2 );
@@ -77,7 +77,7 @@ describe('Day', () => {
 
   it('withDayOfWeek', () => {
 
-    let d0 = Day.create(2018, Month.APRIL, 4);
+    let d0 = Day.build(2018, Month.APRIL, 4);
     let d1 = d0.withDayOfWeek(Weekday.SUNDAY);
 
     expect( d1.dayOfMonth ).toBe( 1 );
@@ -85,7 +85,7 @@ describe('Day', () => {
     expect( d1.year ).toBe( 2018 );
     expect( d1.dayOfWeek ).toBe( Weekday.SUNDAY );
 
-    let d2 = Day.create(2018, Month.APRIL, 30);
+    let d2 = Day.build(2018, Month.APRIL, 30);
     let d3 = d2.withDayOfWeek(Weekday.FRIDAY);
 
     expect( d3.dayOfMonth ).toBe( 4 );

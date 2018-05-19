@@ -7,7 +7,7 @@
 		exports["ds"] = factory(require("moment"));
 	else
 		root["ds"] = factory(root["moment"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_2__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_0__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -70,18 +70,24 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-module.exports = __webpack_require__(1);
-
+module.exports = __WEBPACK_EXTERNAL_MODULE_0__;
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(2);
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -147,6 +153,16 @@ var Functions = (function () {
     Functions.coalesce = function (a, b, c) {
         return this.isDefined(a) ? a : (this.isDefined(b) ? b : c);
     };
+    Functions.pad = function (x, length, padding, before) {
+        while (x.length < length) {
+            before ? x = padding + x : x = x + padding;
+        }
+        return x;
+    };
+    Functions.padNumber = function (x, length, first) {
+        if (first === void 0) { first = length; }
+        return this.pad(x + '', length, '0', true).substring(0, first);
+    };
     return Functions;
 }());
 
@@ -181,6 +197,8 @@ var Constants = (function () {
     Constants.START_NONE = 0;
     Constants.END_NONE = 0;
     Constants.DURATION_NONE = 0;
+    Constants.DURATION_DEFAULT_UNIT = 'minutes';
+    Constants.MAX_EVENTS_PER_DAY = 24;
     Constants.WEEK_OF_MONTH_MINIMUM_WEEKDAY = 4; // Thursday by default
     return Constants;
 }());
@@ -222,456 +240,6 @@ function operate(value, op, absolute) {
     }
     return value;
 }
-
-// CONCATENATED MODULE: ./src/Day.ts
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_moment__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_moment__);
-
-
-
-// @ts-ignore
-
-var Day_Day = (function () {
-    function Day(date) {
-        this.date = date;
-        this.time = date.unix();
-        this.millis = date.millisecond();
-        this.seconds = date.second();
-        this.minute = date.minute();
-        this.hour = date.hour();
-        this.month = date.month();
-        this.year = date.year();
-        this.quarter = date.quarter();
-        this.dayOfWeek = date.day();
-        this.dayOfMonth = date.date();
-        this.dayOfYear = date.dayOfYear();
-        this.week = date.week();
-        this.weekOfYear = Day.getWeekOfYear(date);
-        this.weekspanOfYear = Day.getWeekspanOfYear(date);
-        this.fullWeekOfYear = Day.getFullWeekOfYear(date);
-        this.weekOfMonth = Day.getWeekOfMonth(date);
-        this.weekspanOfMonth = Day.getWeekspanOfMonth(date);
-        this.fullWeekOfMonth = Day.getFullWeekOfMonth(date);
-        this.dayIdentifier = Day.getDayIdentifier(date);
-        this.weekIdentifier = Day.getWeekIdentifier(date);
-        this.monthIdentifier = Day.getMonthIdentifier(date);
-        this.quarterIdentifier = Day.getQuarterIdentifier(date);
-    }
-    // Same
-    Day.prototype.sameDay = function (day) {
-        return this.dayIdentifier === day.dayIdentifier;
-    };
-    Day.prototype.sameMonth = function (day) {
-        return this.monthIdentifier === day.monthIdentifier;
-    };
-    Day.prototype.sameWeek = function (day) {
-        return this.weekIdentifier === day.weekIdentifier;
-    };
-    Day.prototype.sameYear = function (day) {
-        return this.year === day.year;
-    };
-    Day.prototype.sameQuarter = function (day) {
-        return this.quarterIdentifier === day.quarterIdentifier;
-    };
-    Day.prototype.sameHour = function (day) {
-        return this.dayIdentifier === day.dayIdentifier && this.hour === day.hour;
-    };
-    Day.prototype.sameMinute = function (day) {
-        return this.dayIdentifier === day.dayIdentifier && this.hour === day.hour && this.minute === day.minute;
-    };
-    // Comparison
-    Day.prototype.isBefore = function (day, precision) {
-        return this.date.isBefore(day.date, precision);
-    };
-    Day.prototype.isSameOrBefore = function (day, precision) {
-        return this.date.isSameOrBefore(day.date, precision);
-    };
-    Day.prototype.isAfter = function (day, precision) {
-        return this.date.isAfter(day.date, precision);
-    };
-    Day.prototype.isSameOrAfter = function (day, precision) {
-        return this.date.isSameOrAfter(day.date, precision);
-    };
-    Day.prototype.max = function (day) {
-        return this.date.isAfter(day.date) ? this : day;
-    };
-    Day.prototype.min = function (day) {
-        return this.date.isBefore(day.date) ? this : day;
-    };
-    // Between
-    Day.prototype.millisBetween = function (day, op, absolute) {
-        if (op === void 0) { op = Op.DOWN; }
-        if (absolute === void 0) { absolute = true; }
-        return operate(this.date.diff(day.date, 'milliseconds', true), op, absolute);
-    };
-    Day.prototype.secondsBetween = function (day, op, absolute) {
-        if (op === void 0) { op = Op.DOWN; }
-        if (absolute === void 0) { absolute = true; }
-        return operate(this.date.diff(day.date, 'seconds', true), op, absolute);
-    };
-    Day.prototype.minutesBetween = function (day, op, absolute) {
-        if (op === void 0) { op = Op.DOWN; }
-        if (absolute === void 0) { absolute = true; }
-        return operate(this.date.diff(day.date, 'minutes', true), op, absolute);
-    };
-    Day.prototype.hoursBetween = function (day, op, absolute) {
-        if (op === void 0) { op = Op.DOWN; }
-        if (absolute === void 0) { absolute = true; }
-        return operate(this.date.diff(day.date, 'hours', true), op, absolute);
-    };
-    Day.prototype.daysBetween = function (day, op, absolute) {
-        if (op === void 0) { op = Op.DOWN; }
-        if (absolute === void 0) { absolute = true; }
-        return operate(this.date.diff(day.date, 'days', true), op, absolute);
-    };
-    Day.prototype.weeksBetween = function (day, op, absolute) {
-        if (op === void 0) { op = Op.DOWN; }
-        if (absolute === void 0) { absolute = true; }
-        return operate(this.date.diff(day.date, 'weeks', true), op, absolute);
-    };
-    Day.prototype.monthsBetween = function (day, op, absolute) {
-        if (op === void 0) { op = Op.DOWN; }
-        if (absolute === void 0) { absolute = true; }
-        return operate(this.date.diff(day.date, 'months', true), op, absolute);
-    };
-    Day.prototype.yearsBetween = function (day, op, absolute) {
-        if (op === void 0) { op = Op.DOWN; }
-        if (absolute === void 0) { absolute = true; }
-        return operate(this.date.diff(day.date, 'years', true), op, absolute);
-    };
-    Day.prototype.isBetween = function (start, end, inclusive) {
-        if (inclusive === void 0) { inclusive = true; }
-        return this.date.isBetween(start.date, end.date, null, inclusive ? '[]' : '[)');
-    };
-    Day.prototype.mutate = function (mutator) {
-        var d = this.toMoment();
-        mutator(d);
-        return new Day(d);
-    };
-    Day.prototype.relative = function (millis) {
-        return this.mutate(function (d) { return d.add(millis, 'milliseconds'); });
-    };
-    // Days
-    Day.prototype.relativeDays = function (days) {
-        return this.mutate(function (d) { return d.add(days, 'days'); });
-    };
-    Day.prototype.prev = function (days) {
-        if (days === void 0) { days = 1; }
-        return this.relativeDays(-days);
-    };
-    Day.prototype.next = function (days) {
-        if (days === void 0) { days = 1; }
-        return this.relativeDays(days);
-    };
-    Day.prototype.withDayOfMonth = function (day) {
-        return this.mutate(function (d) { return d.date(day); });
-    };
-    Day.prototype.withDayOfWeek = function (dayOfWeek) {
-        return this.mutate(function (d) { return d.day(dayOfWeek); });
-    };
-    Day.prototype.withDayOfYear = function (dayOfYear) {
-        return this.mutate(function (d) { return d.dayOfYear(dayOfYear); });
-    };
-    // Month
-    Day.prototype.withMonth = function (month) {
-        return this.mutate(function (d) { return d.month(month); });
-    };
-    Day.prototype.relativeMonths = function (months) {
-        return this.mutate(function (d) { return d.add(months, 'months'); });
-    };
-    Day.prototype.prevMonth = function (months) {
-        if (months === void 0) { months = 1; }
-        return this.relativeMonths(-months);
-    };
-    Day.prototype.nextMonth = function (months) {
-        if (months === void 0) { months = 1; }
-        return this.relativeMonths(months);
-    };
-    // Week Of Year
-    Day.prototype.withWeek = function (week, relativeWeek) {
-        if (relativeWeek === void 0) { relativeWeek = this.week; }
-        return this.mutate(function (d) { return d.add((week - relativeWeek) * Constants.DAYS_IN_WEEK, 'days'); });
-    };
-    Day.prototype.withWeekOfYear = function (week) {
-        return this.withWeek(week, this.weekOfYear);
-    };
-    Day.prototype.withFullWeekOfYear = function (week) {
-        return this.withWeek(week, this.fullWeekOfYear);
-    };
-    Day.prototype.withWeekspanOfYear = function (week) {
-        return this.withWeek(week, this.weekspanOfYear);
-    };
-    Day.prototype.withWeekOfMonth = function (week) {
-        return this.withWeek(week, this.weekOfMonth);
-    };
-    Day.prototype.withWeekspanOfMonth = function (week) {
-        return this.withWeek(week, this.weekspanOfMonth);
-    };
-    Day.prototype.withFullWeekOfMonth = function (week) {
-        return this.withWeek(week, this.fullWeekOfMonth);
-    };
-    Day.prototype.relativeWeeks = function (weeks) {
-        return this.mutate(function (d) { return d.add(weeks, 'weeks'); });
-    };
-    Day.prototype.prevWeek = function (weeks) {
-        if (weeks === void 0) { weeks = 1; }
-        return this.relativeWeeks(-weeks);
-    };
-    Day.prototype.nextWeek = function (weeks) {
-        if (weeks === void 0) { weeks = 1; }
-        return this.relativeWeeks(weeks);
-    };
-    // Year
-    Day.prototype.withYear = function (year) {
-        return this.mutate(function (d) { return d.year(year); });
-    };
-    Day.prototype.relativeYears = function (years) {
-        return this.mutate(function (d) { return d.add(years, 'year'); });
-    };
-    Day.prototype.prevYear = function (years) {
-        if (years === void 0) { years = 1; }
-        return this.relativeYears(-years);
-    };
-    Day.prototype.nextYear = function (years) {
-        if (years === void 0) { years = 1; }
-        return this.relativeYears(years);
-    };
-    // Hour
-    Day.prototype.withHour = function (hour) {
-        return this.mutate(function (d) { return d.hour(hour); });
-    };
-    Day.prototype.relativeHours = function (hours) {
-        return this.mutate(function (d) { return d.add(hours, 'hours'); });
-    };
-    Day.prototype.prevHour = function (hours) {
-        if (hours === void 0) { hours = 1; }
-        return this.relativeHours(-hours);
-    };
-    Day.prototype.nextHour = function (hours) {
-        if (hours === void 0) { hours = 1; }
-        return this.relativeHours(hours);
-    };
-    // Time
-    Day.prototype.withTime = function (hour, minute, second, millisecond) {
-        if (hour === void 0) { hour = Constants.HOUR_MIN; }
-        if (minute === void 0) { minute = Constants.MINUTE_MIN; }
-        if (second === void 0) { second = Constants.SECOND_MIN; }
-        if (millisecond === void 0) { millisecond = Constants.MILLIS_MIN; }
-        return this.mutate(function (d) { return d.set({ hour: hour, minute: minute, second: second, millisecond: millisecond }); });
-    };
-    // Start & End
-    // Time
-    Day.prototype.start = function () {
-        return this.mutate(function (d) { return d.startOf('day'); });
-    };
-    Day.prototype.isStart = function () {
-        return this.hour === Constants.HOUR_MIN &&
-            this.minute === Constants.MINUTE_MIN &&
-            this.seconds === Constants.SECOND_MIN &&
-            this.millis === Constants.MILLIS_MIN;
-    };
-    Day.prototype.end = function (inclusive) {
-        if (inclusive === void 0) { inclusive = true; }
-        return inclusive ?
-            this.mutate(function (d) { return d.endOf('day'); }) :
-            this.mutate(function (d) { return d.startOf('day').add(1, 'day'); });
-    };
-    Day.prototype.isEnd = function () {
-        return this.hour === Constants.HOUR_MAX &&
-            this.minute === Constants.MINUTE_MAX &&
-            this.seconds === Constants.SECOND_MAX &&
-            this.millis === Constants.MILLIS_MAX;
-    };
-    // Hour
-    Day.prototype.startOfHour = function () {
-        return this.mutate(function (d) { return d.startOf('hour'); });
-    };
-    Day.prototype.isStartOfHour = function () {
-        return this.minute === Constants.MINUTE_MIN &&
-            this.seconds === Constants.SECOND_MIN &&
-            this.millis === Constants.MILLIS_MIN;
-    };
-    Day.prototype.endOfHour = function (inclusive) {
-        if (inclusive === void 0) { inclusive = true; }
-        return inclusive ?
-            this.mutate(function (d) { return d.endOf('hour'); }) :
-            this.mutate(function (d) { return d.startOf('hour').add(1, 'hour'); });
-    };
-    Day.prototype.isEndOfHour = function () {
-        return this.minute === Constants.MINUTE_MAX &&
-            this.seconds === Constants.SECOND_MAX &&
-            this.millis === Constants.MILLIS_MAX;
-    };
-    // Week
-    Day.prototype.startOfWeek = function () {
-        return this.mutate(function (d) { return d.startOf('week'); });
-    };
-    Day.prototype.isStartOfWeek = function () {
-        return this.dayOfWeek === Constants.WEEKDAY_MIN;
-    };
-    Day.prototype.endOfWeek = function (inclusive) {
-        if (inclusive === void 0) { inclusive = true; }
-        return inclusive ?
-            this.mutate(function (d) { return d.endOf('week'); }) :
-            this.mutate(function (d) { return d.startOf('week').add(1, 'week'); });
-    };
-    Day.prototype.isEndOfWeek = function () {
-        return this.dayOfWeek === Constants.WEEKDAY_MAX;
-    };
-    // Month
-    Day.prototype.startOfMonth = function () {
-        return this.mutate(function (d) { return d.startOf('month'); });
-    };
-    Day.prototype.isStartOfMonth = function () {
-        return this.dayOfMonth === Constants.DAY_MIN;
-    };
-    Day.prototype.endOfMonth = function (inclusive) {
-        if (inclusive === void 0) { inclusive = true; }
-        return inclusive ?
-            this.mutate(function (d) { return d.endOf('month'); }) :
-            this.mutate(function (d) { return d.startOf('month').add(1, 'month'); });
-    };
-    Day.prototype.isEndOfMonth = function () {
-        return this.dayOfMonth === this.daysInMonth();
-    };
-    // Year
-    Day.prototype.startOfYear = function () {
-        return this.mutate(function (d) { return d.startOf('year'); });
-    };
-    Day.prototype.isStartOfYear = function () {
-        return this.month === Constants.MONTH_MIN && this.dayOfMonth === Constants.DAY_MIN;
-    };
-    Day.prototype.endOfYear = function (inclusive) {
-        if (inclusive === void 0) { inclusive = true; }
-        return inclusive ?
-            this.mutate(function (d) { return d.endOf('year'); }) :
-            this.mutate(function (d) { return d.startOf('year').add(1, 'year'); });
-    };
-    Day.prototype.isEndOfYear = function () {
-        return this.month === Constants.MONTH_MAX && this.dayOfMonth === Constants.DAY_MAX;
-    };
-    // Days In X
-    Day.prototype.daysInMonth = function () {
-        return this.date.daysInMonth();
-    };
-    Day.prototype.daysInYear = function () {
-        return this.endOfYear().dayOfYear;
-    };
-    Day.prototype.weeksInYear = function () {
-        return this.date.weeksInYear();
-    };
-    // Display
-    Day.prototype.format = function (format) {
-        return this.date.format(format);
-    };
-    Day.prototype.utc = function (keepLocalTime) {
-        return this.mutate(function (d) { return d.utc(keepLocalTime); });
-    };
-    Day.prototype.toMoment = function () {
-        return this.date.clone();
-    };
-    Day.prototype.toDate = function () {
-        return this.date.toDate();
-    };
-    Day.prototype.toArray = function () {
-        return this.date.toArray();
-    };
-    Day.prototype.toJSON = function () {
-        return this.date.toJSON();
-    };
-    Day.prototype.toISOString = function (keepOffset) {
-        if (keepOffset === void 0) { keepOffset = false; }
-        return this.date.toISOString(keepOffset);
-    };
-    Day.prototype.toObject = function () {
-        return this.date.toObject();
-    };
-    Day.prototype.toString = function () {
-        return this.date.toString();
-    };
-    // State
-    Day.prototype.isDST = function () {
-        return this.date.isDST();
-    };
-    Day.prototype.isLeapYear = function () {
-        return this.date.isLeapYear();
-    };
-    // Instances
-    Day.now = function () {
-        return new Day(__WEBPACK_IMPORTED_MODULE_2_moment__());
-    };
-    Day.today = function () {
-        return this.now().start();
-    };
-    Day.tomorrow = function () {
-        return this.today().next();
-    };
-    Day.unix = function (millis) {
-        return new Day(__WEBPACK_IMPORTED_MODULE_2_moment__(millis));
-    };
-    Day.parse = function (input) {
-        return new Day(__WEBPACK_IMPORTED_MODULE_2_moment__(input));
-    };
-    Day.fromFormat = function (input, formats) {
-        return new Day(__WEBPACK_IMPORTED_MODULE_2_moment__(input, formats));
-    };
-    Day.fromObject = function (input) {
-        return new Day(__WEBPACK_IMPORTED_MODULE_2_moment__(input));
-    };
-    Day.fromDate = function (input) {
-        return new Day(__WEBPACK_IMPORTED_MODULE_2_moment__(input));
-    };
-    Day.fromArray = function (input) {
-        return new Day(__WEBPACK_IMPORTED_MODULE_2_moment__(input));
-    };
-    Day.create = function (year, month, date, hour, minute, second, millisecond) {
-        if (date === void 0) { date = Constants.DAY_MIN; }
-        if (hour === void 0) { hour = Constants.HOUR_MIN; }
-        if (minute === void 0) { minute = Constants.MINUTE_MIN; }
-        if (second === void 0) { second = Constants.SECOND_MIN; }
-        if (millisecond === void 0) { millisecond = Constants.MILLIS_MIN; }
-        return new Day(__WEBPACK_IMPORTED_MODULE_2_moment__({ year: year, month: month, date: date, hour: hour, minute: minute, second: second, millisecond: millisecond }));
-    };
-    Day.getWeekspanOfYear = function (date) {
-        return Math.floor((date.dayOfYear() - 1) / Constants.DAYS_IN_WEEK);
-    };
-    Day.getWeekOfYear = function (date) {
-        var firstOfYear = date.clone().startOf('year');
-        var weeks = date.week();
-        return firstOfYear.day() > Constants.WEEK_OF_MONTH_MINIMUM_WEEKDAY ? weeks - 1 : weeks;
-    };
-    Day.getFullWeekOfYear = function (date) {
-        var firstOfYear = date.clone().startOf('year');
-        var weeks = date.week();
-        return firstOfYear.day() === Constants.WEEKDAY_MIN ? weeks : weeks - 1;
-    };
-    Day.getWeekspanOfMonth = function (date) {
-        return Math.floor((date.date() - 1) / Constants.DAYS_IN_WEEK);
-    };
-    Day.getFullWeekOfMonth = function (date) {
-        return Math.floor((date.date() - 1 - date.day() + Constants.DAYS_IN_WEEK) / Constants.DAYS_IN_WEEK);
-    };
-    Day.getWeekOfMonth = function (date) {
-        var dom = date.date();
-        var dow = date.day();
-        var sundayDate = dom - dow;
-        return Math.floor((sundayDate + Constants.WEEK_OF_MONTH_MINIMUM_WEEKDAY + 5) / Constants.DAYS_IN_WEEK);
-    };
-    Day.getWeekIdentifier = function (date) {
-        return date.week() + date.year() * 100;
-    };
-    Day.getMonthIdentifier = function (date) {
-        return (date.month() + 1) + date.year() * 100;
-    };
-    Day.getDayIdentifier = function (date) {
-        return date.date() + (date.month() + 1) * 100 + date.year() * 10000;
-    };
-    Day.getQuarterIdentifier = function (date) {
-        return date.quarter() + date.year() * 10;
-    };
-    return Day;
-}());
-
 
 // CONCATENATED MODULE: ./src/Units.ts
 
@@ -812,10 +380,15 @@ var DaySpan_DaySpan = (function () {
 var DaySpan__a;
 
 // CONCATENATED MODULE: ./src/Schedule.ts
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_moment__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_moment__);
 
 
 
 
+
+
+// @ts-ignore
 
 var Schedule_Schedule = (function () {
     function Schedule(input) {
@@ -823,28 +396,31 @@ var Schedule_Schedule = (function () {
             this.set(input);
         }
     }
+    Object.defineProperty(Schedule.prototype, "lastTime", {
+        get: function () {
+            return this.times[this.times.length - 1];
+        },
+        enumerable: true,
+        configurable: true
+    });
     Schedule.prototype.set = function (input) {
         Parse_Parse.schedule(input, this);
         return this;
     };
-    Schedule.prototype.refreshHours = function () {
-        var hours = [];
-        for (var i = Constants.HOUR_MIN; i <= Constants.HOUR_MAX; i++) {
-            if (this.hour(i)) {
-                hours.push(i);
-            }
-        }
-        hours.sort();
-        this.hours = hours;
+    Schedule.prototype.updateDurationInDays = function () {
+        this.durationInDays = !this.lastTime ? 0 : Math.max(0, Math.ceil(__WEBPACK_IMPORTED_MODULE_5_moment__["duration"](this.lastTime.toMilliseconds(), 'milliseconds')
+            .add(this.duration, this.durationUnit)
+            .subtract(1, 'day')
+            .asDays()));
         return this;
     };
     Schedule.prototype.matchesSpan = function (day) {
-        return (this.start === Constants.START_NONE || day.time >= this.start) &&
-            (this.end === Constants.END_NONE || day.time < this.end + this.duration);
+        return (this.start === null || day.isSameOrAfter(this.start)) &&
+            (this.end === null || day.isBefore(this.endWithDuration));
     };
     Schedule.prototype.matchesRange = function (start, end) {
-        return (this.start === Constants.START_NONE || start.time <= this.start) &&
-            (this.end === Constants.END_NONE || end.time < this.end + this.duration);
+        return (this.start === null || start.isSameOrBefore(this.start)) &&
+            (this.end === null || end.isBefore(this.endWithDuration));
     };
     Schedule.prototype.isExcluded = function (day) {
         return !!this.exclude[day.dayIdentifier];
@@ -878,7 +454,7 @@ var Schedule_Schedule = (function () {
      * @param
      */
     Schedule.prototype.coversDay = function (day) {
-        var before = this.durationInDays();
+        var before = this.durationInDays;
         while (before >= 0) {
             if (this.matchesDay(day)) {
                 return true;
@@ -887,12 +463,6 @@ var Schedule_Schedule = (function () {
             before--;
         }
         return false;
-    };
-    Schedule.prototype.durationInDays = function () {
-        var lastHour = this.hours[this.hours.length - 1];
-        var durationEnd = lastHour * Constants.MILLIS_IN_HOUR + this.duration;
-        var durationPast = durationEnd - Constants.MILLIS_IN_DAY;
-        return Math.max(0, Math.ceil(durationPast / Constants.MILLIS_IN_DAY));
     };
     Schedule.prototype.nextDay = function (day, lookAhead) {
         if (lookAhead === void 0) { lookAhead = 366; }
@@ -915,12 +485,19 @@ var Schedule_Schedule = (function () {
         return null;
     };
     Schedule.prototype.matchesTime = function (day) {
-        return this.matchesDay(day) &&
-            this.hour(day.hour) &&
-            day.minute === this.minute;
+        if (!this.matchesDay(day)) {
+            return false;
+        }
+        for (var _i = 0, _a = this.times; _i < _a.length; _i++) {
+            var time = _a[_i];
+            if (day.sameTime(time)) {
+                return true;
+            }
+        }
+        return false;
     };
     Schedule.prototype.isFullDay = function () {
-        return !this.hour.input || this.duration === Constants.DURATION_NONE;
+        return this.times.length === 0 || this.duration === Constants.DURATION_NONE;
     };
     Schedule.prototype.getSpansOver = function (day) {
         var spans = [];
@@ -931,13 +508,13 @@ var Schedule_Schedule = (function () {
             }
         }
         else {
-            var behind = this.durationInDays();
+            var behind = this.durationInDays;
             while (behind >= 0) {
                 if (this.matchesDay(day)) {
-                    for (var _i = 0, _a = this.hours; _i < _a.length; _i++) {
-                        var hour = _a[_i];
-                        var hourStart = day.withTime(hour, this.minute);
-                        var hourEnd = hourStart.relative(this.duration);
+                    for (var _i = 0, _a = this.times; _i < _a.length; _i++) {
+                        var time = _a[_i];
+                        var hourStart = day.withTime(time);
+                        var hourEnd = hourStart.add(this.duration, this.durationUnit);
                         var hourSpan = new DaySpan_DaySpan(hourStart, hourEnd);
                         if (hourSpan.matchesDay(start)) {
                             spans.push(hourSpan);
@@ -956,7 +533,7 @@ var Schedule_Schedule = (function () {
             return DaySpan_DaySpan.point(start);
         }
         else {
-            var behind = this.durationInDays();
+            var behind = this.durationInDays;
             while (behind >= 0) {
                 if (this.matchesDay(day)) {
                     return DaySpan_DaySpan.point(day);
@@ -978,21 +555,208 @@ var Schedule_Schedule = (function () {
             spans.push(DaySpan_DaySpan.point(start));
         }
         else {
-            for (var _i = 0, _a = this.hours; _i < _a.length; _i++) {
-                var hour = _a[_i];
-                var hourStart = day.withTime(hour, this.minute);
-                var hourEnd = hourStart.relative(this.duration);
+            for (var _i = 0, _a = this.times; _i < _a.length; _i++) {
+                var time = _a[_i];
+                var hourStart = day.withTime(time);
+                var hourEnd = hourStart.add(this.duration, this.durationUnit);
                 var hourSpan = new DaySpan_DaySpan(hourStart, hourEnd);
                 spans.push(hourSpan);
             }
         }
         return spans;
     };
+    Schedule.prototype.toInput = function (returnDays) {
+        if (returnDays === void 0) { returnDays = false; }
+        var out = {};
+        var exclusions = [];
+        var times = [];
+        for (var dayIdentifierKey in this.exclude) {
+            var dayIdentifier = parseInt(dayIdentifierKey);
+            exclusions.push(returnDays ? Day_Day.fromDayIdentifier(dayIdentifier) : dayIdentifier);
+        }
+        for (var _i = 0, _a = this.times; _i < _a.length; _i++) {
+            var time = _a[_i];
+            times.push(time.toString());
+        }
+        if (this.start)
+            out.start = returnDays ? this.start : this.start.time;
+        if (this.end)
+            out.end = returnDays ? this.end : this.end.time;
+        if (this.duration !== Constants.DURATION_NONE)
+            out.duration = this.duration;
+        if (this.durationUnit !== Constants.DURATION_DEFAULT_UNIT)
+            out.durationUnit = this.durationUnit;
+        if (this.dayOfWeek.input)
+            out.dayOfWeek = this.dayOfWeek.input;
+        if (this.dayOfMonth.input)
+            out.dayOfMonth = this.dayOfMonth.input;
+        if (this.dayOfYear.input)
+            out.dayOfYear = this.dayOfYear.input;
+        if (this.month.input)
+            out.month = this.month.input;
+        if (this.week.input)
+            out.week = this.week.input;
+        if (this.weekOfYear.input)
+            out.weekOfYear = this.weekOfYear.input;
+        if (this.weekspanOfYear.input)
+            out.weekspanOfYear = this.weekspanOfYear.input;
+        if (this.fullWeekOfYear.input)
+            out.fullWeekOfYear = this.fullWeekOfYear.input;
+        if (this.weekOfMonth.input)
+            out.weekOfMonth = this.weekOfMonth.input;
+        if (this.weekspanOfMonth.input)
+            out.weekspanOfMonth = this.weekspanOfMonth.input;
+        if (this.fullWeekOfMonth.input)
+            out.fullWeekOfMonth = this.fullWeekOfMonth.input;
+        if (this.year.input)
+            out.year = this.year.input;
+        if (times.length)
+            out.times = times;
+        if (exclusions.length)
+            out.exclude = exclusions;
+        return out;
+    };
     return Schedule;
 }());
 
 
+// CONCATENATED MODULE: ./src/Time.ts
+
+
+
+
+var Time_Time = (function () {
+    function Time(hour, minute, second, millisecond) {
+        if (minute === void 0) { minute = Constants.MINUTE_MIN; }
+        if (second === void 0) { second = Constants.SECOND_MIN; }
+        if (millisecond === void 0) { millisecond = Constants.MILLIS_MIN; }
+        this.hour = hour;
+        this.minute = minute;
+        this.second = second;
+        this.millisecond = millisecond;
+    }
+    Time.prototype.format = function (format) {
+        var formatterEntries = Time.FORMATTERS;
+        var out = '';
+        for (var i = 0; i < format.length; i++) {
+            var handled = false;
+            for (var k = 0; k < formatterEntries.length && !handled; k++) {
+                var entry = formatterEntries[k];
+                var part = format.substring(i, i + entry.size);
+                if (part.length === entry.size) {
+                    var formatter = entry.formats[part];
+                    if (formatter) {
+                        out += formatter(this);
+                        i += entry.size - 1;
+                        handled = true;
+                    }
+                }
+            }
+            if (!handled) {
+                out += format.charAt(i);
+            }
+        }
+        return out;
+    };
+    Time.prototype.toMilliseconds = function () {
+        return this.hour * Constants.MILLIS_IN_HOUR +
+            this.minute * Constants.MILLIS_IN_MINUTE +
+            this.second * Constants.MILLIS_IN_SECOND +
+            this.millisecond;
+    };
+    Time.prototype.toString = function () {
+        if (this.millisecond)
+            return this.format('HH:mm:ss.SSS');
+        if (this.second)
+            return this.format('HH:mm:ss');
+        if (this.minute)
+            return this.format('HH:mm');
+        return this.format('HH');
+    };
+    Time.prototype.toIdentifer = function () {
+        return this.hour +
+            this.minute * 100 +
+            this.second * 10000 +
+            this.millisecond * 10000000;
+    };
+    Time.prototype.toObject = function () {
+        var out = {
+            hour: this.hour
+        };
+        if (this.minute)
+            out.minute = this.minute;
+        if (this.second)
+            out.second = this.second;
+        if (this.millisecond)
+            out.millisecond = this.millisecond;
+        return out;
+    };
+    Time.parse = function (input) {
+        return Parse_Parse.time(input);
+    };
+    Time.fromString = function (time) {
+        var matches = this.REGEX.exec(time);
+        if (!matches) {
+            return null;
+        }
+        var h = parseInt(matches[1]) || 0;
+        var m = parseInt(matches[2]) || 0;
+        var s = parseInt(matches[3]) || 0;
+        var l = parseInt(matches[4]) || 0;
+        return this.build(h, m, s, l);
+    };
+    Time.fromIdentifier = function (time) {
+        var h = time % 100;
+        var m = Math.floor(time / 100) % 100;
+        var s = Math.floor(time / 10000) % 100;
+        var l = Math.floor(time / 10000000) % 1000;
+        return this.build(h, m, s, l);
+    };
+    Time.build = function (hour, minute, second, millisecond) {
+        if (minute === void 0) { minute = Constants.MINUTE_MIN; }
+        if (second === void 0) { second = Constants.SECOND_MIN; }
+        if (millisecond === void 0) { millisecond = Constants.MILLIS_MIN; }
+        return new Time(hour, minute, second, millisecond);
+    };
+    Time.REGEX = /^(\d\d?):?(\d\d)?:?(\d\d)?\.?(\d\d\d)?$/;
+    Time.FORMATTERS = [
+        {
+            size: 3,
+            formats: {
+                SSS: function (t) { return Functions.padNumber(t.millisecond, 3); }
+            }
+        },
+        {
+            size: 2,
+            formats: {
+                HH: function (t) { return Functions.padNumber(t.hour, 2); },
+                hh: function (t) { return Functions.padNumber((t.hour % 12) || 12, 2); },
+                kk: function (t) { return Functions.padNumber(t.hour + 1, 2); },
+                mm: function (t) { return Functions.padNumber(t.minute, 2); },
+                ss: function (t) { return Functions.padNumber(t.second, 2); },
+                SS: function (t) { return Functions.padNumber(t.millisecond, 3, 2); }
+            }
+        },
+        {
+            size: 1,
+            formats: {
+                A: function (t) { return t.hour < 12 ? 'AM' : 'PM'; },
+                a: function (t) { return t.hour < 12 ? 'am' : 'pm'; },
+                H: function (t) { return t.hour + ''; },
+                h: function (t) { return ((t.hour % 12) || 12) + ''; },
+                k: function (t) { return (t.hour + 1) + ''; },
+                m: function (t) { return t.minute + ''; },
+                s: function (t) { return t.second + ''; },
+                S: function (t) { return Functions.padNumber(t.millisecond, 3, 1); }
+            }
+        }
+    ];
+    return Time;
+}());
+
+
 // CONCATENATED MODULE: ./src/Parse.ts
+
 
 
 
@@ -1059,16 +823,44 @@ var Parse_Parse = (function () {
         }
         return null;
     };
+    Parse.time = function (input) {
+        if (Functions.isNumber(input)) {
+            return Time_Time.fromIdentifier(input);
+        }
+        if (Functions.isString(input)) {
+            return Time_Time.fromString(input);
+        }
+        if (Functions.isObject(input) && Functions.isNumber(input.hour)) {
+            return new Time_Time(input.hour, input.minute, input.second, input.millisecond);
+        }
+        return null;
+    };
+    Parse.times = function (input) {
+        var times = [];
+        if (Functions.isArray(input)) {
+            for (var _i = 0, input_1 = input; _i < input_1.length; _i++) {
+                var timeInput = input_1[_i];
+                var time = this.time(timeInput);
+                if (time) {
+                    times.push(time);
+                }
+            }
+        }
+        return times;
+    };
     Parse.exclusions = function (input) {
         var exclusions = {};
         if (Functions.isArray(input)) {
-            for (var _i = 0, input_1 = input; _i < input_1.length; _i++) {
-                var dayIdentifier = input_1[_i];
+            for (var _i = 0, input_2 = input; _i < input_2.length; _i++) {
+                var dayIdentifier = input_2[_i];
                 if (Functions.isNumber(dayIdentifier)) {
                     exclusions[dayIdentifier] = true;
                 }
-                else if (dayIdentifier instanceof Day_Day) {
-                    exclusions[dayIdentifier.dayIdentifier] = true;
+                else {
+                    var day = this.day(dayIdentifier);
+                    if (day) {
+                        exclusions[day.dayIdentifier] = true;
+                    }
                 }
             }
         }
@@ -1079,15 +871,16 @@ var Parse_Parse = (function () {
         var on = this.day(input.on);
         if (on) {
             input.start = on.start();
-            input.end = on.end(false);
+            input.end = on.end();
             input.year = [on.year];
             input.month = [on.month];
             input.dayOfMonth = [on.dayOfMonth];
         }
-        out.start = this.utc(input.start, Constants.START_NONE);
-        out.end = this.utc(input.end, Constants.END_NONE);
         out.duration = Functions.coalesce(input.duration, Constants.DURATION_NONE);
-        out.exclude = Functions.coalesce(input.exclude, []);
+        out.durationUnit = Functions.coalesce(input.durationUnit, Constants.DURATION_DEFAULT_UNIT);
+        out.start = this.day(input.start);
+        out.end = this.day(input.end);
+        out.endWithDuration = out.end ? out.end.add(out.duration, out.durationUnit) : null;
         out.dayOfWeek = this.frequency(input.dayOfWeek);
         out.dayOfMonth = this.frequency(input.dayOfMonth);
         out.dayOfYear = this.frequency(input.dayOfYear);
@@ -1100,10 +893,9 @@ var Parse_Parse = (function () {
         out.weekspanOfMonth = this.frequency(input.weekspanOfMonth);
         out.fullWeekOfMonth = this.frequency(input.fullWeekOfMonth);
         out.year = this.frequency(input.year);
-        out.hour = this.frequency(input.hour, Constants.HOURS_IN_DAY);
-        out.minute = Functions.coalesce(input.minute, Constants.MINUTE_MIN);
+        out.times = this.times(input.times);
         out.exclude = this.exclusions(input.exclude);
-        out.refreshHours();
+        out.updateDurationInDays();
         return out;
     };
     Parse.calendarSchedule = function (input) {
@@ -1120,6 +912,479 @@ var Parse_Parse = (function () {
         return out;
     };
     return Parse;
+}());
+
+
+// CONCATENATED MODULE: ./src/Day.ts
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_moment__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_moment__);
+
+
+
+
+// @ts-ignore
+
+var Day_Day = (function () {
+    function Day(date) {
+        this.date = date;
+        this.time = date.unix();
+        this.millis = date.millisecond();
+        this.seconds = date.second();
+        this.minute = date.minute();
+        this.hour = date.hour();
+        this.month = date.month();
+        this.year = date.year();
+        this.quarter = date.quarter();
+        this.dayOfWeek = date.day();
+        this.dayOfMonth = date.date();
+        this.dayOfYear = date.dayOfYear();
+        this.week = date.week();
+        this.weekOfYear = Day.getWeekOfYear(date);
+        this.weekspanOfYear = Day.getWeekspanOfYear(date);
+        this.fullWeekOfYear = Day.getFullWeekOfYear(date);
+        this.weekOfMonth = Day.getWeekOfMonth(date);
+        this.weekspanOfMonth = Day.getWeekspanOfMonth(date);
+        this.fullWeekOfMonth = Day.getFullWeekOfMonth(date);
+        this.dayIdentifier = Day.getDayIdentifier(date);
+        this.weekIdentifier = Day.getWeekIdentifier(date);
+        this.monthIdentifier = Day.getMonthIdentifier(date);
+        this.quarterIdentifier = Day.getQuarterIdentifier(date);
+    }
+    // Same
+    Day.prototype.sameDay = function (day) {
+        return this.dayIdentifier === day.dayIdentifier;
+    };
+    Day.prototype.sameMonth = function (day) {
+        return this.monthIdentifier === day.monthIdentifier;
+    };
+    Day.prototype.sameWeek = function (day) {
+        return this.weekIdentifier === day.weekIdentifier;
+    };
+    Day.prototype.sameYear = function (day) {
+        return this.year === day.year;
+    };
+    Day.prototype.sameQuarter = function (day) {
+        return this.quarterIdentifier === day.quarterIdentifier;
+    };
+    Day.prototype.sameHour = function (day) {
+        return this.dayIdentifier === day.dayIdentifier && this.hour === day.hour;
+    };
+    Day.prototype.sameMinute = function (day) {
+        return this.dayIdentifier === day.dayIdentifier && this.hour === day.hour && this.minute === day.minute;
+    };
+    Day.prototype.sameTime = function (time) {
+        return this.hour === time.hour && this.minute === time.minute && this.seconds === time.second && this.millis === time.millisecond;
+    };
+    // Comparison
+    Day.prototype.isBefore = function (day, precision) {
+        return this.date.isBefore(day.date, precision);
+    };
+    Day.prototype.isSameOrBefore = function (day, precision) {
+        return this.date.isSameOrBefore(day.date, precision);
+    };
+    Day.prototype.isAfter = function (day, precision) {
+        return this.date.isAfter(day.date, precision);
+    };
+    Day.prototype.isSameOrAfter = function (day, precision) {
+        return this.date.isSameOrAfter(day.date, precision);
+    };
+    Day.prototype.max = function (day) {
+        return this.date.isAfter(day.date) ? this : day;
+    };
+    Day.prototype.min = function (day) {
+        return this.date.isBefore(day.date) ? this : day;
+    };
+    // Between
+    Day.prototype.millisBetween = function (day, op, absolute) {
+        if (op === void 0) { op = Op.DOWN; }
+        if (absolute === void 0) { absolute = true; }
+        return operate(this.date.diff(day.date, 'milliseconds', true), op, absolute);
+    };
+    Day.prototype.secondsBetween = function (day, op, absolute) {
+        if (op === void 0) { op = Op.DOWN; }
+        if (absolute === void 0) { absolute = true; }
+        return operate(this.date.diff(day.date, 'seconds', true), op, absolute);
+    };
+    Day.prototype.minutesBetween = function (day, op, absolute) {
+        if (op === void 0) { op = Op.DOWN; }
+        if (absolute === void 0) { absolute = true; }
+        return operate(this.date.diff(day.date, 'minutes', true), op, absolute);
+    };
+    Day.prototype.hoursBetween = function (day, op, absolute) {
+        if (op === void 0) { op = Op.DOWN; }
+        if (absolute === void 0) { absolute = true; }
+        return operate(this.date.diff(day.date, 'hours', true), op, absolute);
+    };
+    Day.prototype.daysBetween = function (day, op, absolute) {
+        if (op === void 0) { op = Op.DOWN; }
+        if (absolute === void 0) { absolute = true; }
+        return operate(this.date.diff(day.date, 'days', true), op, absolute);
+    };
+    Day.prototype.weeksBetween = function (day, op, absolute) {
+        if (op === void 0) { op = Op.DOWN; }
+        if (absolute === void 0) { absolute = true; }
+        return operate(this.date.diff(day.date, 'weeks', true), op, absolute);
+    };
+    Day.prototype.monthsBetween = function (day, op, absolute) {
+        if (op === void 0) { op = Op.DOWN; }
+        if (absolute === void 0) { absolute = true; }
+        return operate(this.date.diff(day.date, 'months', true), op, absolute);
+    };
+    Day.prototype.yearsBetween = function (day, op, absolute) {
+        if (op === void 0) { op = Op.DOWN; }
+        if (absolute === void 0) { absolute = true; }
+        return operate(this.date.diff(day.date, 'years', true), op, absolute);
+    };
+    Day.prototype.isBetween = function (start, end, inclusive) {
+        if (inclusive === void 0) { inclusive = true; }
+        return this.date.isBetween(start.date, end.date, null, inclusive ? '[]' : '[)');
+    };
+    Day.prototype.mutate = function (mutator) {
+        var d = this.toMoment();
+        mutator(d);
+        return new Day(d);
+    };
+    Day.prototype.add = function (amount, unit) {
+        return this.mutate(function (d) { return d.add(amount, unit); });
+    };
+    Day.prototype.relative = function (millis) {
+        return this.mutate(function (d) { return d.add(millis, 'milliseconds'); });
+    };
+    // Days
+    Day.prototype.relativeDays = function (days) {
+        return this.mutate(function (d) { return d.add(days, 'days'); });
+    };
+    Day.prototype.prev = function (days) {
+        if (days === void 0) { days = 1; }
+        return this.relativeDays(-days);
+    };
+    Day.prototype.next = function (days) {
+        if (days === void 0) { days = 1; }
+        return this.relativeDays(days);
+    };
+    Day.prototype.withDayOfMonth = function (day) {
+        return this.mutate(function (d) { return d.date(day); });
+    };
+    Day.prototype.withDayOfWeek = function (dayOfWeek) {
+        return this.mutate(function (d) { return d.day(dayOfWeek); });
+    };
+    Day.prototype.withDayOfYear = function (dayOfYear) {
+        return this.mutate(function (d) { return d.dayOfYear(dayOfYear); });
+    };
+    // Month
+    Day.prototype.withMonth = function (month) {
+        return this.mutate(function (d) { return d.month(month); });
+    };
+    Day.prototype.relativeMonths = function (months) {
+        return this.mutate(function (d) { return d.add(months, 'months'); });
+    };
+    Day.prototype.prevMonth = function (months) {
+        if (months === void 0) { months = 1; }
+        return this.relativeMonths(-months);
+    };
+    Day.prototype.nextMonth = function (months) {
+        if (months === void 0) { months = 1; }
+        return this.relativeMonths(months);
+    };
+    // Week Of Year
+    Day.prototype.withWeek = function (week, relativeWeek) {
+        if (relativeWeek === void 0) { relativeWeek = this.week; }
+        return this.mutate(function (d) { return d.add((week - relativeWeek) * Constants.DAYS_IN_WEEK, 'days'); });
+    };
+    Day.prototype.withWeekOfYear = function (week) {
+        return this.withWeek(week, this.weekOfYear);
+    };
+    Day.prototype.withFullWeekOfYear = function (week) {
+        return this.withWeek(week, this.fullWeekOfYear);
+    };
+    Day.prototype.withWeekspanOfYear = function (week) {
+        return this.withWeek(week, this.weekspanOfYear);
+    };
+    Day.prototype.withWeekOfMonth = function (week) {
+        return this.withWeek(week, this.weekOfMonth);
+    };
+    Day.prototype.withWeekspanOfMonth = function (week) {
+        return this.withWeek(week, this.weekspanOfMonth);
+    };
+    Day.prototype.withFullWeekOfMonth = function (week) {
+        return this.withWeek(week, this.fullWeekOfMonth);
+    };
+    Day.prototype.relativeWeeks = function (weeks) {
+        return this.mutate(function (d) { return d.add(weeks, 'weeks'); });
+    };
+    Day.prototype.prevWeek = function (weeks) {
+        if (weeks === void 0) { weeks = 1; }
+        return this.relativeWeeks(-weeks);
+    };
+    Day.prototype.nextWeek = function (weeks) {
+        if (weeks === void 0) { weeks = 1; }
+        return this.relativeWeeks(weeks);
+    };
+    // Year
+    Day.prototype.withYear = function (year) {
+        return this.mutate(function (d) { return d.year(year); });
+    };
+    Day.prototype.relativeYears = function (years) {
+        return this.mutate(function (d) { return d.add(years, 'year'); });
+    };
+    Day.prototype.prevYear = function (years) {
+        if (years === void 0) { years = 1; }
+        return this.relativeYears(-years);
+    };
+    Day.prototype.nextYear = function (years) {
+        if (years === void 0) { years = 1; }
+        return this.relativeYears(years);
+    };
+    // Hour
+    Day.prototype.withHour = function (hour) {
+        return this.mutate(function (d) { return d.hour(hour); });
+    };
+    Day.prototype.relativeHours = function (hours) {
+        return this.mutate(function (d) { return d.add(hours, 'hours'); });
+    };
+    Day.prototype.prevHour = function (hours) {
+        if (hours === void 0) { hours = 1; }
+        return this.relativeHours(-hours);
+    };
+    Day.prototype.nextHour = function (hours) {
+        if (hours === void 0) { hours = 1; }
+        return this.relativeHours(hours);
+    };
+    // Time
+    Day.prototype.withTimes = function (hour, minute, second, millisecond) {
+        if (hour === void 0) { hour = Constants.HOUR_MIN; }
+        if (minute === void 0) { minute = Constants.MINUTE_MIN; }
+        if (second === void 0) { second = Constants.SECOND_MIN; }
+        if (millisecond === void 0) { millisecond = Constants.MILLIS_MIN; }
+        return this.mutate(function (d) { return d.set({ hour: hour, minute: minute, second: second, millisecond: millisecond }); });
+    };
+    Day.prototype.withTime = function (time) {
+        return this.withTimes(time.hour, time.minute, time.second, time.millisecond);
+    };
+    // Start & End
+    // Time
+    Day.prototype.start = function () {
+        return this.mutate(function (d) { return d.startOf('day'); });
+    };
+    Day.prototype.isStart = function () {
+        return this.hour === Constants.HOUR_MIN &&
+            this.minute === Constants.MINUTE_MIN &&
+            this.seconds === Constants.SECOND_MIN &&
+            this.millis === Constants.MILLIS_MIN;
+    };
+    Day.prototype.end = function (inclusive) {
+        if (inclusive === void 0) { inclusive = true; }
+        return inclusive ?
+            this.mutate(function (d) { return d.endOf('day'); }) :
+            this.mutate(function (d) { return d.startOf('day').add(1, 'day'); });
+    };
+    Day.prototype.isEnd = function () {
+        return this.hour === Constants.HOUR_MAX &&
+            this.minute === Constants.MINUTE_MAX &&
+            this.seconds === Constants.SECOND_MAX &&
+            this.millis === Constants.MILLIS_MAX;
+    };
+    // Hour
+    Day.prototype.startOfHour = function () {
+        return this.mutate(function (d) { return d.startOf('hour'); });
+    };
+    Day.prototype.isStartOfHour = function () {
+        return this.minute === Constants.MINUTE_MIN &&
+            this.seconds === Constants.SECOND_MIN &&
+            this.millis === Constants.MILLIS_MIN;
+    };
+    Day.prototype.endOfHour = function (inclusive) {
+        if (inclusive === void 0) { inclusive = true; }
+        return inclusive ?
+            this.mutate(function (d) { return d.endOf('hour'); }) :
+            this.mutate(function (d) { return d.startOf('hour').add(1, 'hour'); });
+    };
+    Day.prototype.isEndOfHour = function () {
+        return this.minute === Constants.MINUTE_MAX &&
+            this.seconds === Constants.SECOND_MAX &&
+            this.millis === Constants.MILLIS_MAX;
+    };
+    // Week
+    Day.prototype.startOfWeek = function () {
+        return this.mutate(function (d) { return d.startOf('week'); });
+    };
+    Day.prototype.isStartOfWeek = function () {
+        return this.dayOfWeek === Constants.WEEKDAY_MIN;
+    };
+    Day.prototype.endOfWeek = function (inclusive) {
+        if (inclusive === void 0) { inclusive = true; }
+        return inclusive ?
+            this.mutate(function (d) { return d.endOf('week'); }) :
+            this.mutate(function (d) { return d.startOf('week').add(1, 'week'); });
+    };
+    Day.prototype.isEndOfWeek = function () {
+        return this.dayOfWeek === Constants.WEEKDAY_MAX;
+    };
+    // Month
+    Day.prototype.startOfMonth = function () {
+        return this.mutate(function (d) { return d.startOf('month'); });
+    };
+    Day.prototype.isStartOfMonth = function () {
+        return this.dayOfMonth === Constants.DAY_MIN;
+    };
+    Day.prototype.endOfMonth = function (inclusive) {
+        if (inclusive === void 0) { inclusive = true; }
+        return inclusive ?
+            this.mutate(function (d) { return d.endOf('month'); }) :
+            this.mutate(function (d) { return d.startOf('month').add(1, 'month'); });
+    };
+    Day.prototype.isEndOfMonth = function () {
+        return this.dayOfMonth === this.daysInMonth();
+    };
+    // Year
+    Day.prototype.startOfYear = function () {
+        return this.mutate(function (d) { return d.startOf('year'); });
+    };
+    Day.prototype.isStartOfYear = function () {
+        return this.month === Constants.MONTH_MIN && this.dayOfMonth === Constants.DAY_MIN;
+    };
+    Day.prototype.endOfYear = function (inclusive) {
+        if (inclusive === void 0) { inclusive = true; }
+        return inclusive ?
+            this.mutate(function (d) { return d.endOf('year'); }) :
+            this.mutate(function (d) { return d.startOf('year').add(1, 'year'); });
+    };
+    Day.prototype.isEndOfYear = function () {
+        return this.month === Constants.MONTH_MAX && this.dayOfMonth === Constants.DAY_MAX;
+    };
+    // Days In X
+    Day.prototype.daysInMonth = function () {
+        return this.date.daysInMonth();
+    };
+    Day.prototype.daysInYear = function () {
+        return this.endOfYear().dayOfYear;
+    };
+    Day.prototype.weeksInYear = function () {
+        return this.date.weeksInYear();
+    };
+    // Display
+    Day.prototype.format = function (format) {
+        return this.date.format(format);
+    };
+    Day.prototype.utc = function (keepLocalTime) {
+        return this.mutate(function (d) { return d.utc(keepLocalTime); });
+    };
+    Day.prototype.toMoment = function () {
+        return this.date.clone();
+    };
+    Day.prototype.toDate = function () {
+        return this.date.toDate();
+    };
+    Day.prototype.toArray = function () {
+        return this.date.toArray();
+    };
+    Day.prototype.toJSON = function () {
+        return this.date.toJSON();
+    };
+    Day.prototype.toISOString = function (keepOffset) {
+        if (keepOffset === void 0) { keepOffset = false; }
+        return this.date.toISOString(keepOffset);
+    };
+    Day.prototype.toObject = function () {
+        return this.date.toObject();
+    };
+    Day.prototype.toString = function () {
+        return this.date.toString();
+    };
+    // State
+    Day.prototype.isDST = function () {
+        return this.date.isDST();
+    };
+    Day.prototype.isLeapYear = function () {
+        return this.date.isLeapYear();
+    };
+    // Instances
+    Day.now = function () {
+        return new Day(__WEBPACK_IMPORTED_MODULE_3_moment__());
+    };
+    Day.today = function () {
+        return this.now().start();
+    };
+    Day.tomorrow = function () {
+        return this.today().next();
+    };
+    Day.fromMoment = function (moment) {
+        return moment && moment.isValid() ? new Day(moment) : null;
+    };
+    Day.unix = function (millis) {
+        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_3_moment__(millis));
+    };
+    Day.parse = function (input) {
+        return Parse_Parse.day(input);
+    };
+    Day.fromString = function (input) {
+        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_3_moment__(input));
+    };
+    Day.fromFormat = function (input, formats) {
+        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_3_moment__(input, formats));
+    };
+    Day.fromObject = function (input) {
+        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_3_moment__(input));
+    };
+    Day.fromDate = function (input) {
+        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_3_moment__(input));
+    };
+    Day.fromArray = function (input) {
+        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_3_moment__(input));
+    };
+    Day.fromDayIdentifier = function (id) {
+        var date = id % 100;
+        var month = (Math.floor(id / 100) % 100) - 1;
+        var year = Math.floor(id / 10000);
+        return this.build(year, month, date);
+    };
+    Day.build = function (year, month, date, hour, minute, second, millisecond) {
+        if (date === void 0) { date = Constants.DAY_MIN; }
+        if (hour === void 0) { hour = Constants.HOUR_MIN; }
+        if (minute === void 0) { minute = Constants.MINUTE_MIN; }
+        if (second === void 0) { second = Constants.SECOND_MIN; }
+        if (millisecond === void 0) { millisecond = Constants.MILLIS_MIN; }
+        return new Day(__WEBPACK_IMPORTED_MODULE_3_moment__({ year: year, month: month, date: date, hour: hour, minute: minute, second: second, millisecond: millisecond }));
+    };
+    Day.getWeekspanOfYear = function (date) {
+        return Math.floor((date.dayOfYear() - 1) / Constants.DAYS_IN_WEEK);
+    };
+    Day.getWeekOfYear = function (date) {
+        var firstOfYear = date.clone().startOf('year');
+        var weeks = date.week();
+        return firstOfYear.day() > Constants.WEEK_OF_MONTH_MINIMUM_WEEKDAY ? weeks - 1 : weeks;
+    };
+    Day.getFullWeekOfYear = function (date) {
+        var firstOfYear = date.clone().startOf('year');
+        var weeks = date.week();
+        return firstOfYear.day() === Constants.WEEKDAY_MIN ? weeks : weeks - 1;
+    };
+    Day.getWeekspanOfMonth = function (date) {
+        return Math.floor((date.date() - 1) / Constants.DAYS_IN_WEEK);
+    };
+    Day.getFullWeekOfMonth = function (date) {
+        return Math.floor((date.date() - 1 - date.day() + Constants.DAYS_IN_WEEK) / Constants.DAYS_IN_WEEK);
+    };
+    Day.getWeekOfMonth = function (date) {
+        var dom = date.date();
+        var dow = date.day();
+        var sundayDate = dom - dow;
+        return Math.floor((sundayDate + Constants.WEEK_OF_MONTH_MINIMUM_WEEKDAY + 5) / Constants.DAYS_IN_WEEK);
+    };
+    Day.getWeekIdentifier = function (date) {
+        return date.week() + date.year() * 100;
+    };
+    Day.getMonthIdentifier = function (date) {
+        return (date.month() + 1) + date.year() * 100;
+    };
+    Day.getDayIdentifier = function (date) {
+        return date.date() + (date.month() + 1) * 100 + date.year() * 10000;
+    };
+    Day.getQuarterIdentifier = function (date) {
+        return date.quarter() + date.year() * 10;
+    };
+    Day.LOAD_TIME = Day.now();
+    return Day;
 }());
 
 
@@ -1141,7 +1406,8 @@ var __extends = (this && this.__extends) || (function () {
 
 
 
-var CalendarDay = (function (_super) {
+
+var Calendar_CalendarDay = (function (_super) {
     __extends(CalendarDay, _super);
     function CalendarDay() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -1149,6 +1415,7 @@ var CalendarDay = (function (_super) {
         _this.currentWeek = false;
         _this.currentMonth = false;
         _this.currentYear = false;
+        _this.currentOffset = 0;
         _this.selectedDay = false;
         _this.selectedWeek = false;
         _this.selectedMonth = false;
@@ -1162,6 +1429,7 @@ var CalendarDay = (function (_super) {
         this.currentWeek = this.sameWeek(current);
         this.currentMonth = this.sameMonth(current);
         this.currentYear = this.sameYear(current);
+        this.currentOffset = this.daysBetween(current, Op.DOWN, false);
         return this;
     };
     CalendarDay.prototype.updateSelected = function (selected) {
@@ -1178,14 +1446,21 @@ var CalendarDay = (function (_super) {
     return CalendarDay;
 }(Day_Day));
 
-var CalendarEvent = (function () {
-    function CalendarEvent(event, schedule, time, actualDay) {
+var Calendar_CalendarEvent = (function () {
+    function CalendarEvent(id, event, schedule, time, actualDay) {
         this.event = event;
         this.schedule = schedule;
         this.time = time;
         this.fullDay = time.isPoint;
         this.starting = time.start.sameDay(actualDay);
     }
+    Object.defineProperty(CalendarEvent.prototype, "scheduleId", {
+        get: function () {
+            return Math.floor(this.id / Constants.MAX_EVENTS_PER_DAY);
+        },
+        enumerable: true,
+        configurable: true
+    });
     return CalendarEvent;
 }());
 
@@ -1310,7 +1585,7 @@ var Calendar_Calendar = (function () {
         for (var i = 0; i < total; i++) {
             var day = days[i];
             if (!day || !day.sameDay(current)) {
-                day = new CalendarDay(current.date);
+                day = new Calendar_CalendarDay(current.date);
                 if (i < days.length) {
                     days.splice(i, 1, day);
                 }
@@ -1362,22 +1637,25 @@ var Calendar_Calendar = (function () {
         if (getTimes === void 0) { getTimes = true; }
         if (covers === void 0) { covers = true; }
         var events = [];
-        for (var _i = 0, _a = this.schedules; _i < _a.length; _i++) {
-            var entry = _a[_i];
-            if ((covers && entry.schedule.coversDay(day)) || (!covers && entry.schedule.matchesDay(day))) {
+        var entries = this.schedules;
+        for (var entryIndex = 0; entryIndex < entries.length; entryIndex++) {
+            var entry = entries[entryIndex];
+            var schedule = entry.schedule;
+            var event_1 = entry.event;
+            var eventId = entryIndex * Constants.MAX_EVENTS_PER_DAY;
+            if ((covers && schedule.coversDay(day)) || (!covers && schedule.matchesDay(day))) {
                 if (getTimes) {
                     var times = covers ?
                         entry.schedule.getSpansOver(day) :
                         entry.schedule.getSpansOn(day);
-                    for (var _b = 0, times_1 = times; _b < times_1.length; _b++) {
-                        var time = times_1[_b];
-                        events.push(new CalendarEvent(entry.event, entry.schedule, time, day));
+                    for (var timeIndex = 0; timeIndex < times.length; timeIndex++) {
+                        events.push(new Calendar_CalendarEvent(eventId + timeIndex, event_1, schedule, times[timeIndex], day));
                     }
                 }
                 else {
                     var over = entry.schedule.getSpanOver(day);
                     if (over) {
-                        events.push(new CalendarEvent(entry.event, entry.schedule, over, day));
+                        events.push(new Calendar_CalendarEvent(eventId, event_1, schedule, over, day));
                     }
                 }
             }
@@ -1517,34 +1795,6 @@ var Calendar_Calendar = (function () {
 }());
 
 
-// CONCATENATED MODULE: ./src/Duration.ts
-
-
-var Duration_Duration = (function () {
-    function Duration() {
-    }
-    Duration.millis = function (x) {
-        return x;
-    };
-    Duration.seconds = function (x) {
-        return x * Constants.MILLIS_IN_SECOND;
-    };
-    Duration.minutes = function (x) {
-        return x * Constants.MILLIS_IN_MINUTE;
-    };
-    Duration.hours = function (x) {
-        return x * Constants.MILLIS_IN_HOUR;
-    };
-    Duration.days = function (x) {
-        return x * Constants.MILLIS_IN_DAY;
-    };
-    Duration.weeks = function (x) {
-        return x * Constants.MILLIS_IN_WEEK;
-    };
-    return Duration;
-}());
-
-
 // CONCATENATED MODULE: ./src/Month.ts
 
 var Month = (function () {
@@ -1617,13 +1867,12 @@ var Weekday = (function () {
 
 
 // CONCATENATED MODULE: ./src/index.ts
-/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "CalendarDay", function() { return CalendarDay; });
-/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "CalendarEvent", function() { return CalendarEvent; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "CalendarDay", function() { return Calendar_CalendarDay; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "CalendarEvent", function() { return Calendar_CalendarEvent; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Calendar", function() { return Calendar_Calendar; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Constants", function() { return Constants; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Day", function() { return Day_Day; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "DaySpan", function() { return DaySpan_DaySpan; });
-/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Duration", function() { return Duration_Duration; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Functions", function() { return Functions; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Month", function() { return Month; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Op", function() { return Op; });
@@ -1631,6 +1880,7 @@ var Weekday = (function () {
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Parse", function() { return Parse_Parse; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Schedule", function() { return Schedule_Schedule; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Suffix", function() { return Suffix; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Time", function() { return Time_Time; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Units", function() { return Units; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Weekday", function() { return Weekday; });
 
@@ -1648,12 +1898,6 @@ var Weekday = (function () {
 
 
 
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
 
 /***/ })
 /******/ ]);

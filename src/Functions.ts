@@ -77,4 +77,19 @@ export class Functions
     return this.isDefined( a ) ? a : (this.isDefined( b ) ? b : c);
   }
 
+  public static pad(x: string, length: number, padding: string, before: boolean): string
+  {
+    while (x.length < length)
+    {
+      before ? x = padding + x : x = x + padding;
+    }
+
+    return x;
+  }
+
+  public static padNumber(x: number, length: number, first: number = length)
+  {
+    return this.pad(x + '', length, '0', true).substring( 0, first );
+  }
+
 }
