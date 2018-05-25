@@ -14,5 +14,5 @@ export type FrequencyValue = FrequencyValueEvery | FrequencyValueOneOf;
 export interface FrequencyCheck
 {
    (value: number): boolean;
-   input?: any;
+   input?: FrequencyValue;
 }

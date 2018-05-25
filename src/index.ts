@@ -7,6 +7,7 @@ export * from './Functions';
 export * from './Month';
 export * from './Op';
 export * from './Parse';
+export * from './Pattern';
 export * from './Schedule';
 export * from './Suffix';
 export * from './Time';

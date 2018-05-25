@@ -7,7 +7,7 @@ export class Suffix
   ];
 
   private static _CACHE: string[];
-  
+
   private static _CACHE_SIZE: number = 366;
 
   public static get CACHE(): string[]
@@ -18,7 +18,7 @@ export class Suffix
 
       for (let i = 0; i < this._CACHE_SIZE; i++)
       {
-        this._CACHE[ i ] = this.determine(i);
+        this._CACHE[ i ] = this.get( i, true );
       }
     }
 

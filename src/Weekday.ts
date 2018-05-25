@@ -11,4 +11,27 @@ export class Weekday
   public static FRIDAY: number = 5;
   public static SATURDAY: number = 6;
 
+  public static LIST: number[] = [
+    Weekday.SUNDAY,
+    Weekday.MONDAY,
+    Weekday.TUESDAY,
+    Weekday.WEDNESDAY,
+    Weekday.THURSDAY,
+    Weekday.FRIDAY,
+    Weekday.SATURDAY
+  ];
+
+  public static WEEK: number[] = [
+    Weekday.MONDAY,
+    Weekday.TUESDAY,
+    Weekday.WEDNESDAY,
+    Weekday.THURSDAY,
+    Weekday.FRIDAY
+  ];
+
+  public static ENDS: number[] = [
+    Weekday.SATURDAY,
+    Weekday.SUNDAY
+  ];
+
 }

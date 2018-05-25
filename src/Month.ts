@@ -15,4 +15,19 @@ export class Month
   public static NOVEMBER: number = 10;
   public static DECEMBER: number = 11;
 
+  public static LIST: number[] = [
+    Month.JANUARY,
+    Month.FEBRUARY,
+    Month.MARCH,
+    Month.APRIL,
+    Month.MAY,
+    Month.JUNE,
+    Month.JULY,
+    Month.AUGUST,
+    Month.SEPTEMBER,
+    Month.OCTOBER,
+    Month.NOVEMBER,
+    Month.DECEMBER
+  ];
+
 }

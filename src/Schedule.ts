@@ -1,11 +1,12 @@
 
 import { Functions as fn } from './Functions';
-import { FrequencyValue, FrequencyCheck } from './Types';
+import { FrequencyValue, FrequencyCheck, FrequencyValueEvery, FrequencyValueOneOf } from './Types';
 import { Day, DayInput, DurationInput } from './Day';
 import { DaySpan } from './DaySpan';
 import { Constants } from './Constants';
 import { Parse } from './Parse';
 import { Time, TimeInput } from './Time';
+import { Suffix } from './Suffix';
 // @ts-ignore
 import * as moment from 'moment';
 
@@ -161,34 +162,68 @@ export class Schedule
     return false;
   }
 
-  public nextDay(day: Day, lookAhead: number = 366): Day
+  public nextDay(day: Day, includeDay: boolean = false, lookAhead: number = 366): Day
   {
-    for (let days = 0; days < lookAhead; days++)
-    {
-      day = day.next();
+    let next: Day = null;
 
-      if (this.matchesDay(day))
-      {
-        return day;
-      }
-    }
+    this.iterateDays(day, 1, true, d => next = d, includeDay, lookAhead);
 
-    return null;
+    return next;
   }
 
-  public prevDay(day: Day, lookBack: number = 366): Day
+  public nextDays(day: Day, max: number, includeDay: boolean = false, lookAhead: number = 366): Day[]
   {
-    for (let days = 0; days < lookBack; days++)
+    let nexts: Day[] = [];
+
+    this.iterateDays(day, max, true, d => nexts.push(d), includeDay, lookAhead);
+
+    return nexts;
+  }
+
+  public prevDay(day: Day, includeDay: boolean = false, lookBack: number = 366): Day
+  {
+    let prev: Day = null;
+
+    this.iterateDays(day, 1, false, d => prev = d, includeDay, lookBack);
+
+    return prev;
+  }
+
+  public prevDays(day: Day, max: number, includeDay: boolean = false, lookBack: number = 366): Day[]
+  {
+    let prevs: Day[] = [];
+
+    this.iterateDays(day, max, false, d => prevs.push(d), includeDay, lookBack);
+
+    return prevs;
+  }
+
+  public iterateDays(day: Day, max: number, next: boolean, onDay: (day: Day) => any, includeDay: boolean = false, lookup: number = 366): this
+  {
+    let iterated: number = 0;
+
+    for (let days = 0; days < lookup; days++)
     {
-      day = day.prev();
+      if (!includeDay || days > 0)
+      {
+        day = next ? day.next() : day.prev();
+      }
 
       if (this.matchesDay(day))
       {
-        return day;
+        if (onDay( day ) === false)
+        {
+          break;
+        }
+
+        if (++iterated >= max)
+        {
+          break;
+        }
       }
     }
 
-    return null;
+    return this;
   }
 
   public matchesTime(day: Day): boolean
@@ -311,11 +346,9 @@ export class Schedule
     return spans;
   }
 
-  public toInput(returnDays: boolean = false): ScheduleInput
+  public getExclusions(returnDays: boolean = true)
   {
-    let out: ScheduleInput = {};
     let exclusions: DayInput[] = [];
-    let times: TimeInput[]  = [];
 
     for (let dayIdentifierKey in this.exclude)
     {
@@ -324,9 +357,18 @@ export class Schedule
       exclusions.push( returnDays ? Day.fromDayIdentifier(dayIdentifier)  : dayIdentifier );
     }
 
+    return exclusions;
+  }
+
+  public toInput(returnDays: boolean = false, returnTimes: boolean = false, timeFormat: string = ''): ScheduleInput
+  {
+    let out: ScheduleInput = {};
+    let exclusions: DayInput[] = this.getExclusions( returnDays );
+    let times: TimeInput[]  = [];
+
     for (let time of this.times)
     {
-      times.push( time.toString() );
+      times.push( returnTimes ? time : (timeFormat ? time.format( timeFormat ) : time.toString()) );
     }
 
     if (this.start) out.start = returnDays ? this.start : this.start.time;
@@ -347,6 +389,137 @@ export class Schedule
     if (this.year.input) out.year = this.year.input;
     if (times.length) out.times = times;
     if (exclusions.length) out.exclude = exclusions;
+
+    return out;
+  }
+
+  public describe(thing: string = 'event',
+    includeRange: boolean = true,
+    includeTimes: boolean = true,
+    includeDuration: boolean = false,
+    includeExcludes: boolean = false): string
+  {
+    let out: string = '';
+
+    if (includeRange)
+    {
+      if (this.start)
+      {
+        out += 'Starting on ' + this.start.format('dddd Do, YYYY');
+
+        if (this.end)
+        {
+          out += ' and ending on ' + this.end.format('dddd Do, YYYY');
+        }
+      }
+      else if (this.end)
+      {
+        out += 'Up until ' + this.end.format('dddd Do, YYYY');
+      }
+    }
+
+    if (out)
+    {
+      out += ' the ' + thing + ' will occur';
+    }
+    else
+    {
+      out += 'The ' + thing + ' will occur';
+    }
+
+    out += this.describeRule( this.dayOfWeek.input, 'day of the week', x => moment.weekdays()[x], 1, false);
+    out += this.describeRule( this.dayOfMonth.input, 'day of the month', x => Suffix.CACHE[x] );
+    out += this.describeRule( this.dayOfYear.input, 'day of the year', x => Suffix.CACHE[x], 1 );
+    out += this.describeRule( this.month.input, 'month', x => moment.months()[x], 0, false, ' in ' );
+    out += this.describeRule( this.weekOfYear.input, 'week of the year', x => Suffix.CACHE[x] );
+    out += this.describeRule( this.weekspanOfYear.input, 'weekspan of the year', x => Suffix.CACHE[x + 1], 1 );
+    out += this.describeRule( this.fullWeekOfYear.input, 'full week of the year', x => Suffix.CACHE[x] );
+    out += this.describeRule( this.weekOfMonth.input, 'week of the month', x => Suffix.CACHE[x] );
+    out += this.describeRule( this.fullWeekOfMonth.input, 'full week of the month', x => Suffix.CACHE[x] );
+    out += this.describeRule( this.weekspanOfMonth.input, 'weekspan of the month', x => Suffix.CACHE[x + 1], 1 );
+    out += this.describeRule( this.year.input, 'year', x => x, 0, false, ' in ' );
+
+    if (includeTimes && this.times.length)
+    {
+      out += ' at ';
+      out += this.describeArray( this.times, x => x.format('hh:mm a') );
+    }
+
+    if (includeDuration && this.duration !== Constants.DURATION_NONE)
+    {
+      out += ' lasting ' + this.duration + ' ';
+
+      if (this.durationUnit)
+      {
+        out += this.durationUnit + ' ';
+      }
+    }
+
+    if (includeExcludes)
+    {
+      let excludes: Day[] = <Day[]>this.getExclusions( true );
+
+      if (excludes.length)
+      {
+        out += ' excluding ';
+        out += this.describeArray( excludes, x => x.format('MM/DD/YYYY') );
+      }
+    }
+
+    return out;
+  }
+
+  private describeRule(value: FrequencyValue, unit: string, map: (x: number) => any, everyOffset: number = 0, the: boolean = true, on: string = ' on ', required: boolean = false): string
+  {
+    let out: string = '';
+    let suffix: string = the ? ' ' + unit : '';
+
+    if (fn.isFrequencyValueEvery(value))
+    {
+      let valueEvery: FrequencyValueEvery = <FrequencyValueEvery>value;
+
+      out += ' every ' + Suffix.CACHE[ valueEvery.every ] + ' ' + unit;
+
+      if (valueEvery.offset)
+      {
+        out += ' starting at ' + map( valueEvery.offset + everyOffset ) + suffix;
+      }
+    }
+    else if (fn.isFrequencyValueOneOf(value))
+    {
+      let valueOne: FrequencyValueOneOf = <FrequencyValueOneOf>value;
+
+      if (valueOne.length)
+      {
+        out += on + (the ? 'the ' : '');
+        out += this.describeArray( valueOne, map );
+        out += suffix;
+      }
+    }
+    else if (required)
+    {
+      out +=  on + 'any ' + unit;
+    }
+
+    return out;
+  }
+
+  private describeArray<T>(array: T[], map: (item: T) => string): string
+  {
+    let out: string = '';
+    let last: number = array.length - 1;
+
+    out += map( array[ 0 ] );
+
+    for (let i = 1; i < last; i++)
+    {
+      out += ', ' + map( array[ i ] );
+    }
+
+    if (last > 0)
+    {
+      out += ' and ' + map( array[ last ] );
+    }
 
     return out;
   }

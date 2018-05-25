@@ -112,6 +112,18 @@ var Functions = (function () {
     Functions.isArray = function (input) {
         return input instanceof Array;
     };
+    Functions.isArrayEquals = function (x, y) {
+        if (x === y)
+            return true;
+        if (x.length !== y.length)
+            return false;
+        for (var i = 0; i < x.length; i++) {
+            if (x[i] !== y[i]) {
+                return false;
+            }
+        }
+        return true;
+    };
     /**
      * Determines whether the given input is a string.
      *
@@ -379,9 +391,44 @@ var DaySpan_DaySpan = (function () {
 
 var DaySpan__a;
 
+// CONCATENATED MODULE: ./src/Suffix.ts
+
+var Suffix = (function () {
+    function Suffix() {
+    }
+    Object.defineProperty(Suffix, "CACHE", {
+        get: function () {
+            if (!this._CACHE) {
+                this._CACHE = [];
+                for (var i = 0; i < this._CACHE_SIZE; i++) {
+                    this._CACHE[i] = this.get(i, true);
+                }
+            }
+            return this._CACHE;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Suffix.determine = function (value) {
+        return value >= 11 && value <= 13 ? 'th' : this.MAP[value % this.MAP.length];
+    };
+    Suffix.get = function (value, append) {
+        if (append === void 0) { append = false; }
+        var suffix = this.determine(value);
+        return append ? value + suffix : suffix;
+    };
+    Suffix.MAP = [
+        'th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'
+    ];
+    Suffix._CACHE_SIZE = 366;
+    return Suffix;
+}());
+
+
 // CONCATENATED MODULE: ./src/Schedule.ts
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_moment__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_moment__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_moment__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_moment__);
+
 
 
 
@@ -408,7 +455,7 @@ var Schedule_Schedule = (function () {
         return this;
     };
     Schedule.prototype.updateDurationInDays = function () {
-        this.durationInDays = !this.lastTime ? 0 : Math.max(0, Math.ceil(__WEBPACK_IMPORTED_MODULE_5_moment__["duration"](this.lastTime.toMilliseconds(), 'milliseconds')
+        this.durationInDays = !this.lastTime ? 0 : Math.max(0, Math.ceil(__WEBPACK_IMPORTED_MODULE_6_moment__["duration"](this.lastTime.toMilliseconds(), 'milliseconds')
             .add(this.duration, this.durationUnit)
             .subtract(1, 'day')
             .asDays()));
@@ -464,25 +511,52 @@ var Schedule_Schedule = (function () {
         }
         return false;
     };
-    Schedule.prototype.nextDay = function (day, lookAhead) {
+    Schedule.prototype.nextDay = function (day, includeDay, lookAhead) {
+        if (includeDay === void 0) { includeDay = false; }
         if (lookAhead === void 0) { lookAhead = 366; }
-        for (var days = 0; days < lookAhead; days++) {
-            day = day.next();
-            if (this.matchesDay(day)) {
-                return day;
-            }
-        }
-        return null;
+        var next = null;
+        this.iterateDays(day, 1, true, function (d) { return next = d; }, includeDay, lookAhead);
+        return next;
     };
-    Schedule.prototype.prevDay = function (day, lookBack) {
+    Schedule.prototype.nextDays = function (day, max, includeDay, lookAhead) {
+        if (includeDay === void 0) { includeDay = false; }
+        if (lookAhead === void 0) { lookAhead = 366; }
+        var nexts = [];
+        this.iterateDays(day, max, true, function (d) { return nexts.push(d); }, includeDay, lookAhead);
+        return nexts;
+    };
+    Schedule.prototype.prevDay = function (day, includeDay, lookBack) {
+        if (includeDay === void 0) { includeDay = false; }
         if (lookBack === void 0) { lookBack = 366; }
-        for (var days = 0; days < lookBack; days++) {
-            day = day.prev();
+        var prev = null;
+        this.iterateDays(day, 1, false, function (d) { return prev = d; }, includeDay, lookBack);
+        return prev;
+    };
+    Schedule.prototype.prevDays = function (day, max, includeDay, lookBack) {
+        if (includeDay === void 0) { includeDay = false; }
+        if (lookBack === void 0) { lookBack = 366; }
+        var prevs = [];
+        this.iterateDays(day, max, false, function (d) { return prevs.push(d); }, includeDay, lookBack);
+        return prevs;
+    };
+    Schedule.prototype.iterateDays = function (day, max, next, onDay, includeDay, lookup) {
+        if (includeDay === void 0) { includeDay = false; }
+        if (lookup === void 0) { lookup = 366; }
+        var iterated = 0;
+        for (var days = 0; days < lookup; days++) {
+            if (!includeDay || days > 0) {
+                day = next ? day.next() : day.prev();
+            }
             if (this.matchesDay(day)) {
-                return day;
+                if (onDay(day) === false) {
+                    break;
+                }
+                if (++iterated >= max) {
+                    break;
+                }
             }
         }
-        return null;
+        return this;
     };
     Schedule.prototype.matchesTime = function (day) {
         if (!this.matchesDay(day)) {
@@ -565,18 +639,25 @@ var Schedule_Schedule = (function () {
         }
         return spans;
     };
-    Schedule.prototype.toInput = function (returnDays) {
-        if (returnDays === void 0) { returnDays = false; }
-        var out = {};
+    Schedule.prototype.getExclusions = function (returnDays) {
+        if (returnDays === void 0) { returnDays = true; }
         var exclusions = [];
-        var times = [];
         for (var dayIdentifierKey in this.exclude) {
             var dayIdentifier = parseInt(dayIdentifierKey);
             exclusions.push(returnDays ? Day_Day.fromDayIdentifier(dayIdentifier) : dayIdentifier);
         }
+        return exclusions;
+    };
+    Schedule.prototype.toInput = function (returnDays, returnTimes, timeFormat) {
+        if (returnDays === void 0) { returnDays = false; }
+        if (returnTimes === void 0) { returnTimes = false; }
+        if (timeFormat === void 0) { timeFormat = ''; }
+        var out = {};
+        var exclusions = this.getExclusions(returnDays);
+        var times = [];
         for (var _i = 0, _a = this.times; _i < _a.length; _i++) {
             var time = _a[_i];
-            times.push(time.toString());
+            times.push(returnTimes ? time : (timeFormat ? time.format(timeFormat) : time.toString()));
         }
         if (this.start)
             out.start = returnDays ? this.start : this.start.time;
@@ -614,6 +695,99 @@ var Schedule_Schedule = (function () {
             out.times = times;
         if (exclusions.length)
             out.exclude = exclusions;
+        return out;
+    };
+    Schedule.prototype.describe = function (thing, includeRange, includeTimes, includeDuration, includeExcludes) {
+        if (thing === void 0) { thing = 'event'; }
+        if (includeRange === void 0) { includeRange = true; }
+        if (includeTimes === void 0) { includeTimes = true; }
+        if (includeDuration === void 0) { includeDuration = false; }
+        if (includeExcludes === void 0) { includeExcludes = false; }
+        var out = '';
+        if (includeRange) {
+            if (this.start) {
+                out += 'Starting on ' + this.start.format('dddd Do, YYYY');
+                if (this.end) {
+                    out += ' and ending on ' + this.end.format('dddd Do, YYYY');
+                }
+            }
+            else if (this.end) {
+                out += 'Up until ' + this.end.format('dddd Do, YYYY');
+            }
+        }
+        if (out) {
+            out += ' the ' + thing + ' will occur';
+        }
+        else {
+            out += 'The ' + thing + ' will occur';
+        }
+        out += this.describeRule(this.dayOfWeek.input, 'day of the week', function (x) { return __WEBPACK_IMPORTED_MODULE_6_moment__["weekdays"]()[x]; }, 1, false);
+        out += this.describeRule(this.dayOfMonth.input, 'day of the month', function (x) { return Suffix.CACHE[x]; });
+        out += this.describeRule(this.dayOfYear.input, 'day of the year', function (x) { return Suffix.CACHE[x]; }, 1);
+        out += this.describeRule(this.month.input, 'month', function (x) { return __WEBPACK_IMPORTED_MODULE_6_moment__["months"]()[x]; }, 0, false, ' in ');
+        out += this.describeRule(this.weekOfYear.input, 'week of the year', function (x) { return Suffix.CACHE[x]; });
+        out += this.describeRule(this.weekspanOfYear.input, 'weekspan of the year', function (x) { return Suffix.CACHE[x + 1]; }, 1);
+        out += this.describeRule(this.fullWeekOfYear.input, 'full week of the year', function (x) { return Suffix.CACHE[x]; });
+        out += this.describeRule(this.weekOfMonth.input, 'week of the month', function (x) { return Suffix.CACHE[x]; });
+        out += this.describeRule(this.fullWeekOfMonth.input, 'full week of the month', function (x) { return Suffix.CACHE[x]; });
+        out += this.describeRule(this.weekspanOfMonth.input, 'weekspan of the month', function (x) { return Suffix.CACHE[x + 1]; }, 1);
+        out += this.describeRule(this.year.input, 'year', function (x) { return x; }, 0, false, ' in ');
+        if (includeTimes && this.times.length) {
+            out += ' at ';
+            out += this.describeArray(this.times, function (x) { return x.format('hh:mm a'); });
+        }
+        if (includeDuration && this.duration !== Constants.DURATION_NONE) {
+            out += ' lasting ' + this.duration + ' ';
+            if (this.durationUnit) {
+                out += this.durationUnit + ' ';
+            }
+        }
+        if (includeExcludes) {
+            var excludes = this.getExclusions(true);
+            if (excludes.length) {
+                out += ' excluding ';
+                out += this.describeArray(excludes, function (x) { return x.format('MM/DD/YYYY'); });
+            }
+        }
+        return out;
+    };
+    Schedule.prototype.describeRule = function (value, unit, map, everyOffset, the, on, required) {
+        if (everyOffset === void 0) { everyOffset = 0; }
+        if (the === void 0) { the = true; }
+        if (on === void 0) { on = ' on '; }
+        if (required === void 0) { required = false; }
+        var out = '';
+        var suffix = the ? ' ' + unit : '';
+        if (Functions.isFrequencyValueEvery(value)) {
+            var valueEvery = value;
+            out += ' every ' + Suffix.CACHE[valueEvery.every] + ' ' + unit;
+            if (valueEvery.offset) {
+                out += ' starting at ' + map(valueEvery.offset + everyOffset) + suffix;
+            }
+        }
+        else if (Functions.isFrequencyValueOneOf(value)) {
+            var valueOne = value;
+            if (valueOne.length) {
+                out += on + (the ? 'the ' : '');
+                out += this.describeArray(valueOne, map);
+                out += suffix;
+            }
+        }
+        else if (required) {
+            out += on + 'any ' + unit;
+        }
+        return out;
+    };
+    Schedule.prototype.describeArray = function (array, map) {
+        var out = '';
+        var last = array.length - 1;
+        out += map(array[0]);
+        for (var i = 1; i < last; i++) {
+            out += ', ' + map(array[i]);
+        }
+        if (last > 0) {
+            out += ' and ' + map(array[last]);
+        }
         return out;
     };
     return Schedule;
@@ -824,6 +998,9 @@ var Parse_Parse = (function () {
         return null;
     };
     Parse.time = function (input) {
+        if (input instanceof Time_Time) {
+            return input;
+        }
         if (Functions.isNumber(input)) {
             return Time_Time.fromIdentifier(input);
         }
@@ -1812,41 +1989,21 @@ var Month = (function () {
     Month.OCTOBER = 9;
     Month.NOVEMBER = 10;
     Month.DECEMBER = 11;
-    return Month;
-}());
-
-
-// CONCATENATED MODULE: ./src/Suffix.ts
-
-var Suffix = (function () {
-    function Suffix() {
-    }
-    Object.defineProperty(Suffix, "CACHE", {
-        get: function () {
-            if (!this._CACHE) {
-                this._CACHE = [];
-                for (var i = 0; i < this._CACHE_SIZE; i++) {
-                    this._CACHE[i] = this.determine(i);
-                }
-            }
-            return this._CACHE;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Suffix.determine = function (value) {
-        return value >= 11 && value <= 13 ? 'th' : this.MAP[value % this.MAP.length];
-    };
-    Suffix.get = function (value, append) {
-        if (append === void 0) { append = false; }
-        var suffix = this.determine(value);
-        return append ? value + suffix : suffix;
-    };
-    Suffix.MAP = [
-        'th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'
+    Month.LIST = [
+        Month.JANUARY,
+        Month.FEBRUARY,
+        Month.MARCH,
+        Month.APRIL,
+        Month.MAY,
+        Month.JUNE,
+        Month.JULY,
+        Month.AUGUST,
+        Month.SEPTEMBER,
+        Month.OCTOBER,
+        Month.NOVEMBER,
+        Month.DECEMBER
     ];
-    Suffix._CACHE_SIZE = 366;
-    return Suffix;
+    return Month;
 }());
 
 
@@ -1862,9 +2019,194 @@ var Weekday = (function () {
     Weekday.THURSDAY = 4;
     Weekday.FRIDAY = 5;
     Weekday.SATURDAY = 6;
+    Weekday.LIST = [
+        Weekday.SUNDAY,
+        Weekday.MONDAY,
+        Weekday.TUESDAY,
+        Weekday.WEDNESDAY,
+        Weekday.THURSDAY,
+        Weekday.FRIDAY,
+        Weekday.SATURDAY
+    ];
+    Weekday.WEEK = [
+        Weekday.MONDAY,
+        Weekday.TUESDAY,
+        Weekday.WEDNESDAY,
+        Weekday.THURSDAY,
+        Weekday.FRIDAY
+    ];
+    Weekday.ENDS = [
+        Weekday.SATURDAY,
+        Weekday.SUNDAY
+    ];
     return Weekday;
 }());
 
+
+// CONCATENATED MODULE: ./src/Pattern.ts
+
+
+
+
+/**
+ *
+ */
+var Pattern_Pattern = (function () {
+    function Pattern(name, listed, describe, rules) {
+        this.name = name;
+        this.listed = listed;
+        this.describe = describe;
+        this.rules = rules;
+    }
+    Pattern.prototype.apply = function (input, day) {
+        for (var prop in Pattern.PROPS) {
+            var rule = this.rules[prop];
+            // Should have one value
+            if (rule === 1) {
+                input[prop] = [day[prop]];
+            }
+            // Can be any of the values in the array
+            if (Functions.isArray(rule)) {
+                input[prop] = rule;
+            }
+            // Must not be present
+            if (!Functions.isDefined(rule)) {
+                delete input[prop];
+            }
+        }
+        return input;
+    };
+    Pattern.prototype.isMatch = function (input, exactlyWith) {
+        var exactly = Functions.isDefined(exactlyWith);
+        for (var _i = 0, _a = Pattern.PROPS; _i < _a.length; _i++) {
+            var prop = _a[_i];
+            var rule = this.rules[prop];
+            var curr = input[prop];
+            // Optional, skip it
+            if (rule === false) {
+                continue;
+            }
+            // Requires any value
+            if (rule === true && !curr) {
+                return false;
+            }
+            // Must not be present
+            if (!Functions.isDefined(rule) && curr) {
+                return false;
+            }
+            // Must be an array of the same size
+            if (Functions.isNumber(rule)) {
+                if (Functions.isArray(curr) && curr.length === rule) {
+                    if (exactly && curr.indexOf(exactlyWith[prop]) === -1) {
+                        return false;
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
+            // Must be an array of the same values
+            if (Functions.isArray(rule)) {
+                if (!Functions.isArray(curr)) {
+                    return false;
+                }
+                if (rule.length !== curr.length) {
+                    return false;
+                }
+                for (var i = 0; i < rule.length; i++) {
+                    if (rule[i] !== curr[i]) {
+                        return false;
+                    }
+                }
+                if (exactly && rule.indexOf(exactlyWith[prop]) === -1) {
+                    return false;
+                }
+            }
+            // Must be an object with same over & offset.
+            if (Functions.isObject(rule)) {
+                if (!Functions.isObject(curr)) {
+                    return false;
+                }
+                var ruleOffset = rule.offset || 0;
+                var currOffset = curr.offset || 0;
+                if (currOffset !== ruleOffset || curr.every !== rule.every) {
+                    return false;
+                }
+                if (exactly && (exactlyWith[prop] % rule.every) !== ruleOffset) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+    Pattern.withName = function (name) {
+        return PatternMap[name];
+    };
+    Pattern.findMatch = function (input, listedOnly, exactlyWith) {
+        if (listedOnly === void 0) { listedOnly = true; }
+        for (var _i = 0, Patterns_1 = Patterns; _i < Patterns_1.length; _i++) {
+            var pattern = Patterns_1[_i];
+            if ((pattern.listed || !listedOnly) && pattern.isMatch(input, exactlyWith)) {
+                return pattern;
+            }
+        }
+        return null;
+    };
+    Pattern.PROPS = [
+        'dayOfWeek', 'dayOfMonth', 'dayOfYear', 'month', 'week', 'year', 'weekOfYear', 'weekspanOfYear', 'fullWeekOfYear', 'weekOfMonth', 'weekspanOfMonth', 'fullWeekOfMonth'
+    ];
+    return Pattern;
+}());
+
+var Patterns = [
+    new Pattern_Pattern('none', true, function (day) { return 'Does not repeat'; }, {
+        year: 1,
+        month: 1,
+        dayOfMonth: 1
+    }),
+    new Pattern_Pattern('daily', true, function (day) { return 'Daily'; }, {}),
+    new Pattern_Pattern('weekly', true, function (day) { return 'Weekly on ' + day.format('dddd'); }, {
+        dayOfWeek: 1
+    }),
+    new Pattern_Pattern('monthlyWeek', true, function (day) { return 'Monthly on the ' + Suffix.CACHE[day.weekspanOfMonth + 1] + ' ' + day.format('dddd'); }, {
+        dayOfWeek: 1,
+        weekspanOfMonth: 1
+    }),
+    new Pattern_Pattern('annually', true, function (day) { return 'Annually on ' + day.format('MMMM Do'); }, {
+        month: 1,
+        dayOfMonth: 1
+    }),
+    new Pattern_Pattern('annuallyMonthWeek', true, function (day) { return 'Annually on the ' + Suffix.CACHE[day.weekspanOfMonth + 1] + ' ' + day.format('dddd') + ' of ' + day.format('MMMM'); }, {
+        month: 1,
+        dayOfWeek: 1,
+        weekspanOfMonth: 1
+    }),
+    new Pattern_Pattern('weekday', true, function (day) { return 'Every weekday (Monday to Friday)'; }, {
+        dayOfWeek: [Weekday.MONDAY, Weekday.TUESDAY, Weekday.WEDNESDAY, Weekday.THURSDAY, Weekday.FRIDAY]
+    }),
+    new Pattern_Pattern('monthly', true, function (day) { return 'Monthly on the ' + day.format('Do') + ' day'; }, {
+        dayOfMonth: 1
+    }),
+    new Pattern_Pattern('custom', true, function (day) { return 'Custom...'; }, {
+        dayOfWeek: false,
+        dayOfMonth: false,
+        dayOfYear: false,
+        month: false,
+        week: false,
+        year: false,
+        weekOfYear: false,
+        weekspanOfYear: false,
+        fullWeekOfYear: false,
+        weekOfMonth: false,
+        weekspanOfMonth: false,
+        fullWeekOfMonth: false
+    })
+];
+var PatternMap = {};
+for (var Pattern__i = 0, Patterns_2 = Patterns; Pattern__i < Patterns_2.length; Pattern__i++) {
+    var Pattern_pattern = Patterns_2[Pattern__i];
+    PatternMap[Pattern_pattern.name] = Pattern_pattern;
+}
 
 // CONCATENATED MODULE: ./src/index.ts
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "CalendarDay", function() { return Calendar_CalendarDay; });
@@ -1878,11 +2220,15 @@ var Weekday = (function () {
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Op", function() { return Op; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "operate", function() { return operate; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Parse", function() { return Parse_Parse; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Pattern", function() { return Pattern_Pattern; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Patterns", function() { return Patterns; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "PatternMap", function() { return PatternMap; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Schedule", function() { return Schedule_Schedule; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Suffix", function() { return Suffix; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Time", function() { return Time_Time; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Units", function() { return Units; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Weekday", function() { return Weekday; });
+
 
 
 

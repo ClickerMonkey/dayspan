@@ -19,6 +19,22 @@ export class Functions
     return input instanceof Array;
   }
 
+  public static isArrayEquals(x: any[], y: any[]): boolean
+  {
+    if (x === y) return true;
+    if (x.length !== y.length) return false;
+
+    for (let i = 0; i < x.length; i++)
+    {
+      if (x[ i ] !== y[ i ])
+      {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   /**
    * Determines whether the given input is a string.
    *

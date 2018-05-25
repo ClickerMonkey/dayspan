@@ -140,44 +140,273 @@
     -->
 
     <script type="text/template" id="template_scheduler">
-      <v-dialog v-model="open" max-width="500px">
+      <v-dialog v-model="open" max-width="700px" persistent>
         <v-card>
-          <v-card-title>
-            {{ header }}
-          </v-card-title>
           <v-card-text>
-            <v-text-field
-              label="Event Title"
-              v-model="title"
-            ></v-text-field>
-            <v-select
-              :items="colors"
-              v-model="color"
-              label="Event Color">
-              <template slot="selection" slot-scope="data">
-                <div class="ds-color-option" :style="{backgroundColor: data.item.value}" v-text="data.item.text"></div>
-              </template>
-              <template slot="item" slot-scope="data">
-                <v-list-tile-content>
-                  <div class="ds-color-option" :style="{backgroundColor: data.item.value}" v-text="data.item.text"></div>
-                </v-list-tile-content>
-              </template>
-            </v-select>
-            <v-select
-              label="Repeats..."
-              :items="types"
-              v-model="type"
-              item-text="label"
-              item-value="value"
-              @change="updateType"
-            ></v-select>
+            <v-layout row>
+              <v-flex xs12>
+                <v-text-field single-line flat hide-details
+                  class="ds-gray-textfield ds-font-18 pr-2 pt-1"
+                  label="Title"
+                  v-model="title"
+                  prepend-icon="close"
+                  :prepend-icon-cb="cancel"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs9>
+                <v-btn :disabled="!canSave" color="primary" dark @click.stop="save">Save</v-btn>
+                <v-menu bottom left>
+                  <v-btn slot="activator" color="grey lighten-4">
+                    More actions...
+                  </v-btn>
+                  <v-list v-if="canRemove || canExclude">
+                    <v-list-tile @click="remove" v-if="canRemove">
+                      <v-list-tile-title>Remove all occurrences</v-list-tile-title>
+                    </v-list-tile>
+                    <v-list-tile @click="exclude" v-if="canExclude">
+                      <v-list-tile-title>Remove this occurrence</v-list-tile-title>
+                    </v-list-tile>
+                  </v-list>
+                </v-menu>
+              </v-flex>
+            </v-layout>
+            <v-layout row class="mt-3">
+              <v-flex xs12 style="padding-left:40px">
+                <v-menu offset-y
+                  :close-on-content-click="false"
+                  :nudge-width="60"
+                  v-model="startMenu">
+                  <v-btn class="ma-0 ds-gray-button" slot="activator">{{ startText }}</v-btn>
+                  <div class="ds-gray-day-dropdown">
+                    <ds-day-picker :highlight-span="!!input.start" :span="startSpan" @picked="setStart"></ds-day-picker>
+                    <v-btn block class="mb-0 ds-gray-button" v-if="input.start" @click="setStart()">
+                      Beginning of Time
+                    </v-btn>
+                  </div>
+                </v-menu>
+                &nbsp;&nbsp;to&nbsp;&nbsp;
+                <v-menu offset-y
+                  :close-on-content-click="false"
+                  :nudge-width="60"
+                  v-model="endMenu">
+                  <v-btn class="ma-0 ds-gray-button" slot="activator">{{ endText }}</v-btn>
+                  <div class="ds-gray-day-dropdown">
+                    <ds-day-picker :highlight-span="!!input.end" :span="endSpan" @picked="setEnd"></ds-day-picker>
+                    <v-btn block class="mb-0 ds-gray-button" v-if="input.end" @click="setEnd()">
+                      End of Time
+                    </v-btn>
+                  </div>
+                </v-menu>
+              </v-flex>
+            </v-flex>
+            </v-layout>
+            <v-layout row>
+              <v-flex xs2 offset-xs1>
+                <v-checkbox hide-details class="mr-2 mt-4"
+                  label="All day"
+                  v-model="allDay"
+                ></v-checkbox>
+              </v-flex>
+              <v-flex xs6>
+                <v-select single-line flat persistent-hint
+                  class="ds-gray-select"
+                  :items="types"
+                  :hint="typeHint"
+                  :hide-details="type !== 'custom'"
+                  v-model="type"
+                  item-text="label"
+                  item-value="value"
+                ></v-select>
+              </v-flex>
+              <v-flex xs3 v-if="type === 'custom'">
+                <v-btn style="margin-top: 18px"
+                  color="grey lighten-4"
+                  @click="editCustom = true">Edit</v-btn>
+              </v-flex>
+            </v-layout>
+            <v-layout row v-if="input.times && input.times.length">
+              <v-flex xs3 style="padding-left:40px"></v-flex>
+              <v-flex xs16>
+                <div v-for="(time, index) in input.times" class="mt-3">
+                  <v-text-field style="width:140px; float:left;"
+                    single-line flat hide-details
+                    class="ds-gray-textfield pt-0"
+                    type="time"
+                    v-model="input.times[ index ]"
+                  ></v-text-field>
+                  <v-btn icon class="btn--flat ma-0 mt-0"
+                    style="top:4px; left:4px;"
+                    v-if="index < input.times.length - 1"
+                    color="secondary"
+                    @click="input.times.splice( index, 1 )"><v-icon>remove</v-icon></v-btn>
+                  <v-btn icon class="btn--flat ma-0 mt-0"
+                    style="top:4px; left:4px;"
+                    v-if="index === input.times.length - 1"
+                    color="secondary"
+                    @click="input.times.push('00:00')"><v-icon>add</v-icon></v-btn>
+                </div>
+              </v-flex>
+            </v-layout>
+            <v-layout row>
+              <v-flex xs12 class="mt-2">
+                <v-tabs v-model="currentTab">
+                  <v-tab href="#appearance">
+                    Appearance
+                  </v-tab>
+                  <v-tab href="#forecast">
+                    Forecast
+                  </v-tab>
+                  <v-tab href="#exclusions">
+                    Removed Occurrences
+                  </v-tab>
+                  <v-tab-item id=appearance>
+                    <v-card flat>
+                      <v-card-text>
+                        <v-select single-line flat hide-details
+                          class="ds-gray-select"
+                          :items="colors"
+                          :color="color"
+                          v-model="color">
+                          <template slot="item" slot-scope="data">
+                            <v-list-tile-content>
+                              <div class="ds-color-option" :style="{backgroundColor: data.item.value}" v-text="data.item.text"></div>
+                            </v-list-tile-content>
+                          </template>
+                        </v-select>
+                      </v-card-text>
+                    </v-card>
+                  </v-tab-item>
+                  <v-tab-item id=forecast lazy>
+                    <v-card flat>
+                      <v-card-text>
+                        <div class="pb-3">
+                          The forecast shows previous & next
+                          <v-text-field single-line hide-details
+                            v-model="forecastSize"
+                            type="number"
+                            class="ds-gray-textfield ds-inline-textfield small"
+                          ></v-text-field>
+                          event occurrences.
+                        </div>
+                        <v-chip label close
+                          v-for="d in forecast"
+                          :key="d.time"
+                          :color="d.sameDay( day ) ? 'primary' : ''"
+                          :text-color="d.sameDay( day ) ? 'white' : ''"
+                          @input="addExclusion( d )">
+                          {{ d.format('ddd MMM Do YYYY') }}
+                        </v-chip>
+                      </v-card-text>
+                    </v-card>
+                  </v-tab-item>
+                  <v-tab-item id=exclusions lazy>
+                    <v-card flat>
+                      <v-card-text>
+                        <div class="pb-3">
+                          This is a list of event occurrences that were removed from the calendar.
+                        </div>
+                        <v-chip label close
+                          v-for="d in input.exclude"
+                          :key="d.time"
+                          @input="removeExclusion( d )">
+                          {{ d.format('ddd MMM Do YYYY') }}
+                        </v-chip>
+                      </v-card-text>
+                    </v-card>
+                  </v-tab-item>
+                </v-tabs>
+              </v-flex>
+            </v-layout>
+
+            <v-dialog v-model="editCustom" max-width="900px" persistent>
+              <v-card v-if="type === 'custom'">
+                <v-card-text>
+                  <div class="pa-3">
+                    {{ typeHint }}
+                  </div>
+                  <v-layout row wrap>
+                    <!-- Year -->
+                    <v-flex xs5>
+                      <v-select v-model="customYear" :items="yearOptions" label="Years" class="ds-gray-select" hide-details></v-select>
+                    </v-flex>
+                    <v-flex xs7 v-if="customYear === 'any'"></v-flex>
+                    <v-flex xs7 v-if="customYear === 'oneof'" class="pl-1">
+                      <v-select v-model="input.year" :items="yearOneOfs" class="ds-gray-select" hide-details multiple></v-select>
+                    </v-flex>
+                    <v-flex xs2 v-if="customYear === 'every'" class="pl-1">
+                      <v-text-field v-model="input.year.every" type="number" class="ds-gray-textfield" hide-details></v-text-field>
+                    </v-flex>
+                    <v-flex xs5 v-if="customYear === 'every'" class="pl-1">
+                      <v-select v-model="input.year.offset" :items="yearOffsets" class="ds-gray-select" hide-details></v-select>
+                    </v-flex>
+                    <!-- Month -->
+                    <v-flex xs5>
+                      <v-select v-model="customMonth" :items="monthOptions" label="Months" class="ds-gray-select" hide-details></v-select>
+                    </v-flex>
+                    <v-flex xs7 v-if="customMonth === 'any'"></v-flex>
+                    <v-flex xs7 v-if="customMonth === 'oneof'" class="pl-1">
+                      <v-select v-model="input.month" :items="monthOneOfs" class="ds-gray-select" hide-details multiple></v-select>
+                    </v-flex>
+                    <v-flex xs2 v-if="customMonth === 'every'" class="pl-1">
+                      <v-text-field v-model="input.month.every" type="number" class="ds-gray-textfield" hide-details></v-text-field>
+                    </v-flex>
+                    <v-flex xs5 v-if="customMonth === 'every'" class="pl-1">
+                      <v-select v-model="input.month.offset" :items="monthOffsets" class="ds-gray-select" hide-details></v-select>
+                    </v-flex>
+                    <!-- Week -->
+                    <v-flex xs5>
+                      <v-select v-model="customWeek" :items="weekOptions" label="Weeks" class="ds-gray-select" hide-details></v-select>
+                    </v-flex>
+                    <v-flex xs7 v-if="customWeek === 'any'"></v-flex>
+                    <v-flex xs7 v-if="customWeek !== 'any'" class="pl-1">
+                      <v-select v-model="customWeekType" :items="weekTypes" class="ds-gray-select" return-object hide-details></v-select>
+                    </v-flex>
+                    <v-flex xs7 offset-xs5 v-if="customWeek === 'oneof'" class="pl-1">
+                      <v-select v-model="input[ customWeekType.property ]" :items="weekOneOfs" class="ds-gray-select" hide-details multiple></v-select>
+                    </v-flex>
+                    <v-flex xs2 offset-xs5 v-if="customWeek === 'every'" class="pl-1">
+                      <v-text-field v-model="input[ customWeekType.property ].every" type="number" class="ds-gray-textfield" hide-details></v-text-field>
+                    </v-flex>
+                    <v-flex xs5 v-if="customWeek === 'every'" class="pl-1">
+                      <v-select v-model="input[ customWeekType.property ].offset" :items="weekOffsets" class="ds-gray-select" hide-details></v-select>
+                    </v-flex>
+                    <!-- Day of Week -->
+                    <v-flex xs5>
+                      <v-select v-model="customWeekday" :items="weekdayOptions" label="Days of week" class="ds-gray-select" hide-details></v-select>
+                    </v-flex>
+                    <v-flex xs7 v-if="customWeekday === 'any' || customWeekday === 'weekday' || customWeekday === 'weekend'"></v-flex>
+                    <v-flex xs7 v-if="customWeekday === 'oneof'" class="pl-1">
+                      <v-select v-model="input.dayOfWeek" :items="weekdayOneOfs" class="ds-gray-select" hide-details multiple></v-select>
+                    </v-flex>
+                    <v-flex xs2 v-if="customWeekday === 'every'" class="pl-1">
+                      <v-text-field v-model="input.dayOfWeek.every" type="number" class="ds-gray-textfield" hide-details></v-text-field>
+                    </v-flex>
+                    <v-flex xs5 v-if="customWeekday === 'every'" class="pl-1">
+                      <v-select v-model="input.dayOfWeek.offset" :items="weekdayOffsets" class="ds-gray-select" hide-details></v-select>
+                    </v-flex>
+                    <!-- Day -->
+                    <v-flex xs5>
+                      <v-select v-model="customDay" :items="dayOptions" label="Days" class="ds-gray-select" hide-details></v-select>
+                    </v-flex>
+                    <v-flex xs7 v-if="customDay === 'any'"></v-flex>
+                    <v-flex xs7 v-if="customDay === 'oneof'" class="pl-1">
+                      <v-select v-model="input[ customDayProperty ]" :items="dayOneOfs" class="ds-gray-select" hide-details multiple></v-select>
+                    </v-flex>
+                    <v-flex xs2 v-if="customDay === 'every'" class="pl-1">
+                      <v-text-field v-model="input[ customDayProperty ].every" class="ds-gray-textfield" type="number" hide-details></v-text-field>
+                    </v-flex>
+                    <v-flex xs5 v-if="customDay === 'every'" class="pl-1">
+                      <v-select v-model="input[ customDayProperty ].offset" :items="dayOffsets" class="ds-gray-select" hide-details></v-select>
+                    </v-flex>
+
+                  </v-layout>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn color="primary" @click.stop="editCustom = false">Done</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </v-card-text>
-          <v-card-actions>
-            <v-btn color="primary" flat @click.stop="cancel">Cancel</v-btn>
-            <v-btn v-if="canRemove" color="primary" flat right @click.stop="remove">Remove</v-btn>
-            <v-btn v-if="canExclude" color="primary" flat right @click.stop="exclude">Exclude</v-btn>
-            <v-btn :disabled="!canSave" color="primary" flat right @click.stop="save">Save</v-btn>
-          </v-card-actions>
         </v-card>
       </v-dialog>
     </script>
@@ -246,7 +475,8 @@
               @click="pick( day )"
               :class="{
                 'btn--active': day.currentDay,
-                'grey--text text--darken-1': !day.inCalendar
+                'grey--text text--darken-1': !day.inCalendar,
+                'primary': isHighlighted( day )
               }">
               {{ day.dayOfMonth }}
             </v-btn>
@@ -256,6 +486,7 @@
     </script>
 
     <script>
+      var fn = ds.Functions;
       var Store = {
         Watcher: function(name, deep) {
           return {
@@ -483,70 +714,6 @@
         }
       });
 
-      /**
-
-       - Does not repeat
-       - Daily
-       - Weekly on [dayOfWeek]
-       - Monthly on the [nth] [dayOfWeek]
-       - Annually on [month] [dayOfMonth]
-       - Every weekday (Monday to Friday)
-       - Monthly on the [nth] day
-       - Custom
-
-       // true = presence required
-       // 1 = an array with 1 element
-       // [] = an array that matches values
-       // {every, offfset} = a matching frequency
-       // false = presense is optional
-       // undefined = presense should not exist
-
-       **/
-
-      // 'start', 'end', 'duration', 'durationUnit', 'exclude', 'times'
-      var PATTERN_PROPS = ['dayOfWeek', 'dayOfMonth', 'dayOfYear', 'month', 'week', 'year', 'weekOfYear', 'weekspanOfYear', 'fullWeekOfYear', 'weekOfMonth', 'weekspanOfMonth', 'fullWeekOfMonth'];
-      var PATTERNS = {
-        none: {
-          year: 1,
-          month: 1,
-          dayOfMonth: 1
-        },
-        daily: {
-
-        },
-        weekly: {
-          dayOfWeek: 1
-        },
-        monthlyWeek: {
-          dayOfWeek: 1,
-          weekspanOfMonth: 1
-        },
-        annually: {
-          month: 1,
-          dayOfMonth: 1
-        },
-        weekday: {
-          dayOfWeek: [ds.Weekday.MONDAY, ds.Weekday.TUESDAY, ds.Weekday.WEDNESDAY, ds.Weekday.THURSDAY, ds.Weekday.FRIDAY]
-        },
-        monthly: {
-          dayOfMonth: 1
-        },
-        custom: {
-          dayOfWeek: false,
-          dayOfMonth: false,
-          dayOfYear: false,
-          month: false,
-          week: false,
-          year: false,
-          weekOfYear: false,
-          weekspanOfYear: false,
-          fullWeekOfYear: false,
-          weekOfMonth: false,
-          weekspanOfMonth: false,
-          fullWeekOfMonth: false
-        }
-      };
-
       Vue.component('dsScheduler', {
         template: '#template_scheduler',
         data: function() {
@@ -559,6 +726,11 @@
             input: {},
             day: null,
             type: '',
+            startMenu: false,
+            endMenu: false,
+            editCustom: false,
+            currentTab: 'appearance',
+            forecastSize: 10,
             colors: [
               { text: 'Red', value: '#F44336' },
               { text: 'Pink', value: '#E91E63' },
@@ -580,10 +752,232 @@
               { text: 'Blue Gray', value: '#607D8B' },
               { text: 'Gray', value: '#9E9E9E' },
               { text: 'Black', value: '#000000' }
+            ],
+
+            yearOptions: [
+              { text: 'Any year', value: 'any'},
+              { text: 'On the following years...', value: 'oneof'},
+              { text: 'Every _ years starting on _', value: 'every'}
+            ],
+            monthOptions: [
+              { text: 'Any month', value: 'any'},
+              { text: 'On the following months...', value: 'oneof'},
+              { text: 'Every _ months starting on _', value: 'every'}
+            ],
+            weekTypes: [
+              { text: 'Week of the month (first week has a Thursday)', property: 'weekOfMonth', max: 6 },
+              { text: 'Weekspan of the month (starts on first day of month)', property: 'weekspanOfMonth', max: 7, min: 1, offset: -1 },
+              { text: 'Full week of the month (0th = the week before if any)', property: 'fullWeekOfMonth', max: 6 },
+              { text: 'Week of the year (first week has a Thursday)', property: 'weekOfYear', max: 54 },
+              { text: 'Weekspan of the year (starts on first day of year)', property: 'weekspanOfYear', max: 53, min: 1, offset: -1 },
+              { text: 'Full week of the year (0th = the week before if any)', property: 'fullWeekOfYear', max: 54 },
+            ],
+            weekOptions: [
+              { text: 'Any week', value: 'any'},
+              { text: 'On the following weeks...', value: 'oneof'},
+              { text: 'Every _ weeks starting on _', value: 'every'}
+            ],
+            weekdayOptions: [
+              { text: 'Any day of the week', value: 'any'},
+              { text: 'On the following days of the week...', value: 'oneof'},
+              { text: 'Ever _ weekday starting on _', value: 'every'},
+              { text: 'Weekends', value: 'weekend'},
+              { text: 'Weekdays', value: 'weekday'}
+            ],
+            dayOptions: [
+              { text: 'Any day of the month', value: 'any'},
+              { text: 'On the following days of the month...', value: 'oneof'},
+              { text: 'Every _ days of the month starting on _', value: 'every'},
+              { text: 'Any day of the year', value: 'anyYear'},
+              { text: 'On the following days of the year...', value: 'oneofYear'},
+              { text: 'Every _ days of the year starting on _', value: 'everyYear'}
             ]
           };
         },
         computed: {
+          // Custom Dropdown Options
+          yearOneOfs: function() {
+            var currentYear = this.input.start || this.day;
+            var min = currentYear.year - 5;
+            var max = currentYear.year + 20;
+            var oneof = [];
+            for (var i = min; i <= max; i++) {
+              oneof.push({
+                text: i,
+                value: i
+              });
+            }
+            return oneof;
+          },
+          yearOffsets: function() {
+            var max = this.input.year.every;
+            var currentYear = this.input.start || this.day;
+            var offsets = [];
+            for (var i = 0; i < max; i++) {
+              offsets.push({
+                text: currentYear.year + i,
+                value: i
+              });
+            }
+            return offsets;
+          },
+          monthOneOfs: function() {
+            return moment.months().map(function(name, i) {
+              return {
+                text: name,
+                value: i
+              };
+            });
+          },
+          monthOffsets: function() {
+            return this.customOffsets( this.input.month.every, moment.months() );
+          },
+          weekdayOneOfs: function() {
+            return moment.weekdays().map(function(name, i) {
+              return {
+                text: name,
+                value: i
+              };
+            });
+          },
+          weekdayOffsets: function() {
+            return this.customOffsets( this.input.dayOfWeek.every, moment.weekdays() );
+          },
+          dayOneOfs: function() {
+            return this.customOffsets( this.customDayForYear ? 367 : 32, ds.Suffix.CACHE, 1 );
+          },
+          dayOffsets: function() {
+            return this.customOffsets( this.input[ this.customDayProperty ].every + 1, ds.Suffix.CACHE, 1, -1 );
+          },
+          weekOneOfs: function() {
+            var opt = this.customWeekType;
+            return this.customOffsets( opt.max, ds.Suffix.CACHE, opt.min, opt.offset  );
+          },
+          weekOffsets: function() {
+            var opt = this.customWeekType;
+            return this.customOffsets( this.input[ opt.property ].every + 1, ds.Suffix.CACHE );
+          },
+
+          // Custom Options
+          customYear: {
+            get: function() {
+              return this.customGet(this.input.year);
+            },
+            set: function(value) {
+              this.customSet('year', value);
+            }
+          },
+          customMonth: {
+            get: function() {
+              return this.customGet(this.input.month);
+            },
+            set: function(value) {
+              this.customSet('month', value);
+            }
+          },
+          customWeekType: {
+            get: function() {
+              var types = this.weekTypes;
+              for (var i = 0; i < types.length; i++) {
+                var type = types[ i ];
+                if (this.input[ type.property ]) {
+                  return type;
+                }
+              }
+              return types[0];
+            },
+            set: function(newType) {
+              var types = this.weekTypes;
+              var first = null;
+              for (var i = 0; i < types.length; i++) {
+                var type = types[ i ];
+                first = first || this.input[ type.property ];
+                delete this.input[ type.property ];
+              }
+              this.input[ newType.propery ] = first || [];
+              this.updateInput();
+            }
+          },
+          customWeek: {
+            get: function() {
+              return this.customGet(this.input[ this.customWeekType.property ]);
+            },
+            set: function(value) {
+              this.customSet(this.customWeekType.property, value);
+            }
+          },
+          customWeekday: {
+            get: function() {
+              var x = this.input.dayOfWeek;
+              if (x && fn.isArrayEquals(x, ds.Weekday.WEEK)) return 'weekday';
+              if (x && fn.isArrayEquals(x, ds.Weekday.ENDS)) return 'weekend';
+              return this.customGet(x);
+            },
+            set: function(value) {
+              switch (value) {
+                case 'weekday':
+                  this.input.dayOfWeek = ds.Weekday.WEEK;
+                  break;
+                case 'weekend':
+                  this.input.dayOfWeek = ds.Weekday.ENDS;
+                  break;
+                default:
+                  this.customSet('dayOfWeek', value, true);
+                  break;
+              }
+              this.updateInput();
+            }
+          },
+          customDayForYear: function() {
+            var x = this.customDay;
+            return x.substring(x.length - 4, x.length) === 'Year';
+          },
+          customDayProperty: function() {
+            return this.customDayForYear ? 'dayOfYear' : 'dayOfMonth';
+          },
+          customDay: {
+            get: function() {
+              var y = this.input.dayOfMonth;
+              var yt = this.customGet(y);
+              if (yt === 'any') {
+                var x = this.input.dayOfYear;
+                var xt = this.customGet(x);
+                if (xt !== 'any') {
+                  return xt + 'Year';
+                }
+              }
+              return yt;
+            },
+            set: function(value) {
+              var forYear = this.customDayForYear;
+              var property = this.customDayProperty;
+              var propertyOther = property === 'dayOfYear' ? 'dayOfMonth' : 'dayOfYear';
+              var type = forYear ? value.substring(0, value.length - 4) : value;
+              this.customSet(propertyOther, 'any', true);
+              this.customSet(property, type);
+            }
+          },
+
+          forecast: function()
+          {
+            var days = [];
+
+            if (this.day)
+            {
+              var schedule = new ds.Schedule(this.input);
+              var size = parseInt(this.forecastSize) || 1;
+
+              days = days.concat( schedule.prevDays( this.day, size + 1, true ) );
+              days.reverse();
+              days = days.concat( schedule.nextDays( this.day, size, false ) );
+            }
+
+            return days;
+          },
+
+          typeHint: function() {
+            return this.type === 'custom' ? new ds.Schedule(this.input).describe('event', false, false, false, false) : '';
+          },
           canSave: function() {
             return !!this.title;
           },
@@ -600,20 +994,47 @@
             if (!this.day) {
               return [];
             }
-            return [
-              {label: 'Does not repeat', value: 'none'},
-              {label: 'Daily', value: 'daily'},
-              {label: 'Weekly on ' + this.day.format('dddd'), value: 'weekly'},
-              {label: 'Monthly on the ' + ds.Suffix.get(this.day.weekspanOfMonth + 1, true) + ' ' + this.day.format('dddd'), value: 'monthlyWeek'},
-              {label: 'Annually on ' + this.day.format('MMMM Do'), value: 'annually'},
-              {label: 'Every weekday (Monday to Friday)', value: 'weekday'},
-              {label: 'Monthly on the ' + this.day.format('Do') + 'day', value: 'monthly'},
-              {label: 'Custom', value: 'custom'}
-            ];
+            var day = this.day;
+            return ds.Patterns.map(function(pattern) {
+              return {
+                label: pattern.describe( day ),
+                value: pattern.name
+              }
+            });
+          },
+          startSpan: function() {
+            return ds.DaySpan.point((this.input ? this.input.start : null) || this.day);
+          },
+          startText: function() {
+            return this.input && this.input.start ? this.input.start.format('MMMM Do, YYYY') : 'Beginning of Time';
+          },
+          endSpan: function() {
+            return ds.DaySpan.point((this.input ? this.input.end : null) || this.day);
+          },
+          endText: function() {
+            return this.input && this.input.end ? this.input.end.format('MMMM Do, YYYY') : 'End of Time';
+          },
+          allDay: {
+            set: function(allDay) {
+              if (allDay) {
+                delete this.input.times;
+              } else {
+                this.input.times = [
+                  '08:00'
+                ];
+              }
+              this.updateInput();
+            },
+            get: function() {
+              return this.input && (!this.input.times || this.input.times.length === 0);
+            }
           }
         },
         mounted: function() {
           window.Scheduler = this;
+        },
+        watch: {
+          type: 'updateType'
         },
         methods: {
           add: function(day) {
@@ -622,18 +1043,23 @@
             this.title = '';
             this.color = this.colors[Math.floor(this.colors.length * Math.random())].value;
             this.input = {};
-            this.type = 'none';
-            this.updateType('none');
-            this.creating = true;
-            this.open = true;
+            this.finishOpen('none');
           },
           edit: function(onDay, event) {
             this.day = onDay;
             this.event = event;
             this.title = event.event.name;
             this.color = event.event.color;
-            this.input = event.schedule.toInput(true);
-            this.type = this.determineType();
+            this.input = event.schedule.toInput(true, false, 'HH:mm');
+            this.finishOpen(this.determineType());
+          },
+          finishOpen: function(type) {
+            this.forceType(type);
+            this.forecastSize = 5;
+            this.currentTab = 'appearance';
+            this.startMenu = false;
+            this.endMenu = false;
+            this.editCustom = false;
             this.creating = false;
             this.open = true;
           },
@@ -661,81 +1087,116 @@
             });
             this.open = false;
           },
+          addExclusion: function(day) {
+            if (day) {
+              if (!this.input.exclude) {
+                this.input.exclude = [];
+                this.updateInput();
+              }
+              this.input.exclude.push( day );
+            }
+          },
+          removeExclusion: function(day) {
+            if (day) {
+              var exclude = this.input.exclude;
+              for (var i = exclude.length - 1; i >= 0; i--) {
+                if (day.sameDay( exclude[ i ] )) {
+                  exclude.splice( i, 1 );
+                }
+              }
+            }
+          },
+          customGet: function(value) {
+            if (!value) return 'any';
+            if (fn.isArray(value)) return 'oneof';
+            if (fn.isFrequencyValueEvery(value)) return 'every';
+            return 'unknown';
+          },
+          customSet: function(prop, newValue, delayUpdate) {
+            switch (newValue) {
+              case 'any':
+                delete this.input[ prop ];
+                break;
+              case 'oneof':
+                if (!fn.isArray(this.input[ prop ])) {
+                  this.input[ prop ] = [];
+                }
+                break;
+              case 'every':
+                if (!fn.isFrequencyValueEvery(this.input[ prop ])) {
+                  this.input[ prop ] = { every: 2 };
+                }
+                break;
+            }
+            if (!delayUpdate) {
+              this.updateInput();
+            }
+          },
+          customOffsets: function(max, array, start, valueOffset) {
+            var offsets = [];
+            var min = start || 0;
+            var offset = valueOffset || 0;
+            for (var i = min; i < max; i++) {
+              offsets.push({
+                text: array[ i ],
+                value: i + offset
+              });
+            }
+            return offsets;
+          },
+          setStart: function(start) {
+            this.input.start = start;
+            this.updateInput();
+            this.startMenu = false;
+          },
+          setEnd: function(end) {
+            this.input.end = end;
+            this.updateInput();
+            this.endMenu = false;
+          },
+          forceType: function(type) {
+            if (this.type === type) {
+              this.updateType('', type);
+              this.updateType(type, '');
+            } else {
+              this.type = type;
+            }
+          },
+          updateType: function(newType, oldType) {
+            var inputChanged = false;
+            if (oldType === 'none') {
+              delete this.input.end;
+              inputChanged = true;
+            }
+            if (newType === 'none') {
+              this.input.start = this.day.start();
+              this.input.end = this.day.end()
+              inputChanged = true;
+            }
+            if (newType) {
+              var pattern = ds.Pattern.withName(newType);
+              if (pattern) {
+                pattern.apply(this.input, this.day);
+                inputChanged = true;
+              }
+            }
+            if (inputChanged) {
+              this.updateInput();
+            }
+          },
           determineType: function() {
-            for (var type in PATTERNS) {
-              if (this.isPattern(PATTERNS[ type ])) {
-                return type;
-              }
-            }
-            return 'custom';
+            var pattern = ds.Pattern.findMatch(this.input);
+            return pattern ? pattern.name : 'custom';
           },
-          updateType: function(type) {
-            var pattern = PATTERNS[type];
-            if (pattern) {
-              this.applyPattern(pattern);
+          copyShallow: function(x) {
+            var out = {};
+            for (var prop in x) {
+              out[ prop ] = x[ prop ];
             }
+            return out;
           },
-          isPattern: function(pattern) {
-            var input = this.input;
-            for (var i = 0; i < PATTERN_PROPS.length; i++) {
-              var prop = PATTERN_PROPS[ i ];
-              var rule = pattern[ prop ];
-              var curr = input[ prop ];
-
-              if (rule === false) {
-                continue;
-              }
-              if (rule === true && !curr) {
-                return false;
-              }
-              if (rule === undefined && curr) {
-                return false;
-              }
-              if (isFinite(rule) && (!curr || !curr.length || curr.length !== rule)) {
-                return false;
-              }
-
-              if (rule instanceof Array) {
-                if (!(curr instanceof Array)) {
-                  return false;
-                }
-                if (rule.length !== curr.length) {
-                  return false;
-                }
-                for (var i = 0; i < rule.length; i++) {
-                  if (rule[ i ] !== curr[ i ]) {
-                    return false;
-                  }
-                }
-              } else if (typeof rule === 'object') {
-                if (typeof curr !== 'object') {
-                  return false;
-                }
-                var ruleOffset = rule.offset || 0;
-                var currOffset = curr.offset || 0;
-                if (currOffset !== ruleOffset || curr.every !== rule.every) {
-                  return false;
-                }
-              }
-            }
-            return true;
-          },
-          applyPattern: function(pattern) {
-            var input = this.input;
-            for (var i = 0; i < PATTERN_PROPS.length; i++) {
-              var prop = PATTERN_PROPS[ i ];
-              var rule = pattern[ prop ];
-
-              if (rule === 1) {
-                input[ prop ] = [this.day[ prop ]];
-              }
-              if (rule instanceof Array) {
-                input[ prop ] = rule;
-              }
-              if (rule === undefined) {
-                delete input[ prop ];
-              }
-            }
+          updateInput: function() {
+            this.input = this.copyShallow(this.input);
           }
         }
       });
@@ -784,7 +1245,7 @@
       });
 
       Vue.component('dsDayPicker', {
-        props: ['span'],
+        props: ['span', 'highlightSpan'],
         template: '#template_day_picker',
         data: function() {
           return {
@@ -794,7 +1255,7 @@
         },
         computed: {
           summary: function() {
-            return this.month.summary(false, false, false, false);
+            return this.month ? this.month.summary(false, false, false, false) : '';
           }
         },
         watch: {
@@ -808,8 +1269,14 @@
           }
         },
         methods: {
+          isHighlighted: function(day) {
+            return this.highlightSpan && this.span.matchesDay(day);
+          },
+          getMonthStart: function() {
+            return this.span && this.span.start ? this.span.start : ds.Day.today();
+          },
           getMonth: function() {
-            return ds.Calendar.months(1, this.span.start, 0, {fill: true, minimumSize: 42});
+            return ds.Calendar.months(1, this.getMonthStart(), 0, {fill: true, minimumSize: 42});
           },
           pick: function(day) {
             this.$emit('picked', day);
@@ -857,9 +1324,9 @@
         border-bottom: #e0e0e0 1px solid;
       }
       .ds-day .ds-today-dom {
-        margin: -4px;
-        padding: 4px;
-        border-radius: 16px;
+        margin: -10px;
+        padding: 10px;
+        border-radius: 20px;
         background-color: #4285f4;
         color: white;
       }
@@ -921,7 +1388,47 @@
       .ds-color-option {
         width: 100%;
         color: white;
+        padding: 4px;
+      }
+      .ds-gray-textfield .input-group__input input,
+      .ds-gray-select .input-group__input {
+        background-color: #f5f5f5;
+        box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);
+        height: 40px;
         padding: 10px;
+      }
+      .ds-gray-textfield > label {
+        margin-top: -8px;
+        margin-left: 8px;
+      }
+      .ds-gray-textfield .input-group__details::before,
+      .ds-gray-select .input-group__details::before {
+        background-color: #f5f5f5 !important;
+      }
+      .ds-font-18,
+      .ds-font-18 input {
+        font-size: 18px;
+      }
+      .ds-gray-button {
+        background-color: #f5f5f5 !important;
+        height: 40px;
+      }
+      .ds-gray-day-dropdown {
+        width: 260px;
+        background-color: white;
+        padding: 10px;
+      }
+      .ds-inline-textfield {
+        width: auto;
+        display: inline-block !important;
+        margin-left: 6px;
+        margin-right: 6px;
+        top: 14px;
+        padding-top: 0px;
+        margin-top: -14px;
+      }
+      .ds-inline-textfield.small {
+        width: 60px;
       }
     </style>
 

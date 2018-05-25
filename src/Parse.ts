@@ -95,6 +95,10 @@ export class Parse
 
   public static time(input: any): Time
   {
+    if (input instanceof Time)
+    {
+      return input;
+    }
     if (fn.isNumber(input))
     {
       return Time.fromIdentifier( <number>input );
