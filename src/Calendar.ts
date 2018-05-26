@@ -66,6 +66,7 @@ export class CalendarEvent<T>
   public starting: boolean;
 
   public constructor(id: number, event: T, schedule: Schedule, time: DaySpan, actualDay: Day) {
+    this.id = id;
     this.event = event;
     this.schedule = schedule;
     this.time = time;
@@ -286,7 +287,7 @@ export class Calendar<T>
 
     if (days.length > total)
     {
-      days.splice( total, total - days.length );
+      days.splice( total, days.length - total );
     }
 
     return this;
@@ -365,7 +366,7 @@ export class Calendar<T>
         }
         else
         {
-          let over: DaySpan = entry.schedule.getSpanOver(day);
+          let over: DaySpan = schedule.getSpanOver(day);
 
           if (over)
           {

@@ -1625,6 +1625,7 @@ var Calendar_CalendarDay = (function (_super) {
 
 var Calendar_CalendarEvent = (function () {
     function CalendarEvent(id, event, schedule, time, actualDay) {
+        this.id = id;
         this.event = event;
         this.schedule = schedule;
         this.time = time;
@@ -1774,7 +1775,7 @@ var Calendar_Calendar = (function () {
             current = current.next();
         }
         if (days.length > total) {
-            days.splice(total, total - days.length);
+            days.splice(total, days.length - total);
         }
         return this;
     };
@@ -2059,7 +2060,8 @@ var Pattern_Pattern = (function () {
         this.rules = rules;
     }
     Pattern.prototype.apply = function (input, day) {
-        for (var prop in Pattern.PROPS) {
+        for (var _i = 0, _a = Pattern.PROPS; _i < _a.length; _i++) {
+            var prop = _a[_i];
             var rule = this.rules[prop];
             // Should have one value
             if (rule === 1) {

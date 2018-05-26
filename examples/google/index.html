@@ -12,6 +12,12 @@
   </head>
   <body>
 
+  <!--
+TODO non-repeating events with duration (don't show 12am)
+TODO days spanning over others
+
+  -->
+
     <v-app id="dayspan" v-cloak>
       <v-navigation-drawer :clipped="$vuetify.breakpoint.lgAndUp" v-model="drawer" fixed app>
         <div class="pa-3" v-if="calendar">
@@ -73,8 +79,23 @@
       <v-content>
         <v-container fluid fill-height class="pa-0">
 
-          <div v-if="isDay">
-            Day View Not Yet Implemented
+          <div v-if="isDay" class="ds-expand ds-day-view">
+
+            <div class="ds-month ds-expand">
+              <div class="ds-week-header">
+                <div class="ds-week-header-day grey--text text--darken-1 pa-1"
+                  v-for="day in calendar.days" :key="day.dayIdentifier"
+                  :class="{ 'ds-week-header-today': day.currentDay }">
+                  {{ day.format('dddd') }}
+                </div>
+              </div>
+              <ds-day-row
+                :days="calendar.days"
+                @edit="edit"
+                @add="add"
+              ></ds-day-row>
+            </div>
+
           </div>
 
           <div v-if="isWeek" class="ds-expand ds-week-view">
@@ -86,11 +107,13 @@
                   {{ weekday }}
                 </div>
               </div>
-              <div class="ds-week" v-for="i in rows">
-                <template v-for="k in 7">
-                  <ds-day :key="k" :day="dayAtIndex(i, k)"></ds-day>
-                </template>
-              </div>
+              <ds-day-row
+                v-for="i in rows"
+                :key="i"
+                :days="daysAtRow( i, 7 )"
+                @edit="edit"
+                @add="add"
+              ></ds-day-row>
             </div>
           </div>
 
@@ -102,11 +125,13 @@
                   {{ weekday }}
                 </div>
               </div>
-              <div class="ds-week" v-for="i in rows">
-                <template v-for="k in 7">
-                  <ds-day :key="k" :day="dayAtIndex(i, k)" @edit="edit" @add="add"></ds-day>
-                </template>
-              </div>
+              <ds-day-row
+                v-for="i in rows"
+                :key="i"
+                :days="daysAtRow( i, 7 )"
+                @edit="edit"
+                @add="add"
+              ></ds-day-row>
             </div>
           </div>
 
@@ -123,37 +148,27 @@
       </v-content>
     </v-app>
 
-    <!--
-    Time
-      - All day
-      - Once a day
-      - Multiple times a day
-    Repeat
-      - Does not repeat
-      - Daily
-      - Weekly on [dayOfWeek]
-      - Monthly on the [nth] [dayOfWeek]
-      - Annually on [month] [dayOfMonth]
-      - Every weekday (Monday to Friday)
-      - Monthly on the [nth] day
-      - Custom
-    -->
-
     <script type="text/template" id="template_scheduler">
       <v-dialog v-model="open" max-width="700px" persistent>
         <v-card>
           <v-card-text>
             <v-layout row>
-              <v-flex xs12>
+              <v-flex xs1>
+                <v-tooltip bottom>
+                  <v-btn slot="activator" icon color="grey lighten-4" @click="cancel">
+                    <v-icon dark>clear</v-icon>
+                  </v-btn>
+                  <span>Cancel event changes</span>
+                </v-tooltip>
+              </v-flex>
+              <v-flex xs6>
                 <v-text-field single-line flat hide-details
                   class="ds-gray-textfield ds-font-18 pr-2 pt-1"
                   label="Title"
                   v-model="title"
-                  prepend-icon="close"
-                  :prepend-icon-cb="cancel"
                 ></v-text-field>
               </v-flex>
-              <v-flex xs9>
+              <v-flex xs5>
                 <v-btn :disabled="!canSave" color="primary" dark @click.stop="save">Save</v-btn>
                 <v-menu bottom left>
                   <v-btn slot="activator" color="grey lighten-4">
@@ -161,7 +176,7 @@
                   </v-btn>
                   <v-list v-if="canRemove || canExclude">
                     <v-list-tile @click="remove" v-if="canRemove">
-                      <v-list-tile-title>Remove all occurrences</v-list-tile-title>
+                      <v-list-tile-title>Remove this event</v-list-tile-title>
                     </v-list-tile>
                     <v-list-tile @click="exclude" v-if="canExclude">
                       <v-list-tile-title>Remove this occurrence</v-list-tile-title>
@@ -171,7 +186,7 @@
               </v-flex>
             </v-layout>
             <v-layout row class="mt-3">
-              <v-flex xs12 style="padding-left:40px">
+              <v-flex xs11 offset-xs1>
                 <v-menu offset-y
                   :close-on-content-click="false"
                   :nudge-width="60"
@@ -198,7 +213,6 @@
                   </div>
                 </v-menu>
               </v-flex>
-            </v-flex>
             </v-layout>
             <v-layout row>
               <v-flex xs2 offset-xs1>
@@ -207,7 +221,7 @@
                   v-model="allDay"
                 ></v-checkbox>
               </v-flex>
-              <v-flex xs6>
+              <v-flex xs7>
                 <v-select single-line flat persistent-hint
                   class="ds-gray-select"
                   :items="types"
@@ -218,33 +232,61 @@
                   item-value="value"
                 ></v-select>
               </v-flex>
-              <v-flex xs3 v-if="type === 'custom'">
-                <v-btn style="margin-top: 18px"
+              <v-flex xs2 v-if="type === 'custom'">
+                <v-btn style="margin-top: 18px; height: 40px"
                   color="grey lighten-4"
-                  @click="editCustom = true">Edit</v-btn>
+                  @click="openCustom">Edit</v-btn>
               </v-flex>
             </v-layout>
-            <v-layout row v-if="input.times && input.times.length">
-              <v-flex xs3 style="padding-left:40px"></v-flex>
-              <v-flex xs16>
-                <div v-for="(time, index) in input.times" class="mt-3">
-                  <v-text-field style="width:140px; float:left;"
+            <v-layout row wrap v-if="!allDay">
+              <template v-for="(time, index) in input.times">
+                <v-flex xs3 offset-xs3 class="mt-3">
+                  <v-text-field
                     single-line flat hide-details
                     class="ds-gray-textfield pt-0"
                     type="time"
                     v-model="input.times[ index ]"
                   ></v-text-field>
-                  <v-btn icon class="btn--flat ma-0 mt-0"
-                    style="top:4px; left:4px;"
-                    v-if="index < input.times.length - 1"
-                    color="secondary"
-                    @click="input.times.splice( index, 1 )"><v-icon>remove</v-icon></v-btn>
-                  <v-btn icon class="btn--flat ma-0 mt-0"
-                    style="top:4px; left:4px;"
-                    v-if="index === input.times.length - 1"
-                    color="secondary"
-                    @click="input.times.push('00:00')"><v-icon>add</v-icon></v-btn>
-                </div>
+                </v-flex>
+                <v-flex xs6 class="mt-3">
+                  <v-tooltip bottom>
+                    <v-btn slot="activator" icon
+                      class="btn--flat ma-0 mt-0 ml-2"
+                      style="top:4px; left:4px;"
+                      v-if="index < input.times.length - 1"
+                      color="secondary"
+                      @click="input.times.splice( index, 1 )"><v-icon>remove</v-icon></v-btn>
+                    <span>Remove time</span>
+                  </v-tooltip>
+                  <v-tooltip bottom>
+                    <v-btn slot="activator" icon
+                      class="btn--flat ma-0 mt-0 ml-2"
+                      style="top:4px; left:4px;"
+                      v-if="index === input.times.length - 1"
+                      color="secondary"
+                      @click="input.times.push('00:00')"><v-icon>add</v-icon></v-btn>
+                    <span>Add time</span>
+                  </v-tooltip>
+                </v-flex>
+              </template>
+              <v-flex xs1 offset-xs2 class="pt-4 mt-1">
+                lasts
+              </v-flex>
+              <v-flex xs3>
+                <v-text-field
+                  single-line flat hide-details
+                  class="ds-gray-textfield"
+                  type="number"
+                  v-model.number="input.duration"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs3>
+                <v-select
+                  single-line flat hide-details
+                  class="ds-gray-select pl-1 mt-0"
+                  :items="durationOptions"
+                  v-model="input.durationUnit"
+                ></v-select>
               </v-flex>
             </v-layout>
             <v-layout row>
@@ -253,17 +295,17 @@
                   <v-tab href="#appearance">
                     Appearance
                   </v-tab>
-                  <v-tab href="#forecast">
+                  <v-tab href="#forecast" v-if="!allDay">
                     Forecast
                   </v-tab>
-                  <v-tab href="#exclusions">
+                  <v-tab href="#exclusions" v-if="!allDay">
                     Removed Occurrences
                   </v-tab>
                   <v-tab-item id=appearance>
                     <v-card flat>
                       <v-card-text>
                         <v-select single-line flat hide-details
-                          class="ds-gray-select"
+                          class="ds-gray-select pt-0"
                           :items="colors"
                           :color="color"
                           v-model="color">
@@ -282,7 +324,7 @@
                         <div class="pb-3">
                           The forecast shows previous & next
                           <v-text-field single-line hide-details
-                            v-model="forecastSize"
+                            v-model.number="forecastSize"
                             type="number"
                             class="ds-gray-textfield ds-inline-textfield small"
                           ></v-text-field>
@@ -334,10 +376,10 @@
                       <v-select v-model="input.year" :items="yearOneOfs" class="ds-gray-select" hide-details multiple></v-select>
                     </v-flex>
                     <v-flex xs2 v-if="customYear === 'every'" class="pl-1">
-                      <v-text-field v-model="input.year.every" type="number" class="ds-gray-textfield" hide-details></v-text-field>
+                      <v-text-field v-model.number="input.year.every" type="number" class="ds-gray-textfield" hide-details></v-text-field>
                     </v-flex>
                     <v-flex xs5 v-if="customYear === 'every'" class="pl-1">
-                      <v-select v-model="input.year.offset" :items="yearOffsets" class="ds-gray-select" hide-details></v-select>
+                      <v-select v-model.number="input.year.offset" :items="yearOffsets" class="ds-gray-select" hide-details></v-select>
                     </v-flex>
                     <!-- Month -->
                     <v-flex xs5>
@@ -348,10 +390,10 @@
                       <v-select v-model="input.month" :items="monthOneOfs" class="ds-gray-select" hide-details multiple></v-select>
                     </v-flex>
                     <v-flex xs2 v-if="customMonth === 'every'" class="pl-1">
-                      <v-text-field v-model="input.month.every" type="number" class="ds-gray-textfield" hide-details></v-text-field>
+                      <v-text-field v-model.number="input.month.every" type="number" class="ds-gray-textfield" hide-details></v-text-field>
                     </v-flex>
                     <v-flex xs5 v-if="customMonth === 'every'" class="pl-1">
-                      <v-select v-model="input.month.offset" :items="monthOffsets" class="ds-gray-select" hide-details></v-select>
+                      <v-select v-model.number="input.month.offset" :items="monthOffsets" class="ds-gray-select" hide-details></v-select>
                     </v-flex>
                     <!-- Week -->
                     <v-flex xs5>
@@ -365,10 +407,10 @@
                       <v-select v-model="input[ customWeekType.property ]" :items="weekOneOfs" class="ds-gray-select" hide-details multiple></v-select>
                     </v-flex>
                     <v-flex xs2 offset-xs5 v-if="customWeek === 'every'" class="pl-1">
-                      <v-text-field v-model="input[ customWeekType.property ].every" type="number" class="ds-gray-textfield" hide-details></v-text-field>
+                      <v-text-field v-model.number="input[ customWeekType.property ].every" type="number" class="ds-gray-textfield" hide-details></v-text-field>
                     </v-flex>
                     <v-flex xs5 v-if="customWeek === 'every'" class="pl-1">
-                      <v-select v-model="input[ customWeekType.property ].offset" :items="weekOffsets" class="ds-gray-select" hide-details></v-select>
+                      <v-select v-model.number="input[ customWeekType.property ].offset" :items="weekOffsets" class="ds-gray-select" hide-details></v-select>
                     </v-flex>
                     <!-- Day of Week -->
                     <v-flex xs5>
@@ -379,30 +421,33 @@
                       <v-select v-model="input.dayOfWeek" :items="weekdayOneOfs" class="ds-gray-select" hide-details multiple></v-select>
                     </v-flex>
                     <v-flex xs2 v-if="customWeekday === 'every'" class="pl-1">
-                      <v-text-field v-model="input.dayOfWeek.every" type="number" class="ds-gray-textfield" hide-details></v-text-field>
+                      <v-text-field v-model.number="input.dayOfWeek.every" type="number" class="ds-gray-textfield" hide-details></v-text-field>
                     </v-flex>
                     <v-flex xs5 v-if="customWeekday === 'every'" class="pl-1">
-                      <v-select v-model="input.dayOfWeek.offset" :items="weekdayOffsets" class="ds-gray-select" hide-details></v-select>
+                      <v-select v-model.number="input.dayOfWeek.offset" :items="weekdayOffsets" class="ds-gray-select" hide-details></v-select>
                     </v-flex>
                     <!-- Day -->
                     <v-flex xs5>
                       <v-select v-model="customDay" :items="dayOptions" label="Days" class="ds-gray-select" hide-details></v-select>
                     </v-flex>
                     <v-flex xs7 v-if="customDay === 'any'"></v-flex>
-                    <v-flex xs7 v-if="customDay === 'oneof'" class="pl-1">
-                      <v-select v-model="input[ customDayProperty ]" :items="dayOneOfs" class="ds-gray-select" hide-details multiple></v-select>
+                    <v-flex xs7 v-if="customDay !== 'any'" class="pl-1">
+                      <v-select v-model="customDayType" :items="dayTypes" class="ds-gray-select" return-object hide-details></v-select>
                     </v-flex>
-                    <v-flex xs2 v-if="customDay === 'every'" class="pl-1">
-                      <v-text-field v-model="input[ customDayProperty ].every" class="ds-gray-textfield" type="number" hide-details></v-text-field>
+                    <v-flex xs7 offset-xs5 v-if="customDay === 'oneof'" class="pl-1">
+                      <v-select v-model="input[ customDayType.property ]" :items="dayOneOfs" class="ds-gray-select" hide-details multiple></v-select>
+                    </v-flex>
+                    <v-flex xs2 offset-xs5 v-if="customDay === 'every'" class="pl-1">
+                      <v-text-field v-model.number="input[ customDayType.property ].every" type="number" class="ds-gray-textfield" hide-details></v-text-field>
                     </v-flex>
                     <v-flex xs5 v-if="customDay === 'every'" class="pl-1">
-                      <v-select v-model="input[ customDayProperty ].offset" :items="dayOffsets" class="ds-gray-select" hide-details></v-select>
+                      <v-select v-model.number="input[ customDayType.property ].offset" :items="dayOffsets" class="ds-gray-select" hide-details></v-select>
                     </v-flex>
 
                   </v-layout>
                 </v-card-text>
                 <v-card-actions>
-                  <v-btn color="primary" @click.stop="editCustom = false">Done</v-btn>
+                  <v-btn class="mx-auto" color="primary" @click.stop="editCustom = false">Done</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -423,8 +468,21 @@
             {{ day.dayOfMonth }}
           </span>
         </div>
-        <template v-for="event in day.events">
-          <ds-event :event="event" :key="event.id" @edit="edit"></ds-event>
+        <template v-for="(event, i) in day.events">
+          <ds-event
+            :event="event"
+            :key="event.id"
+            :style="{position: 'relative', top: ((event.row - i) * 18) + 'px'}"
+            @edit="edit"
+          ></ds-event>
+        </template>
+      </div>
+    </script>
+
+    <script type="text/template" id="template_day_row">
+      <div class="ds-week">
+        <template v-for="(day, i) in days">
+          <ds-day :key="i" :day="day" @edit="edit" @add="add"></ds-day>
         </template>
       </div>
     </script>
@@ -439,6 +497,9 @@
             {{ event.event.name }}
           </strong>
         </span>
+        <div v-else>
+          &nbsp;
+        </div>
       </div>
     </script>
 
@@ -564,7 +625,8 @@
                 weekspanOfMonth: [0],
                 dayOfWeek: [ds.Weekday.FRIDAY],
                 duration: 3,
-                durationUnit: 'days'
+                durationUnit: 'days',
+                times: [0]
               }
             }
           ]
@@ -609,9 +671,20 @@
           window.app = this;
         },
         methods: {
+          getAround: function() {
+            var today = ds.Day.today();
+            var cal = this.calendar;
+            if (!cal) {
+              return today;
+            }
+            if (cal.span.matchesDay(today)) {
+              return today;
+            }
+            return cal.start;
+          },
           rebuild: function(aroundDay) {
             var type = this.currentType || this.types[ 2 ];
-            var around = aroundDay || (this.calendar ? this.calendar.start : ds.Day.today());
+            var around = aroundDay || this.getAround();
 
             if (this.calendar &&
                 this.calendar.type === type.type &&
@@ -683,6 +756,10 @@
           dayAtIndex: function(row, cell) {
             return this.calendar.days[ (row - 1) * 7 + (cell - 1) ];
           },
+          daysAtRow: function(row, rowSize) {
+            var start = (row - 1) * rowSize;
+            return this.calendar.days.slice( start, start + rowSize );
+          },
           edit: function(eventDay) {
             this.$refs.scheduler.edit(eventDay.day, eventDay.event);
           },
@@ -691,21 +768,21 @@
           },
           eventSave: function(data) {
             if (data.event) {
-              data.event.event.title = data.title;
+              data.event.event.name = data.name;
               data.event.event.color = data.color;
               data.event.schedule.set(data.schedule);
               this.calendar.refreshEvents();
             } else {
               var entry = {
-                event: {name: data.title, color: data.color},
+                event: {name: data.name, color: data.color},
                 schedule: data.schedule
               };
               this.schedules.push(entry);
               this.calendar.addSchedule(entry);
             }
           },
-          eventRemove: function(event) {
-            this.calendar.removeSchedule(event);
+          eventRemove: function(calendarEvent) {
+            this.calendar.removeSchedule(calendarEvent.event);
           },
           eventRemoveOccurrence: function(data) {
             data.event.schedule.exclude[ data.day.dayIdentifier ] = true;
@@ -731,6 +808,8 @@
             editCustom: false,
             currentTab: 'appearance',
             forecastSize: 10,
+            customWeekTypeCache: null,
+            customDayTypeCache: null,
             colors: [
               { text: 'Red', value: '#F44336' },
               { text: 'Pink', value: '#E91E63' },
@@ -784,13 +863,21 @@
               { text: 'Weekends', value: 'weekend'},
               { text: 'Weekdays', value: 'weekday'}
             ],
+            dayTypes: [
+              { text: 'Day of the month', property: 'dayOfMonth', max: 32, min: 1 },
+              { text: 'Day of the year', property: 'dayOfYear', max: 367, min: 1, offset: -1 }
+            ],
             dayOptions: [
-              { text: 'Any day of the month', value: 'any'},
-              { text: 'On the following days of the month...', value: 'oneof'},
-              { text: 'Every _ days of the month starting on _', value: 'every'},
-              { text: 'Any day of the year', value: 'anyYear'},
-              { text: 'On the following days of the year...', value: 'oneofYear'},
-              { text: 'Every _ days of the year starting on _', value: 'everyYear'}
+              { text: 'Any day', value: 'any'},
+              { text: 'On the following days...', value: 'oneof'},
+              { text: 'Every _ days starting on _', value: 'every'}
+            ],
+            durationOptions: [
+              { text: 'minutes', value: 'minutes' },
+              { text: 'hours', value: 'hours' },
+              { text: 'days', value: 'days' },
+              { text: 'weeks', value: 'weeks' },
+              { text: 'months', value: 'months' }
             ]
           };
         },
@@ -844,10 +931,12 @@
             return this.customOffsets( this.input.dayOfWeek.every, moment.weekdays() );
           },
           dayOneOfs: function() {
-            return this.customOffsets( this.customDayForYear ? 367 : 32, ds.Suffix.CACHE, 1 );
+            var opt = this.customDayType;
+            return this.customOffsets( opt.max, ds.Suffix.CACHE, opt.min, opt.offset );
           },
           dayOffsets: function() {
-            return this.customOffsets( this.input[ this.customDayProperty ].every + 1, ds.Suffix.CACHE, 1, -1 );
+            var opt = this.customDayType;
+            return this.customOffsets( this.input[ opt.property ].every + 1, ds.Suffix.CACHE, opt.min, opt.offset );
           },
           weekOneOfs: function() {
             var opt = this.customWeekType;
@@ -877,25 +966,13 @@
           },
           customWeekType: {
             get: function() {
-              var types = this.weekTypes;
-              for (var i = 0; i < types.length; i++) {
-                var type = types[ i ];
-                if (this.input[ type.property ]) {
-                  return type;
-                }
+              if (!this.customWeekTypeCache) {
+                this.customWeekTypeCache = this.customFindType(this.weekTypes);
               }
-              return types[0];
+              return this.customWeekTypeCache;
             },
             set: function(newType) {
-              var types = this.weekTypes;
-              var first = null;
-              for (var i = 0; i < types.length; i++) {
-                var type = types[ i ];
-                first = first || this.input[ type.property ];
-                delete this.input[ type.property ];
-              }
-              this.input[ newType.propery ] = first || [];
-              this.updateInput();
+              this.customWeekTypeCache = this.customApplyType(newType, [], this.customWeekTypeCache);
             }
           },
           customWeek: {
@@ -928,33 +1005,23 @@
               this.updateInput();
             }
           },
-          customDayForYear: function() {
-            var x = this.customDay;
-            return x.substring(x.length - 4, x.length) === 'Year';
-          },
-          customDayProperty: function() {
-            return this.customDayForYear ? 'dayOfYear' : 'dayOfMonth';
+          customDayType: {
+            get: function() {
+              if (!this.customDayTypeCache) {
+                this.customDayTypeCache = this.customFindType(this.dayTypes);
+              }
+              return this.customDayTypeCache;
+            },
+            set: function(newType) {
+              this.customDayTypeCache = this.customApplyType(newType, [], this.customDayTypeCache);
+            }
           },
           customDay: {
             get: function() {
-              var y = this.input.dayOfMonth;
-              var yt = this.customGet(y);
-              if (yt === 'any') {
-                var x = this.input.dayOfYear;
-                var xt = this.customGet(x);
-                if (xt !== 'any') {
-                  return xt + 'Year';
-                }
-              }
-              return yt;
+              return this.customGet(this.input[ this.customDayType.property ]);
             },
             set: function(value) {
-              var forYear = this.customDayForYear;
-              var property = this.customDayProperty;
-              var propertyOther = property === 'dayOfYear' ? 'dayOfMonth' : 'dayOfYear';
-              var type = forYear ? value.substring(0, value.length - 4) : value;
-              this.customSet(propertyOther, 'any', true);
-              this.customSet(property, type);
+              this.customSet(this.customDayType.property, value);
             }
           },
 
@@ -1018,10 +1085,12 @@
             set: function(allDay) {
               if (allDay) {
                 delete this.input.times;
+                delete this.input.duration;
+                delete this.input.durationUnit;
               } else {
-                this.input.times = [
-                  '08:00'
-                ];
+                this.input.times = ['08:00'];
+                this.input.duration = 1;
+                this.input.durationUnit = 'hours';
               }
               this.updateInput();
             },
@@ -1051,6 +1120,9 @@
             this.title = event.event.name;
             this.color = event.event.color;
             this.input = event.schedule.toInput(true, false, 'HH:mm');
+            if (this.input.duration && !this.input.durationUnit) {
+              this.input.durationUnit = 'minutes';
+            }
             this.finishOpen(this.determineType());
           },
           finishOpen: function(type) {
@@ -1062,6 +1134,11 @@
             this.editCustom = false;
             this.creating = false;
             this.open = true;
+          },
+          openCustom: function() {
+            this.customWeekTypeCache = null;
+            this.customDayTypeCache = null;
+            this.editCustom = true;
           },
           remove: function() {
             this.$emit('remove', this.event);
@@ -1078,11 +1155,14 @@
             this.$emit('cancel');
             this.open = false;
           },
+          prepareInput: function() {
+            return this.copyShallow(this.input);
+          },
           save: function() {
             this.$emit('save', {
-              title: this.title,
+              name: this.title,
               color: this.color,
-              schedule: this.input,
+              schedule: this.prepareInput(),
               event: this.event
             });
             this.open = false;
@@ -1144,6 +1224,27 @@
             }
             return offsets;
           },
+          customFindType: function(types) {
+            for (var i = 0; i < types.length; i++) {
+              var type = types[ i ];
+              if (this.input[ type.property ]) {
+                return type;
+              }
+            }
+            return types[0];
+          },
+          customApplyType: function(newType, newValue, oldType) {
+            if (oldType) {
+              var oldValue = this.input[ oldType.property ];
+              if (oldValue) {
+                newValue = oldValue;
+              }
+              delete this.input[ oldType.property ];
+            }
+            this.input[ newType.property ] = newValue;
+            this.updateInput();
+            return newType;
+          },
           setStart: function(start) {
             this.input.start = start;
             this.updateInput();
@@ -1164,21 +1265,34 @@
           },
           updateType: function(newType, oldType) {
             var inputChanged = false;
+            var input = this.input;
             if (oldType === 'none') {
-              delete this.input.end;
-              inputChanged = true;
-            }
-            if (newType === 'none') {
-              this.input.start = this.day.start();
-              this.input.end = this.day.end()
+              delete input.end;
               inputChanged = true;
             }
             if (newType) {
               var pattern = ds.Pattern.withName(newType);
               if (pattern) {
-                pattern.apply(this.input, this.day);
+                pattern.apply(input, this.day);
                 inputChanged = true;
               }
+            }
+            if (newType === 'none') {
+              input.start = this.day.start();
+              input.end = this.day.end();
+              if (input.times && input.duration && input.durationUnit) {
+                var lastTime = null;
+                input.times.forEach(function(rawTime) {
+                  var time = ds.Time.parse(rawTime);
+                  if (time && (!lastTime || time.toMilliseconds() > lastTime.toMilliseconds())) {
+                    lastTime = time;
+                  }
+                });
+                if (lastTime) {
+                  input.end = this.day.withTime(lastTime).add(input.duration, input.durationUnit);
+                }
+              }
+              inputChanged = true;
             }
             if (inputChanged) {
               this.updateInput();
@@ -1224,6 +1338,41 @@
         methods: {
           edit: function() {
             this.$emit('edit', this.event);
+          }
+        }
+      });
+
+      Vue.component('dsDayRow', {
+        props: ['days'],
+        template: '#template_day_row',
+        watch: {
+          days: {
+            immediate: true,
+            handler: 'updateRows'
+          }
+        },
+        methods: {
+          edit: function(eventDay) {
+            this.$emit('edit', eventDay);
+          },
+          add: function(day) {
+            this.$emit('add', day);
+          },
+          updateRows: function() {
+            var eventToRow = {};
+            this.days.forEach(function(day) {
+              day.events.sort(function(a, b) {
+                return a.time.start.time - b.time.start.time;
+              });
+              var rowIndex = 0;
+              day.events.forEach(function(e) {
+                if (e.id in eventToRow) {
+                  rowIndex = (e.row = eventToRow[ e.id ]) + 1;
+                } else {
+                  eventToRow[ e.id ] = e.row = rowIndex++;
+                }
+              });
+            });
           }
         }
       });

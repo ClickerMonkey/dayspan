@@ -64,7 +64,7 @@ export class Pattern
 
   public apply(input: ScheduleInput, day: Day): ScheduleInput
   {
-    for (let prop in Pattern.PROPS)
+    for (let prop of Pattern.PROPS)
     {
       let rule = this.rules[ prop ];
 
