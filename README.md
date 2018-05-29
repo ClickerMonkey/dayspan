@@ -2,6 +2,10 @@
 
 A date & schedule library to use for advanced calendars in TypeScript and JS.
 
+- [Google Calendar Clone](https://clickermonkey.github.io/dayspan/examples/google/)
+- [Documentation](https://clickermonkey.github.io/dayspan/docs/)
+- [Download JS](umd/dayspan.js)
+
 ### TypeScript Example
 
 ```typescript
@@ -13,8 +17,9 @@ cal.addSchedule({
   event: 'Weekly Meeting',
   schedule: new Schedule({
     dayOfWeek: [Weekday.MONDAY],
-    hour: [9],
-    duration: Duration.minutes(30)
+    times: [9],
+    duration: 30,
+    durationUnit: 'minutes'
   })
 });
 
@@ -71,8 +76,9 @@ cal.addSchedule({
   event: 'Weekly Meeting',
   schedule: new ds.Schedule({
     dayOfWeek: [ds.Weekday.MONDAY],
-    hour: [9],
-    duration: ds.Duration.minutes(30)
+    times: [9],
+    duration: 30,
+    durationUnit: 'minutes'
   })
 });
 
