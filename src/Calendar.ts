@@ -64,17 +64,22 @@ export class CalendarEvent<T>
   public time: DaySpan;
   public fullDay: boolean;
   public starting: boolean;
+  public ending: boolean;
+  public row: number = 0;
+  public col: number = 0;
 
   public constructor(id: number, event: T, schedule: Schedule, time: DaySpan, actualDay: Day) {
     this.id = id;
     this.event = event;
     this.schedule = schedule;
     this.time = time;
-    this.fullDay = time.isPoint;
-    this.starting = time.start.sameDay( actualDay );
+    this.fullDay = schedule.isFullDay();
+    this.starting = time.isPoint || time.start.sameDay( actualDay );
+    this.ending = time.isPoint || time.end.relative(-1).sameDay( actualDay );
   }
 
-  public get scheduleId(): number {
+  public get scheduleId(): number
+  {
     return Math.floor( this.id / Constants.MAX_EVENTS_PER_DAY );
   }
 
@@ -533,8 +538,8 @@ export class Calendar<T>
 
   public static years<T>(years: number = 1, around: Day = Day.today(), focus: number = 0.4999, input: CalendarInput<T> = {fill: true}): Calendar<T>
   {
-    let start: Day = around.start().startOfMonth().relativeMonths( -Math.floor( years * focus ) );
-    let end: Day = start.relativeMonths( years - 1 ).endOfYear();
+    let start: Day = around.start().startOfYear().relativeYears( -Math.floor( years * focus ) );
+    let end: Day = start.relativeYears( years - 1 ).endOfYear();
     let mover: CalendarMover = (day, amount) => day.relativeYears(amount);
 
     return new Calendar(start, end, Units.YEAR, years, mover, mover, input);

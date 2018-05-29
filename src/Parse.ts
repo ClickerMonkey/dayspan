@@ -164,7 +164,9 @@ export class Parse
 
   public static schedule(input: ScheduleInput, out: Schedule = new Schedule()): Schedule
   {
-    let on = this.day( input.on );
+    let on: Day = this.day( input.on );
+    let times: Time[] = this.times( input.times );
+    let fullDay: boolean = times.length === 0;
 
     if (on)
     {
@@ -175,11 +177,11 @@ export class Parse
       input.dayOfMonth = [on.dayOfMonth];
     }
 
-    out.duration = fn.coalesce( input.duration, Constants.DURATION_NONE );
-    out.durationUnit = <DurationInput>fn.coalesce( input.durationUnit, Constants.DURATION_DEFAULT_UNIT );
+    out.times = times;
+    out.duration = fn.coalesce( input.duration, Constants.DURATION_DEFAULT );
+    out.durationUnit = <DurationInput>fn.coalesce( input.durationUnit, Constants.DURATION_DEFAULT_UNIT( fullDay ) );
     out.start = this.day( input.start );
     out.end = this.day( input.end );
-    out.endWithDuration = out.end ? out.end.add(out.duration, out.durationUnit) : null;
     out.dayOfWeek = this.frequency( input.dayOfWeek );
     out.dayOfMonth = this.frequency( input.dayOfMonth );
     out.dayOfYear = this.frequency( input.dayOfYear );
@@ -192,7 +194,6 @@ export class Parse
     out.weekspanOfMonth = this.frequency( input.weekspanOfMonth );
     out.fullWeekOfMonth = this.frequency( input.fullWeekOfMonth );
     out.year = this.frequency( input.year );
-    out.times = this.times( input.times );
     out.exclude = this.exclusions( input.exclude );
     out.updateDurationInDays();
 

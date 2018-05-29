@@ -12,12 +12,6 @@
   </head>
   <body>
 
-  <!--
-TODO non-repeating events with duration (don't show 12am)
-TODO days spanning over others
-
-  -->
-
     <v-app id="dayspan" v-cloak>
       <v-navigation-drawer :clipped="$vuetify.breakpoint.lgAndUp" v-model="drawer" fixed app>
         <div class="pa-3" v-if="calendar">
@@ -32,7 +26,7 @@ TODO days spanning over others
         </v-toolbar-title>
 
         <v-tooltip bottom>
-          <v-btn depressed @click="today" slot="activator">TODAY</v-btn>
+          <v-btn depressed @click="setToday" slot="activator">TODAY</v-btn>
           <span>{{ todayDate }}</span>
         </v-tooltip>
 
@@ -40,13 +34,13 @@ TODO days spanning over others
           <v-btn slot="activator" icon depressed @click="prev" class="grey--text text--darken-1">
             <v-icon>keyboard_arrow_left</v-icon>
           </v-btn>
-          <span>Previous month</span>
+          <span>{{ prevLabel }}</span>
         </v-tooltip>
         <v-tooltip bottom>
           <v-btn slot="activator" icon depressed @click="next" class="grey--text text--darken-1">
             <v-icon>keyboard_arrow_right</v-icon>
           </v-btn>
-          <span>Next month</span>
+          <span>{{ nextLabel }}</span>
         </v-tooltip>
 
         <h1 class="title grey--text text--darken-1">
@@ -77,47 +71,10 @@ TODO days spanning over others
         </v-btn>
       </v-toolbar>
       <v-content>
-        <v-container fluid fill-height class="pa-0">
+        <v-container fluid fill-height class="ds-calendar-container">
 
-          <div v-if="isDay" class="ds-expand ds-day-view">
-
-            <div class="ds-month ds-expand">
-              <div class="ds-week-header">
-                <div class="ds-week-header-day grey--text text--darken-1 pa-1"
-                  v-for="day in calendar.days" :key="day.dayIdentifier"
-                  :class="{ 'ds-week-header-today': day.currentDay }">
-                  {{ day.format('dddd') }}
-                </div>
-              </div>
-              <ds-day-row
-                :days="calendar.days"
-                @edit="edit"
-                @add="add"
-              ></ds-day-row>
-            </div>
-
-          </div>
-
-          <div v-if="isWeek" class="ds-expand ds-week-view">
-            <div class="ds-month ds-expand">
-              <div class="ds-week-header">
-                <div class="ds-week-header-day grey--text text--darken-1 pa-1"
-                  v-for="(weekday, weekdayIndex) in weekdayCodes" :key="weekday"
-                  :class="{ 'ds-week-header-today': dayAtIndex(1, weekdayIndex + 1).currentDay }">
-                  {{ weekday }}
-                </div>
-              </div>
-              <ds-day-row
-                v-for="i in rows"
-                :key="i"
-                :days="daysAtRow( i, 7 )"
-                @edit="edit"
-                @add="add"
-              ></ds-day-row>
-            </div>
-          </div>
-
-          <div v-if="isMonth" class="ds-expand ds-month-view">
+          <div v-if="isMonth || isYear" class="ds-expand ds-month-view"
+            :class="{ 'ds-year-view': isYear }">
             <div class="ds-month ds-expand">
               <div class="ds-week-header">
                 <div class="ds-week-header-day grey--text text--darken-1 pa-1"
@@ -129,14 +86,44 @@ TODO days spanning over others
                 v-for="i in rows"
                 :key="i"
                 :days="daysAtRow( i, 7 )"
+                :calendar="calendar"
                 @edit="edit"
                 @add="add"
               ></ds-day-row>
             </div>
           </div>
 
-          <div v-if="isYear">
-            Year View Not Yet Implemented
+          <div v-if="isWeek || isDay" class="ds-week-view">
+            <div class="ds-week-view-container">
+              <ds-week-header
+                :calendar="calendar"
+                :days="calendar.days"
+                @add="add"
+                @edit="edit"
+              ></ds-week-header>
+              <div class="ds-week-view-bottom">
+                <div class="ds-week-view-scrollable">
+                  <div class="ds-week-view-pane">
+                    <div class="ds-week ds-expand">
+                      <div class="ds-hour-list">
+                        <div v-for="hour in hours" class="ds-hour">
+                          <div class="ds-hour-text">{{ hour }}</div>
+                        </div>
+                      </div>
+                      <template v-for="day in calendar.days">
+                        <ds-day-times
+                          :key="day.dayIdentifier"
+                          :day="day"
+                          :calendar="calendar"
+                          @edit="edit"
+                          @add-at="addAt"
+                        ></ds-day-times>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <ds-scheduler ref="scheduler"
@@ -149,7 +136,7 @@ TODO days spanning over others
     </v-app>
 
     <script type="text/template" id="template_scheduler">
-      <v-dialog v-model="open" max-width="700px" persistent>
+      <v-dialog v-model="open" max-width="700px" persistent lazy>
         <v-card>
           <v-card-text>
             <v-layout row>
@@ -169,12 +156,12 @@ TODO days spanning over others
                 ></v-text-field>
               </v-flex>
               <v-flex xs5>
-                <v-btn :disabled="!canSave" color="primary" dark @click.stop="save">Save</v-btn>
-                <v-menu bottom left>
+                <v-btn :disabled="!canSave" color="primary" class="btn--flat" dark @click.stop="save">Save</v-btn>
+                <v-menu bottom left v-if="canRemove || canExclude">
                   <v-btn slot="activator" color="grey lighten-4">
                     More actions...
                   </v-btn>
-                  <v-list v-if="canRemove || canExclude">
+                  <v-list>
                     <v-list-tile @click="remove" v-if="canRemove">
                       <v-list-tile-title>Remove this event</v-list-tile-title>
                     </v-list-tile>
@@ -215,13 +202,7 @@ TODO days spanning over others
               </v-flex>
             </v-layout>
             <v-layout row>
-              <v-flex xs2 offset-xs1>
-                <v-checkbox hide-details class="mr-2 mt-4"
-                  label="All day"
-                  v-model="allDay"
-                ></v-checkbox>
-              </v-flex>
-              <v-flex xs7>
+              <v-flex xs7 offset-xs1>
                 <v-select single-line flat persistent-hint
                   class="ds-gray-select"
                   :items="types"
@@ -235,7 +216,31 @@ TODO days spanning over others
               <v-flex xs2 v-if="type === 'custom'">
                 <v-btn style="margin-top: 18px; height: 40px"
                   color="grey lighten-4"
-                  @click="openCustom">Edit</v-btn>
+                  @click.stop="openCustom">Edit</v-btn>
+              </v-flex>
+            </v-layout>
+            <v-layout row>
+              <v-flex xs2 offset-xs1>
+                <v-checkbox hide-details class="mr-2 mt-4"
+                  label="All day"
+                  v-model="allDay"
+                ></v-checkbox>
+              </v-flex>
+              <v-flex xs2>
+                <v-text-field
+                  single-line flat hide-details
+                  class="ds-gray-textfield"
+                  type="number"
+                  v-model.number="input.duration"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs3>
+                <v-select
+                  single-line flat hide-details
+                  class="ds-gray-select pl-1 mt-0"
+                  :items="durationOptions"
+                  v-model="input.durationUnit"
+                ></v-select>
               </v-flex>
             </v-layout>
             <v-layout row wrap v-if="!allDay">
@@ -269,25 +274,6 @@ TODO days spanning over others
                   </v-tooltip>
                 </v-flex>
               </template>
-              <v-flex xs1 offset-xs2 class="pt-4 mt-1">
-                lasts
-              </v-flex>
-              <v-flex xs3>
-                <v-text-field
-                  single-line flat hide-details
-                  class="ds-gray-textfield"
-                  type="number"
-                  v-model.number="input.duration"
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs3>
-                <v-select
-                  single-line flat hide-details
-                  class="ds-gray-select pl-1 mt-0"
-                  :items="durationOptions"
-                  v-model="input.durationUnit"
-                ></v-select>
-              </v-flex>
             </v-layout>
             <v-layout row>
               <v-flex xs12 class="mt-2">
@@ -295,10 +281,10 @@ TODO days spanning over others
                   <v-tab href="#appearance">
                     Appearance
                   </v-tab>
-                  <v-tab href="#forecast" v-if="!allDay">
+                  <v-tab href="#forecast" v-if="repeats">
                     Forecast
                   </v-tab>
-                  <v-tab href="#exclusions" v-if="!allDay">
+                  <v-tab href="#exclusions" v-if="repeats">
                     Removed Occurrences
                   </v-tab>
                   <v-tab-item id=appearance>
@@ -328,7 +314,7 @@ TODO days spanning over others
                             type="number"
                             class="ds-gray-textfield ds-inline-textfield small"
                           ></v-text-field>
-                          event occurrences.
+                          event occurrences within a years time.
                         </div>
                         <v-chip label close
                           v-for="d in forecast"
@@ -360,8 +346,8 @@ TODO days spanning over others
               </v-flex>
             </v-layout>
 
-            <v-dialog v-model="editCustom" max-width="900px" persistent>
-              <v-card v-if="type === 'custom'">
+            <v-dialog v-model="editCustom" max-width="900px" persistent lazy>
+              <v-card>
                 <v-card-text>
                   <div class="pa-3">
                     {{ typeHint }}
@@ -457,9 +443,12 @@ TODO days spanning over others
     </script>
 
     <script type="text/template" id="template_day">
-      <div class="ds-day pa-1"
-         :class="{ 'ds-today': day.currentDay, 'grey--text text--darken-1': day.currentOffset < 0 }"
-         @click.stop="add">
+      <div class="ds-day pa-1" @click.stop="add"
+         :class="{
+           'ds-today': day.currentDay,
+           'ds-first-day-day': day.dayOfMonth === 1,
+           'grey--text text--darken-1': !day.inCalendar
+         }">
         <div :class="{'grey--text text--darken-1': !day.inCalendar}">
           <span class="ds-first-day" v-if="day.dayOfMonth === 1">
             {{ day.format('MMM') }}
@@ -472,7 +461,8 @@ TODO days spanning over others
           <ds-event
             :event="event"
             :key="event.id"
-            :style="{position: 'relative', top: ((event.row - i) * 18) + 'px'}"
+            :index="i"
+            :calendar="calendar"
             @edit="edit"
           ></ds-event>
         </template>
@@ -482,14 +472,14 @@ TODO days spanning over others
     <script type="text/template" id="template_day_row">
       <div class="ds-week">
         <template v-for="(day, i) in days">
-          <ds-day :key="i" :day="day" @edit="edit" @add="add"></ds-day>
+          <ds-day :key="i" :day="day" :calendar="calendar" @edit="edit" @add="add"></ds-day>
         </template>
       </div>
     </script>
 
     <script type="text/template" id="template_event">
       <div class="ds-event" :style="style" @click.stop="edit">
-        <span v-if="event.starting">
+        <span v-if="showName">
           <span v-if="hasStartTime">
             {{ getStartTime }}
           </span>
@@ -500,6 +490,14 @@ TODO days spanning over others
         <div v-else>
           &nbsp;
         </div>
+      </div>
+    </script>
+
+    <script type="text/template" id="template_event_time">
+      <div class="ds-event" :style="style" @click.stop="edit">
+        <strong v-if="showName">
+          {{ event.event.name }}
+        </strong>
       </div>
     </script>
 
@@ -546,7 +544,58 @@ TODO days spanning over others
       </div>
     </script>
 
+    <script type="text/template" id="template_week_day_header">
+      <div class="ds-day pa-1" @click.stop="add"
+        :class="{ 'ds-today': day.currentDay }">
+        <div class="ds-week-weekday">{{ day.format('ddd') }}</div>
+        <div class="ds-week-date">{{ day.dayOfMonth }}</div>
+        <div class="ds-all-events">
+          <template v-for="(event, i) in day.events">
+            <ds-event
+              :event="event"
+              :key="event.id"
+              :index="i"
+              :calendar="calendar"
+              v-if="event.fullDay"
+              @edit="edit"
+            ></ds-event>
+          </template>
+        </div>
+      </div>
+    </script>
+
+    <script type="text/template" id="template_week_header">
+      <div class="ds-week-view-top ds-week">
+        <div class="ds-hour-list"></div>
+        <template v-for="day in days">
+          <ds-week-day-header
+            :day="day"
+            :calendar="calendar"
+            @edit="edit"
+            @add="add"
+          ></ds-week-day-header>
+        </template>
+      </div>
+    </script>
+
+    <script type="text/template" id="template_day_times">
+      <div class="ds-day" :class="{'ds-today': day.currentDay}">
+        <div class="ds-hour" v-for="h in 24" @click.stop="addAt( h )"></div>
+        <template v-for="(event, i) in day.events">
+          <ds-event-time
+            :event="event"
+            :key="event.id"
+            :calendar="calendar"
+            v-if="!event.fullDay"
+            @edit="edit"
+          ></ds-event-time>
+        </template>
+        <div v-if="day.currentDay" :style="nowLine"></div>
+      </div>
+    </script>
+
     <script>
+
       var fn = ds.Functions;
       var Store = {
         Watcher: function(name, deep) {
@@ -570,233 +619,11 @@ TODO days spanning over others
         }
       };
 
-      new Vue({
-        el: '#dayspan',
-        props: ['source'],
-        data: {
-          drawer: null,
-          calendar: null,
-          dayProperty: Store.Load('dayProperty', 'dayOfMonth'),
-          currentType: null,
-          types: [
-            {id: 'D', label: 'Day', shortcut: 'D', type: ds.Units.DAY, size: 1},
-            {id: 'W', label: 'Week', shortcut: 'W', type: ds.Units.WEEK, size: 1},
-            {id: 'M', label: 'Month', shortcut: 'M', type: ds.Units.MONTH, size: 1},
-            {id: 'Y', label: 'Year', shortcut: 'Y', type: ds.Units.YEAR, size: 1},
-            {id: 'X', label: '4 days', shortcut: 'X', type: ds.Units.DAY, size: 4}
-          ],
-          selectionStart: null,
-          dayProperties: {
-            'Day Of Week': 'dayOfWeek',
-            'Day Of Month': 'dayOfMonth',
-            'Day Of Year': 'dayOfYear',
-            'Week': 'week',
-            'Week Of Year': 'weekOfYear',
-            'Weekspan Of Year': 'weekspanOfYear',
-            'Full Week Of Year': 'fullWeekOfYear',
-            'Week Of Month': 'weekOfMonth',
-            'Weekspan Of Month': 'weekspanOfMonth',
-            'Full Week Of Month': 'fullWeekOfMonth'
-          },
-          weekdays: moment.weekdays(),
-          weekdayCodes: moment.weekdaysShort(),
-          schedules: [
-            {
-              event: {name: 'Monthly Meeting', color: '#3F51B5'},
-              schedule: {
-                dayOfWeek: [ds.Weekday.MONDAY],
-                times: [9],
-                duration: 30,
-                durationUnit: 'minutes'
-              }
-            },
-            {
-              event: {name: 'Mother\'s Day', color: '#2196F3'},
-              schedule: {
-                month: [ds.Month.MAY],
-                dayOfWeek: [ds.Weekday.SUNDAY],
-                weekspanOfMonth: [1]
-              }
-            },
-            {
-              event: {name: 'First Weekend of May', color: '#4CAF50'},
-              schedule: {
-                month: [ds.Month.MAY],
-                weekspanOfMonth: [0],
-                dayOfWeek: [ds.Weekday.FRIDAY],
-                duration: 3,
-                durationUnit: 'days',
-                times: [0]
-              }
-            }
-          ]
-        },
-        watch: {
-          input: Store.Watcher('input'),
-          dayProperty: Store.Watcher('dayProperty'),
-          currentType: function() {
-            this.rebuild();
-          }
-        },
-        computed: {
-          summary: function() {
-            return this.calendar ? this.calendar.summary(false, false, false, false) : '';
-          },
-          todayDate: function() {
-            return ds.Day.today().format('dddd, MMMM D');
-          },
-          rows: function() {
-            return Math.floor( this.calendar.days.length / 7 );
-          },
-          isDay: function() {
-            return this.calendar && this.calendar.type === ds.Units.DAY;
-          },
-          isWeek: function() {
-            return this.calendar && this.calendar.type === ds.Units.WEEK;
-          },
-          isMonth: function() {
-            return this.calendar && this.calendar.type === ds.Units.MONTH;
-          },
-          isYear: function() {
-            return this.calendar && this.calendar.type === ds.Units.YEAR;
-          }
-        },
-        created: function() {
-          // Initialize types
-          if (!this.currentType) {
-            this.currentType = this.types[2];
-          }
-
-          // Export
-          window.app = this;
-        },
-        methods: {
-          getAround: function() {
-            var today = ds.Day.today();
-            var cal = this.calendar;
-            if (!cal) {
-              return today;
-            }
-            if (cal.span.matchesDay(today)) {
-              return today;
-            }
-            return cal.start;
-          },
-          rebuild: function(aroundDay) {
-            var type = this.currentType || this.types[ 2 ];
-            var around = aroundDay || this.getAround();
-
-            if (this.calendar &&
-                this.calendar.type === type.type &&
-                this.calendar.size === type.size &&
-                (!around || this.calendar.span.matchesDay( around ))) {
-              return;
-            }
-
-            switch (type.type) {
-              case ds.Units.DAY:
-                this.calendar = ds.Calendar.days(type.size, around, 0, {
-                  eventsOutside: true,
-                  listTimes: true,
-                  schedules: this.schedules
-                });
-                break;
-              case ds.Units.WEEK:
-                this.calendar = ds.Calendar.weeks(type.size, around, 0, {
-                  eventsOutside: true,
-                  listTimes: true,
-                  schedules: this.schedules
-                });
-                break;
-              case ds.Units.MONTH:
-                this.calendar = ds.Calendar.months(type.size, around, 0, {
-                  eventsOutside: true,
-                  fill: true,
-                  schedules: this.schedules
-                });
-                break;
-              case ds.Units.YEAR:
-                this.calendar = ds.Calendar.years(type.size, around, 0, {
-                  eventsOutside: true,
-                  fill: true,
-                  schedules: this.schedules
-                });
-                break;
-            }
-          },
-          selectStart: function(day) {
-            this.selectionStart = day;
-          },
-          selectMove: function(day) {
-            if (!this.selectionStart) {
-              return;
-            }
-            var existing = this.calendar.selection;
-            if (existing && existing.isPoint && existing.matchesDay( day ) && day.sameDay( this.selectionStart )) {
-              this.calendar.unselect();
-            } else {
-              var min = day.min( this.selectionStart );
-              var max = day.max( this.selectionStart );
-              this.calendar.select(min, max);
-            }
-          },
-          selectEnd: function(day) {
-            this.selectMove( day );
-            this.selectionStart = null;
-          },
-          next: function() {
-            this.calendar.unselect().next();
-          },
-          prev: function() {
-            this.calendar.unselect().prev();
-          },
-          today: function() {
-            this.rebuild(ds.Day.today());
-          },
-          dayAtIndex: function(row, cell) {
-            return this.calendar.days[ (row - 1) * 7 + (cell - 1) ];
-          },
-          daysAtRow: function(row, rowSize) {
-            var start = (row - 1) * rowSize;
-            return this.calendar.days.slice( start, start + rowSize );
-          },
-          edit: function(eventDay) {
-            this.$refs.scheduler.edit(eventDay.day, eventDay.event);
-          },
-          add: function(day) {
-            this.$refs.scheduler.add(day);
-          },
-          eventSave: function(data) {
-            if (data.event) {
-              data.event.event.name = data.name;
-              data.event.event.color = data.color;
-              data.event.schedule.set(data.schedule);
-              this.calendar.refreshEvents();
-            } else {
-              var entry = {
-                event: {name: data.name, color: data.color},
-                schedule: data.schedule
-              };
-              this.schedules.push(entry);
-              this.calendar.addSchedule(entry);
-            }
-          },
-          eventRemove: function(calendarEvent) {
-            this.calendar.removeSchedule(calendarEvent.event);
-          },
-          eventRemoveOccurrence: function(data) {
-            data.event.schedule.exclude[ data.day.dayIdentifier ] = true;
-            this.calendar.refreshEvents();
-          }
-        }
-      });
-
       Vue.component('dsScheduler', {
         template: '#template_scheduler',
         data: function() {
           return {
             open: false,
-            creating: false,
             event: null,
             color: null,
             title: '',
@@ -871,13 +698,6 @@ TODO days spanning over others
               { text: 'Any day', value: 'any'},
               { text: 'On the following days...', value: 'oneof'},
               { text: 'Every _ days starting on _', value: 'every'}
-            ],
-            durationOptions: [
-              { text: 'minutes', value: 'minutes' },
-              { text: 'hours', value: 'hours' },
-              { text: 'days', value: 'days' },
-              { text: 'weeks', value: 'weeks' },
-              { text: 'months', value: 'months' }
             ]
           };
         },
@@ -1025,6 +845,20 @@ TODO days spanning over others
             }
           },
 
+          durationOptions: function() {
+            var suffix = this.input.duration === 1 ? '' : 's';
+            var duringDay = [
+              { text: 'minute' + suffix, value: 'minutes' },
+              { text: 'hour' + suffix, value: 'hours' }
+            ];
+            var allDay = [
+              { text: 'day' + suffix, value: 'days' },
+              { text: 'week' + suffix, value: 'weeks' },
+              { text: 'month' + suffix, value: 'months' }
+            ];
+            return this.allDay ? allDay : duringDay.concat( allDay );
+          },
+
           forecast: function()
           {
             var days = [];
@@ -1055,7 +889,7 @@ TODO days spanning over others
             return !!this.event;
           },
           canExclude: function() {
-            return !!this.event;
+            return !!this.event && this.repeats;
           },
           types: function() {
             if (!this.day) {
@@ -1081,12 +915,16 @@ TODO days spanning over others
           endText: function() {
             return this.input && this.input.end ? this.input.end.format('MMMM Do, YYYY') : 'End of Time';
           },
+
+          repeats: function() {
+            return this.type !== 'none';
+          },
           allDay: {
             set: function(allDay) {
               if (allDay) {
                 delete this.input.times;
-                delete this.input.duration;
-                delete this.input.durationUnit;
+                this.input.duration = 1;
+                this.input.durationUnit = 'days';
               } else {
                 this.input.times = ['08:00'];
                 this.input.duration = 1;
@@ -1114,16 +952,28 @@ TODO days spanning over others
             this.input = {};
             this.finishOpen('none');
           },
+          addAt: function(day, hour) {
+            this.day = day;
+            this.event = null;
+            this.title = '';
+            this.color = this.colors[Math.floor(this.colors.length * Math.random())].value;
+            this.input = {
+              times: [ds.Time.parse(hour).format('HH:mm')],
+              duration: 1,
+              durationUnit: 'hours'
+            };
+            this.finishOpen('none');
+          },
           edit: function(onDay, event) {
             this.day = onDay;
             this.event = event;
             this.title = event.event.name;
             this.color = event.event.color;
-            this.input = event.schedule.toInput(true, false, 'HH:mm');
-            if (this.input.duration && !this.input.durationUnit) {
-              this.input.durationUnit = 'minutes';
-            }
+            this.input = this.readInput( event.schedule );
             this.finishOpen(this.determineType());
+          },
+          readInput: function(schedule) {
+            return schedule.toInput(true, false, 'HH:mm', true);
           },
           finishOpen: function(type) {
             this.forceType(type);
@@ -1132,7 +982,6 @@ TODO days spanning over others
             this.startMenu = false;
             this.endMenu = false;
             this.editCustom = false;
-            this.creating = false;
             this.open = true;
           },
           openCustom: function() {
@@ -1155,14 +1004,14 @@ TODO days spanning over others
             this.$emit('cancel');
             this.open = false;
           },
-          prepareInput: function() {
+          writeInput: function() {
             return this.copyShallow(this.input);
           },
           save: function() {
             this.$emit('save', {
               name: this.title,
               color: this.color,
-              schedule: this.prepareInput(),
+              schedule: this.writeInput(),
               event: this.event
             });
             this.open = false;
@@ -1280,6 +1129,14 @@ TODO days spanning over others
             if (newType === 'none') {
               input.start = this.day.start();
               input.end = this.day.end();
+              if (!input.times) {
+                if (!input.duration) {
+                  input.duration = 1;
+                }
+                if (!input.durationUnit) {
+                  input.durationUnit = 'days';
+                }
+              }
               if (input.times && input.duration && input.durationUnit) {
                 var lastTime = null;
                 input.times.forEach(function(rawTime) {
@@ -1316,23 +1173,33 @@ TODO days spanning over others
       });
 
       Vue.component('dsEvent', {
-        props: ['event'],
+        props: ['event', 'index', 'calendar'],
         template: '#template_event',
         computed: {
-          now: function() {
-            return ds.Day.now();
-          },
           style: function() {
+            var now = this.$root.today;
+            var past = this.event.time.start.isBefore(now);
+            var color = this.event.event.color;
+            if (past) {
+              color = brighten(color);
+            }
+
             return {
-              backgroundColor: this.event.event.color,
-              opacity: this.now.isAfter(this.event.time.end) ? 0.5 : 1.0
+              position: 'relative',
+              top: ((this.event.row - (this.index || 0)) * 19) + 'px',
+              backgroundColor: color,
+              marginLeft: this.event.starting ? 0 : '-5px',
+              marginRight: this.event.ending ? 0 : '-5px'
             };
           },
           hasStartTime: function() {
-            return !this.event.schedule.isFullDay() && this.event.schedule.times.length === 1;
+            return this.event.schedule.times.length === 1;
           },
           getStartTime: function() {
             return this.event.schedule.times[0].format('ha');
+          },
+          showName: function() {
+            return this.event.starting || (this.calendar && !this.calendar.filled.contains( this.event.time.start ));
           }
         },
         methods: {
@@ -1342,9 +1209,55 @@ TODO days spanning over others
         }
       });
 
-      Vue.component('dsDayRow', {
-        props: ['days'],
-        template: '#template_day_row',
+      Vue.component('dsEventTime', {
+        props: ['event', 'calendar'],
+        template: '#template_event_time',
+        computed: {
+          style: function() {
+            var HEIGHT = 960;
+            var MILLIS_IN_DAY = ds.Constants.MILLIS_IN_DAY;
+            var SCALE = HEIGHT / MILLIS_IN_DAY;
+            var COLUMN_OFFSET = 14;
+
+            var now = this.$root.now;
+            var start = Math.max(0, this.event.time.start.asTime().toMilliseconds());
+            var end = Math.min(MILLIS_IN_DAY, this.event.time.end.asTime().toMilliseconds());
+            var past = this.event.time.end.isBefore(now);
+            var color = this.event.event.color;
+            if (past) {
+              color = brighten(color);
+            }
+
+            return {
+              position: 'absolute',
+              top: (start * SCALE) + 'px',
+              height: ((end - start) * SCALE) + 'px',
+              left: (COLUMN_OFFSET * this.event.col) + 'px',
+              zIndex: this.event.col + 1,
+              right: '0px',
+              backgroundColor: color,
+              marginLeft: this.event.starting ? 0 : '-5px',
+              marginRight: this.event.ending ? 0 : '-5px'
+            };
+          },
+          hasStartTime: function() {
+            return this.event.schedule.times.length === 1;
+          },
+          getStartTime: function() {
+            return this.event.schedule.times[0].format('ha');
+          },
+          showName: function() {
+            return this.event.starting || (this.calendar && !this.calendar.span.contains( this.event.time.start ));
+          }
+        },
+        methods: {
+          edit: function() {
+            this.$emit('edit', this.event);
+          }
+        }
+      });
+
+      var UpdateRowsMixin = {
         watch: {
           days: {
             immediate: true,
@@ -1352,13 +1265,8 @@ TODO days spanning over others
           }
         },
         methods: {
-          edit: function(eventDay) {
-            this.$emit('edit', eventDay);
-          },
-          add: function(day) {
-            this.$emit('add', day);
-          },
           updateRows: function() {
+            var parent = this;
             var eventToRow = {};
             this.days.forEach(function(day) {
               day.events.sort(function(a, b) {
@@ -1366,6 +1274,9 @@ TODO days spanning over others
               });
               var rowIndex = 0;
               day.events.forEach(function(e) {
+                if (!parent.isValidEvent(e)) {
+                  return;
+                }
                 if (e.id in eventToRow) {
                   rowIndex = (e.row = eventToRow[ e.id ]) + 1;
                 } else {
@@ -1375,10 +1286,60 @@ TODO days spanning over others
             });
           }
         }
+      };
+
+      Vue.component('dsDayRow', {
+        props: ['days', 'calendar'],
+        mixin: [ UpdateRowsMixin ],
+        template: '#template_day_row',
+        methods: {
+          edit: function(eventDay) {
+            this.$emit('edit', eventDay);
+          },
+          add: function(day) {
+            this.$emit('add', day);
+          },
+          isValidEvent: function(e) {
+            return true;
+          }
+        }
+      });
+
+      Vue.component('dsWeekHeader', {
+        props: ['days', 'calendar'],
+        mixin: [ UpdateRowsMixin ],
+        template: '#template_week_header',
+        methods: {
+          add: function(day) {
+            this.$emit('add', day);
+          },
+          edit: function(eventDay) {
+            this.$emit('edit', eventDay);
+          },
+          isValidEvent: function(e) {
+            return e.fullDay;
+          }
+        }
+      });
+
+      Vue.component('dsWeekDayHeader', {
+        props: ['day', 'calendar'],
+        template: '#template_week_day_header',
+        methods: {
+          add: function() {
+            this.$emit('add', this.day);
+          },
+          edit: function(event) {
+            this.$emit('edit', {
+              day: this.day,
+              event: event
+            });
+          }
+        }
       });
 
       Vue.component('dsDay', {
-        props: ['day'],
+        props: ['day', 'calendar'],
         template: '#template_day',
         methods: {
           edit: function(event) {
@@ -1422,7 +1383,7 @@ TODO days spanning over others
             return this.highlightSpan && this.span.matchesDay(day);
           },
           getMonthStart: function() {
-            return this.span && this.span.start ? this.span.start : ds.Day.today();
+            return this.span && this.span.start ? this.span.start : this.$root.today;
           },
           getMonth: function() {
             return ds.Calendar.months(1, this.getMonthStart(), 0, {fill: true, minimumSize: 42});
@@ -1440,6 +1401,359 @@ TODO days spanning over others
           }
         }
       });
+
+      Vue.component('dsDayTimes', {
+        props: ['day', 'calendar'],
+        template: '#template_day_times',
+        watch: {
+          'day.events': {
+            immediate: true,
+            handler: 'updateColumns'
+          }
+        },
+        computed: {
+          nowLine: function() {
+            var now = this.$root.now.asTime().toMilliseconds();
+            var delta = now / ds.Constants.MILLIS_IN_DAY;
+            var top = delta * 960;
+
+            return {
+              position: 'absolute',
+              left: '0px',
+              right: '-1px',
+              top: (top - 1) + 'px',
+              borderTop: '#db4437 solid 2px'
+            };
+          }
+        },
+        methods: {
+          edit: function(event) {
+            this.$emit('edit', {
+              day: this.day,
+              event: event
+            });
+          },
+          addAt: function(hour) {
+            this.$emit('add-at', {
+              day: this.day,
+              hour: hour - 1
+            });
+          },
+          updateColumns: function() {
+            var marks = [];
+
+            this.day.events.forEach(function(e) {
+              if (e.fullDay) {
+                return;
+              }
+              marks.push({
+                time: e.time.start,
+                event: e,
+                start: true
+              });
+              marks.push({
+                time: e.time.end,
+                event: e,
+                start: false
+              });
+            });
+
+            marks.sort(function(a, b) {
+              return a.time.time - b.time.time;
+            });
+
+            var indent = 0;
+
+            marks.forEach(function(m) {
+              if (m.start) {
+                m.event.col = indent;
+              }
+              indent += m.start ? 1 : -1;
+            });
+          }
+        }
+      });
+
+      new Vue({
+        el: '#dayspan',
+        props: ['source'],
+        data: {
+          drawer: null,
+          calendar: null,
+          dayProperty: Store.Load('dayProperty', 'dayOfMonth'),
+          currentType: null,
+          today: ds.Day.today(),
+          tomorrow: ds.Day.tomorrow(),
+          now: ds.Day.now(),
+          types: [
+            {id: 'D', label: 'Day', shortcut: 'D', type: ds.Units.DAY, size: 1},
+            {id: 'W', label: 'Week', shortcut: 'W', type: ds.Units.WEEK, size: 1},
+            {id: 'M', label: 'Month', shortcut: 'M', type: ds.Units.MONTH, size: 1},
+            {id: 'Y', label: 'Year', shortcut: 'Y', type: ds.Units.YEAR, size: 1},
+            {id: 'X', label: '4 days', shortcut: 'X', type: ds.Units.DAY, size: 4}
+          ],
+          hours: [
+            '    ', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am', '10am', '11am',
+            '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm'
+          ],
+          selectionStart: null,
+          dayProperties: {
+            'Day Of Week': 'dayOfWeek',
+            'Day Of Month': 'dayOfMonth',
+            'Day Of Year': 'dayOfYear',
+            'Week': 'week',
+            'Week Of Year': 'weekOfYear',
+            'Weekspan Of Year': 'weekspanOfYear',
+            'Full Week Of Year': 'fullWeekOfYear',
+            'Week Of Month': 'weekOfMonth',
+            'Weekspan Of Month': 'weekspanOfMonth',
+            'Full Week Of Month': 'fullWeekOfMonth'
+          },
+          weekdays: moment.weekdays(),
+          weekdayCodes: moment.weekdaysShort(),
+          schedules: [
+            {
+              event: {name: 'Weekly Meeting', color: '#3F51B5'},
+              schedule: {
+                dayOfWeek: [ds.Weekday.MONDAY],
+                times: [9],
+                duration: 30,
+                durationUnit: 'minutes'
+              }
+            },
+            {
+              event: {name: 'Mother\'s Day', color: '#2196F3'},
+              schedule: {
+                month: [ds.Month.MAY],
+                dayOfWeek: [ds.Weekday.SUNDAY],
+                weekspanOfMonth: [1]
+              }
+            },
+            {
+              event: {name: 'First Weekend', color: '#4CAF50'},
+              schedule: {
+                weekspanOfMonth: [0],
+                dayOfWeek: [ds.Weekday.FRIDAY],
+                duration: 3,
+                durationUnit: 'days'
+              }
+            }
+          ]
+        },
+        watch: {
+          input: Store.Watcher('input'),
+          dayProperty: Store.Watcher('dayProperty'),
+          currentType: function() {
+            this.rebuild();
+          }
+        },
+        computed: {
+          summary: function() {
+            return this.calendar ? this.calendar.summary(false, false, false, false) : '';
+          },
+          todayDate: function() {
+            return this.$root.today.format('dddd, MMMM D');
+          },
+          rows: function() {
+            return Math.floor( this.calendar.days.length / 7 );
+          },
+          isDay: function() {
+            return this.calendar && this.calendar.type === ds.Units.DAY;
+          },
+          isWeek: function() {
+            return this.calendar && this.calendar.type === ds.Units.WEEK;
+          },
+          isMonth: function() {
+            return this.calendar && this.calendar.type === ds.Units.MONTH;
+          },
+          isYear: function() {
+            return this.calendar && this.calendar.type === ds.Units.YEAR;
+          },
+          nextLabel: function() {
+            return this.currentType ? 'Next ' + this.currentType.label.toLowerCase() : 'Next';
+          },
+          prevLabel: function() {
+            return this.currentType ? 'Previous ' + this.currentType.label.toLowerCase() : 'Previous';
+          }
+        },
+        created: function() {
+          // Initialize types
+          if (!this.currentType) {
+            this.currentType = this.types[2];
+          }
+
+          // Export
+          window.app = this;
+
+          // Update Times
+          setTimeout(this.updateTimes, ds.Constants.MILLIS_IN_MINUTE);
+        },
+        methods: {
+          updateTimes: function() {
+            this.today = ds.Day.today();
+            this.now = ds.Day.now();
+            this.tomorrow = ds.Day.tomorrow();
+          },
+          getAround: function() {
+            var today = this.today;
+            var cal = this.calendar;
+            if (!cal) {
+              return today;
+            }
+            if (cal.span.matchesDay(today)) {
+              return today;
+            }
+            return cal.start;
+          },
+          rebuild: function(aroundDay) {
+            var type = this.currentType || this.types[ 2 ];
+            var around = aroundDay || this.getAround();
+
+            if (this.calendar &&
+                this.calendar.type === type.type &&
+                this.calendar.size === type.size &&
+                (!around || this.calendar.span.matchesDay( around ))) {
+              return;
+            }
+
+            switch (type.type) {
+              case ds.Units.DAY:
+                this.calendar = ds.Calendar.days(type.size, around, 0, {
+                  eventsOutside: true,
+                  listTimes: true,
+                  schedules: this.schedules
+                });
+                break;
+              case ds.Units.WEEK:
+                this.calendar = ds.Calendar.weeks(type.size, around, 0, {
+                  eventsOutside: true,
+                  listTimes: true,
+                  schedules: this.schedules
+                });
+                break;
+              case ds.Units.MONTH:
+                this.calendar = ds.Calendar.months(type.size, around, 0, {
+                  eventsOutside: true,
+                  fill: true,
+                  schedules: this.schedules
+                });
+                break;
+              case ds.Units.YEAR:
+                this.calendar = ds.Calendar.years(type.size, around, 0, {
+                  eventsOutside: true,
+                  fill: true,
+                  schedules: this.schedules
+                });
+                break;
+            }
+          },
+          selectStart: function(day) {
+            this.selectionStart = day;
+          },
+          selectMove: function(day) {
+            if (!this.selectionStart) {
+              return;
+            }
+            var existing = this.calendar.selection;
+            if (existing && existing.isPoint && existing.matchesDay( day ) && day.sameDay( this.selectionStart )) {
+              this.calendar.unselect();
+            } else {
+              var min = day.min( this.selectionStart );
+              var max = day.max( this.selectionStart );
+              this.calendar.select(min, max);
+            }
+          },
+          selectEnd: function(day) {
+            this.selectMove( day );
+            this.selectionStart = null;
+          },
+          next: function() {
+            this.calendar.unselect().next();
+          },
+          prev: function() {
+            this.calendar.unselect().prev();
+          },
+          setToday: function() {
+            this.rebuild(this.today);
+          },
+          dayAtIndex: function(row, cell) {
+            return this.calendar.days[ (row - 1) * 7 + (cell - 1) ];
+          },
+          daysAtRow: function(row, rowSize) {
+            var start = (row - 1) * rowSize;
+            return this.calendar.days.slice( start, start + rowSize );
+          },
+          edit: function(eventDay) {
+            this.$refs.scheduler.edit(eventDay.day, eventDay.event);
+          },
+          add: function(day) {
+            this.$refs.scheduler.add(day);
+          },
+          addAt: function(dayHour) {
+            this.$refs.scheduler.addAt(dayHour.day, dayHour.hour);
+          },
+          eventSave: function(data) {
+            if (data.event) {
+              data.event.event.name = data.name;
+              data.event.event.color = data.color;
+              data.event.schedule.set( data.schedule );
+              this.calendar.refreshEvents();
+            } else {
+              var entry = {
+                event: { name: data.name, color: data.color },
+                schedule: data.schedule
+              };
+              this.schedules.push( entry );
+              this.calendar.addSchedule( entry );
+            }
+            this.$forceUpdate();
+          },
+          eventRemove: function(calendarEvent) {
+            this.calendar.removeSchedule( calendarEvent.event );
+            var schedules = this.schedules;
+            for (var i = schedules.length - 1; i >= 0; i--) {
+              if (schedules[ i ].event === calendarEvent.event) {
+                schedules.splice( i, 1 );
+              }
+            }
+            this.$forceUpdate();
+          },
+          eventRemoveOccurrence: function(data) {
+            data.event.schedule.exclude[ data.day.dayIdentifier ] = true;
+            this.calendar.refreshEvents();
+            this.$forceUpdate();
+          }
+        }
+      });
+
+      function brighten(color)
+      {
+        var match = /#(\w\w)(\w\w)(\w\w)/.exec(color);
+
+        var pr = parseInt( match[1], 16 );
+        var pg = parseInt( match[2], 16 );
+        var pb = parseInt( match[3], 16 );
+
+        var opacity = 0.5;
+
+        var ar = 255;
+        var ag = 255;
+        var ab = 255;
+
+        var r = ar + (pr - ar) * opacity;
+        var g = ag + (pg - ag) * opacity;
+        var b = ab + (pb - ab) * opacity;
+
+        var hr = Math.min( 255, Math.floor(r) ).toString(16);
+        var hg = Math.min( 255, Math.floor(g) ).toString(16);
+        var hb = Math.min( 255, Math.floor(b) ).toString(16);
+
+        return '#' +
+          (hr.length === 1 ? '0' + hr : hr) +
+          (hg.length === 1 ? '0' + hg : hg) +
+          (hb.length === 1 ? '0' + hb : hb);
+      }
+
     </script>
 
     <style>
@@ -1514,26 +1828,6 @@ TODO days spanning over others
       .ds-day-picker .ds-day-pick {
         flex: 1 0 14%;
       }
-      .ds-week-view .ds-first-day {
-        display: none;
-      }
-      .ds-week-view .ds-week-header-today,
-      .ds-week-view .ds-today .ds-today-dom {
-        color: #4285f4 !important;
-        margin: 0;
-        padding: 0;
-        border-radius: 0;
-        background-color: white;
-      }
-      .ds-week-view .ds-day > div:first-child {
-        margin-top: -16px;
-      }
-      .ds-week-view .ds-dom {
-        font-size: 38px;
-      }
-      .ds-week-view .ds-week-header-day {
-        padding-left: 0.5em !important;
-      }
       .ds-color-option {
         width: 100%;
         color: white;
@@ -1578,6 +1872,104 @@ TODO days spanning over others
       }
       .ds-inline-textfield.small {
         width: 60px;
+      }
+      .ds-calendar-container {
+        padding: 0px;
+        position: relative;
+      }
+      .ds-month-view .ds-today {
+        background-color: rgba(0,0,0,0.04);
+      }
+
+
+      .ds-week-view {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        overflow-y: auto;
+        outline: none;
+        background-color: white;
+      }
+      .ds-week-view-container {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        height: 100%;
+      }
+      .ds-week-view-top {
+        flex: none;
+        display: flex;
+      }
+      .ds-week-view-bottom {
+        flex: 1 1 60%;
+        overflow: hidden;
+        display: flex;
+        position: relative;
+        flex-direction: column;
+      }
+      .ds-week-view-scrollable {
+        overflow-y: scroll;
+        flex: 1 1 auto;
+        display: flex;
+        align-items: flex-start;
+      }
+      .ds-week-view-pane {
+        height: 960px;
+        width: 100%;
+        overflow-y: hidden;
+        flex: none;
+        display: flex;
+        align-items: flex-start;
+      }
+      .ds-hour {
+        height: 40px;
+        border-bottom: #e0e0e0 1px solid;
+      }
+      .ds-hour-text {
+        display: block;
+        position: relative;
+        top: -6px;
+        font-size: 10px;
+        color: #212121;
+      }
+      .ds-hour-list {
+        flex: none;
+        width: 44px;
+        border-right: #e0e0e0 1px solid;
+      }
+      .ds-hour-list .ds-hour {
+        text-align: center;
+        border-bottom: none;
+      }
+      .ds-week-weekday {
+        color: black;
+        padding-left: 8px;
+      }
+      .ds-week-date {
+        font-size: 40px;
+        line-height: 44px;
+        color: black;
+        padding-left: 8px;
+      }
+      .ds-week-view .ds-today {
+        background-color: rgba(0,0,0,0.04);
+      }
+      .ds-today .ds-week-weekday,
+      .ds-today .ds-week-date {
+        color: #4285f4;
+      }
+      .ds-week-view-pane .ds-day {
+        position: relative;
+      }
+
+
+      .ds-year-view .ds-first-day {
+        font-weight: bold;
+      }
+      .ds-year-view .ds-first-day-day {
+        background-color: rgba(0,0,0,0.08);
       }
     </style>
 

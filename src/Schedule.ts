@@ -1,7 +1,7 @@
 
 import { Functions as fn } from './Functions';
 import { FrequencyValue, FrequencyCheck, FrequencyValueEvery, FrequencyValueOneOf } from './Types';
-import { Day, DayInput, DurationInput } from './Day';
+import { Day, DayInput, DayIterator, DurationInput } from './Day';
 import { DaySpan } from './DaySpan';
 import { Constants } from './Constants';
 import { Parse } from './Parse';
@@ -36,13 +36,11 @@ export interface ScheduleInput
 
 export type ScheduleExclusions = { [dayIdentifier: number]: boolean };
 
-
 export class Schedule
 {
 
   public start: Day;
   public end: Day;
-  public endWithDuration: Day;
   public duration: number;
   public durationUnit: DurationInput;
   public times: Time[];
@@ -83,14 +81,12 @@ export class Schedule
 
   public updateDurationInDays(): this
   {
-    this.durationInDays = !this.lastTime ? 0 : Math.max(0,
-      Math.ceil(
-        moment.duration(this.lastTime.toMilliseconds(), 'milliseconds')
-          .add(this.duration, this.durationUnit)
-          .subtract(1, 'day')
-          .asDays()
-      )
-    );
+    let start: number = this.lastTime ? this.lastTime.toMilliseconds() : 0;
+    let duration: number = this.duration * (Constants.DURATION_TO_MILLIS[ this.durationUnit ] || 0);
+    let exclude: number = Constants.MILLIS_IN_DAY;
+    let day: number = Constants.MILLIS_IN_DAY;
+
+    this.durationInDays = Math.max(0, Math.ceil((start + duration - exclude) / day));
 
     return this;
   }
@@ -98,13 +94,13 @@ export class Schedule
   public matchesSpan(day: Day): boolean
   {
     return (this.start === null || day.isSameOrAfter(this.start)) &&
-      (this.end === null || day.isBefore(this.endWithDuration));
+      (this.end === null || day.isBefore(this.end));
   }
 
   public matchesRange(start: Day, end: Day): boolean
   {
     return (this.start === null || start.isSameOrBefore(this.start)) &&
-      (this.end === null || end.isBefore(this.endWithDuration));
+      (this.end === null || end.isBefore(this.end));
   }
 
   public isExcluded(day: Day): boolean
@@ -146,27 +142,18 @@ export class Schedule
    */
   public coversDay(day: Day): boolean
   {
-    let before: number = this.durationInDays;
-
-    while (before >= 0)
-    {
-      if (this.matchesDay(day))
-      {
-        return true;
-      }
-
-      day = day.prev();
-      before--;
-    }
-
-    return false;
+    return !!this.findStartingDay( day );
   }
 
   public nextDay(day: Day, includeDay: boolean = false, lookAhead: number = 366): Day
   {
     let next: Day = null;
+    let setNext: DayIterator = d => {
+      next = d;
+      return false;
+    };
 
-    this.iterateDays(day, 1, true, d => next = d, includeDay, lookAhead);
+    this.iterateDays(day, 1, true, setNext, includeDay, lookAhead);
 
     return next;
   }
@@ -183,8 +170,12 @@ export class Schedule
   public prevDay(day: Day, includeDay: boolean = false, lookBack: number = 366): Day
   {
     let prev: Day = null;
+    let setPrev: DayIterator = d => {
+      prev = d;
+      return false;
+    };
 
-    this.iterateDays(day, 1, false, d => prev = d, includeDay, lookBack);
+    this.iterateDays(day, 1, false, setPrev, includeDay, lookBack);
 
     return prev;
   }
@@ -198,7 +189,7 @@ export class Schedule
     return prevs;
   }
 
-  public iterateDays(day: Day, max: number, next: boolean, onDay: (day: Day) => any, includeDay: boolean = false, lookup: number = 366): this
+  public iterateDays(day: Day, max: number, next: boolean, onDay: DayIterator, includeDay: boolean = false, lookup: number = 366): this
   {
     let iterated: number = 0;
 
@@ -246,74 +237,60 @@ export class Schedule
 
   public isFullDay(): boolean
   {
-    return this.times.length === 0 || this.duration === Constants.DURATION_NONE;
+    return this.times.length === 0;
+  }
+
+  public getFullSpan(day: Day): DaySpan
+  {
+    let start: Day = day.start();
+    let end: Day = start.add( this.duration, this.durationUnit );
+
+    return new DaySpan( start, end );
+  }
+
+  public getTimeSpan(day: Day, time: Time): DaySpan
+  {
+    let start: Day = day.withTime( time );
+    let end: Day = start.add( this.duration, this.durationUnit );
+
+    return new DaySpan( start, end );
   }
 
   public getSpansOver(day: Day): DaySpan[]
   {
     let spans: DaySpan[] = [];
-    let start: Day = day.start();
+    let start: Day = this.findStartingDay( day );
+
+    if (!start)
+    {
+      return spans;
+    }
 
     if (this.isFullDay())
     {
-      if (this.matchesDay(day))
-      {
-        spans.push(DaySpan.point(start));
-      }
+      spans.push(this.getFullSpan(start));
     }
     else
     {
-      let behind: number = this.durationInDays;
-
-      while (behind >= 0)
+      for (let time of this.times)
       {
-        if (this.matchesDay(day))
+        let span: DaySpan = this.getTimeSpan( start, time );
+
+        if (span.matchesDay(start))
         {
-          for (let time of this.times)
-          {
-            let hourStart: Day = day.withTime(time);
-            let hourEnd: Day = hourStart.add(this.duration, this.durationUnit);
-            let hourSpan: DaySpan = new DaySpan( hourStart, hourEnd );
-
-            if (hourSpan.matchesDay(start))
-            {
-              spans.push( hourSpan );
-            }
-          }
+          spans.push( span );
         }
-
-        day = day.prev();
-        behind--;
       }
     }
+
     return spans;
   }
 
   public getSpanOver(day: Day): DaySpan
   {
-    let start: Day = day.start();
+    let start: Day = this.findStartingDay( day );
 
-    if (this.isFullDay())
-    {
-      return DaySpan.point(start);
-    }
-    else
-    {
-      let behind: number = this.durationInDays;
-
-      while (behind >= 0)
-      {
-        if (this.matchesDay(day))
-        {
-          return DaySpan.point(day);
-        }
-
-        day = day.prev();
-        behind--;
-      }
-    }
-
-    return null;
+    return start ? this.getFullSpan( start ) : null;
   }
 
   public getSpansOn(day: Day, check: boolean = false): DaySpan[]
@@ -325,25 +302,39 @@ export class Schedule
       return spans;
     }
 
-    let start: Day = day.start();
-
     if (this.isFullDay())
     {
-      spans.push(DaySpan.point(start));
+      spans.push(this.getFullSpan( day ));
     }
     else
     {
       for (let time of this.times)
       {
-        let hourStart: Day = day.withTime(time);
-        let hourEnd: Day = hourStart.add(this.duration, this.durationUnit);
-        let hourSpan: DaySpan = new DaySpan( hourStart, hourEnd );
+        let span: DaySpan = this.getTimeSpan( day, time );
 
-        spans.push(hourSpan);
+        spans.push(span);
       }
     }
 
     return spans;
+  }
+
+  public findStartingDay(day: Day): Day
+  {
+    let behind: number = this.durationInDays;
+
+    while (behind >= 0)
+    {
+      if (this.matchesDay(day))
+      {
+        return day;
+      }
+
+      day = day.prev();
+      behind--;
+    }
+
+    return null;
   }
 
   public getExclusions(returnDays: boolean = true)
@@ -360,8 +351,9 @@ export class Schedule
     return exclusions;
   }
 
-  public toInput(returnDays: boolean = false, returnTimes: boolean = false, timeFormat: string = ''): ScheduleInput
+  public toInput(returnDays: boolean = false, returnTimes: boolean = false, timeFormat: string = '', alwaysDuration: boolean = false): ScheduleInput
   {
+    let defaultUnit: string = Constants.DURATION_DEFAULT_UNIT( this.isFullDay() );
     let out: ScheduleInput = {};
     let exclusions: DayInput[] = this.getExclusions( returnDays );
     let times: TimeInput[]  = [];
@@ -373,8 +365,6 @@ export class Schedule
 
     if (this.start) out.start = returnDays ? this.start : this.start.time;
     if (this.end) out.end = returnDays ? this.end : this.end.time;
-    if (this.duration !== Constants.DURATION_NONE) out.duration = this.duration;
-    if (this.durationUnit !== Constants.DURATION_DEFAULT_UNIT) out.durationUnit = this.durationUnit;
     if (this.dayOfWeek.input) out.dayOfWeek = this.dayOfWeek.input;
     if (this.dayOfMonth.input) out.dayOfMonth = this.dayOfMonth.input;
     if (this.dayOfYear.input) out.dayOfYear = this.dayOfYear.input;
@@ -389,6 +379,8 @@ export class Schedule
     if (this.year.input) out.year = this.year.input;
     if (times.length) out.times = times;
     if (exclusions.length) out.exclude = exclusions;
+    if (alwaysDuration || this.duration !== Constants.DURATION_DEFAULT) out.duration = this.duration;
+    if (alwaysDuration || this.durationUnit !== defaultUnit) out.durationUnit = this.durationUnit;
 
     return out;
   }
@@ -445,7 +437,7 @@ export class Schedule
       out += this.describeArray( this.times, x => x.format('hh:mm a') );
     }
 
-    if (includeDuration && this.duration !== Constants.DURATION_NONE)
+    if (includeDuration && this.duration !== Constants.DURATION_DEFAULT)
     {
       out += ' lasting ' + this.duration + ' ';
 

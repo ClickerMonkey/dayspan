@@ -11,6 +11,8 @@ export type DurationInput = moment.unitOfTime.DurationConstructor;
 
 export type DayInput = number | string | Day | number[] | object | true;
 
+export type DayIterator = (day: Day) => any;
+
 export class Day
 {
 
@@ -320,6 +322,10 @@ export class Day
 
   public withTime(time: Time): Day {
     return this.withTimes(time.hour, time.minute, time.second, time.millisecond);
+  }
+
+  public asTime(): Time {
+    return new Time(this.hour, this.minute, this.seconds, this.millis);
   }
 
   // Start & End
