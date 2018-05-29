@@ -966,9 +966,6 @@ img { max-width: 100%; }
 				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
 					<a href="parse.html#times" class="tsd-kind-icon">times</a>
 				</li>
-				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
-					<a href="parse.html#utc" class="tsd-kind-icon">utc</a>
-				</li>
 			</ul>
 		</li>
 		<li class=" tsd-kind-class">
@@ -1083,7 +1080,6 @@ img { max-width: 100%; }
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="parse.html#schedule" class="tsd-kind-icon">schedule</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="parse.html#time" class="tsd-kind-icon">time</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="parse.html#times" class="tsd-kind-icon">times</a></li>
-							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="parse.html#utc" class="tsd-kind-icon">utc</a></li>
 						</ul>
 					</section>
 				</div>
@@ -1101,9 +1097,14 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Parse.ts#L203">Parse.ts:203</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L262">Parse.ts:262</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Parses <a href="../globals.html#calendarscheduleinput">CalendarScheduleInput</a> and returns a <a href="../interfaces/calendarschedule.html">CalendarSchedule</a>.</p>
+							</div>
+						</div>
 						<h4 class="tsd-type-parameters-title">Type parameters</h4>
 						<ul class="tsd-type-parameters">
 							<li>
@@ -1114,9 +1115,13 @@ img { max-width: 100%; }
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <a href="../globals.html#calendarscheduleinput" class="tsd-signature-type">CalendarScheduleInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The input to parse.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="../interfaces/calendarschedule.html" class="tsd-signature-type">CalendarSchedule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						<p>The parsed value.</p>
 					</li>
 				</ul>
 			</section>
@@ -1130,9 +1135,14 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Parse.ts#L216">Parse.ts:216</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L278">Parse.ts:278</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Parses a schedule from a CRON pattern. TODO</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
@@ -1156,16 +1166,32 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Parse.ts#L66">Parse.ts:66</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L71">Parse.ts:71</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Parses <a href="../globals.html#dayinput">DayInput</a> into a <a href="day.html">Day</a> instance.</p>
+							</div>
+							<pre><code class="lang-typescript">Parse.day( <span class="hljs-number">65342300</span> );               <span class="hljs-comment">// unix timestamp</span>
+Parse.day( <span class="hljs-string">'01/02/2014'</span> );           <span class="hljs-comment">// strings in many formats</span>
+Parse.day( day );                    <span class="hljs-comment">// return a passed instance</span>
+Parse.day( [<span class="hljs-number">2018</span>, <span class="hljs-number">0</span>, <span class="hljs-number">2</span>] );           <span class="hljs-comment">// array: 01/02/2018</span>
+Parse.day( {year: <span class="hljs-number">2018</span>, month: <span class="hljs-number">2</span>} ); <span class="hljs-comment">// object: 03/01/2018</span>
+Parse.day( <span class="hljs-literal">true</span> );                   <span class="hljs-comment">// today</span>
+</code></pre>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <a href="../globals.html#dayinput" class="tsd-signature-type">DayInput</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The input to parse.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="day.html" class="tsd-signature-type">Day</a></h4>
+						<p>The Day parsed or <code>null</code> if the value is not valid.</p>
 					</li>
 				</ul>
 			</section>
@@ -1179,16 +1205,33 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Parse.ts#L138">Parse.ts:138</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L183">Parse.ts:183</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Parses an array of excluded days into a map of excluded days where the
+								array value and returned object key are <a href="day.html#dayidentifier">Day.dayIdentifier</a>.</p>
+							</div>
+							<pre><code class="lang-typescript">Parse.exclusions( [ <span class="hljs-number">01012018</span>, <span class="hljs-number">05062014</span> ] ); <span class="hljs-comment">// {'01012018': true, '05062014': true}</span>
+</code></pre>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="day.html#dayidentifier">Day.dayIdentifier</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <span class="tsd-signature-type">any</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The input to parse.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="../globals.html#scheduleexclusions" class="tsd-signature-type">ScheduleExclusions</a></h4>
+						<p>The object with identifier keys and <code>true</code> values.</p>
 					</li>
 				</ul>
 			</section>
@@ -1202,9 +1245,19 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Parse.ts#L17">Parse.ts:17</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L22">Parse.ts:22</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Parses a value and converts it to a <a href="../interfaces/frequencycheck.html">FrequencyCheck</a>.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="schedule.html">Schedule</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
@@ -1231,19 +1284,32 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Parse.ts#L165">Parse.ts:165</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L218">Parse.ts:218</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Parses an object which specifies a schedule where events may or may not
+								repeat and they may be all day events or at specific times.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <a href="../interfaces/scheduleinput.html" class="tsd-signature-type">ScheduleInput</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The input to parse into a schedule.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> out: <a href="schedule.html" class="tsd-signature-type">Schedule</a><span class="tsd-signature-symbol"> =&nbsp;new Schedule()</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The schedule to set the values of and return.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="schedule.html" class="tsd-signature-type">Schedule</a></h4>
+						<p>An instance of the parsed <a href="schedule.html">Schedule</a>.</p>
 					</li>
 				</ul>
 			</section>
@@ -1257,16 +1323,42 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Parse.ts#L96">Parse.ts:96</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L120">Parse.ts:120</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Parses a value and tries to convert it to a Time instance.</p>
+							</div>
+							<pre><code class="lang-typescript">Parse.time( time );      <span class="hljs-comment">// return a passed instance</span>
+Parse.time( <span class="hljs-number">9</span> );         <span class="hljs-comment">// 09:00:00.000</span>
+Parse.time( <span class="hljs-number">3009</span> );      <span class="hljs-comment">// 09:30:00.000</span>
+Parse.time( <span class="hljs-number">593009</span> );    <span class="hljs-comment">// 09:30:59.000</span>
+Parsetime( <span class="hljs-string">'09'</span> );       <span class="hljs-comment">// 09:00:00.000</span>
+Parse.time( <span class="hljs-string">'9:30'</span> );    <span class="hljs-comment">// 09:30:00.000</span>
+Parse.time( <span class="hljs-string">'9:30:59'</span> ); <span class="hljs-comment">// 09:30:59.000</span>
+Parse.time( {hour: <span class="hljs-number">2</span>} ); <span class="hljs-comment">// 02:00:00.000</span>
+</code></pre>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="time.html#fromidentifier">Time.fromIdentifier</a></p>
+								</dd>
+								<dt>see</dt>
+								<dd><p><a href="time.html#fromstring">Time.fromString</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <span class="tsd-signature-type">any</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The input to parse.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="time.html" class="tsd-signature-type">Time</a></h4>
+						<p>The instance parsed or <code>null</code> if it was invalid.</p>
 					</li>
 				</ul>
 			</section>
@@ -1280,42 +1372,32 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Parse.ts#L118">Parse.ts:118</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L151">Parse.ts:151</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Parses a value and tries to convert it to an array of Time instances.
+									If any of the given values are not a valid time value then the resulting
+								array will not contain a time instance.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="parse.html#time">Parse.time</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <span class="tsd-signature-type">any</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The input to parse.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="time.html" class="tsd-signature-type">Time</a><span class="tsd-signature-symbol">[]</span></h4>
-					</li>
-				</ul>
-			</section>
-			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
-				<a name="utc" class="tsd-anchor"></a>
-				<h3><span class="tsd-flag ts-flagStatic">Static</span> utc</h3>
-				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
-					<li class="tsd-signature tsd-kind-icon">utc<span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, otherwise<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
-				</ul>
-				<ul class="tsd-descriptions">
-					<li class="tsd-description">
-						<aside class="tsd-sources">
-							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Parse.ts#L51">Parse.ts:51</a></li>
-							</ul>
-						</aside>
-						<h4 class="tsd-parameters-title">Parameters</h4>
-						<ul class="tsd-parameters">
-							<li>
-								<h5>input: <span class="tsd-signature-type">any</span></h5>
-							</li>
-							<li>
-								<h5>otherwise: <span class="tsd-signature-type">number</span></h5>
-							</li>
-						</ul>
-						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						<p>A non-null array of time instances.</p>
 					</li>
 				</ul>
 			</section>

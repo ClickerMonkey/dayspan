@@ -1027,6 +1027,11 @@ img { max-width: 100%; }
 		<div class="tsd-panel tsd-typography">
 			<h1 id="dayspan">dayspan</h1>
 			<p>A date &amp; schedule library to use for advanced calendars in TypeScript and JS.</p>
+			<ul>
+				<li><a href="https://clickermonkey.github.io/dayspan/examples/google/">Google Calendar Clone</a></li>
+				<li><a href="https://clickermonkey.github.io/dayspan/docs/">Documentation</a></li>
+				<li><a href="umd/dayspan.js">Download JS</a></li>
+			</ul>
 			<h3 id="typescript-example">TypeScript Example</h3>
 			<pre><code class="lang-typescript"><span class="hljs-comment">// A monthly calendar around today</span>
 <span class="hljs-keyword">let</span> cal = Calendar.months&lt;<span class="hljs-built_in">string</span>&gt;();
@@ -1036,8 +1041,9 @@ cal.addSchedule({
   event: <span class="hljs-string">'Weekly Meeting'</span>,
   schedule: <span class="hljs-keyword">new</span> Schedule({
     dayOfWeek: [Weekday.MONDAY],
-    hour: [<span class="hljs-number">9</span>],
-    duration: Duration.minutes(<span class="hljs-number">30</span>)
+    times: [<span class="hljs-number">9</span>],
+    duration: <span class="hljs-number">30</span>,
+    durationUnit: <span class="hljs-string">'minutes'</span>
   })
 });
 
@@ -1090,8 +1096,9 @@ cal.addSchedule({
   <span class="hljs-attr">event</span>: <span class="hljs-string">'Weekly Meeting'</span>,
   <span class="hljs-attr">schedule</span>: <span class="hljs-keyword">new</span> ds.Schedule({
     <span class="hljs-attr">dayOfWeek</span>: [ds.Weekday.MONDAY],
-    <span class="hljs-attr">hour</span>: [<span class="hljs-number">9</span>],
-    <span class="hljs-attr">duration</span>: ds.Duration.minutes(<span class="hljs-number">30</span>)
+    <span class="hljs-attr">times</span>: [<span class="hljs-number">9</span>],
+    <span class="hljs-attr">duration</span>: <span class="hljs-number">30</span>,
+    <span class="hljs-attr">durationUnit</span>: <span class="hljs-string">'minutes'</span>
   })
 });
 
@@ -1187,7 +1194,7 @@ cal.addSchedule({
 				<div class="tsd-signature tsd-kind-icon">Calendar<wbr>Mover<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Calendar.ts#L12">Calendar.ts:12</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L12">Calendar.ts:12</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-type-declaration">
@@ -1221,7 +1228,7 @@ cal.addSchedule({
 				<div class="tsd-signature tsd-kind-icon">Calendar<wbr>Schedule<wbr>Identifier<span class="tsd-signature-symbol">:</span> <a href="interfaces/calendarschedule.html" class="tsd-signature-type">CalendarSchedule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><a href="classes/schedule.html" class="tsd-signature-type">Schedule</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">T</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Calendar.ts#L94">Calendar.ts:94</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L94">Calendar.ts:94</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1231,7 +1238,7 @@ cal.addSchedule({
 				<div class="tsd-signature tsd-kind-icon">Calendar<wbr>Schedule<wbr>Input<span class="tsd-signature-symbol">:</span> <a href="interfaces/calendarschedule.html" class="tsd-signature-type">CalendarSchedule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Calendar.ts#L96">Calendar.ts:96</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L96">Calendar.ts:96</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1241,7 +1248,7 @@ cal.addSchedule({
 				<div class="tsd-signature tsd-kind-icon">Day<wbr>Input<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="classes/day.html" class="tsd-signature-type">Day</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Day.ts#L12">Day.ts:12</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Day.ts#L12">Day.ts:12</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1251,7 +1258,7 @@ cal.addSchedule({
 				<div class="tsd-signature tsd-kind-icon">Day<wbr>Iterator<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Day.ts#L14">Day.ts:14</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Day.ts#L14">Day.ts:14</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-type-declaration">
@@ -1282,7 +1289,7 @@ cal.addSchedule({
 				<div class="tsd-signature tsd-kind-icon">Describe<wbr>Pattern<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Pattern.ts#L12">Pattern.ts:12</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L12">Pattern.ts:12</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-type-declaration">
@@ -1313,7 +1320,7 @@ cal.addSchedule({
 				<div class="tsd-signature tsd-kind-icon">Duration<wbr>Input<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">moment.unitOfTime.DurationConstructor</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Day.ts#L10">Day.ts:10</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Day.ts#L10">Day.ts:10</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1323,7 +1330,7 @@ cal.addSchedule({
 				<div class="tsd-signature tsd-kind-icon">Frequency<wbr>Value<span class="tsd-signature-symbol">:</span> <a href="interfaces/frequencyvalueevery.html" class="tsd-signature-type">FrequencyValueEvery</a><span class="tsd-signature-symbol"> | </span><a href="globals.html#frequencyvalueoneof" class="tsd-signature-type">FrequencyValueOneOf</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Types.ts#L12">Types.ts:12</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Types.ts#L12">Types.ts:12</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1333,7 +1340,7 @@ cal.addSchedule({
 				<div class="tsd-signature tsd-kind-icon">Frequency<wbr>Value<wbr>One<wbr>Of<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Types.ts#L10">Types.ts:10</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Types.ts#L10">Types.ts:10</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1343,7 +1350,7 @@ cal.addSchedule({
 				<div class="tsd-signature tsd-kind-icon">Pattern<wbr>Rule<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Pattern.ts#L17">Pattern.ts:17</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L17">Pattern.ts:17</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1353,7 +1360,7 @@ cal.addSchedule({
 				<div class="tsd-signature tsd-kind-icon">Schedule<wbr>Exclusions<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Schedule.ts#L37">Schedule.ts:37</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Schedule.ts#L37">Schedule.ts:37</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-type-declaration">
@@ -1368,10 +1375,10 @@ cal.addSchedule({
 			<section class="tsd-panel tsd-member tsd-kind-type-alias">
 				<a name="timeinput" class="tsd-anchor"></a>
 				<h3>Time<wbr>Input</h3>
-				<div class="tsd-signature tsd-kind-icon">Time<wbr>Input<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span></div>
+				<div class="tsd-signature tsd-kind-icon">Time<wbr>Input<span class="tsd-signature-symbol">:</span> <a href="classes/time.html" class="tsd-signature-type">Time</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Time.ts#L7">Time.ts:7</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Time.ts#L7">Time.ts:7</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1384,7 +1391,7 @@ cal.addSchedule({
 				<div class="tsd-signature tsd-kind-icon">Pattern<wbr>Map<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Pattern.ts#L293">Pattern.ts:293</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L293">Pattern.ts:293</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-type-declaration">
@@ -1402,7 +1409,7 @@ cal.addSchedule({
 				<div class="tsd-signature tsd-kind-icon">Patterns<span class="tsd-signature-symbol">:</span> <a href="classes/pattern.html" class="tsd-signature-type">Pattern</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[new Pattern(&#x27;none&#x27;, true,(day: Day) &#x3D;&gt; &#x27;Does not repeat&#x27;,{year: 1,month: 1,dayOfMonth: 1}),new Pattern(&#x27;daily&#x27;, true,(day: Day) &#x3D;&gt; &#x27;Daily&#x27;,{}),new Pattern(&#x27;weekly&#x27;, true,(day: Day) &#x3D;&gt;  &#x27;Weekly on &#x27; + day.format(&#x27;dddd&#x27;),{dayOfWeek: 1}),new Pattern(&#x27;monthlyWeek&#x27;, true,(day: Day) &#x3D;&gt; &#x27;Monthly on the &#x27; + Suffix.CACHE[day.weekspanOfMonth + 1] + &#x27; &#x27; + day.format(&#x27;dddd&#x27;),{dayOfWeek: 1,weekspanOfMonth: 1}),new Pattern(&#x27;annually&#x27;, true,(day: Day) &#x3D;&gt; &#x27;Annually on &#x27; + day.format(&#x27;MMMM Do&#x27;),{month: 1,dayOfMonth: 1}),new Pattern(&#x27;annuallyMonthWeek&#x27;, true,(day: Day) &#x3D;&gt; &#x27;Annually on the &#x27; + Suffix.CACHE[day.weekspanOfMonth + 1] + &#x27; &#x27; + day.format(&#x27;dddd&#x27;) + &#x27; of &#x27; + day.format(&#x27;MMMM&#x27;),{month: 1,dayOfWeek: 1,weekspanOfMonth: 1}),new Pattern(&#x27;weekday&#x27;, true,(day: Day) &#x3D;&gt; &#x27;Every weekday (Monday to Friday)&#x27;,{dayOfWeek: [Weekday.MONDAY, Weekday.TUESDAY, Weekday.WEDNESDAY, Weekday.THURSDAY, Weekday.FRIDAY]}),new Pattern(&#x27;monthly&#x27;, true,(day: Day) &#x3D;&gt; &#x27;Monthly on the &#x27; + day.format(&#x27;Do&#x27;) + &#x27; day&#x27;,{dayOfMonth: 1}),new Pattern(&#x27;custom&#x27;, true,(day: Day) &#x3D;&gt; &#x27;Custom...&#x27;,{dayOfWeek: false,dayOfMonth: false,dayOfYear: false,month: false,week: false,year: false,weekOfYear: false,weekspanOfYear: false,fullWeekOfYear: false,weekOfMonth: false,weekspanOfMonth: false,fullWeekOfMonth: false})]</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Pattern.ts#L210">Pattern.ts:210</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L210">Pattern.ts:210</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1419,7 +1426,7 @@ cal.addSchedule({
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/6db7fcb/src/Op.ts#L56">Op.ts:56</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Op.ts#L56">Op.ts:56</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
