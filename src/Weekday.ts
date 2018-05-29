@@ -1,5 +1,8 @@
 
 
+/**
+ * The days in a week.
+ */
 export class Weekday
 {
 
@@ -11,6 +14,9 @@ export class Weekday
   public static FRIDAY: number = 5;
   public static SATURDAY: number = 6;
 
+  /**
+   * The full list of days in a week.
+   */
   public static LIST: number[] = [
     Weekday.SUNDAY,
     Weekday.MONDAY,
@@ -21,6 +27,9 @@ export class Weekday
     Weekday.SATURDAY
   ];
 
+  /**
+   * The list of days starting with Monday and ending on Friday.
+   */
   public static WEEK: number[] = [
     Weekday.MONDAY,
     Weekday.TUESDAY,
@@ -29,6 +38,9 @@ export class Weekday
     Weekday.FRIDAY
   ];
 
+  /**
+   * The days on the weekend, starting with Saturday and ending with Sunday.
+   */
   public static ENDS: number[] = [
     Weekday.SATURDAY,
     Weekday.SUNDAY

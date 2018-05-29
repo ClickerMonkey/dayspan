@@ -4,7 +4,7 @@ import { Constants } from './Constants';
 import { Parse } from './Parse';
 
 
-export type TimeInput = number | string | {hour: number, minute?: number, second?: number, millisecond?: number};
+export type TimeInput = Time | number | string | {hour: number, minute?: number, second?: number, millisecond?: number};
 
 export class Time
 {

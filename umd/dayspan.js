@@ -181,36 +181,123 @@ var Functions = (function () {
 
 // CONCATENATED MODULE: ./src/Constants.ts
 
+/**
+ * A class that stores commonly used values.
+ */
 var Constants = (function () {
     function Constants() {
     }
+    /**
+     * The number of milliseconds in a second.
+     */
     Constants.MILLIS_IN_SECOND = 1000;
+    /**
+     * The number of milliseconds in a minute.
+     */
     Constants.MILLIS_IN_MINUTE = Constants.MILLIS_IN_SECOND * 60;
+    /**
+     * The number of milliseconds in an hour.
+     */
     Constants.MILLIS_IN_HOUR = Constants.MILLIS_IN_MINUTE * 60;
+    /**
+     * The number of milliseconds in a day (not including DST days).
+     */
     Constants.MILLIS_IN_DAY = Constants.MILLIS_IN_HOUR * 24;
+    /**
+     * The number of milliseconds in a week (not including ones that include DST).
+     */
     Constants.MILLIS_IN_WEEK = Constants.MILLIS_IN_DAY * 7;
+    /**
+     * The number of days in a week.
+     */
     Constants.DAYS_IN_WEEK = 7;
+    /**
+     * The number of months in a year.
+     */
     Constants.MONTHS_IN_YEAR = 12;
+    /**
+     * The number of hours in a day (not including DST days).
+     */
     Constants.HOURS_IN_DAY = 24;
+    /**
+     * The first month of the year.
+     */
     Constants.MONTH_MIN = 0;
+    /**
+     * The last month of the year.
+     */
     Constants.MONTH_MAX = 11;
+    /**
+     * The first day of a month.
+     */
     Constants.DAY_MIN = 1;
+    /**
+     * The last day of the longest month.
+     */
     Constants.DAY_MAX = 31;
+    /**
+     * The first hour of the day.
+     */
     Constants.HOUR_MIN = 0;
+    /**
+     * The last hour of the day.
+     */
     Constants.HOUR_MAX = 23;
+    /**
+     * The first minute of the hour.
+     */
     Constants.MINUTE_MIN = 0;
+    /**
+     * The last minute of the hour.
+     */
     Constants.MINUTE_MAX = 59;
+    /**
+     * The first second of the minute.
+     */
     Constants.SECOND_MIN = 0;
+    /**
+     * The last second of the minute.
+     */
     Constants.SECOND_MAX = 59;
+    /**
+     * The first millisecond of the second.
+     */
     Constants.MILLIS_MIN = 0;
+    /**
+     * The last millisecond of the second.
+     */
     Constants.MILLIS_MAX = 999;
+    /**
+     * The first day of the week.
+     */
     Constants.WEEKDAY_MIN = 0;
+    /**
+     * The last day of the week.
+     */
     Constants.WEEKDAY_MAX = 6;
+    /**
+     * The default duration for an event.
+     */
     Constants.DURATION_DEFAULT = 1;
+    /**
+     * The default duration unit for an all day event.
+     */
     Constants.DURATION_DEFAULT_UNIT_ALL = 'days';
+    /**
+     * The default duration unit for an event at a given time.
+     */
     Constants.DURATION_DEFAULT_UNIT_TIMES = 'hours';
+    /**
+     * Computes the duration unit given its for an all day event.
+     *
+     * @param all If the event is all day.
+     * @return The default unit for the event.
+     */
     Constants.DURATION_DEFAULT_UNIT = function (all) { return all ? Constants.DURATION_DEFAULT_UNIT_ALL : Constants.DURATION_DEFAULT_UNIT_TIMES; };
-    // worst case not including DST changes
+    /**
+     * The number of milliseconds for various duration units. These are worse case
+     * scenario and do not include DST changes.
+     */
     Constants.DURATION_TO_MILLIS = {
         minute: Constants.MILLIS_IN_MINUTE,
         minutes: Constants.MILLIS_IN_MINUTE,
@@ -220,27 +307,72 @@ var Constants = (function () {
         days: Constants.MILLIS_IN_DAY,
         week: Constants.MILLIS_IN_WEEK,
         weeks: Constants.MILLIS_IN_WEEK,
-        month: Constants.MILLIS_IN_DAY * 31,
-        months: Constants.MILLIS_IN_DAY * 31
+        month: Constants.MILLIS_IN_DAY * Constants.DAY_MAX,
+        months: Constants.MILLIS_IN_DAY * Constants.DAY_MAX
     };
+    /**
+     * The maximum estimated number of events per day. This is used to calculate
+     * [[CalendarEvent.id]] to give each event a unique ID. If you think you will
+     * have more events than this per day, you can enlarge the value.
+     */
     Constants.MAX_EVENTS_PER_DAY = 24;
-    Constants.WEEK_OF_MONTH_MINIMUM_WEEKDAY = 4; // Thursday by default
+    /**
+     * The day of the week which determines the first week of the year or month.
+     * By default this day is Thursday.
+     */
+    Constants.WEEK_OF_MONTH_MINIMUM_WEEKDAY = 4;
     return Constants;
 }());
 
 
 // CONCATENATED MODULE: ./src/Op.ts
 
+/**
+ * An operation that can be performed on a single number.
+ */
 var Op;
 (function (Op) {
+    /**
+     * The number is returned unmodified.
+     */
     Op[Op["NONE"] = 0] = "NONE";
+    /**
+     * The number is rounded down to the nearest whole number.
+     */
     Op[Op["FLOOR"] = 1] = "FLOOR";
+    /**
+     * The number is rounded up to the nearest whole number.
+     */
     Op[Op["CEIL"] = 2] = "CEIL";
+    /**
+     * The number is rounded up or down depending on if the fractional value is
+     * greater than or less than 0.5 respectively.
+     */
     Op[Op["ROUND"] = 3] = "ROUND";
+    /**
+     * The fractional part of the number is dropped.
+     */
     Op[Op["TRUNCATE"] = 4] = "TRUNCATE";
+    /**
+     * The number is rounded up when positive and down when negative. This is
+     * effectively ceiling the absolute value where the result preserves the sign.
+     */
     Op[Op["UP"] = 5] = "UP";
+    /**
+     * The number is rounded down when positive and up when negative. This is
+     * effectively floor the absolute value where the result preserves the sign.
+     */
     Op[Op["DOWN"] = 6] = "DOWN";
 })(Op = Op || (Op = {}));
+/**
+ * Performs the requested operation on the given number, optionally taking
+ * the absolute value of the number before the operation.
+ *
+ * @param value The number to operate on.
+ * @param op The operation to perform.
+ * @param absolute If the number should be positive before the operation.
+ * @return The operated result, or the original value if its not a valid number.
+ */
 function operate(value, op, absolute) {
     if (absolute === void 0) { absolute = false; }
     if (isFinite(value)) {
@@ -406,6 +538,16 @@ var DaySpan__a;
 
 // CONCATENATED MODULE: ./src/Suffix.ts
 
+/**
+ * A class which takes a number and determines the suffix for that number.
+ *
+ * ```typescript
+ * Suffix.CACHE[ 2 ];         // 2nd
+ * Suffix.determine( 3 );     // rd
+ * Suffix.get( 4 );           // th
+ * Suffix.get( 4, true );     // 4th
+ * ```
+ */
 var Suffix = (function () {
     function Suffix() {
     }
@@ -430,6 +572,9 @@ var Suffix = (function () {
         var suffix = this.determine(value);
         return append ? value + suffix : suffix;
     };
+    /**
+     * The array of suffixes used.
+     */
     Suffix.MAP = [
         'th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'
     ];
@@ -955,6 +1100,11 @@ var Time_Time = (function () {
 var Parse_Parse = (function () {
     function Parse() {
     }
+    /**
+     * Parses a value and converts it to a [[FrequencyCheck]].
+     *
+     * @see [[Schedule]]
+     */
     Parse.frequency = function (input, otherwiseEvery, otherwiseOffset) {
         if (otherwiseEvery === void 0) { otherwiseEvery = 1; }
         if (otherwiseOffset === void 0) { otherwiseOffset = 0; }
@@ -980,15 +1130,21 @@ var Parse_Parse = (function () {
         check.input = input;
         return check;
     };
-    Parse.utc = function (input, otherwise) {
-        if (Functions.isNumber(input)) {
-            return input;
-        }
-        if (input instanceof Day_Day) {
-            return input.time;
-        }
-        return otherwise;
-    };
+    /**
+     * Parses [[DayInput]] into a [[Day]] instance.
+     *
+     * ```typescript
+     * Parse.day( 65342300 );               // unix timestamp
+     * Parse.day( '01/02/2014' );           // strings in many formats
+     * Parse.day( day );                    // return a passed instance
+     * Parse.day( [2018, 0, 2] );           // array: 01/02/2018
+     * Parse.day( {year: 2018, month: 2} ); // object: 03/01/2018
+     * Parse.day( true );                   // today
+     * ```
+     *
+     * @param input The input to parse.
+     * @returns The Day parsed or `null` if the value is not valid.
+     */
     Parse.day = function (input) {
         if (Functions.isNumber(input)) {
             return Day_Day.unix(input);
@@ -1010,6 +1166,25 @@ var Parse_Parse = (function () {
         }
         return null;
     };
+    /**
+     * Parses a value and tries to convert it to a Time instance.
+     *
+     * ```typescript
+     * Parse.time( time );      // return a passed instance
+     * Parse.time( 9 );         // 09:00:00.000
+     * Parse.time( 3009 );      // 09:30:00.000
+     * Parse.time( 593009 );    // 09:30:59.000
+     * Parsetime( '09' );       // 09:00:00.000
+     * Parse.time( '9:30' );    // 09:30:00.000
+     * Parse.time( '9:30:59' ); // 09:30:59.000
+     * Parse.time( {hour: 2} ); // 02:00:00.000
+     * ```
+     *
+     * @param input The input to parse.
+     * @returns The instance parsed or `null` if it was invalid.
+     * @see [[Time.fromIdentifier]]
+     * @see [[Time.fromString]]
+     */
     Parse.time = function (input) {
         if (input instanceof Time_Time) {
             return input;
@@ -1025,6 +1200,15 @@ var Parse_Parse = (function () {
         }
         return null;
     };
+    /**
+     * Parses a value and tries to convert it to an array of Time instances.
+     * If any of the given values are not a valid time value then the resulting
+     * array will not contain a time instance.
+     *
+     * @param input The input to parse.
+     * @returns A non-null array of time instances.
+     * @see [[Parse.time]]
+     */
     Parse.times = function (input) {
         var times = [];
         if (Functions.isArray(input)) {
@@ -1038,6 +1222,18 @@ var Parse_Parse = (function () {
         }
         return times;
     };
+    /**
+     * Parses an array of excluded days into a map of excluded days where the
+     * array value and returned object key are [[Day.dayIdentifier]].
+     *
+     * ```typescript
+     * Parse.exclusions( [ 01012018, 05062014 ] ); // {'01012018': true, '05062014': true}
+     * ```
+     *
+     * @param input The input to parse.
+     * @returns The object with identifier keys and `true` values.
+     * @see [[Day.dayIdentifier]]
+     */
     Parse.exclusions = function (input) {
         var exclusions = {};
         if (Functions.isArray(input)) {
@@ -1056,6 +1252,14 @@ var Parse_Parse = (function () {
         }
         return exclusions;
     };
+    /**
+     * Parses an object which specifies a schedule where events may or may not
+     * repeat and they may be all day events or at specific times.
+     *
+     * @param input The input to parse into a schedule.
+     * @param out The schedule to set the values of and return.
+     * @returns An instance of the parsed [[Schedule]].
+     */
     Parse.schedule = function (input, out) {
         if (out === void 0) { out = new Schedule_Schedule(); }
         var on = this.day(input.on);
@@ -1089,6 +1293,12 @@ var Parse_Parse = (function () {
         out.updateDurationInDays();
         return out;
     };
+    /**
+     * Parses [[CalendarScheduleInput]] and returns a [[CalendarSchedule]].
+     *
+     * @param input The input to parse.
+     * @returns The parsed value.
+     */
     Parse.calendarSchedule = function (input) {
         if (input.schedule instanceof Schedule_Schedule) {
             return input;
@@ -1098,6 +1308,9 @@ var Parse_Parse = (function () {
             event: input.event
         };
     };
+    /**
+     * Parses a schedule from a CRON pattern. TODO
+     */
     Parse.cron = function (pattern, out) {
         if (out === void 0) { out = new Schedule_Schedule(); }
         return out;
@@ -1996,6 +2209,9 @@ var Calendar_Calendar = (function () {
 
 // CONCATENATED MODULE: ./src/Month.ts
 
+/**
+ * The months in a year.
+ */
 var Month = (function () {
     function Month() {
     }
@@ -2011,6 +2227,9 @@ var Month = (function () {
     Month.OCTOBER = 9;
     Month.NOVEMBER = 10;
     Month.DECEMBER = 11;
+    /**
+     * The full list of months in a year.
+     */
     Month.LIST = [
         Month.JANUARY,
         Month.FEBRUARY,
@@ -2031,6 +2250,9 @@ var Month = (function () {
 
 // CONCATENATED MODULE: ./src/Weekday.ts
 
+/**
+ * The days in a week.
+ */
 var Weekday = (function () {
     function Weekday() {
     }
@@ -2041,6 +2263,9 @@ var Weekday = (function () {
     Weekday.THURSDAY = 4;
     Weekday.FRIDAY = 5;
     Weekday.SATURDAY = 6;
+    /**
+     * The full list of days in a week.
+     */
     Weekday.LIST = [
         Weekday.SUNDAY,
         Weekday.MONDAY,
@@ -2050,6 +2275,9 @@ var Weekday = (function () {
         Weekday.FRIDAY,
         Weekday.SATURDAY
     ];
+    /**
+     * The list of days starting with Monday and ending on Friday.
+     */
     Weekday.WEEK = [
         Weekday.MONDAY,
         Weekday.TUESDAY,
@@ -2057,6 +2285,9 @@ var Weekday = (function () {
         Weekday.THURSDAY,
         Weekday.FRIDAY
     ];
+    /**
+     * The days on the weekend, starting with Saturday and ending with Sunday.
+     */
     Weekday.ENDS = [
         Weekday.SATURDAY,
         Weekday.SUNDAY

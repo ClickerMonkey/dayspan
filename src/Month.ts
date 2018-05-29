@@ -1,4 +1,7 @@
 
+/**
+ * The months in a year.
+ */
 export class Month
 {
 
@@ -15,6 +18,9 @@ export class Month
   public static NOVEMBER: number = 10;
   public static DECEMBER: number = 11;
 
+  /**
+   * The full list of months in a year.
+   */
   public static LIST: number[] = [
     Month.JANUARY,
     Month.FEBRUARY,

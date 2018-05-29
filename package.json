@@ -23,7 +23,7 @@
     "prebuild": "npm run cleanup && npm run verify",
     "build": "tsc && tsc -p tsconfig.esm.json && webpack && webpack --env.prod",
     "build:fesm:min": "uglifyjs lib-fesm/index.js --compress --mangle --source-map --output lib-fesm/index.min.js",
-    "docs": "typedoc -p . --readme README.md --theme minimal --mode file --target 'es5' --excludeNotExported --excludePrivate --ignoreCompilerErrors --exclude \"**/src/**/__tests__/*.*\" --out ../dayspan-pages/docs src/ && cp tester.html ../dayspan-pages/tester.html && cp -R umd ../dayspan-pages/",
+    "docs": "typedoc -p . --readme README.md --theme minimal --mode file --target 'es5' --excludeNotExported --excludePrivate --ignoreCompilerErrors --exclude \"**/src/**/__tests__/*.*\" --out ../dayspan-pages/docs src/ && cp -R examples ../dayspan-pages/ && cp -R umd ../dayspan-pages/ && cp -R node_modules/moment/min ../dayspan-pages/node_modules/moment/",
     "test": "jest",
     "test:watch": "npm test -- --watch",
     "test:coverage": "npm test -- --coverage",

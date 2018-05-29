@@ -1,7 +1,20 @@
 
+/**
+ * A class which takes a number and determines the suffix for that number.
+ *
+ * ```typescript
+ * Suffix.CACHE[ 2 ];         // 2nd
+ * Suffix.determine( 3 );     // rd
+ * Suffix.get( 4 );           // th
+ * Suffix.get( 4, true );     // 4th
+ * ```
+ */
 export class Suffix
 {
 
+  /**
+   * The array of suffixes used.
+   */
   public static MAP: string[] = [
     'th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'
   ];

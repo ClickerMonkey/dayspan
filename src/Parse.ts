@@ -14,6 +14,11 @@ import { Time } from './Time';
 export class Parse
 {
 
+  /**
+   * Parses a value and converts it to a [[FrequencyCheck]].
+   *
+   * @see [[Schedule]]
+   */
   public static frequency(input: any, otherwiseEvery: number = 1, otherwiseOffset: number = 0): FrequencyCheck
   {
     let check: FrequencyCheck = (value: number) => {
@@ -48,21 +53,21 @@ export class Parse
     return check;
   }
 
-  public static utc(input: any, otherwise: number): number
-  {
-    if (fn.isNumber(input))
-    {
-      return input;
-    }
-
-    if (input instanceof Day)
-    {
-      return input.time;
-    }
-
-    return otherwise;
-  }
-
+  /**
+   * Parses [[DayInput]] into a [[Day]] instance.
+   *
+   * ```typescript
+   * Parse.day( 65342300 );               // unix timestamp
+   * Parse.day( '01/02/2014' );           // strings in many formats
+   * Parse.day( day );                    // return a passed instance
+   * Parse.day( [2018, 0, 2] );           // array: 01/02/2018
+   * Parse.day( {year: 2018, month: 2} ); // object: 03/01/2018
+   * Parse.day( true );                   // today
+   * ```
+   *
+   * @param input The input to parse.
+   * @returns The Day parsed or `null` if the value is not valid.
+   */
   public static day(input: DayInput): Day
   {
     if (fn.isNumber(input))
@@ -93,6 +98,25 @@ export class Parse
     return null;
   }
 
+  /**
+   * Parses a value and tries to convert it to a Time instance.
+   *
+   * ```typescript
+   * Parse.time( time );      // return a passed instance
+   * Parse.time( 9 );         // 09:00:00.000
+   * Parse.time( 3009 );      // 09:30:00.000
+   * Parse.time( 593009 );    // 09:30:59.000
+   * Parsetime( '09' );       // 09:00:00.000
+   * Parse.time( '9:30' );    // 09:30:00.000
+   * Parse.time( '9:30:59' ); // 09:30:59.000
+   * Parse.time( {hour: 2} ); // 02:00:00.000
+   * ```
+   *
+   * @param input The input to parse.
+   * @returns The instance parsed or `null` if it was invalid.
+   * @see [[Time.fromIdentifier]]
+   * @see [[Time.fromString]]
+   */
   public static time(input: any): Time
   {
     if (input instanceof Time)
@@ -115,6 +139,15 @@ export class Parse
     return null;
   }
 
+  /**
+   * Parses a value and tries to convert it to an array of Time instances.
+   * If any of the given values are not a valid time value then the resulting
+   * array will not contain a time instance.
+   *
+   * @param input The input to parse.
+   * @returns A non-null array of time instances.
+   * @see [[Parse.time]]
+   */
   public static times(input: any): Time[]
   {
     let times: Time[] = [];
@@ -135,6 +168,18 @@ export class Parse
     return times;
   }
 
+  /**
+   * Parses an array of excluded days into a map of excluded days where the
+   * array value and returned object key are [[Day.dayIdentifier]].
+   *
+   * ```typescript
+   * Parse.exclusions( [ 01012018, 05062014 ] ); // {'01012018': true, '05062014': true}
+   * ```
+   *
+   * @param input The input to parse.
+   * @returns The object with identifier keys and `true` values.
+   * @see [[Day.dayIdentifier]]
+   */
   public static exclusions(input: any): ScheduleExclusions
   {
     let exclusions: ScheduleExclusions = {};
@@ -162,6 +207,14 @@ export class Parse
     return exclusions;
   }
 
+  /**
+   * Parses an object which specifies a schedule where events may or may not
+   * repeat and they may be all day events or at specific times.
+   *
+   * @param input The input to parse into a schedule.
+   * @param out The schedule to set the values of and return.
+   * @returns An instance of the parsed [[Schedule]].
+   */
   public static schedule(input: ScheduleInput, out: Schedule = new Schedule()): Schedule
   {
     let on: Day = this.day( input.on );
@@ -200,6 +253,12 @@ export class Parse
     return out;
   }
 
+  /**
+   * Parses [[CalendarScheduleInput]] and returns a [[CalendarSchedule]].
+   *
+   * @param input The input to parse.
+   * @returns The parsed value.
+   */
   public static calendarSchedule<T>(input: CalendarScheduleInput<T>): CalendarSchedule<T>
   {
     if (input.schedule instanceof Schedule)
@@ -213,6 +272,9 @@ export class Parse
     };
   }
 
+  /**
+   * Parses a schedule from a CRON pattern. TODO
+   */
   public static cron(pattern: string, out: Schedule = new Schedule()): Schedule
   {
     return out;
