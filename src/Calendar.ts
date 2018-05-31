@@ -6,126 +6,181 @@ import { Schedule, ScheduleInput } from './Schedule';
 import { Op } from './Op';
 import { Units } from './Units';
 import { Parse } from './Parse';
+import { SortEvent } from './Sort';
 import { Constants } from './Constants';
+import { CalendarDay } from './CalendarDay';
+import { CalendarEvent } from './CalendarEvent';
 
 
-export type CalendarMover = (day: Day, amount: number) => Day;
-
-export class CalendarDay<T> extends Day
-{
-
-  public currentDay: boolean = false;
-  public currentWeek: boolean = false;
-  public currentMonth: boolean = false;
-  public currentYear: boolean = false;
-  public currentOffset: number = 0;
-  public selectedDay: boolean = false;
-  public selectedWeek: boolean = false;
-  public selectedMonth: boolean = false;
-  public selectedYear: boolean = false;
-  public inCalendar: boolean = false;
-  public events: CalendarEvent<T>[] = [];
-
-  public updateCurrent(current: Day): this
-  {
-    this.currentDay = this.sameDay(current);
-    this.currentWeek = this.sameWeek(current);
-    this.currentMonth = this.sameMonth(current);
-    this.currentYear = this.sameYear(current);
-    this.currentOffset = this.daysBetween(current, Op.DOWN, false);
-
-    return this;
-  }
-
-  public updateSelected(selected: DaySpan): this
-  {
-    this.selectedDay = selected.matchesDay(this);
-    this.selectedWeek = selected.matchesWeek(this);
-    this.selectedMonth = selected.matchesMonth(this);
-    this.selectedYear = selected.matchesYear(this);
-
-    return this;
-  }
-
-  public clearSelected(): this
-  {
-    this.selectedDay = this.selectedWeek = this.selectedMonth = this.selectedYear = false;
-    return this;
-  }
-
-}
-
-export class CalendarEvent<T>
-{
-
-  public id: number;
-  public event: T;
-  public schedule: Schedule;
-  public time: DaySpan;
-  public fullDay: boolean;
-  public starting: boolean;
-  public ending: boolean;
-  public row: number = 0;
-  public col: number = 0;
-
-  public constructor(id: number, event: T, schedule: Schedule, time: DaySpan, actualDay: Day) {
-    this.id = id;
-    this.event = event;
-    this.schedule = schedule;
-    this.time = time;
-    this.fullDay = schedule.isFullDay();
-    this.starting = time.isPoint || time.start.sameDay( actualDay );
-    this.ending = time.isPoint || time.end.relative(-1).sameDay( actualDay );
-  }
-
-  public get scheduleId(): number
-  {
-    return Math.floor( this.id / Constants.MAX_EVENTS_PER_DAY );
-  }
-
-}
-
+/**
+ *
+ */
 export interface CalendarSchedule<T>
 {
   schedule: Schedule;
   event: T;
 }
 
+/**
+ *
+ */
 export type CalendarScheduleIdentifier<T> = CalendarSchedule<T> | Schedule | T;
 
+/**
+ *
+ */
 export type CalendarScheduleInput<T> = CalendarSchedule<T> | { schedule: ScheduleInput, event: T };
 
+/**
+ *
+ */
+export type CalendarMover = (day: Day, amount: number) => Day;
+
+/**
+ *
+ */
 export interface CalendarInput<T>
 {
+  /**
+   * @see [[Calendar.fill]]
+   */
   fill?: boolean;
+  /**
+   * @see [[Calendar.minimumSize]]
+   */
   minimumSize?: number;
+  /**
+   * @see [[Calendar.repeatCovers]]
+   */
   repeatCovers?: boolean;
+  /**
+   * @see [[Calendar.listTimes]]
+   */
   listTimes?: boolean;
+  /**
+   * @see [[Calendar.eventsOutside]]
+   */
   eventsOutside?: boolean;
+  /**
+   * @see [[Calendar.updateRows]]
+   */
+  updateRows?: boolean;
+  /**
+   * @see [[Calendar.updateColumns]]
+   */
+  updateColumns?: boolean;
+  /**
+   * @see [[Calendar.eventSorter]]
+   */
+  eventSorter?: SortEvent<T>;
+  /**
+   * @see [[Calendar.schedules]]
+   */
   schedules?: CalendarSchedule<T>[];
 }
 
+/**
+ *
+ */
 export class Calendar<T>
 {
 
+  /**
+   *
+   */
   public span: DaySpan;
+
+  /**
+   *
+   */
   public filled: DaySpan;
+
+  /**
+   *
+   */
   public length: number;
+
+  /**
+   *
+   */
   public type: Units;
+
+  /**
+   *
+   */
   public size: number;
+
+  /**
+   *
+   */
   public moveStart: CalendarMover;
+
+  /**
+   *
+   */
   public moveEnd: CalendarMover;
 
+
+  /**
+   *
+   */
   public fill: boolean = false;
+
+  /**
+   *
+   */
   public minimumSize: number = 0;
+
+  /**
+   *
+   */
   public repeatCovers: boolean = true;
+
+  /**
+   *
+   */
   public listTimes: boolean = false;
+
+  /**
+   *
+   */
   public eventsOutside: boolean = false;
 
+  /**
+   *
+   */
+  public updateRows: boolean = false;
+
+  /**
+   *
+   */
+  public updateColumns: boolean = false;
+
+  /**
+   *
+   */
+  public eventSorter: SortEvent<T> = null;
+
+
+  /**
+   *
+   */
   public selection: DaySpan = null;
+
+  /**
+   *
+   */
   public days: CalendarDay<T>[] = [];
+
+  /**
+   *
+   */
   public schedules: CalendarSchedule<T>[] = [];
 
+
+  /**
+   *
+   */
   public constructor(start: Day, end: Day, type: Units, size: number, moveStart: CalendarMover, moveEnd: CalendarMover, input?: CalendarInput<T>)
   {
     this.span = new DaySpan(start, end);
@@ -143,6 +198,9 @@ export class Calendar<T>
     this.refresh();
   }
 
+  /**
+   *
+   */
   public withInput(input: CalendarInput<T>, refresh: boolean = true): this
   {
     this.fill = fn.coalesce( input.fill, this.fill );
@@ -150,11 +208,14 @@ export class Calendar<T>
     this.repeatCovers = fn.coalesce( input.repeatCovers, this.repeatCovers );
     this.listTimes = fn.coalesce( input.listTimes, this.listTimes );
     this.eventsOutside = fn.coalesce( input.eventsOutside, this.eventsOutside );
+    this.updateRows = fn.coalesce( input.updateRows, this.updateRows );
+    this.updateColumns = fn.coalesce( input.updateColumns, this.updateColumns );
+    this.eventSorter = fn.coalesce( input.eventSorter, this.eventSorter );
 
     if (fn.isArray(input.schedules))
     {
       this.removeSchedules();
-      this.addSchedules(input.schedules, false, !refresh);
+      this.addSchedules(input.schedules, false, true);
     }
 
     if (refresh)
@@ -165,6 +226,9 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
   public withMinimumSize(minimumSize: number): this
   {
     this.minimumSize = minimumSize;
@@ -173,6 +237,9 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
   public withRepeatCovers(repeatCovers: boolean): this
   {
     this.repeatCovers = repeatCovers;
@@ -181,6 +248,9 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
   public withListTimes(listTimes: boolean): this
   {
     this.listTimes = listTimes;
@@ -189,6 +259,9 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
   public withEventsOutside(eventsOutside: boolean): this
   {
     this.eventsOutside = eventsOutside;
@@ -197,31 +270,79 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
+  public withUpdateRows(updateRows: boolean, refresh: boolean = true): this
+  {
+    this.updateRows = updateRows;
+
+    if (refresh && updateRows)
+    {
+      this.refreshRows();
+    }
+
+    return this;
+  }
+
+  /**
+   *
+   */
+  public withUpdateColumns(updateColumns: boolean, refresh: boolean = true): this
+  {
+    this.updateColumns = updateColumns;
+
+    if (refresh && updateColumns)
+    {
+      this.refreshColumns();
+    }
+
+    return this;
+  }
+
+  /**
+   *
+   */
   public get start(): Day
   {
     return this.span.start;
   }
 
+  /**
+   *
+   */
   public set start(day: Day)
   {
     this.span.start = day;
   }
 
+  /**
+   *
+   */
   public get end(): Day
   {
     return this.span.end;
   }
 
+  /**
+   *
+   */
   public set end(day: Day)
   {
     this.span.end = day;
   }
 
+  /**
+   *
+   */
   public summary(dayOfWeek: boolean = true, short: boolean = false, repeat: boolean = false, contextual: boolean = true, delimiter: string = ' - '): string
   {
     return this.span.summary( this.type, dayOfWeek, short, repeat, contextual, delimiter );
   }
 
+  /**
+   *
+   */
   public split(by: number = 1): Calendar<T>[]
   {
     let split: Calendar<T>[] = [];
@@ -238,6 +359,9 @@ export class Calendar<T>
     return split;
   }
 
+  /**
+   *
+   */
   public refresh(today: Day = Day.today()): this
   {
     this.length = this.span.days(Op.UP, true);
@@ -249,6 +373,9 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
   public resetFilled(): this
   {
     this.filled.start = this.fill ? this.start.startOfWeek() : this.start;
@@ -257,6 +384,9 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
   public resetDays(): this
   {
     this.resetFilled();
@@ -298,6 +428,9 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
   public refreshCurrent(today: Day = Day.today()): this
   {
     return this.iterateDays(d =>
@@ -306,6 +439,9 @@ export class Calendar<T>
     });
   }
 
+  /**
+   *
+   */
   public refreshSelection(): this
   {
     return this.iterateDays(d =>
@@ -321,17 +457,164 @@ export class Calendar<T>
     });
   }
 
+  /**
+   *
+   */
   public refreshEvents(): this
   {
-    return this.iterateDays(d =>
+    this.iterateDays(d =>
     {
       if (d.inCalendar || this.eventsOutside)
       {
         d.events = this.eventsForDay(d, this.listTimes, this.repeatCovers);
+
+        if (this.eventSorter)
+        {
+          d.events.sort( this.eventSorter );
+        }
       }
     });
+
+    if (this.updateRows)
+    {
+      this.refreshRows();
+    }
+
+    if (this.updateColumns)
+    {
+      this.refreshColumns();
+    }
+
+    return this;
   }
 
+  /**
+   *
+   */
+  public refreshRows(): this
+  {
+    type EventToRowMap = { [id: number]: number };
+    type UsedMap = { [row: number]: boolean };
+
+    let eventToRow: EventToRowMap = {};
+    let onlyFullDay: boolean = this.listTimes;
+
+    this.iterateDays(d =>
+    {
+      if (d.dayOfWeek === 0)
+      {
+        eventToRow = {};
+      }
+
+      let used: UsedMap = {};
+
+      for (let event of d.events)
+      {
+        if (onlyFullDay && !event.fullDay)
+        {
+          continue;
+        }
+
+        if (event.id in eventToRow)
+        {
+          used[ event.row = eventToRow[ event.id ] ] = true;
+        }
+      }
+
+      let rowIndex: number = 0;
+
+      for (let event of d.events)
+      {
+        if ((onlyFullDay && !event.fullDay) || event.id in eventToRow)
+        {
+          continue;
+        }
+
+        while (used[ rowIndex ])
+        {
+          rowIndex++;
+        }
+
+        eventToRow[ event.id ] = event.row = rowIndex;
+
+        rowIndex++;
+      }
+    });
+
+    return this;
+  }
+
+  /**
+   *
+   */
+  public refreshColumns(): this
+  {
+    interface Marker {
+      time: number,
+      event: CalendarEvent<T>,
+      start: boolean,
+      parent: Marker;
+    }
+
+    this.iterateDays(d =>
+    {
+      let markers: Marker[] = [];
+
+      for (let event of d.events)
+      {
+        if (!event.fullDay)
+        {
+          markers.push({
+            time: event.time.start.time,
+            event: event,
+            start: true,
+            parent: null
+          });
+
+          markers.push({
+            time: event.time.end.time - 1,
+            event: event,
+            start: false,
+            parent: null
+          });
+        }
+      }
+
+      markers.sort((a, b) =>
+      {
+        return a.time - b.time;
+      });
+
+      let parent = null;
+
+      for (let marker of markers)
+      {
+        if (marker.start)
+        {
+          marker.parent = parent;
+          parent = marker;
+        }
+        else if (parent)
+        {
+          parent = parent.parent;
+        }
+      }
+
+      for (let marker of markers)
+      {
+        if (marker.start)
+        {
+          marker.event.col = marker.parent ? marker.parent.event.col + 1 : 0;
+        }
+      }
+    });
+
+    return this;
+  }
+
+  /**
+   *
+   */
   public iterateDays(iterator: (day: CalendarDay<T>) => any): this
   {
     let days: CalendarDay<T>[] = this.days;
@@ -344,6 +627,9 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
   public eventsForDay(day: Day, getTimes: boolean = true, covers: boolean = true): CalendarEvent<T>[]
   {
     let events: CalendarEvent<T>[] = [];
@@ -384,6 +670,9 @@ export class Calendar<T>
     return events
   }
 
+  /**
+   *
+   */
   public findSchedule(input: CalendarScheduleIdentifier<T>): CalendarSchedule<T>
   {
     for (let schedule of this.schedules)
@@ -397,6 +686,9 @@ export class Calendar<T>
     return null;
   }
 
+  /**
+   *
+   */
   public removeSchedules(schedules: CalendarScheduleIdentifier<T>[] = null, delayRefresh: boolean = false): this
   {
     if (schedules)
@@ -418,6 +710,9 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
   public removeSchedule(schedule: CalendarScheduleIdentifier<T>, delayRefresh: boolean = false): this
   {
     let found = this.findSchedule(schedule);
@@ -434,6 +729,9 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
   public addSchedule(schedule: CalendarScheduleInput<T>, allowDuplicates: boolean = false, delayRefresh: boolean = false): this
   {
     let parsed = Parse.calendarSchedule(schedule);
@@ -458,6 +756,9 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
   public addSchedules(schedules: CalendarScheduleInput<T>[], allowDuplicates: boolean = false, delayRefresh: boolean = false): this
   {
     for (let schedule of schedules)
@@ -473,6 +774,9 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
   public select(start: Day, end?: Day): this
   {
     this.selection = end ? new DaySpan( start, end ) : DaySpan.point( start );
@@ -481,6 +785,9 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
   public unselect(): this
   {
     this.selection = null;
@@ -489,6 +796,9 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
   public move(jump: number = this.size): this
   {
     this.start = this.moveStart( this.start, jump );
@@ -498,16 +808,26 @@ export class Calendar<T>
     return this;
   }
 
+  /**
+   *
+   */
   public next(jump: number = this.size): this
   {
     return this.move( jump );
   }
 
+  /**
+   *
+   */
   public prev(jump: number = this.size): this
   {
     return this.move( -jump );
   }
 
+
+  /**
+   *
+   */
   public static days<T>(days: number = 1, around: Day = Day.today(), focus: number = 0.4999, input?: CalendarInput<T>): Calendar<T>
   {
     let start: Day = around.start().relativeDays( -Math.floor( days * focus ) );
@@ -517,6 +837,9 @@ export class Calendar<T>
     return new Calendar(start, end, Units.DAY, days, mover, mover, input);
   }
 
+  /**
+   *
+   */
   public static weeks<T>(weeks: number = 1, around: Day = Day.today(), focus: number = 0.4999, input?: CalendarInput<T>): Calendar<T>
   {
     let start: Day = around.start().startOfWeek().relativeWeeks( -Math.floor( weeks * focus ) );
@@ -526,6 +849,9 @@ export class Calendar<T>
     return new Calendar(start, end, Units.WEEK, weeks, mover, mover, input);
   }
 
+  /**
+   *
+   */
   public static months<T>(months: number = 1, around: Day = Day.today(), focus: number = 0.4999, input: CalendarInput<T> = {fill: true}): Calendar<T>
   {
     let start: Day = around.start().startOfMonth().relativeMonths( -Math.floor( months * focus ) );
@@ -536,6 +862,9 @@ export class Calendar<T>
     return new Calendar(start, end, Units.MONTH, months, moveStart, moveEnd, input);
   }
 
+  /**
+   *
+   */
   public static years<T>(years: number = 1, around: Day = Day.today(), focus: number = 0.4999, input: CalendarInput<T> = {fill: true}): Calendar<T>
   {
     let start: Day = around.start().startOfYear().relativeYears( -Math.floor( years * focus ) );
@@ -544,6 +873,5 @@ export class Calendar<T>
 
     return new Calendar(start, end, Units.YEAR, years, mover, mover, input);
   }
-
 
 }

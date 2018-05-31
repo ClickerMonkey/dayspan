@@ -1,6 +1,6 @@
 
 import { Functions as fn } from './Functions';
-import { FrequencyValue, FrequencyCheck, FrequencyValueEvery, FrequencyValueOneOf } from './Types';
+import { FrequencyValue, FrequencyCheck, FrequencyValueEvery, FrequencyValueOneOf } from './Frequency';
 import { Day, DayInput, DayIterator, DurationInput } from './Day';
 import { DaySpan } from './DaySpan';
 import { Constants } from './Constants';
@@ -11,54 +11,275 @@ import { Suffix } from './Suffix';
 import * as moment from 'moment';
 
 
+
+/**
+ *
+ */
 export interface ScheduleInput
 {
+  /**
+   *
+   */
   start?: DayInput;
+
+  /**
+   *
+   */
   end?: DayInput;
+
+  /**
+   *
+   */
   on?: DayInput;
-  duration?: number;
-  durationUnit?: DurationInput;
-  exclude?: DayInput[];
-  month?: FrequencyValue;
-  year?: FrequencyValue;
-  week?: FrequencyValue;
+
+  /**
+   *
+   */
   times?: TimeInput[];
+
+  /**
+   *
+   */
+  duration?: number;
+
+  /**
+   *
+   */
+  durationUnit?: DurationInput;
+
+  /**
+   *
+   */
+  exclude?: DayInput[];
+
+  /**
+   *
+   */
+  month?: FrequencyValue;
+
+  /**
+   *
+   */
+  year?: FrequencyValue;
+
+  /**
+   *
+   */
+  week?: FrequencyValue;
+
+  /**
+   *
+   */
   dayOfWeek?: FrequencyValue;
+
+  /**
+   *
+   */
   dayOfMonth?: FrequencyValue;
+
+  /**
+   *
+   */
+  lastDayOfMonth?: FrequencyValue;
+
+  /**
+   *
+   */
   dayOfYear?: FrequencyValue;
+
+  /**
+   *
+   */
   weekOfYear?: FrequencyValue;
+
+  /**
+   *
+   */
   weekspanOfYear?: FrequencyValue;
+
+  /**
+   *
+   */
   fullWeekOfYear?: FrequencyValue;
+
+  /**
+   *
+   */
+  lastWeekspanOfYear?: FrequencyValue;
+
+  /**
+   *
+   */
+  lastFullWeekOfYear?: FrequencyValue;
+
+  /**
+   *
+   */
   weekOfMonth?: FrequencyValue;
+
+  /**
+   *
+   */
   weekspanOfMonth?: FrequencyValue;
+
+  /**
+   *
+   */
   fullWeekOfMonth?: FrequencyValue;
+
+  /**
+   *
+   */
+  lastWeekspanOfMonth?: FrequencyValue;
+
+  /**
+   *
+   */
+  lastFullWeekOfMonth?: FrequencyValue;
 }
 
+
+/**
+ *
+ */
 export type ScheduleExclusions = { [dayIdentifier: number]: boolean };
 
+
+/**
+ *
+ */
 export class Schedule
 {
 
+  /**
+   *
+   */
   public start: Day;
+
+  /**
+   *
+   */
   public end: Day;
+
+  /**
+   *
+   */
   public duration: number;
+
+  /**
+   *
+   */
   public durationUnit: DurationInput;
+
+  /**
+   *
+   */
   public times: Time[];
+
+  /**
+   *
+   */
   public durationInDays: number;
+
+  /**
+   *
+   */
   public exclude: ScheduleExclusions;
+
+  /**
+   *
+   */
   public dayOfWeek: FrequencyCheck;
+
+  /**
+   *
+   */
   public dayOfMonth: FrequencyCheck;
+
+  /**
+   *
+   */
+  public lastDayOfMonth: FrequencyCheck;
+
+  /**
+   *
+   */
   public dayOfYear: FrequencyCheck;
+
+  /**
+   *
+   */
   public month: FrequencyCheck;
+
+  /**
+   *
+   */
   public week: FrequencyCheck;
+
+  /**
+   *
+   */
   public weekOfYear: FrequencyCheck;
+
+  /**
+   *
+   */
   public weekspanOfYear: FrequencyCheck;
+
+  /**
+   *
+   */
   public fullWeekOfYear: FrequencyCheck;
+
+  /**
+   *
+   */
+  public lastWeekspanOfYear: FrequencyCheck;
+
+  /**
+   *
+   */
+  public lastFullWeekOfYear: FrequencyCheck;
+
+  /**
+   *
+   */
   public weekOfMonth: FrequencyCheck;
+
+  /**
+   *
+   */
   public weekspanOfMonth: FrequencyCheck;
+
+  /**
+   *
+   */
   public fullWeekOfMonth: FrequencyCheck;
+
+  /**
+   *
+   */
+  public lastWeekspanOfMonth: FrequencyCheck;
+
+  /**
+   *
+   */
+  public lastFullWeekOfMonth: FrequencyCheck;
+
+  /**
+   *
+   */
   public year: FrequencyCheck;
 
+  /**
+   *
+   */
+  public checks: FrequencyCheck[];
+
+
+  /**
+   *
+   */
   public constructor(input?: ScheduleInput)
   {
     if (fn.isDefined(input))
@@ -67,11 +288,9 @@ export class Schedule
     }
   }
 
-  public get lastTime(): Time
-  {
-    return this.times[ this.times.length - 1 ];
-  }
-
+  /**
+   *
+   */
   public set(input: ScheduleInput): this
   {
     Parse.schedule(input, this);
@@ -79,6 +298,17 @@ export class Schedule
     return this;
   }
 
+  /**
+   *
+   */
+  public get lastTime(): Time
+  {
+    return this.times[ this.times.length - 1 ];
+  }
+
+  /**
+   *
+   */
   public updateDurationInDays(): this
   {
     let start: number = this.lastTime ? this.lastTime.toMilliseconds() : 0;
@@ -91,44 +321,87 @@ export class Schedule
     return this;
   }
 
+  /**
+   *
+   */
+  public updateChecks(): this
+  {
+    this.checks = Parse.givenFrequency([
+      this.year,
+      this.month,
+      this.week,
+      this.weekOfYear,
+      this.fullWeekOfYear,
+      this.weekspanOfYear,
+      this.lastFullWeekOfYear,
+      this.lastWeekspanOfYear,
+      this.weekOfMonth,
+      this.weekspanOfMonth,
+      this.fullWeekOfMonth,
+      this.lastWeekspanOfMonth,
+      this.lastFullWeekOfMonth,
+      this.dayOfWeek,
+      this.dayOfMonth,
+      this.lastDayOfMonth,
+      this.dayOfYear
+    ]);
+
+    return this;
+  }
+
+  /**
+   *
+   */
   public matchesSpan(day: Day): boolean
   {
     return (this.start === null || day.isSameOrAfter(this.start)) &&
       (this.end === null || day.isBefore(this.end));
   }
 
+  /**
+   *
+   */
   public matchesRange(start: Day, end: Day): boolean
   {
     return (this.start === null || start.isSameOrBefore(this.start)) &&
       (this.end === null || end.isBefore(this.end));
   }
 
+  /**
+   *
+   */
   public isExcluded(day: Day): boolean
   {
     return !!this.exclude[ day.dayIdentifier ];
   }
 
+  /**
+   *
+   */
   public isIncluded(day: Day): boolean
   {
     return !this.exclude[ day.dayIdentifier ];
   }
 
+  /**
+   *
+   */
   public matchesDay(day: Day): boolean
   {
-    return this.isIncluded( day ) &&
-      this.matchesSpan( day ) &&
-      this.dayOfWeek( day.dayOfWeek ) &&
-      this.dayOfMonth( day.dayOfMonth ) &&
-      this.dayOfYear( day.dayOfYear ) &&
-      this.year( day.year ) &&
-      this.month( day.month ) &&
-      this.week( day.week ) &&
-      this.weekOfYear( day.weekOfYear ) &&
-      this.weekspanOfYear( day.weekspanOfYear ) &&
-      this.fullWeekOfYear( day.fullWeekOfYear ) &&
-      this.weekOfMonth( day.weekOfMonth ) &&
-      this.weekspanOfMonth( day.weekspanOfMonth ) &&
-      this.fullWeekOfMonth( day.fullWeekOfMonth );
+    if (!this.isIncluded( day ) || !this.matchesSpan( day ))
+    {
+      return false;
+    }
+
+    for (let check of this.checks)
+    {
+      if (!check( day[ check.property ] ))
+      {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -145,6 +418,9 @@ export class Schedule
     return !!this.findStartingDay( day );
   }
 
+  /**
+   *
+   */
   public nextDay(day: Day, includeDay: boolean = false, lookAhead: number = 366): Day
   {
     let next: Day = null;
@@ -158,6 +434,9 @@ export class Schedule
     return next;
   }
 
+  /**
+   *
+   */
   public nextDays(day: Day, max: number, includeDay: boolean = false, lookAhead: number = 366): Day[]
   {
     let nexts: Day[] = [];
@@ -167,6 +446,9 @@ export class Schedule
     return nexts;
   }
 
+  /**
+   *
+   */
   public prevDay(day: Day, includeDay: boolean = false, lookBack: number = 366): Day
   {
     let prev: Day = null;
@@ -180,6 +462,9 @@ export class Schedule
     return prev;
   }
 
+  /**
+   *
+   */
   public prevDays(day: Day, max: number, includeDay: boolean = false, lookBack: number = 366): Day[]
   {
     let prevs: Day[] = [];
@@ -189,6 +474,9 @@ export class Schedule
     return prevs;
   }
 
+  /**
+   *
+   */
   public iterateDays(day: Day, max: number, next: boolean, onDay: DayIterator, includeDay: boolean = false, lookup: number = 366): this
   {
     let iterated: number = 0;
@@ -217,6 +505,9 @@ export class Schedule
     return this;
   }
 
+  /**
+   *
+   */
   public matchesTime(day: Day): boolean
   {
     if (!this.matchesDay( day ))
@@ -235,11 +526,17 @@ export class Schedule
     return false;
   }
 
+  /**
+   *
+   */
   public isFullDay(): boolean
   {
     return this.times.length === 0;
   }
 
+  /**
+   *
+   */
   public getFullSpan(day: Day): DaySpan
   {
     let start: Day = day.start();
@@ -248,6 +545,9 @@ export class Schedule
     return new DaySpan( start, end );
   }
 
+  /**
+   *
+   */
   public getTimeSpan(day: Day, time: Time): DaySpan
   {
     let start: Day = day.withTime( time );
@@ -256,6 +556,9 @@ export class Schedule
     return new DaySpan( start, end );
   }
 
+  /**
+   *
+   */
   public getSpansOver(day: Day): DaySpan[]
   {
     let spans: DaySpan[] = [];
@@ -286,6 +589,9 @@ export class Schedule
     return spans;
   }
 
+  /**
+   *
+   */
   public getSpanOver(day: Day): DaySpan
   {
     let start: Day = this.findStartingDay( day );
@@ -293,6 +599,9 @@ export class Schedule
     return start ? this.getFullSpan( start ) : null;
   }
 
+  /**
+   *
+   */
   public getSpansOn(day: Day, check: boolean = false): DaySpan[]
   {
     let spans: DaySpan[] = [];
@@ -319,6 +628,9 @@ export class Schedule
     return spans;
   }
 
+  /**
+   *
+   */
   public findStartingDay(day: Day): Day
   {
     let behind: number = this.durationInDays;
@@ -337,6 +649,9 @@ export class Schedule
     return null;
   }
 
+  /**
+   *
+   */
   public getExclusions(returnDays: boolean = true)
   {
     let exclusions: DayInput[] = [];
@@ -351,6 +666,9 @@ export class Schedule
     return exclusions;
   }
 
+  /**
+   *
+   */
   public toInput(returnDays: boolean = false, returnTimes: boolean = false, timeFormat: string = '', alwaysDuration: boolean = false): ScheduleInput
   {
     let defaultUnit: string = Constants.DURATION_DEFAULT_UNIT( this.isFullDay() );
@@ -365,26 +683,34 @@ export class Schedule
 
     if (this.start) out.start = returnDays ? this.start : this.start.time;
     if (this.end) out.end = returnDays ? this.end : this.end.time;
+    if (times.length) out.times = times;
+    if (alwaysDuration || this.duration !== Constants.DURATION_DEFAULT) out.duration = this.duration;
+    if (alwaysDuration || this.durationUnit !== defaultUnit) out.durationUnit = this.durationUnit;
+    if (exclusions.length) out.exclude = exclusions;
     if (this.dayOfWeek.input) out.dayOfWeek = this.dayOfWeek.input;
     if (this.dayOfMonth.input) out.dayOfMonth = this.dayOfMonth.input;
+    if (this.lastDayOfMonth.input) out.lastDayOfMonth = this.lastDayOfMonth.input;
     if (this.dayOfYear.input) out.dayOfYear = this.dayOfYear.input;
+    if (this.year.input) out.year = this.year.input;
     if (this.month.input) out.month = this.month.input;
     if (this.week.input) out.week = this.week.input;
     if (this.weekOfYear.input) out.weekOfYear = this.weekOfYear.input;
     if (this.weekspanOfYear.input) out.weekspanOfYear = this.weekspanOfYear.input;
     if (this.fullWeekOfYear.input) out.fullWeekOfYear = this.fullWeekOfYear.input;
+    if (this.lastWeekspanOfYear.input) out.lastWeekspanOfYear = this.lastWeekspanOfYear.input;
+    if (this.lastFullWeekOfYear.input) out.lastFullWeekOfYear = this.lastFullWeekOfYear.input;
     if (this.weekOfMonth.input) out.weekOfMonth = this.weekOfMonth.input;
     if (this.weekspanOfMonth.input) out.weekspanOfMonth = this.weekspanOfMonth.input;
     if (this.fullWeekOfMonth.input) out.fullWeekOfMonth = this.fullWeekOfMonth.input;
-    if (this.year.input) out.year = this.year.input;
-    if (times.length) out.times = times;
-    if (exclusions.length) out.exclude = exclusions;
-    if (alwaysDuration || this.duration !== Constants.DURATION_DEFAULT) out.duration = this.duration;
-    if (alwaysDuration || this.durationUnit !== defaultUnit) out.durationUnit = this.durationUnit;
+    if (this.lastWeekspanOfMonth.input) out.lastWeekspanOfMonth = this.lastWeekspanOfMonth.input;
+    if (this.lastFullWeekOfMonth.input) out.lastFullWeekOfMonth = this.lastFullWeekOfMonth.input;
 
     return out;
   }
 
+  /**
+   *
+   */
   public describe(thing: string = 'event',
     includeRange: boolean = true,
     includeTimes: boolean = true,
@@ -420,16 +746,21 @@ export class Schedule
     }
 
     out += this.describeRule( this.dayOfWeek.input, 'day of the week', x => moment.weekdays()[x], 1, false);
+    out += this.describeRule( this.lastDayOfMonth.input, 'last day of the month', x => Suffix.CACHE[x] );
     out += this.describeRule( this.dayOfMonth.input, 'day of the month', x => Suffix.CACHE[x] );
     out += this.describeRule( this.dayOfYear.input, 'day of the year', x => Suffix.CACHE[x], 1 );
+    out += this.describeRule( this.year.input, 'year', x => x, 0, false, ' in ' );
     out += this.describeRule( this.month.input, 'month', x => moment.months()[x], 0, false, ' in ' );
     out += this.describeRule( this.weekOfYear.input, 'week of the year', x => Suffix.CACHE[x] );
     out += this.describeRule( this.weekspanOfYear.input, 'weekspan of the year', x => Suffix.CACHE[x + 1], 1 );
     out += this.describeRule( this.fullWeekOfYear.input, 'full week of the year', x => Suffix.CACHE[x] );
+    out += this.describeRule( this.lastWeekspanOfYear.input, 'last weekspan of the year', x => Suffix.CACHE[x + 1], 1 );
+    out += this.describeRule( this.lastFullWeekOfYear.input, 'last full week of the year', x => Suffix.CACHE[x] );
     out += this.describeRule( this.weekOfMonth.input, 'week of the month', x => Suffix.CACHE[x] );
     out += this.describeRule( this.fullWeekOfMonth.input, 'full week of the month', x => Suffix.CACHE[x] );
     out += this.describeRule( this.weekspanOfMonth.input, 'weekspan of the month', x => Suffix.CACHE[x + 1], 1 );
-    out += this.describeRule( this.year.input, 'year', x => x, 0, false, ' in ' );
+    out += this.describeRule( this.lastFullWeekOfMonth.input, 'last full week of the month', x => Suffix.CACHE[x] );
+    out += this.describeRule( this.lastWeekspanOfMonth.input, 'last weekspan of the month', x => Suffix.CACHE[x + 1], 1 );
 
     if (includeTimes && this.times.length)
     {
@@ -461,6 +792,9 @@ export class Schedule
     return out;
   }
 
+  /**
+   *
+   */
   private describeRule(value: FrequencyValue, unit: string, map: (x: number) => any, everyOffset: number = 0, the: boolean = true, on: string = ' on ', required: boolean = false): string
   {
     let out: string = '';
@@ -496,6 +830,9 @@ export class Schedule
     return out;
   }
 
+  /**
+   *
+   */
   private describeArray<T>(array: T[], map: (item: T) => string): string
   {
     let out: string = '';

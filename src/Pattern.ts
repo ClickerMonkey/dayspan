@@ -7,12 +7,23 @@ import { Functions as fn } from './Functions';
 
 
 /**
+ * Describes a [[Pattern]] given a day to base it on.
  *
+ * @param day The day to base the description on.
+ * @returns The description of the pattern.
  */
 export type DescribePattern = (day: Day) => string;
 
 /**
+ * A rule helps parse [[ScheduleInput]] and determines whether it matches the
+ * given pattern.
  *
+ * - When a number is given, the input MUST be an array of the same length and contain any values.
+ * - When an array of numbers is given, the input MUST be an array containing the same values.
+ * - When a TRUE is given the input MUST contain that property and can be any value.
+ * - When a FALSE is given the input MAY contain that property (optional).
+ * - When a property is NOT specified, the input MUST NOT contain that property.
+ * - When an object with every is given, the input must match the every and offset values (have the same frequency).
  */
 export type PatternRule =
   number |                          // has array with this number of elements
@@ -21,11 +32,13 @@ export type PatternRule =
   {every: number, offset?: number}; // is object with matching every and offset
 
 /**
- *
+ * The set of rules you can specify for determining if a [[ScheduleInput]]
+ * matches a pattern.
  */
 export interface PatternRules {
   dayOfWeek?: PatternRule;
   dayOfMonth?: PatternRule;
+  lastDayOfMonth?: PatternRule;
   dayOfYear?: PatternRule;
   month?: PatternRule;
   week?: PatternRule;
@@ -33,27 +46,58 @@ export interface PatternRules {
   weekOfYear?: PatternRule;
   weekspanOfYear?: PatternRule;
   fullWeekOfYear?: PatternRule;
+  lastWeekspanOfYear?: PatternRule;
+  lastFullWeekOfYear?: PatternRule;
   weekOfMonth?: PatternRule;
   weekspanOfMonth?: PatternRule;
   fullWeekOfMonth?: PatternRule;
+  lastWeekspanOfMonth?: PatternRule;
+  lastFullWeekOfMonth?: PatternRule;
 }
 
 
 /**
- *
+ * A class which helps describe [[ScheduleInput]] if it matches a pattern.
  */
 export class Pattern
 {
 
-  public static PROPS: string[] = [
-    'dayOfWeek', 'dayOfMonth', 'dayOfYear', 'month', 'week', 'year', 'weekOfYear', 'weekspanOfYear', 'fullWeekOfYear', 'weekOfMonth', 'weekspanOfMonth', 'fullWeekOfMonth'
+  /**
+   * The properties in the [[ScheduleInput]] which are compared against the
+   * rules of a pattern.
+   */
+  public static PROPS: string[] =
+  [
+    'dayOfWeek', 'dayOfMonth', 'lastDayOfMonth', 'dayOfYear',
+    'month', 'week', 'year',
+    'weekOfYear', 'weekspanOfYear', 'fullWeekOfYear', 'lastWeekspanOfYear', 'lastFullWeekOfYear',
+    'weekOfMonth', 'weekspanOfMonth', 'fullWeekOfMonth', 'lastWeekspanOfMonth', 'lastFullWeekOfMonth'
   ];
 
+  /**
+   *
+   */
   public listed: boolean;
+
+  /**
+   *
+   */
   public describe: DescribePattern;
+
+  /**
+   *
+   */
   public name: string;
+
+  /**
+   *
+   */
   public rules: PatternRules;
 
+
+  /**
+   *
+   */
   public constructor(name: string, listed: boolean, describe: DescribePattern, rules: PatternRules)
   {
     this.name = name;
@@ -62,6 +106,9 @@ export class Pattern
     this.rules = rules;
   }
 
+  /**
+   *
+   */
   public apply(input: ScheduleInput, day: Day): ScheduleInput
   {
     for (let prop of Pattern.PROPS)
@@ -90,6 +137,9 @@ export class Pattern
     return input;
   }
 
+  /**
+   *
+   */
   public isMatch(input: ScheduleInput, exactlyWith?: Day): boolean
   {
     let exactly: boolean = fn.isDefined( exactlyWith );
@@ -186,11 +236,17 @@ export class Pattern
     return true;
   }
 
+  /**
+   *
+   */
   public static withName(name: string): Pattern
   {
     return PatternMap[ name ];
   }
 
+  /**
+   *
+   */
   public static findMatch(input: ScheduleInput, listedOnly: boolean = true, exactlyWith?: Day): Pattern
   {
     for (let pattern of Patterns)
@@ -207,6 +263,10 @@ export class Pattern
 
 }
 
+
+/**
+ *
+ */
 export let Patterns: Pattern[] = [
   new Pattern(
     'none', true,
@@ -276,20 +336,28 @@ export let Patterns: Pattern[] = [
     {
       dayOfWeek: false,
       dayOfMonth: false,
+      lastDayOfMonth: false,
       dayOfYear: false,
+      year: false,
       month: false,
       week: false,
-      year: false,
       weekOfYear: false,
       weekspanOfYear: false,
       fullWeekOfYear: false,
+      lastWeekspanOfYear: false,
+      lastFullWeekOfYear: false,
       weekOfMonth: false,
       weekspanOfMonth: false,
-      fullWeekOfMonth: false
+      fullWeekOfMonth: false,
+      lastWeekspanOfMonth: false,
+      lastFullWeekOfMonth: false
     }
   )
 ];
 
+/**
+ *
+ */
 export let PatternMap: { [name: string]: Pattern } = {};
 
 for (let pattern of Patterns)

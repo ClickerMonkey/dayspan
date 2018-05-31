@@ -1,10 +1,11 @@
-# dayspan
+# DaySpan
 
 A date & schedule library to use for advanced calendars in TypeScript and JS.
 
 - [Google Calendar Clone](https://clickermonkey.github.io/dayspan/examples/google/)
 - [Documentation](https://clickermonkey.github.io/dayspan/docs/)
 - [Download JS](umd/dayspan.js)
+- Install via `bower install dayspan` or `npm install dayspan`
 
 ### TypeScript Example
 
@@ -90,3 +91,20 @@ cal.addSchedule({
   })
 });
 ```
+
+### Google Calendar Clone Preview
+
+#### Month View
+![Month](examples/google/DaySpan-Month.png)
+
+#### Week View
+![Week](examples/google/DaySpan-Week.png)
+
+#### Schedule an Event
+![Scheduler](examples/google/DaySpan-Scheduler.png)
+
+#### Custom Schedule
+![Custom](examples/google/DaySpan-Custom.png)
+
+#### Year View
+![Year](examples/google/DaySpan-Year.png)

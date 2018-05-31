@@ -19,6 +19,9 @@ export class Functions
     return input instanceof Array;
   }
 
+  /**
+   *
+   */
   public static isArrayEquals(x: any[], y: any[]): boolean
   {
     if (x === y) return true;
@@ -46,12 +49,17 @@ export class Functions
     return typeof(input) === 'string';
   }
 
-
+  /**
+   *
+   */
   public static isNumber(input: any): boolean
   {
     return isFinite(input);
   }
 
+  /**
+   *
+   */
   public static isObject(input: any): boolean
   {
     return !this.isArray(input) && typeof(input) === 'object';
@@ -68,17 +76,21 @@ export class Functions
     return typeof(input) !== 'undefined';
   }
 
+  /**
+   *
+   */
   public static isFrequencyValueEvery(input: any): boolean
   {
     return this.isObject( input ) && this.isNumber( input.every );
   }
 
+  /**
+   *
+   */
   public static isFrequencyValueOneOf(input: any): boolean
   {
     return this.isArray( input ) && input.length > 0;
   }
-
-
 
   /**
    * Returns the first argument which is defined.
@@ -93,6 +105,9 @@ export class Functions
     return this.isDefined( a ) ? a : (this.isDefined( b ) ? b : c);
   }
 
+  /**
+   *
+   */
   public static pad(x: string, length: number, padding: string, before: boolean): string
   {
     while (x.length < length)
@@ -103,6 +118,9 @@ export class Functions
     return x;
   }
 
+  /**
+   *
+   */
   public static padNumber(x: number, length: number, first: number = length)
   {
     return this.pad(x + '', length, '0', true).substring( 0, first );

@@ -7,131 +7,315 @@ import { Time } from './Time';
 import * as moment from 'moment';
 
 
+/**
+ *
+ */
 export type DurationInput = moment.unitOfTime.DurationConstructor;
 
+/**
+ *
+ */
 export type DayInput = number | string | Day | number[] | object | true;
 
+/**
+ *
+ */
 export type DayIterator = (day: Day) => any;
 
+/**
+ *
+ */
 export class Day
 {
 
+  /**
+   *
+   */
   public static readonly LOAD_TIME: Day = Day.now();
 
+  /**
+   *
+   */
   public readonly date: moment.Moment;
+
+  /**
+   *
+   */
   public readonly time: number;
+
+  /**
+   *
+   */
   public readonly millis: number;
+
+  /**
+   *
+   */
   public readonly seconds: number;
+
+  /**
+   *
+   */
   public readonly minute: number;
+
+  /**
+   *
+   */
   public readonly hour: number;
+
+  /**
+   *
+   */
   public readonly month: number;
+
+  /**
+   *
+   */
   public readonly year: number;
+
+  /**
+   *
+   */
   public readonly quarter: number;
 
+
+  /**
+   *
+   */
   public readonly dayOfWeek: number;
+
+  /**
+   *
+   */
   public readonly dayOfMonth: number;
+
+  /**
+   *
+   */
+  public readonly lastDayOfMonth: number;
+
+  /**
+   *
+   */
   public readonly dayOfYear: number;
 
+
+  /**
+   *
+   */
   public readonly week: number;
+
+  /**
+   *
+   */
   public readonly weekOfYear: number;
+
+  /**
+   *
+   */
   public readonly weekspanOfYear: number;
+
+  /**
+   *
+   */
   public readonly fullWeekOfYear: number;
 
+  /**
+   *
+   */
+  public readonly lastWeekspanOfYear: number;
+
+  /**
+   *
+   */
+  public readonly lastFullWeekOfYear: number;
+
+
+  /**
+   *
+   */
   public readonly weekOfMonth: number;
+
+  /**
+   *
+   */
   public readonly weekspanOfMonth: number;
+
+  /**
+   *
+   */
   public readonly fullWeekOfMonth: number;
 
+  /**
+   *
+   */
+  public readonly lastWeekspanOfMonth: number;
+
+  /**
+   *
+   */
+  public readonly lastFullWeekOfMonth: number;
+
+
+  /**
+   *
+   */
   public readonly dayIdentifier: number;
+
+  /**
+   *
+   */
   public readonly weekIdentifier: number;
+
+  /**
+   *
+   */
   public readonly monthIdentifier: number;
+
+  /**
+   *
+   */
   public readonly quarterIdentifier: number;
 
 
 
-  public constructor(date: moment.Moment) {
-    this.date             = date;
-    this.time             = date.unix();
-    this.millis           = date.millisecond();
-    this.seconds          = date.second();
-    this.minute           = date.minute();
-    this.hour             = date.hour();
-    this.month            = date.month();
-    this.year             = date.year();
-    this.quarter          = date.quarter();
-    this.dayOfWeek        = date.day();
-    this.dayOfMonth       = date.date();
-    this.dayOfYear        = date.dayOfYear();
-    this.week             = date.week();
+  /**
+   *
+   */
+  public constructor(date: moment.Moment)
+  {
+    this.date                 = date;
+    this.time                 = date.unix();
+    this.millis               = date.millisecond();
+    this.seconds              = date.second();
+    this.minute               = date.minute();
+    this.hour                 = date.hour();
+    this.month                = date.month();
+    this.year                 = date.year();
+    this.quarter              = date.quarter();
+    this.dayOfWeek            = date.day();
+    this.dayOfMonth           = date.date();
+    this.dayOfYear            = date.dayOfYear();
+    this.week                 = date.week();
 
-    this.weekOfYear       = Day.getWeekOfYear( date );
-    this.weekspanOfYear   = Day.getWeekspanOfYear( date );
-    this.fullWeekOfYear   = Day.getFullWeekOfYear( date );
-    this.weekOfMonth      = Day.getWeekOfMonth( date );
-    this.weekspanOfMonth  = Day.getWeekspanOfMonth( date );
-    this.fullWeekOfMonth  = Day.getFullWeekOfMonth( date );
+    this.lastDayOfMonth       = Day.getLastDayOfMonth( date );
+    this.weekOfYear           = Day.getWeekOfYear( date );
+    this.weekspanOfYear       = Day.getWeekspanOfYear( date );
+    this.fullWeekOfYear       = Day.getFullWeekOfYear( date );
+    this.lastWeekspanOfYear   = Day.getLastWeekspanOfYear( date );
+    this.lastFullWeekOfYear   = Day.getLastFullWeekOfYear( date );
 
-    this.dayIdentifier    = Day.getDayIdentifier( date );
-    this.weekIdentifier   = Day.getWeekIdentifier( date );
-    this.monthIdentifier  = Day.getMonthIdentifier( date );
-    this.quarterIdentifier = Day.getQuarterIdentifier( date );
+    this.weekOfMonth          = Day.getWeekOfMonth( date );
+    this.weekspanOfMonth      = Day.getWeekspanOfMonth( date );
+    this.fullWeekOfMonth      = Day.getFullWeekOfMonth( date );
+    this.lastWeekspanOfMonth  = Day.getLastWeekspanOfMonth( date );
+    this.lastFullWeekOfMonth  = Day.getLastFullWeekOfMonth( date );
+
+    this.dayIdentifier        = Day.getDayIdentifier( date );
+    this.weekIdentifier       = Day.getWeekIdentifier( date );
+    this.monthIdentifier      = Day.getMonthIdentifier( date );
+    this.quarterIdentifier    = Day.getQuarterIdentifier( date );
   }
 
   // Same
 
-  public sameDay(day: Day): boolean {
+  /**
+   *
+   */
+  public sameDay(day: Day): boolean
+  {
     return this.dayIdentifier === day.dayIdentifier;
   }
 
+  /**
+   *
+   */
   public sameMonth(day: Day): boolean {
     return this.monthIdentifier === day.monthIdentifier;
   }
 
+  /**
+   *
+   */
   public sameWeek(day: Day): boolean {
     return this.weekIdentifier === day.weekIdentifier;
   }
 
+  /**
+   *
+   */
   public sameYear(day: Day): boolean {
     return this.year === day.year;
   }
 
+  /**
+   *
+   */
   public sameQuarter(day: Day): boolean {
     return this.quarterIdentifier === day.quarterIdentifier;
   }
 
+  /**
+   *
+   */
   public sameHour(day: Day): boolean {
     return this.dayIdentifier === day.dayIdentifier && this.hour === day.hour;
   }
 
+  /**
+   *
+   */
   public sameMinute(day: Day): boolean {
     return this.dayIdentifier === day.dayIdentifier && this.hour === day.hour && this.minute === day.minute;
   }
 
+  /**
+   *
+   */
   public sameTime(time: Time): boolean {
     return this.hour === time.hour && this.minute === time.minute && this.seconds === time.second && this.millis === time.millisecond;
   }
 
   // Comparison
 
+  /**
+   *
+   */
   public isBefore(day: Day, precision?: moment.unitOfTime.StartOf): boolean {
     return this.date.isBefore( day.date, precision );
   }
 
+  /**
+   *
+   */
   public isSameOrBefore(day: Day, precision?: moment.unitOfTime.StartOf): boolean {
     return this.date.isSameOrBefore( day.date, precision );
   }
 
+  /**
+   *
+   */
   public isAfter(day: Day, precision?: moment.unitOfTime.StartOf): boolean {
     return this.date.isAfter( day.date, precision );
   }
 
+  /**
+   *
+   */
   public isSameOrAfter(day: Day, precision?: moment.unitOfTime.StartOf): boolean {
     return this.date.isSameOrAfter( day.date, precision );
   }
 
+  /**
+   *
+   */
   public max(day: Day): Day {
     return this.date.isAfter( day.date ) ? this : day;
   }
 
+  /**
+   *
+   */
   public min(day: Day): Day {
     return this.date.isBefore( day.date ) ? this : day;
   }
@@ -578,6 +762,14 @@ export class Day
     return Math.floor( (date.dayOfYear() - 1) / Constants.DAYS_IN_WEEK );
   }
 
+  public static getLastWeekspanOfYear(date: moment.Moment): number
+  {
+    let lastOfYear = date.clone().endOf('year');
+    let daysInYear: number = lastOfYear.dayOfYear();
+
+    return Math.floor( (daysInYear - date.dayOfYear()) / Constants.DAYS_IN_WEEK );
+  }
+
   public static getWeekOfYear(date: moment.Moment): number
   {
     let firstOfYear = date.clone().startOf('year');
@@ -594,14 +786,34 @@ export class Day
     return firstOfYear.day() === Constants.WEEKDAY_MIN ? weeks : weeks - 1;
   }
 
+  public static getLastFullWeekOfYear(date: moment.Moment): number
+  {
+    let firstOfYear = date.clone().startOf('year');
+    let weeks: number = date.week();
+    let weeksMax: number = date.weeksInYear();
+    let lastWeek: number = weeksMax - weeks;
+
+    return firstOfYear.day() === Constants.WEEKDAY_MIN ? lastWeek + 1 : lastWeek;
+  }
+
   public static getWeekspanOfMonth(date: moment.Moment): number
   {
     return Math.floor((date.date() - 1) / Constants.DAYS_IN_WEEK);
   }
 
+  public static getLastWeekspanOfMonth(date: moment.Moment): number
+  {
+    return Math.floor((date.daysInMonth() - date.date()) / Constants.DAYS_IN_WEEK);
+  }
+
   public static getFullWeekOfMonth(date: moment.Moment): number
   {
     return Math.floor((date.date() - 1 - date.day() + Constants.DAYS_IN_WEEK) / Constants.DAYS_IN_WEEK);
+  }
+
+  public static getLastFullWeekOfMonth(date: moment.Moment): number
+  {
+    return Math.floor((date.daysInMonth() - date.date() - (Constants.WEEKDAY_MAX - date.day()) + Constants.DAYS_IN_WEEK) / Constants.DAYS_IN_WEEK);
   }
 
   public static getWeekOfMonth(date: moment.Moment): number
@@ -611,6 +823,11 @@ export class Day
     let sundayDate = dom - dow;
 
     return Math.floor( ( sundayDate + Constants.WEEK_OF_MONTH_MINIMUM_WEEKDAY + 5 ) / Constants.DAYS_IN_WEEK );
+  }
+
+  public static getLastDayOfMonth(date: moment.Moment): number
+  {
+    return date.daysInMonth() - date.date() + 1;
   }
 
   public static getWeekIdentifier(date: moment.Moment): number

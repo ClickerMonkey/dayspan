@@ -19,10 +19,20 @@ export class Suffix
     'th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'
   ];
 
+  /**
+   * An internal cache of [[Suffix._CACHE_SIZE]] suffixes.
+   */
   private static _CACHE: string[];
 
+  /**
+   *
+   */
   private static _CACHE_SIZE: number = 366;
 
+
+  /**
+   *
+   */
   public static get CACHE(): string[]
   {
     if (!this._CACHE)
@@ -38,11 +48,17 @@ export class Suffix
     return this._CACHE;
   }
 
+  /**
+   *
+   */
   public static determine(value: number): string
   {
     return value >= 11 && value <= 13 ? 'th' : this.MAP[ value % this.MAP.length ];
   }
 
+  /**
+   *
+   */
   public static get(value: number, append: boolean = false): string
   {
     let suffix: string = this.determine(value);

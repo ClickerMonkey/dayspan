@@ -112,6 +112,9 @@ var Functions = (function () {
     Functions.isArray = function (input) {
         return input instanceof Array;
     };
+    /**
+     *
+     */
     Functions.isArrayEquals = function (x, y) {
         if (x === y)
             return true;
@@ -133,9 +136,15 @@ var Functions = (function () {
     Functions.isString = function (input) {
         return typeof (input) === 'string';
     };
+    /**
+     *
+     */
     Functions.isNumber = function (input) {
         return isFinite(input);
     };
+    /**
+     *
+     */
     Functions.isObject = function (input) {
         return !this.isArray(input) && typeof (input) === 'object';
     };
@@ -148,9 +157,15 @@ var Functions = (function () {
     Functions.isDefined = function (input) {
         return typeof (input) !== 'undefined';
     };
+    /**
+     *
+     */
     Functions.isFrequencyValueEvery = function (input) {
         return this.isObject(input) && this.isNumber(input.every);
     };
+    /**
+     *
+     */
     Functions.isFrequencyValueOneOf = function (input) {
         return this.isArray(input) && input.length > 0;
     };
@@ -165,12 +180,18 @@ var Functions = (function () {
     Functions.coalesce = function (a, b, c) {
         return this.isDefined(a) ? a : (this.isDefined(b) ? b : c);
     };
+    /**
+     *
+     */
     Functions.pad = function (x, length, padding, before) {
         while (x.length < length) {
             before ? x = padding + x : x = x + padding;
         }
         return x;
     };
+    /**
+     *
+     */
     Functions.padNumber = function (x, length, first) {
         if (first === void 0) { first = length; }
         return this.pad(x + '', length, '0', true).substring(0, first);
@@ -400,6 +421,9 @@ function operate(value, op, absolute) {
 
 // CONCATENATED MODULE: ./src/Units.ts
 
+/**
+ * Units of time that are compromised of 1 or more days for the [[Calendar]] class.
+ */
 var Units;
 (function (Units) {
     Units[Units["DAY"] = 0] = "DAY";
@@ -413,73 +437,199 @@ var Units;
 
 
 
+/**
+ * A class for a range of time between two [[Day]] timestamps.
+ */
 var DaySpan_DaySpan = (function () {
+    /**
+     * Creates a new span of time.
+     *
+     * @param start The starting timestamp.
+     * @param end The ending timestamp.
+     */
     function DaySpan(start, end) {
         this.start = start;
         this.end = end;
     }
     Object.defineProperty(DaySpan.prototype, "isPoint", {
+        /**
+         * Whether this span starts and ends on the same timestamp.
+         */
         get: function () {
             return this.start.time === this.end.time;
         },
         enumerable: true,
         configurable: true
     });
+    /**
+     * Determines whether the given timestamp lies between the start and end
+     * timestamp.
+     *
+     * @param day The timestamp to test.
+     * @returns True if the day is >= the start and <= the end of this span.
+     */
     DaySpan.prototype.contains = function (day) {
         return day.time >= this.start.time && day.time <= this.end.time;
     };
+    /**
+     * Determines whether the given timestamp is between the start and end
+     * timestamp or lies on the same day as the start or end timestamp.
+     *
+     * @param day The timestamp to test.
+     * @see [[Day.sameDay]]
+     */
     DaySpan.prototype.matchesDay = function (day) {
         return this.contains(day) || day.sameDay(this.start) || day.sameDay(this.end);
     };
+    /**
+     * Determines whether the given timestamp is between the start and end
+     * timestamp or lies on the same week as the start or end timestamp.
+     *
+     * @param day The timestamp to test.
+     * @see [[Day.sameWeek]]
+     */
     DaySpan.prototype.matchesWeek = function (day) {
         return this.contains(day) || day.sameWeek(this.start) || day.sameWeek(this.end);
     };
+    /**
+     * Determines whether the given timestamp is between the start and end
+     * timestamp or lies on the same month as the start or end timestamp.
+     *
+     * @param day The timestamp to test.
+     * @see [[Day.sameMonth]]
+     */
     DaySpan.prototype.matchesMonth = function (day) {
         return this.contains(day) || day.sameMonth(this.start) || day.sameMonth(this.end);
     };
+    /**
+     * Determines whether the given timestamp is between the start and end
+     * timestamp or lies on the same year as the start or end timestamp.
+     *
+     * @param day The timestamp to test.
+     * @see [[Day.sameYear]]
+     */
     DaySpan.prototype.matchesYear = function (day) {
         return this.contains(day) || day.sameYear(this.start) || day.sameYear(this.end);
     };
+    /**
+     * Calculates the number of milliseconds between the start and end timestamp.
+     *
+     * @param op The operation to perform on the result.
+     * @param absolute Whether the result should always be positive.
+     * @returns The time between the start and end timestamp.
+     * @see [[Day.millisBetween]]
+     */
     DaySpan.prototype.millis = function (op, absolute) {
         if (op === void 0) { op = Op.DOWN; }
         if (absolute === void 0) { absolute = true; }
         return this.start.millisBetween(this.end, op, absolute);
     };
+    /**
+     * Calculates the number of seconds between the start and end timestamp.
+     *
+     * @param op The operation to perform on the result.
+     * @param absolute Whether the result should always be positive.
+     * @returns The time between the start and end timestamp.
+     * @see [[Day.secondsBetween]]
+     */
     DaySpan.prototype.seconds = function (op, absolute) {
         if (op === void 0) { op = Op.DOWN; }
         if (absolute === void 0) { absolute = true; }
         return this.start.secondsBetween(this.end, op, absolute);
     };
+    /**
+     * Calculates the number of minutes between the start and end timestamp.
+     *
+     * @param op The operation to perform on the result.
+     * @param absolute Whether the result should always be positive.
+     * @returns The time between the start and end timestamp.
+     * @see [[Day.minutesBetween]]
+     */
     DaySpan.prototype.minutes = function (op, absolute) {
         if (op === void 0) { op = Op.DOWN; }
         if (absolute === void 0) { absolute = true; }
         return this.start.minutesBetween(this.end, op, absolute);
     };
+    /**
+     * Calculates the number of hours between the start and end timestamp.
+     *
+     * @param op The operation to perform on the result.
+     * @param absolute Whether the result should always be positive.
+     * @returns The time between the start and end timestamp.
+     * @see [[Day.hoursBetween]]
+     */
     DaySpan.prototype.hours = function (op, absolute) {
         if (op === void 0) { op = Op.DOWN; }
         if (absolute === void 0) { absolute = true; }
         return this.start.hoursBetween(this.end, op, absolute);
     };
+    /**
+     * Calculates the number of days between the start and end timestamp.
+     *
+     * @param op The operation to perform on the result.
+     * @param absolute Whether the result should always be positive.
+     * @returns The time between the start and end timestamp.
+     * @see [[Day.daysBetween]]
+     */
     DaySpan.prototype.days = function (op, absolute) {
         if (op === void 0) { op = Op.DOWN; }
         if (absolute === void 0) { absolute = true; }
         return this.start.daysBetween(this.end, op, absolute);
     };
+    /**
+     * Calculates the number of weeks between the start and end timestamp.
+     *
+     * @param op The operation to perform on the result.
+     * @param absolute Whether the result should always be positive.
+     * @returns The time between the start and end timestamp.
+     * @see [[Day.weeksBetween]]
+     */
     DaySpan.prototype.weeks = function (op, absolute) {
         if (op === void 0) { op = Op.DOWN; }
         if (absolute === void 0) { absolute = true; }
         return this.start.weeksBetween(this.end, op, absolute);
     };
+    /**
+     * Calculates the number of months between the start and end timestamp.
+     *
+     * @param op The operation to perform on the result.
+     * @param absolute Whether the result should always be positive.
+     * @returns The time between the start and end timestamp.
+     * @see [[Day.monthsBetween]]
+     */
     DaySpan.prototype.months = function (op, absolute) {
         if (op === void 0) { op = Op.DOWN; }
         if (absolute === void 0) { absolute = true; }
         return this.start.monthsBetween(this.end, op, absolute);
     };
+    /**
+     * Calculates the number of years between the start and end timestamp.
+     *
+     * @param op The operation to perform on the result.
+     * @param absolute Whether the result should always be positive.
+     * @returns The time between the start and end timestamp.
+     * @see [[Day.yearsBetween]]
+     */
     DaySpan.prototype.years = function (op, absolute) {
         if (op === void 0) { op = Op.DOWN; }
         if (absolute === void 0) { absolute = true; }
         return this.start.yearsBetween(this.end, op, absolute);
     };
+    /**
+     * Summarizes this span given an approximate unit of time and a few other
+     * options. If the start and end are on the same unit, a single value will
+     * be returned. Otherwise a start and end will be returned with a `delimiter`.
+     *
+     * @param type The unit of time this span is for.
+     * @param dayOfWeek When `true` the weekday of the start and end are included.
+     * @param short When `true` the short form of weekdays and months will be used.
+     * @param repeat When `true` the year will be repeated on the start and end
+     *  timestamp even if they are the same year.
+     * @param contextual When `true` the year will be hidden if it's the current
+     *  year.
+     * @param delimiter The string to separate the start and end timestamps with.
+     * @returns The summary of this span.
+     */
     DaySpan.prototype.summary = function (type, dayOfWeek, short, repeat, contextual, delimiter) {
         if (dayOfWeek === void 0) { dayOfWeek = true; }
         if (short === void 0) { short = false; }
@@ -505,18 +655,52 @@ var DaySpan_DaySpan = (function () {
         }
         return summary;
     };
+    /**
+     * Determines whether the gven span intersects with this span.
+     *
+     * @param span The span to test.
+     * @returns `true` if the spans intersect, otherwise `false`.
+     */
     DaySpan.prototype.intersects = function (span) {
         return !(this.end.time < span.start.time ||
             this.start.time > span.end.time);
     };
+    /**
+     * Calculates the intersection between this span and the given span. If there
+     * is no intersection between the two spans then `null` is returned.
+     *
+     * @param span The span to calculate the intersection with.
+     * @returns The intersection or `null` if none exists.
+     */
     DaySpan.prototype.intersection = function (span) {
-        var start = Math.max(this.start.time, span.start.time);
-        var end = Math.min(this.end.time, span.end.time);
-        return start >= end ? null : new DaySpan(Day_Day.unix(start), Day_Day.unix(end));
+        var start = this.start.max(span.start);
+        var end = this.end.min(span.end);
+        return start.isAfter(end) ? null : new DaySpan(start, end);
     };
+    /**
+     * Calculates the union between this span and the given span.
+     *
+     * @param span The span to calculate the union with.
+     * @returns The union of the two spans.
+     */
+    DaySpan.prototype.union = function (span) {
+        var start = this.start.min(span.start);
+        var end = this.end.max(span.end);
+        return new DaySpan(start, end);
+    };
+    /**
+     * Returns a point [[DaySpan]] with the same start and end timestamp.
+     *
+     * @param day The timestamp which will be the start and end.
+     * @returns The new instance.
+     * @see [[DaySpan.isPoint]]
+     */
     DaySpan.point = function (day) {
         return new DaySpan(day, day);
     };
+    /**
+     * Formatting functions which assist the [[DaySpan.summary]] function.
+     */
     DaySpan.SUMMARY_FORMATS = (DaySpan__a = {},
         DaySpan__a[Units.DAY] = function (short, dayOfWeek, year) {
             return (dayOfWeek ? (short ? 'ddd, ' : 'dddd, ') : '') + (short ? 'MMM ' : 'MMMM ') + 'Do' + (year ? ' YYYY' : '');
@@ -552,6 +736,9 @@ var Suffix = (function () {
     function Suffix() {
     }
     Object.defineProperty(Suffix, "CACHE", {
+        /**
+         *
+         */
         get: function () {
             if (!this._CACHE) {
                 this._CACHE = [];
@@ -564,9 +751,15 @@ var Suffix = (function () {
         enumerable: true,
         configurable: true
     });
+    /**
+     *
+     */
     Suffix.determine = function (value) {
         return value >= 11 && value <= 13 ? 'th' : this.MAP[value % this.MAP.length];
     };
+    /**
+     *
+     */
     Suffix.get = function (value, append) {
         if (append === void 0) { append = false; }
         var suffix = this.determine(value);
@@ -578,6 +771,9 @@ var Suffix = (function () {
     Suffix.MAP = [
         'th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'
     ];
+    /**
+     *
+     */
     Suffix._CACHE_SIZE = 366;
     return Suffix;
 }());
@@ -595,23 +791,38 @@ var Suffix = (function () {
 
 // @ts-ignore
 
+/**
+ *
+ */
 var Schedule_Schedule = (function () {
+    /**
+     *
+     */
     function Schedule(input) {
         if (Functions.isDefined(input)) {
             this.set(input);
         }
     }
+    /**
+     *
+     */
+    Schedule.prototype.set = function (input) {
+        Parse_Parse.schedule(input, this);
+        return this;
+    };
     Object.defineProperty(Schedule.prototype, "lastTime", {
+        /**
+         *
+         */
         get: function () {
             return this.times[this.times.length - 1];
         },
         enumerable: true,
         configurable: true
     });
-    Schedule.prototype.set = function (input) {
-        Parse_Parse.schedule(input, this);
-        return this;
-    };
+    /**
+     *
+     */
     Schedule.prototype.updateDurationInDays = function () {
         var start = this.lastTime ? this.lastTime.toMilliseconds() : 0;
         var duration = this.duration * (Constants.DURATION_TO_MILLIS[this.durationUnit] || 0);
@@ -620,35 +831,71 @@ var Schedule_Schedule = (function () {
         this.durationInDays = Math.max(0, Math.ceil((start + duration - exclude) / day));
         return this;
     };
+    /**
+     *
+     */
+    Schedule.prototype.updateChecks = function () {
+        this.checks = Parse_Parse.givenFrequency([
+            this.year,
+            this.month,
+            this.week,
+            this.weekOfYear,
+            this.fullWeekOfYear,
+            this.weekspanOfYear,
+            this.lastFullWeekOfYear,
+            this.lastWeekspanOfYear,
+            this.weekOfMonth,
+            this.weekspanOfMonth,
+            this.fullWeekOfMonth,
+            this.lastWeekspanOfMonth,
+            this.lastFullWeekOfMonth,
+            this.dayOfWeek,
+            this.dayOfMonth,
+            this.lastDayOfMonth,
+            this.dayOfYear
+        ]);
+        return this;
+    };
+    /**
+     *
+     */
     Schedule.prototype.matchesSpan = function (day) {
         return (this.start === null || day.isSameOrAfter(this.start)) &&
             (this.end === null || day.isBefore(this.end));
     };
+    /**
+     *
+     */
     Schedule.prototype.matchesRange = function (start, end) {
         return (this.start === null || start.isSameOrBefore(this.start)) &&
             (this.end === null || end.isBefore(this.end));
     };
+    /**
+     *
+     */
     Schedule.prototype.isExcluded = function (day) {
         return !!this.exclude[day.dayIdentifier];
     };
+    /**
+     *
+     */
     Schedule.prototype.isIncluded = function (day) {
         return !this.exclude[day.dayIdentifier];
     };
+    /**
+     *
+     */
     Schedule.prototype.matchesDay = function (day) {
-        return this.isIncluded(day) &&
-            this.matchesSpan(day) &&
-            this.dayOfWeek(day.dayOfWeek) &&
-            this.dayOfMonth(day.dayOfMonth) &&
-            this.dayOfYear(day.dayOfYear) &&
-            this.year(day.year) &&
-            this.month(day.month) &&
-            this.week(day.week) &&
-            this.weekOfYear(day.weekOfYear) &&
-            this.weekspanOfYear(day.weekspanOfYear) &&
-            this.fullWeekOfYear(day.fullWeekOfYear) &&
-            this.weekOfMonth(day.weekOfMonth) &&
-            this.weekspanOfMonth(day.weekspanOfMonth) &&
-            this.fullWeekOfMonth(day.fullWeekOfMonth);
+        if (!this.isIncluded(day) || !this.matchesSpan(day)) {
+            return false;
+        }
+        for (var _i = 0, _a = this.checks; _i < _a.length; _i++) {
+            var check = _a[_i];
+            if (!check(day[check.property])) {
+                return false;
+            }
+        }
+        return true;
     };
     /**
      * Determines if the given day is covered by this schedule. A schedule can
@@ -662,6 +909,9 @@ var Schedule_Schedule = (function () {
     Schedule.prototype.coversDay = function (day) {
         return !!this.findStartingDay(day);
     };
+    /**
+     *
+     */
     Schedule.prototype.nextDay = function (day, includeDay, lookAhead) {
         if (includeDay === void 0) { includeDay = false; }
         if (lookAhead === void 0) { lookAhead = 366; }
@@ -673,6 +923,9 @@ var Schedule_Schedule = (function () {
         this.iterateDays(day, 1, true, setNext, includeDay, lookAhead);
         return next;
     };
+    /**
+     *
+     */
     Schedule.prototype.nextDays = function (day, max, includeDay, lookAhead) {
         if (includeDay === void 0) { includeDay = false; }
         if (lookAhead === void 0) { lookAhead = 366; }
@@ -680,6 +933,9 @@ var Schedule_Schedule = (function () {
         this.iterateDays(day, max, true, function (d) { return nexts.push(d); }, includeDay, lookAhead);
         return nexts;
     };
+    /**
+     *
+     */
     Schedule.prototype.prevDay = function (day, includeDay, lookBack) {
         if (includeDay === void 0) { includeDay = false; }
         if (lookBack === void 0) { lookBack = 366; }
@@ -691,6 +947,9 @@ var Schedule_Schedule = (function () {
         this.iterateDays(day, 1, false, setPrev, includeDay, lookBack);
         return prev;
     };
+    /**
+     *
+     */
     Schedule.prototype.prevDays = function (day, max, includeDay, lookBack) {
         if (includeDay === void 0) { includeDay = false; }
         if (lookBack === void 0) { lookBack = 366; }
@@ -698,6 +957,9 @@ var Schedule_Schedule = (function () {
         this.iterateDays(day, max, false, function (d) { return prevs.push(d); }, includeDay, lookBack);
         return prevs;
     };
+    /**
+     *
+     */
     Schedule.prototype.iterateDays = function (day, max, next, onDay, includeDay, lookup) {
         if (includeDay === void 0) { includeDay = false; }
         if (lookup === void 0) { lookup = 366; }
@@ -717,6 +979,9 @@ var Schedule_Schedule = (function () {
         }
         return this;
     };
+    /**
+     *
+     */
     Schedule.prototype.matchesTime = function (day) {
         if (!this.matchesDay(day)) {
             return false;
@@ -729,19 +994,31 @@ var Schedule_Schedule = (function () {
         }
         return false;
     };
+    /**
+     *
+     */
     Schedule.prototype.isFullDay = function () {
         return this.times.length === 0;
     };
+    /**
+     *
+     */
     Schedule.prototype.getFullSpan = function (day) {
         var start = day.start();
         var end = start.add(this.duration, this.durationUnit);
         return new DaySpan_DaySpan(start, end);
     };
+    /**
+     *
+     */
     Schedule.prototype.getTimeSpan = function (day, time) {
         var start = day.withTime(time);
         var end = start.add(this.duration, this.durationUnit);
         return new DaySpan_DaySpan(start, end);
     };
+    /**
+     *
+     */
     Schedule.prototype.getSpansOver = function (day) {
         var spans = [];
         var start = this.findStartingDay(day);
@@ -762,10 +1039,16 @@ var Schedule_Schedule = (function () {
         }
         return spans;
     };
+    /**
+     *
+     */
     Schedule.prototype.getSpanOver = function (day) {
         var start = this.findStartingDay(day);
         return start ? this.getFullSpan(start) : null;
     };
+    /**
+     *
+     */
     Schedule.prototype.getSpansOn = function (day, check) {
         if (check === void 0) { check = false; }
         var spans = [];
@@ -784,6 +1067,9 @@ var Schedule_Schedule = (function () {
         }
         return spans;
     };
+    /**
+     *
+     */
     Schedule.prototype.findStartingDay = function (day) {
         var behind = this.durationInDays;
         while (behind >= 0) {
@@ -795,6 +1081,9 @@ var Schedule_Schedule = (function () {
         }
         return null;
     };
+    /**
+     *
+     */
     Schedule.prototype.getExclusions = function (returnDays) {
         if (returnDays === void 0) { returnDays = true; }
         var exclusions = [];
@@ -804,6 +1093,9 @@ var Schedule_Schedule = (function () {
         }
         return exclusions;
     };
+    /**
+     *
+     */
     Schedule.prototype.toInput = function (returnDays, returnTimes, timeFormat, alwaysDuration) {
         if (returnDays === void 0) { returnDays = false; }
         if (returnTimes === void 0) { returnTimes = false; }
@@ -821,12 +1113,24 @@ var Schedule_Schedule = (function () {
             out.start = returnDays ? this.start : this.start.time;
         if (this.end)
             out.end = returnDays ? this.end : this.end.time;
+        if (times.length)
+            out.times = times;
+        if (alwaysDuration || this.duration !== Constants.DURATION_DEFAULT)
+            out.duration = this.duration;
+        if (alwaysDuration || this.durationUnit !== defaultUnit)
+            out.durationUnit = this.durationUnit;
+        if (exclusions.length)
+            out.exclude = exclusions;
         if (this.dayOfWeek.input)
             out.dayOfWeek = this.dayOfWeek.input;
         if (this.dayOfMonth.input)
             out.dayOfMonth = this.dayOfMonth.input;
+        if (this.lastDayOfMonth.input)
+            out.lastDayOfMonth = this.lastDayOfMonth.input;
         if (this.dayOfYear.input)
             out.dayOfYear = this.dayOfYear.input;
+        if (this.year.input)
+            out.year = this.year.input;
         if (this.month.input)
             out.month = this.month.input;
         if (this.week.input)
@@ -837,24 +1141,25 @@ var Schedule_Schedule = (function () {
             out.weekspanOfYear = this.weekspanOfYear.input;
         if (this.fullWeekOfYear.input)
             out.fullWeekOfYear = this.fullWeekOfYear.input;
+        if (this.lastWeekspanOfYear.input)
+            out.lastWeekspanOfYear = this.lastWeekspanOfYear.input;
+        if (this.lastFullWeekOfYear.input)
+            out.lastFullWeekOfYear = this.lastFullWeekOfYear.input;
         if (this.weekOfMonth.input)
             out.weekOfMonth = this.weekOfMonth.input;
         if (this.weekspanOfMonth.input)
             out.weekspanOfMonth = this.weekspanOfMonth.input;
         if (this.fullWeekOfMonth.input)
             out.fullWeekOfMonth = this.fullWeekOfMonth.input;
-        if (this.year.input)
-            out.year = this.year.input;
-        if (times.length)
-            out.times = times;
-        if (exclusions.length)
-            out.exclude = exclusions;
-        if (alwaysDuration || this.duration !== Constants.DURATION_DEFAULT)
-            out.duration = this.duration;
-        if (alwaysDuration || this.durationUnit !== defaultUnit)
-            out.durationUnit = this.durationUnit;
+        if (this.lastWeekspanOfMonth.input)
+            out.lastWeekspanOfMonth = this.lastWeekspanOfMonth.input;
+        if (this.lastFullWeekOfMonth.input)
+            out.lastFullWeekOfMonth = this.lastFullWeekOfMonth.input;
         return out;
     };
+    /**
+     *
+     */
     Schedule.prototype.describe = function (thing, includeRange, includeTimes, includeDuration, includeExcludes) {
         if (thing === void 0) { thing = 'event'; }
         if (includeRange === void 0) { includeRange = true; }
@@ -880,16 +1185,21 @@ var Schedule_Schedule = (function () {
             out += 'The ' + thing + ' will occur';
         }
         out += this.describeRule(this.dayOfWeek.input, 'day of the week', function (x) { return __WEBPACK_IMPORTED_MODULE_6_moment__["weekdays"]()[x]; }, 1, false);
+        out += this.describeRule(this.lastDayOfMonth.input, 'last day of the month', function (x) { return Suffix.CACHE[x]; });
         out += this.describeRule(this.dayOfMonth.input, 'day of the month', function (x) { return Suffix.CACHE[x]; });
         out += this.describeRule(this.dayOfYear.input, 'day of the year', function (x) { return Suffix.CACHE[x]; }, 1);
+        out += this.describeRule(this.year.input, 'year', function (x) { return x; }, 0, false, ' in ');
         out += this.describeRule(this.month.input, 'month', function (x) { return __WEBPACK_IMPORTED_MODULE_6_moment__["months"]()[x]; }, 0, false, ' in ');
         out += this.describeRule(this.weekOfYear.input, 'week of the year', function (x) { return Suffix.CACHE[x]; });
         out += this.describeRule(this.weekspanOfYear.input, 'weekspan of the year', function (x) { return Suffix.CACHE[x + 1]; }, 1);
         out += this.describeRule(this.fullWeekOfYear.input, 'full week of the year', function (x) { return Suffix.CACHE[x]; });
+        out += this.describeRule(this.lastWeekspanOfYear.input, 'last weekspan of the year', function (x) { return Suffix.CACHE[x + 1]; }, 1);
+        out += this.describeRule(this.lastFullWeekOfYear.input, 'last full week of the year', function (x) { return Suffix.CACHE[x]; });
         out += this.describeRule(this.weekOfMonth.input, 'week of the month', function (x) { return Suffix.CACHE[x]; });
         out += this.describeRule(this.fullWeekOfMonth.input, 'full week of the month', function (x) { return Suffix.CACHE[x]; });
         out += this.describeRule(this.weekspanOfMonth.input, 'weekspan of the month', function (x) { return Suffix.CACHE[x + 1]; }, 1);
-        out += this.describeRule(this.year.input, 'year', function (x) { return x; }, 0, false, ' in ');
+        out += this.describeRule(this.lastFullWeekOfMonth.input, 'last full week of the month', function (x) { return Suffix.CACHE[x]; });
+        out += this.describeRule(this.lastWeekspanOfMonth.input, 'last weekspan of the month', function (x) { return Suffix.CACHE[x + 1]; }, 1);
         if (includeTimes && this.times.length) {
             out += ' at ';
             out += this.describeArray(this.times, function (x) { return x.format('hh:mm a'); });
@@ -909,6 +1219,9 @@ var Schedule_Schedule = (function () {
         }
         return out;
     };
+    /**
+     *
+     */
     Schedule.prototype.describeRule = function (value, unit, map, everyOffset, the, on, required) {
         if (everyOffset === void 0) { everyOffset = 0; }
         if (the === void 0) { the = true; }
@@ -936,6 +1249,9 @@ var Schedule_Schedule = (function () {
         }
         return out;
     };
+    /**
+     *
+     */
     Schedule.prototype.describeArray = function (array, map) {
         var out = '';
         var last = array.length - 1;
@@ -957,7 +1273,19 @@ var Schedule_Schedule = (function () {
 
 
 
+/**
+ * A class which holds a specific time during in any day.
+ */
 var Time_Time = (function () {
+    /**
+     * Creates a new Time instance given an hour and optionally a minute, second,
+     * and millisecond. If they have not been specified they default to 0.
+     *
+     * @param hour The hour.
+     * @param minute The minute.
+     * @param second The second.
+     * @param millisecond The millisecond.
+     */
     function Time(hour, minute, second, millisecond) {
         if (minute === void 0) { minute = Constants.MINUTE_MIN; }
         if (second === void 0) { second = Constants.SECOND_MIN; }
@@ -967,6 +1295,33 @@ var Time_Time = (function () {
         this.second = second;
         this.millisecond = millisecond;
     }
+    /**
+     * Formats this time into a string. The following list describes the available
+     * formatting patterns:
+     *
+     * ### Hour
+     * - H: 0-23
+     * - HH: 00-23
+     * - h: 12,1-12,1-11
+     * - hh: 12,01-12,01-11
+     * - k: 1-24
+     * - kk: 01-24
+     * - a: am,pm
+     * - A: AM,PM
+     * ### Minute
+     * - m: 0-59
+     * - mm: 00-59
+     * ### Second
+     * - s: 0-59
+     * - ss: 00-59
+     * ### Millisecond
+     * - S: 0-9
+     * - SS: 00-99
+     * - SSS: 000-999
+     *
+     * @param format The format to output.
+     * @returns The formatted time.
+     */
     Time.prototype.format = function (format) {
         var formatterEntries = Time.FORMATTERS;
         var out = '';
@@ -990,12 +1345,20 @@ var Time_Time = (function () {
         }
         return out;
     };
+    /**
+     * @returns The number of milliseconds from the start of the day until this
+     *  time.
+     */
     Time.prototype.toMilliseconds = function () {
         return this.hour * Constants.MILLIS_IN_HOUR +
             this.minute * Constants.MILLIS_IN_MINUTE +
             this.second * Constants.MILLIS_IN_SECOND +
             this.millisecond;
     };
+    /**
+     * @returns The time formatted using the smallest format that completely
+     *  represents this time.
+     */
     Time.prototype.toString = function () {
         if (this.millisecond)
             return this.format('HH:mm:ss.SSS');
@@ -1005,12 +1368,20 @@ var Time_Time = (function () {
             return this.format('HH:mm');
         return this.format('HH');
     };
+    /**
+     * @returns A unique identifier for this time. The number returned is in the
+     *  following format: SSSssmmHH
+     */
     Time.prototype.toIdentifer = function () {
         return this.hour +
             this.minute * 100 +
             this.second * 10000 +
             this.millisecond * 10000000;
     };
+    /**
+     * @returns An object with hour, minute, second, a millisecond properties if
+     *  they are non-zero on this time.
+     */
     Time.prototype.toObject = function () {
         var out = {
             hour: this.hour
@@ -1023,9 +1394,24 @@ var Time_Time = (function () {
             out.millisecond = this.millisecond;
         return out;
     };
+    /**
+     * Parses a value and tries to convert it to a Time instance.
+     *
+     * @param input The input to parse.
+     * @returns The instance parsed or `null` if it was invalid.
+     * @see [[Parse.time]]
+     */
     Time.parse = function (input) {
         return Parse_Parse.time(input);
     };
+    /**
+     * Parses a string and converts it to a Time instance. If the string is not
+     * in a valid format `null` is returned.
+     *
+     * @param time The string to parse.
+     * @returns The instance parsed or `null` if it was invalid.
+     * @see [[Time.REGEX]]
+     */
     Time.fromString = function (time) {
         var matches = this.REGEX.exec(time);
         if (!matches) {
@@ -1037,6 +1423,13 @@ var Time_Time = (function () {
         var l = parseInt(matches[4]) || 0;
         return this.build(h, m, s, l);
     };
+    /**
+     * Parses a number and converts it to a Time instance. The number is assumed
+     * to be in the [[Time.toIdentifier]] format.
+     *
+     * @param time The number to parse.
+     * @returns The instance parsed.
+     */
     Time.fromIdentifier = function (time) {
         var h = time % 100;
         var m = Math.floor(time / 100) % 100;
@@ -1044,13 +1437,34 @@ var Time_Time = (function () {
         var l = Math.floor(time / 10000000) % 1000;
         return this.build(h, m, s, l);
     };
+    /**
+     * Returns a new instance given an hour and optionally a minute, second,
+     * and millisecond. If they have not been specified they default to 0.
+     *
+     * @param hour The hour.
+     * @param minute The minute.
+     * @param second The second.
+     * @param millisecond The millisecond.
+     * @returns A new instance.
+     */
     Time.build = function (hour, minute, second, millisecond) {
         if (minute === void 0) { minute = Constants.MINUTE_MIN; }
         if (second === void 0) { second = Constants.SECOND_MIN; }
         if (millisecond === void 0) { millisecond = Constants.MILLIS_MIN; }
         return new Time(hour, minute, second, millisecond);
     };
+    /**
+     * The regular expression used to parse a time from a string.
+     *
+     * - ## = hour
+     * - ##:## = hour & minute
+     * - ##:##:## = hour, minute, & second
+     * - ##:##:##.### = hour, minute, second, and milliseconds
+     */
     Time.REGEX = /^(\d\d?):?(\d\d)?:?(\d\d)?\.?(\d\d\d)?$/;
+    /**
+     * A set of formatting functions keyed by their format string.
+     */
     Time.FORMATTERS = [
         {
             size: 3,
@@ -1103,20 +1517,22 @@ var Parse_Parse = (function () {
     /**
      * Parses a value and converts it to a [[FrequencyCheck]].
      *
+     * @param input The input to parse into a function.
+     * @returns A function which determines whether a value matches a frequency.
      * @see [[Schedule]]
      */
-    Parse.frequency = function (input, otherwiseEvery, otherwiseOffset) {
-        if (otherwiseEvery === void 0) { otherwiseEvery = 1; }
-        if (otherwiseOffset === void 0) { otherwiseOffset = 0; }
+    Parse.frequency = function (input, property) {
         var check = function (value) {
-            return value % otherwiseEvery === otherwiseOffset;
+            return true;
         };
+        check.given = false;
         if (Functions.isFrequencyValueEvery(input)) {
             var offset_1 = input.offset || 0;
             var every_1 = input.every;
             check = function (value) {
                 return value % every_1 === offset_1;
             };
+            check.given = true;
         }
         if (Functions.isFrequencyValueOneOf(input)) {
             var map_1 = {};
@@ -1126,8 +1542,10 @@ var Parse_Parse = (function () {
             check = function (value) {
                 return !!map_1[value];
             };
+            check.given = true;
         }
         check.input = input;
+        check.property = property;
         return check;
     };
     /**
@@ -1150,7 +1568,7 @@ var Parse_Parse = (function () {
             return Day_Day.unix(input);
         }
         else if (Functions.isString(input)) {
-            return Day_Day.parse(input);
+            return Day_Day.fromString(input);
         }
         else if (input instanceof Day_Day) {
             return input;
@@ -1277,20 +1695,43 @@ var Parse_Parse = (function () {
         out.durationUnit = Functions.coalesce(input.durationUnit, Constants.DURATION_DEFAULT_UNIT(fullDay));
         out.start = this.day(input.start);
         out.end = this.day(input.end);
-        out.dayOfWeek = this.frequency(input.dayOfWeek);
-        out.dayOfMonth = this.frequency(input.dayOfMonth);
-        out.dayOfYear = this.frequency(input.dayOfYear);
-        out.month = this.frequency(input.month);
-        out.week = this.frequency(input.week);
-        out.weekOfYear = this.frequency(input.weekOfYear);
-        out.weekspanOfYear = this.frequency(input.weekspanOfYear);
-        out.fullWeekOfYear = this.frequency(input.fullWeekOfYear);
-        out.weekOfMonth = this.frequency(input.weekOfMonth);
-        out.weekspanOfMonth = this.frequency(input.weekspanOfMonth);
-        out.fullWeekOfMonth = this.frequency(input.fullWeekOfMonth);
-        out.year = this.frequency(input.year);
         out.exclude = this.exclusions(input.exclude);
+        out.year = this.frequency(input.year, 'year');
+        out.month = this.frequency(input.month, 'month');
+        out.week = this.frequency(input.week, 'week');
+        out.weekOfYear = this.frequency(input.weekOfYear, 'weekOfYear');
+        out.weekspanOfYear = this.frequency(input.weekspanOfYear, 'weekspanOfYear');
+        out.fullWeekOfYear = this.frequency(input.fullWeekOfYear, 'fullWeekOfYear');
+        out.lastWeekspanOfYear = this.frequency(input.lastWeekspanOfYear, 'lastWeekspanOfYear');
+        out.lastFullWeekOfYear = this.frequency(input.lastFullWeekOfYear, 'lastFullWeekOfYear');
+        out.weekOfMonth = this.frequency(input.weekOfMonth, 'weekOfMonth');
+        out.weekspanOfMonth = this.frequency(input.weekspanOfMonth, 'weekspanOfMonth');
+        out.fullWeekOfMonth = this.frequency(input.fullWeekOfMonth, 'fullWeekOfMonth');
+        out.lastWeekspanOfMonth = this.frequency(input.lastWeekspanOfMonth, 'lastWeekspanOfMonth');
+        out.lastFullWeekOfMonth = this.frequency(input.lastFullWeekOfMonth, 'lastFullWeekOfMonth');
+        out.dayOfWeek = this.frequency(input.dayOfWeek, 'dayOfWeek');
+        out.dayOfMonth = this.frequency(input.dayOfMonth, 'dayOfMonth');
+        out.lastDayOfMonth = this.frequency(input.lastDayOfMonth, 'lastDayOfMonth');
+        out.dayOfYear = this.frequency(input.dayOfYear, 'dayOfYear');
         out.updateDurationInDays();
+        out.updateChecks();
+        return out;
+    };
+    /**
+     * Parses an array of [[FrequencyCheck]] functions and returns an array of
+     * functions for only the checks that were specified by the user.
+     *
+     * @param checks The array of check functions to filter through.
+     * @returns The array of user specified checks.
+     */
+    Parse.givenFrequency = function (checks) {
+        var out = [];
+        for (var _i = 0, checks_1 = checks; _i < checks_1.length; _i++) {
+            var check = checks_1[_i];
+            if (check.given) {
+                out.push(check);
+            }
+        }
         return out;
     };
     /**
@@ -1329,7 +1770,13 @@ var Parse_Parse = (function () {
 
 // @ts-ignore
 
+/**
+ *
+ */
 var Day_Day = (function () {
+    /**
+     *
+     */
     function Day(date) {
         this.date = date;
         this.time = date.unix();
@@ -1344,58 +1791,105 @@ var Day_Day = (function () {
         this.dayOfMonth = date.date();
         this.dayOfYear = date.dayOfYear();
         this.week = date.week();
+        this.lastDayOfMonth = Day.getLastDayOfMonth(date);
         this.weekOfYear = Day.getWeekOfYear(date);
         this.weekspanOfYear = Day.getWeekspanOfYear(date);
         this.fullWeekOfYear = Day.getFullWeekOfYear(date);
+        this.lastWeekspanOfYear = Day.getLastWeekspanOfYear(date);
+        this.lastFullWeekOfYear = Day.getLastFullWeekOfYear(date);
         this.weekOfMonth = Day.getWeekOfMonth(date);
         this.weekspanOfMonth = Day.getWeekspanOfMonth(date);
         this.fullWeekOfMonth = Day.getFullWeekOfMonth(date);
+        this.lastWeekspanOfMonth = Day.getLastWeekspanOfMonth(date);
+        this.lastFullWeekOfMonth = Day.getLastFullWeekOfMonth(date);
         this.dayIdentifier = Day.getDayIdentifier(date);
         this.weekIdentifier = Day.getWeekIdentifier(date);
         this.monthIdentifier = Day.getMonthIdentifier(date);
         this.quarterIdentifier = Day.getQuarterIdentifier(date);
     }
     // Same
+    /**
+     *
+     */
     Day.prototype.sameDay = function (day) {
         return this.dayIdentifier === day.dayIdentifier;
     };
+    /**
+     *
+     */
     Day.prototype.sameMonth = function (day) {
         return this.monthIdentifier === day.monthIdentifier;
     };
+    /**
+     *
+     */
     Day.prototype.sameWeek = function (day) {
         return this.weekIdentifier === day.weekIdentifier;
     };
+    /**
+     *
+     */
     Day.prototype.sameYear = function (day) {
         return this.year === day.year;
     };
+    /**
+     *
+     */
     Day.prototype.sameQuarter = function (day) {
         return this.quarterIdentifier === day.quarterIdentifier;
     };
+    /**
+     *
+     */
     Day.prototype.sameHour = function (day) {
         return this.dayIdentifier === day.dayIdentifier && this.hour === day.hour;
     };
+    /**
+     *
+     */
     Day.prototype.sameMinute = function (day) {
         return this.dayIdentifier === day.dayIdentifier && this.hour === day.hour && this.minute === day.minute;
     };
+    /**
+     *
+     */
     Day.prototype.sameTime = function (time) {
         return this.hour === time.hour && this.minute === time.minute && this.seconds === time.second && this.millis === time.millisecond;
     };
     // Comparison
+    /**
+     *
+     */
     Day.prototype.isBefore = function (day, precision) {
         return this.date.isBefore(day.date, precision);
     };
+    /**
+     *
+     */
     Day.prototype.isSameOrBefore = function (day, precision) {
         return this.date.isSameOrBefore(day.date, precision);
     };
+    /**
+     *
+     */
     Day.prototype.isAfter = function (day, precision) {
         return this.date.isAfter(day.date, precision);
     };
+    /**
+     *
+     */
     Day.prototype.isSameOrAfter = function (day, precision) {
         return this.date.isSameOrAfter(day.date, precision);
     };
+    /**
+     *
+     */
     Day.prototype.max = function (day) {
         return this.date.isAfter(day.date) ? this : day;
     };
+    /**
+     *
+     */
     Day.prototype.min = function (day) {
         return this.date.isBefore(day.date) ? this : day;
     };
@@ -1757,6 +2251,11 @@ var Day_Day = (function () {
     Day.getWeekspanOfYear = function (date) {
         return Math.floor((date.dayOfYear() - 1) / Constants.DAYS_IN_WEEK);
     };
+    Day.getLastWeekspanOfYear = function (date) {
+        var lastOfYear = date.clone().endOf('year');
+        var daysInYear = lastOfYear.dayOfYear();
+        return Math.floor((daysInYear - date.dayOfYear()) / Constants.DAYS_IN_WEEK);
+    };
     Day.getWeekOfYear = function (date) {
         var firstOfYear = date.clone().startOf('year');
         var weeks = date.week();
@@ -1767,17 +2266,33 @@ var Day_Day = (function () {
         var weeks = date.week();
         return firstOfYear.day() === Constants.WEEKDAY_MIN ? weeks : weeks - 1;
     };
+    Day.getLastFullWeekOfYear = function (date) {
+        var firstOfYear = date.clone().startOf('year');
+        var weeks = date.week();
+        var weeksMax = date.weeksInYear();
+        var lastWeek = weeksMax - weeks;
+        return firstOfYear.day() === Constants.WEEKDAY_MIN ? lastWeek + 1 : lastWeek;
+    };
     Day.getWeekspanOfMonth = function (date) {
         return Math.floor((date.date() - 1) / Constants.DAYS_IN_WEEK);
     };
+    Day.getLastWeekspanOfMonth = function (date) {
+        return Math.floor((date.daysInMonth() - date.date()) / Constants.DAYS_IN_WEEK);
+    };
     Day.getFullWeekOfMonth = function (date) {
         return Math.floor((date.date() - 1 - date.day() + Constants.DAYS_IN_WEEK) / Constants.DAYS_IN_WEEK);
+    };
+    Day.getLastFullWeekOfMonth = function (date) {
+        return Math.floor((date.daysInMonth() - date.date() - (Constants.WEEKDAY_MAX - date.day()) + Constants.DAYS_IN_WEEK) / Constants.DAYS_IN_WEEK);
     };
     Day.getWeekOfMonth = function (date) {
         var dom = date.date();
         var dow = date.day();
         var sundayDate = dom - dow;
         return Math.floor((sundayDate + Constants.WEEK_OF_MONTH_MINIMUM_WEEKDAY + 5) / Constants.DAYS_IN_WEEK);
+    };
+    Day.getLastDayOfMonth = function (date) {
+        return date.daysInMonth() - date.date() + 1;
     };
     Day.getWeekIdentifier = function (date) {
         return date.week() + date.year() * 100;
@@ -1791,12 +2306,15 @@ var Day_Day = (function () {
     Day.getQuarterIdentifier = function (date) {
         return date.quarter() + date.year() * 10;
     };
+    /**
+     *
+     */
     Day.LOAD_TIME = Day.now();
     return Day;
 }());
 
 
-// CONCATENATED MODULE: ./src/Calendar.ts
+// CONCATENATED MODULE: ./src/CalendarDay.ts
 
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -1810,28 +2328,71 @@ var __extends = (this && this.__extends) || (function () {
 })();
 
 
-
-
-
-
-
-var Calendar_CalendarDay = (function (_super) {
+/**
+ * A day in a [[Calendar]] with extra information relative to any selection on
+ * the calendar, the current date, or events on the day.
+ */
+var CalendarDay_CalendarDay = (function (_super) {
     __extends(CalendarDay, _super);
     function CalendarDay() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
+        /**
+         * Whether this day is the current day (ex: today).
+         */
         _this.currentDay = false;
+        /**
+         * Whether this day is on the same week as the current day (ex: today).
+         */
         _this.currentWeek = false;
+        /**
+         * Whether this day is on the same month as the current day (ex: today).
+         */
         _this.currentMonth = false;
+        /**
+         * Whether this day is on the same year as the current day (ex: today).
+         */
         _this.currentYear = false;
+        /**
+         * How many days away this day is from the current day (ex: today). If this
+         * day is the current day the offset is 0. If this day is before the current
+         * day it will be the negative number of days away. Otherwise this will be
+         * positive meaning this day is after the current day by the given days.
+         */
         _this.currentOffset = 0;
+        /**
+         * Whether this day is part of a selection on the calendar.
+         */
         _this.selectedDay = false;
+        /**
+         * Whether this day is on the same week that the calendar selection is.
+         */
         _this.selectedWeek = false;
+        /**
+         * Whether this day is on the same month that the calendar selection is.
+         */
         _this.selectedMonth = false;
+        /**
+         * Whether this day is on the same year that the calendar selection is.
+         */
         _this.selectedYear = false;
+        /**
+         * Whether this day is in the current calendar or not. Some days are outside
+         * the calendar span and used to fill in weeks. Month calendars will fill in
+         * days so the list of days in the calendar start on Sunday and end on Saturday.
+         */
         _this.inCalendar = false;
+        /**
+         * The list of events on this day based on the settings and schedules in the
+         * calendar.
+         */
         _this.events = [];
         return _this;
     }
+    /**
+     * Updates the current flags on this day given the current day (ex: today).
+     *
+     * @param current The current day of the calendar.
+     */
     CalendarDay.prototype.updateCurrent = function (current) {
         this.currentDay = this.sameDay(current);
         this.currentWeek = this.sameWeek(current);
@@ -1840,6 +2401,12 @@ var Calendar_CalendarDay = (function (_super) {
         this.currentOffset = this.daysBetween(current, Op.DOWN, false);
         return this;
     };
+    /**
+     * Updates the selection flags on this day given the selection range on the
+     * calendar.
+     *
+     * @param selected The span of days selected on the calendar.
+     */
     CalendarDay.prototype.updateSelected = function (selected) {
         this.selectedDay = selected.matchesDay(this);
         this.selectedWeek = selected.matchesWeek(this);
@@ -1847,6 +2414,10 @@ var Calendar_CalendarDay = (function (_super) {
         this.selectedYear = selected.matchesYear(this);
         return this;
     };
+    /**
+     * Clears the selection flags on this day. This is done when the selection on
+     * the calendar is cleared.
+     */
     CalendarDay.prototype.clearSelected = function () {
         this.selectedDay = this.selectedWeek = this.selectedMonth = this.selectedYear = false;
         return this;
@@ -1854,9 +2425,41 @@ var Calendar_CalendarDay = (function (_super) {
     return CalendarDay;
 }(Day_Day));
 
-var Calendar_CalendarEvent = (function () {
+
+// CONCATENATED MODULE: ./src/CalendarEvent.ts
+
+
+/**
+ * An event on a given day and the schedule that generated the event.
+ */
+var CalendarEvent_CalendarEvent = (function () {
+    /**
+     * Creates a new event instance given the id, the event paired with the
+     * schedule, the schedule, the time span of the event, and the day on the
+     * calendar the event belongs to.
+     *
+     * @param id The relatively unique identifier of this event.
+     * @param event The event paired with the schedule.
+     * @param schedule The schedule that generated this event.
+     * @param time The time span of this event.
+     * @param actualDay The day on the calendar this event is for.
+     */
     function CalendarEvent(id, event, schedule, time, actualDay) {
+        /**
+         * The row this event is on in a visual calendar. An event can span multiple
+         * days and it is desirable to have the occurrence on each day to line up.
+         * This is only set when [[Calendar.updateRows]] is true or manually set.
+         * This value makes sense for visual calendars for all day events or when the
+         * visual calendar is not positioning events based on their time span.
+         */
         this.row = 0;
+        /**
+         * The column this event is on in a visual calendar. An event can have its
+         * time overlap with another event displaying one of the events in another
+         * column. This is only set when [[Calendar.updateColumns]] is true or
+         * manually set. This value makes sense for visual calendars that are
+         * displaying event occurrences at specific times positioned accordingly.
+         */
         this.col = 0;
         this.id = id;
         this.event = event;
@@ -1867,6 +2470,9 @@ var Calendar_CalendarEvent = (function () {
         this.ending = time.isPoint || time.end.relative(-1).sameDay(actualDay);
     }
     Object.defineProperty(CalendarEvent.prototype, "scheduleId", {
+        /**
+         * The id of the schedule uniqe within the calendar which generated this event.
+         */
         get: function () {
             return Math.floor(this.id / Constants.MAX_EVENTS_PER_DAY);
         },
@@ -1876,15 +2482,69 @@ var Calendar_CalendarEvent = (function () {
     return CalendarEvent;
 }());
 
+
+// CONCATENATED MODULE: ./src/Calendar.ts
+
+
+
+
+
+
+
+
+
+
+/**
+ *
+ */
 var Calendar_Calendar = (function () {
+    /**
+     *
+     */
     function Calendar(start, end, type, size, moveStart, moveEnd, input) {
+        /**
+         *
+         */
         this.fill = false;
+        /**
+         *
+         */
         this.minimumSize = 0;
+        /**
+         *
+         */
         this.repeatCovers = true;
+        /**
+         *
+         */
         this.listTimes = false;
+        /**
+         *
+         */
         this.eventsOutside = false;
+        /**
+         *
+         */
+        this.updateRows = false;
+        /**
+         *
+         */
+        this.updateColumns = false;
+        /**
+         *
+         */
+        this.eventSorter = null;
+        /**
+         *
+         */
         this.selection = null;
+        /**
+         *
+         */
         this.days = [];
+        /**
+         *
+         */
         this.schedules = [];
         this.span = new DaySpan_DaySpan(start, end);
         this.filled = new DaySpan_DaySpan(start, end);
@@ -1897,6 +2557,9 @@ var Calendar_Calendar = (function () {
         }
         this.refresh();
     }
+    /**
+     *
+     */
     Calendar.prototype.withInput = function (input, refresh) {
         if (refresh === void 0) { refresh = true; }
         this.fill = Functions.coalesce(input.fill, this.fill);
@@ -1904,39 +2567,82 @@ var Calendar_Calendar = (function () {
         this.repeatCovers = Functions.coalesce(input.repeatCovers, this.repeatCovers);
         this.listTimes = Functions.coalesce(input.listTimes, this.listTimes);
         this.eventsOutside = Functions.coalesce(input.eventsOutside, this.eventsOutside);
+        this.updateRows = Functions.coalesce(input.updateRows, this.updateRows);
+        this.updateColumns = Functions.coalesce(input.updateColumns, this.updateColumns);
+        this.eventSorter = Functions.coalesce(input.eventSorter, this.eventSorter);
         if (Functions.isArray(input.schedules)) {
             this.removeSchedules();
-            this.addSchedules(input.schedules, false, !refresh);
+            this.addSchedules(input.schedules, false, true);
         }
         if (refresh) {
             this.refresh();
         }
         return this;
     };
+    /**
+     *
+     */
     Calendar.prototype.withMinimumSize = function (minimumSize) {
         this.minimumSize = minimumSize;
         this.refresh();
         return this;
     };
+    /**
+     *
+     */
     Calendar.prototype.withRepeatCovers = function (repeatCovers) {
         this.repeatCovers = repeatCovers;
         this.refreshEvents();
         return this;
     };
+    /**
+     *
+     */
     Calendar.prototype.withListTimes = function (listTimes) {
         this.listTimes = listTimes;
         this.refreshEvents();
         return this;
     };
+    /**
+     *
+     */
     Calendar.prototype.withEventsOutside = function (eventsOutside) {
         this.eventsOutside = eventsOutside;
         this.refreshEvents();
         return this;
     };
+    /**
+     *
+     */
+    Calendar.prototype.withUpdateRows = function (updateRows, refresh) {
+        if (refresh === void 0) { refresh = true; }
+        this.updateRows = updateRows;
+        if (refresh && updateRows) {
+            this.refreshRows();
+        }
+        return this;
+    };
+    /**
+     *
+     */
+    Calendar.prototype.withUpdateColumns = function (updateColumns, refresh) {
+        if (refresh === void 0) { refresh = true; }
+        this.updateColumns = updateColumns;
+        if (refresh && updateColumns) {
+            this.refreshColumns();
+        }
+        return this;
+    };
     Object.defineProperty(Calendar.prototype, "start", {
+        /**
+         *
+         */
         get: function () {
             return this.span.start;
         },
+        /**
+         *
+         */
         set: function (day) {
             this.span.start = day;
         },
@@ -1944,15 +2650,24 @@ var Calendar_Calendar = (function () {
         configurable: true
     });
     Object.defineProperty(Calendar.prototype, "end", {
+        /**
+         *
+         */
         get: function () {
             return this.span.end;
         },
+        /**
+         *
+         */
         set: function (day) {
             this.span.end = day;
         },
         enumerable: true,
         configurable: true
     });
+    /**
+     *
+     */
     Calendar.prototype.summary = function (dayOfWeek, short, repeat, contextual, delimiter) {
         if (dayOfWeek === void 0) { dayOfWeek = true; }
         if (short === void 0) { short = false; }
@@ -1961,6 +2676,9 @@ var Calendar_Calendar = (function () {
         if (delimiter === void 0) { delimiter = ' - '; }
         return this.span.summary(this.type, dayOfWeek, short, repeat, contextual, delimiter);
     };
+    /**
+     *
+     */
     Calendar.prototype.split = function (by) {
         if (by === void 0) { by = 1; }
         var split = [];
@@ -1973,6 +2691,9 @@ var Calendar_Calendar = (function () {
         }
         return split;
     };
+    /**
+     *
+     */
     Calendar.prototype.refresh = function (today) {
         if (today === void 0) { today = Day_Day.today(); }
         this.length = this.span.days(Op.UP, true);
@@ -1982,11 +2703,17 @@ var Calendar_Calendar = (function () {
         this.refreshEvents();
         return this;
     };
+    /**
+     *
+     */
     Calendar.prototype.resetFilled = function () {
         this.filled.start = this.fill ? this.start.startOfWeek() : this.start;
         this.filled.end = this.fill ? this.end.endOfWeek() : this.end;
         return this;
     };
+    /**
+     *
+     */
     Calendar.prototype.resetDays = function () {
         this.resetFilled();
         var days = this.days;
@@ -1997,7 +2724,7 @@ var Calendar_Calendar = (function () {
         for (var i = 0; i < total; i++) {
             var day = days[i];
             if (!day || !day.sameDay(current)) {
-                day = new Calendar_CalendarDay(current.date);
+                day = new CalendarDay_CalendarDay(current.date);
                 if (i < days.length) {
                     days.splice(i, 1, day);
                 }
@@ -2013,12 +2740,18 @@ var Calendar_Calendar = (function () {
         }
         return this;
     };
+    /**
+     *
+     */
     Calendar.prototype.refreshCurrent = function (today) {
         if (today === void 0) { today = Day_Day.today(); }
         return this.iterateDays(function (d) {
             d.updateCurrent(today);
         });
     };
+    /**
+     *
+     */
     Calendar.prototype.refreshSelection = function () {
         var _this = this;
         return this.iterateDays(function (d) {
@@ -2030,14 +2763,111 @@ var Calendar_Calendar = (function () {
             }
         });
     };
+    /**
+     *
+     */
     Calendar.prototype.refreshEvents = function () {
         var _this = this;
-        return this.iterateDays(function (d) {
+        this.iterateDays(function (d) {
             if (d.inCalendar || _this.eventsOutside) {
                 d.events = _this.eventsForDay(d, _this.listTimes, _this.repeatCovers);
+                if (_this.eventSorter) {
+                    d.events.sort(_this.eventSorter);
+                }
             }
         });
+        if (this.updateRows) {
+            this.refreshRows();
+        }
+        if (this.updateColumns) {
+            this.refreshColumns();
+        }
+        return this;
     };
+    /**
+     *
+     */
+    Calendar.prototype.refreshRows = function () {
+        var eventToRow = {};
+        var onlyFullDay = this.listTimes;
+        this.iterateDays(function (d) {
+            if (d.dayOfWeek === 0) {
+                eventToRow = {};
+            }
+            var used = {};
+            for (var _i = 0, _a = d.events; _i < _a.length; _i++) {
+                var event_1 = _a[_i];
+                if (onlyFullDay && !event_1.fullDay) {
+                    continue;
+                }
+                if (event_1.id in eventToRow) {
+                    used[event_1.row = eventToRow[event_1.id]] = true;
+                }
+            }
+            var rowIndex = 0;
+            for (var _b = 0, _c = d.events; _b < _c.length; _b++) {
+                var event_2 = _c[_b];
+                if ((onlyFullDay && !event_2.fullDay) || event_2.id in eventToRow) {
+                    continue;
+                }
+                while (used[rowIndex]) {
+                    rowIndex++;
+                }
+                eventToRow[event_2.id] = event_2.row = rowIndex;
+                rowIndex++;
+            }
+        });
+        return this;
+    };
+    /**
+     *
+     */
+    Calendar.prototype.refreshColumns = function () {
+        this.iterateDays(function (d) {
+            var markers = [];
+            for (var _i = 0, _a = d.events; _i < _a.length; _i++) {
+                var event_3 = _a[_i];
+                if (!event_3.fullDay) {
+                    markers.push({
+                        time: event_3.time.start.time,
+                        event: event_3,
+                        start: true,
+                        parent: null
+                    });
+                    markers.push({
+                        time: event_3.time.end.time - 1,
+                        event: event_3,
+                        start: false,
+                        parent: null
+                    });
+                }
+            }
+            markers.sort(function (a, b) {
+                return a.time - b.time;
+            });
+            var parent = null;
+            for (var _b = 0, markers_1 = markers; _b < markers_1.length; _b++) {
+                var marker = markers_1[_b];
+                if (marker.start) {
+                    marker.parent = parent;
+                    parent = marker;
+                }
+                else if (parent) {
+                    parent = parent.parent;
+                }
+            }
+            for (var _c = 0, markers_2 = markers; _c < markers_2.length; _c++) {
+                var marker = markers_2[_c];
+                if (marker.start) {
+                    marker.event.col = marker.parent ? marker.parent.event.col + 1 : 0;
+                }
+            }
+        });
+        return this;
+    };
+    /**
+     *
+     */
     Calendar.prototype.iterateDays = function (iterator) {
         var days = this.days;
         for (var i = 0; i < days.length; i++) {
@@ -2045,6 +2875,9 @@ var Calendar_Calendar = (function () {
         }
         return this;
     };
+    /**
+     *
+     */
     Calendar.prototype.eventsForDay = function (day, getTimes, covers) {
         if (getTimes === void 0) { getTimes = true; }
         if (covers === void 0) { covers = true; }
@@ -2053,7 +2886,7 @@ var Calendar_Calendar = (function () {
         for (var entryIndex = 0; entryIndex < entries.length; entryIndex++) {
             var entry = entries[entryIndex];
             var schedule = entry.schedule;
-            var event_1 = entry.event;
+            var event_4 = entry.event;
             var eventId = entryIndex * Constants.MAX_EVENTS_PER_DAY;
             if ((covers && schedule.coversDay(day)) || (!covers && schedule.matchesDay(day))) {
                 if (getTimes) {
@@ -2061,19 +2894,22 @@ var Calendar_Calendar = (function () {
                         entry.schedule.getSpansOver(day) :
                         entry.schedule.getSpansOn(day);
                     for (var timeIndex = 0; timeIndex < times.length; timeIndex++) {
-                        events.push(new Calendar_CalendarEvent(eventId + timeIndex, event_1, schedule, times[timeIndex], day));
+                        events.push(new CalendarEvent_CalendarEvent(eventId + timeIndex, event_4, schedule, times[timeIndex], day));
                     }
                 }
                 else {
                     var over = schedule.getSpanOver(day);
                     if (over) {
-                        events.push(new Calendar_CalendarEvent(eventId, event_1, schedule, over, day));
+                        events.push(new CalendarEvent_CalendarEvent(eventId, event_4, schedule, over, day));
                     }
                 }
             }
         }
         return events;
     };
+    /**
+     *
+     */
     Calendar.prototype.findSchedule = function (input) {
         for (var _i = 0, _a = this.schedules; _i < _a.length; _i++) {
             var schedule = _a[_i];
@@ -2083,6 +2919,9 @@ var Calendar_Calendar = (function () {
         }
         return null;
     };
+    /**
+     *
+     */
     Calendar.prototype.removeSchedules = function (schedules, delayRefresh) {
         if (schedules === void 0) { schedules = null; }
         if (delayRefresh === void 0) { delayRefresh = false; }
@@ -2100,6 +2939,9 @@ var Calendar_Calendar = (function () {
         }
         return this;
     };
+    /**
+     *
+     */
     Calendar.prototype.removeSchedule = function (schedule, delayRefresh) {
         if (delayRefresh === void 0) { delayRefresh = false; }
         var found = this.findSchedule(schedule);
@@ -2111,6 +2953,9 @@ var Calendar_Calendar = (function () {
         }
         return this;
     };
+    /**
+     *
+     */
     Calendar.prototype.addSchedule = function (schedule, allowDuplicates, delayRefresh) {
         if (allowDuplicates === void 0) { allowDuplicates = false; }
         if (delayRefresh === void 0) { delayRefresh = false; }
@@ -2127,6 +2972,9 @@ var Calendar_Calendar = (function () {
         }
         return this;
     };
+    /**
+     *
+     */
     Calendar.prototype.addSchedules = function (schedules, allowDuplicates, delayRefresh) {
         if (allowDuplicates === void 0) { allowDuplicates = false; }
         if (delayRefresh === void 0) { delayRefresh = false; }
@@ -2139,16 +2987,25 @@ var Calendar_Calendar = (function () {
         }
         return this;
     };
+    /**
+     *
+     */
     Calendar.prototype.select = function (start, end) {
         this.selection = end ? new DaySpan_DaySpan(start, end) : DaySpan_DaySpan.point(start);
         this.refreshSelection();
         return this;
     };
+    /**
+     *
+     */
     Calendar.prototype.unselect = function () {
         this.selection = null;
         this.refreshSelection();
         return this;
     };
+    /**
+     *
+     */
     Calendar.prototype.move = function (jump) {
         if (jump === void 0) { jump = this.size; }
         this.start = this.moveStart(this.start, jump);
@@ -2156,14 +3013,23 @@ var Calendar_Calendar = (function () {
         this.refresh();
         return this;
     };
+    /**
+     *
+     */
     Calendar.prototype.next = function (jump) {
         if (jump === void 0) { jump = this.size; }
         return this.move(jump);
     };
+    /**
+     *
+     */
     Calendar.prototype.prev = function (jump) {
         if (jump === void 0) { jump = this.size; }
         return this.move(-jump);
     };
+    /**
+     *
+     */
     Calendar.days = function (days, around, focus, input) {
         if (days === void 0) { days = 1; }
         if (around === void 0) { around = Day_Day.today(); }
@@ -2173,6 +3039,9 @@ var Calendar_Calendar = (function () {
         var mover = function (day, amount) { return day.relativeDays(amount); };
         return new Calendar(start, end, Units.DAY, days, mover, mover, input);
     };
+    /**
+     *
+     */
     Calendar.weeks = function (weeks, around, focus, input) {
         if (weeks === void 0) { weeks = 1; }
         if (around === void 0) { around = Day_Day.today(); }
@@ -2182,6 +3051,9 @@ var Calendar_Calendar = (function () {
         var mover = function (day, amount) { return day.relativeWeeks(amount); };
         return new Calendar(start, end, Units.WEEK, weeks, mover, mover, input);
     };
+    /**
+     *
+     */
     Calendar.months = function (months, around, focus, input) {
         if (months === void 0) { months = 1; }
         if (around === void 0) { around = Day_Day.today(); }
@@ -2193,6 +3065,9 @@ var Calendar_Calendar = (function () {
         var moveEnd = function (day, amount) { return day.startOfMonth().relativeMonths(amount).endOfMonth(); };
         return new Calendar(start, end, Units.MONTH, months, moveStart, moveEnd, input);
     };
+    /**
+     *
+     */
     Calendar.years = function (years, around, focus, input) {
         if (years === void 0) { years = 1; }
         if (around === void 0) { around = Day_Day.today(); }
@@ -2302,15 +3177,21 @@ var Weekday = (function () {
 
 
 /**
- *
+ * A class which helps describe [[ScheduleInput]] if it matches a pattern.
  */
 var Pattern_Pattern = (function () {
+    /**
+     *
+     */
     function Pattern(name, listed, describe, rules) {
         this.name = name;
         this.listed = listed;
         this.describe = describe;
         this.rules = rules;
     }
+    /**
+     *
+     */
     Pattern.prototype.apply = function (input, day) {
         for (var _i = 0, _a = Pattern.PROPS; _i < _a.length; _i++) {
             var prop = _a[_i];
@@ -2330,6 +3211,9 @@ var Pattern_Pattern = (function () {
         }
         return input;
     };
+    /**
+     *
+     */
     Pattern.prototype.isMatch = function (input, exactlyWith) {
         var exactly = Functions.isDefined(exactlyWith);
         for (var _i = 0, _a = Pattern.PROPS; _i < _a.length; _i++) {
@@ -2393,9 +3277,15 @@ var Pattern_Pattern = (function () {
         }
         return true;
     };
+    /**
+     *
+     */
     Pattern.withName = function (name) {
         return PatternMap[name];
     };
+    /**
+     *
+     */
     Pattern.findMatch = function (input, listedOnly, exactlyWith) {
         if (listedOnly === void 0) { listedOnly = true; }
         for (var _i = 0, Patterns_1 = Patterns; _i < Patterns_1.length; _i++) {
@@ -2406,12 +3296,22 @@ var Pattern_Pattern = (function () {
         }
         return null;
     };
+    /**
+     * The properties in the [[ScheduleInput]] which are compared against the
+     * rules of a pattern.
+     */
     Pattern.PROPS = [
-        'dayOfWeek', 'dayOfMonth', 'dayOfYear', 'month', 'week', 'year', 'weekOfYear', 'weekspanOfYear', 'fullWeekOfYear', 'weekOfMonth', 'weekspanOfMonth', 'fullWeekOfMonth'
+        'dayOfWeek', 'dayOfMonth', 'lastDayOfMonth', 'dayOfYear',
+        'month', 'week', 'year',
+        'weekOfYear', 'weekspanOfYear', 'fullWeekOfYear', 'lastWeekspanOfYear', 'lastFullWeekOfYear',
+        'weekOfMonth', 'weekspanOfMonth', 'fullWeekOfMonth', 'lastWeekspanOfMonth', 'lastFullWeekOfMonth'
     ];
     return Pattern;
 }());
 
+/**
+ *
+ */
 var Patterns = [
     new Pattern_Pattern('none', true, function (day) { return 'Does not repeat'; }, {
         year: 1,
@@ -2444,28 +3344,91 @@ var Patterns = [
     new Pattern_Pattern('custom', true, function (day) { return 'Custom...'; }, {
         dayOfWeek: false,
         dayOfMonth: false,
+        lastDayOfMonth: false,
         dayOfYear: false,
+        year: false,
         month: false,
         week: false,
-        year: false,
         weekOfYear: false,
         weekspanOfYear: false,
         fullWeekOfYear: false,
+        lastWeekspanOfYear: false,
+        lastFullWeekOfYear: false,
         weekOfMonth: false,
         weekspanOfMonth: false,
-        fullWeekOfMonth: false
+        fullWeekOfMonth: false,
+        lastWeekspanOfMonth: false,
+        lastFullWeekOfMonth: false
     })
 ];
+/**
+ *
+ */
 var PatternMap = {};
 for (var Pattern__i = 0, Patterns_2 = Patterns; Pattern__i < Patterns_2.length; Pattern__i++) {
     var Pattern_pattern = Patterns_2[Pattern__i];
     PatternMap[Pattern_pattern.name] = Pattern_pattern;
 }
 
+// CONCATENATED MODULE: ./src/Sort.ts
+
+// Sorts.List( Sorts.FullDay, Sorts.Desc( Sorts.Start ) );
+var Sorts = (function () {
+    function Sorts() {
+    }
+    Sorts.Start = function (a, b) {
+        return a.time.start.time - b.time.start.time;
+    };
+    Sorts.End = function (a, b) {
+        return a.time.end.time - b.time.end.time;
+    };
+    Sorts.FullDay = function (a, b) {
+        var af = a.fullDay ? 0 : 1;
+        var bf = b.fullDay ? 0 : 1;
+        return af - bf;
+    };
+    Sorts.Duration = function (a, b) {
+        return a.time.millis() - b.time.millis();
+    };
+    Sorts.Desc = function (sorter) {
+        return function (a, b) {
+            return sorter(b, a);
+        };
+    };
+    Sorts.Alphabetical = function (getString) {
+        return function (a, b) {
+            var as = getString(a.event) || '';
+            var bs = getString(b.event) || '';
+            return as.localeCompare(bs);
+        };
+    };
+    Sorts.Ordered = function (getOrder) {
+        return function (a, b) {
+            var ao = getOrder(a.event);
+            var bo = getOrder(b.event);
+            return ao - bo;
+        };
+    };
+    Sorts.List = function (list) {
+        return function (a, b) {
+            for (var _i = 0, list_1 = list; _i < list_1.length; _i++) {
+                var sorter = list_1[_i];
+                var compare = sorter(a, b);
+                if (compare !== 0) {
+                    return compare;
+                }
+            }
+            return 0;
+        };
+    };
+    return Sorts;
+}());
+
+
 // CONCATENATED MODULE: ./src/index.ts
-/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "CalendarDay", function() { return Calendar_CalendarDay; });
-/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "CalendarEvent", function() { return Calendar_CalendarEvent; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Calendar", function() { return Calendar_Calendar; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "CalendarDay", function() { return CalendarDay_CalendarDay; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "CalendarEvent", function() { return CalendarEvent_CalendarEvent; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Constants", function() { return Constants; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Day", function() { return Day_Day; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "DaySpan", function() { return DaySpan_DaySpan; });
@@ -2478,10 +3441,14 @@ for (var Pattern__i = 0, Patterns_2 = Patterns; Pattern__i < Patterns_2.length; 
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Patterns", function() { return Patterns; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "PatternMap", function() { return PatternMap; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Schedule", function() { return Schedule_Schedule; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Sorts", function() { return Sorts; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Suffix", function() { return Suffix; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Time", function() { return Time_Time; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Units", function() { return Units; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Weekday", function() { return Weekday; });
+
+
+
 
 
 

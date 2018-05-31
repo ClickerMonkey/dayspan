@@ -1,6 +1,6 @@
 
 import { Functions as fn } from './Functions';
-import { FrequencyCheck } from './Types';
+import { FrequencyCheck } from './Frequency';
 import { Schedule, ScheduleInput, ScheduleExclusions } from './Schedule';
 import { Constants } from './Constants';
 import { Day, DayInput, DurationInput } from './Day';
@@ -17,13 +17,17 @@ export class Parse
   /**
    * Parses a value and converts it to a [[FrequencyCheck]].
    *
+   * @param input The input to parse into a function.
+   * @returns A function which determines whether a value matches a frequency.
    * @see [[Schedule]]
    */
-  public static frequency(input: any, otherwiseEvery: number = 1, otherwiseOffset: number = 0): FrequencyCheck
+  public static frequency(input: any, property: string): FrequencyCheck
   {
     let check: FrequencyCheck = (value: number) => {
-      return value % otherwiseEvery === otherwiseOffset;
+      return true;
     };
+
+    check.given = false;
 
     if (fn.isFrequencyValueEvery(input))
     {
@@ -33,6 +37,7 @@ export class Parse
       check = (value: number) => {
         return value % every === offset;
       };
+      check.given = true;
     }
 
     if (fn.isFrequencyValueOneOf(input))
@@ -46,9 +51,11 @@ export class Parse
       check = (value: number) => {
         return !!map[ value ];
       };
+      check.given = true;
     }
 
     check.input = input;
+    check.property = property;
 
     return check;
   }
@@ -76,7 +83,7 @@ export class Parse
     }
     else if (fn.isString(input))
     {
-      return Day.parse( input );
+      return Day.fromString( <string>input );
     }
     else if (input instanceof Day)
     {
@@ -235,20 +242,48 @@ export class Parse
     out.durationUnit = <DurationInput>fn.coalesce( input.durationUnit, Constants.DURATION_DEFAULT_UNIT( fullDay ) );
     out.start = this.day( input.start );
     out.end = this.day( input.end );
-    out.dayOfWeek = this.frequency( input.dayOfWeek );
-    out.dayOfMonth = this.frequency( input.dayOfMonth );
-    out.dayOfYear = this.frequency( input.dayOfYear );
-    out.month = this.frequency( input.month );
-    out.week = this.frequency( input.week );
-    out.weekOfYear = this.frequency( input.weekOfYear );
-    out.weekspanOfYear = this.frequency( input.weekspanOfYear );
-    out.fullWeekOfYear = this.frequency( input.fullWeekOfYear );
-    out.weekOfMonth = this.frequency( input.weekOfMonth );
-    out.weekspanOfMonth = this.frequency( input.weekspanOfMonth );
-    out.fullWeekOfMonth = this.frequency( input.fullWeekOfMonth );
-    out.year = this.frequency( input.year );
     out.exclude = this.exclusions( input.exclude );
+    out.year = this.frequency( input.year, 'year' );
+    out.month = this.frequency( input.month, 'month' );
+    out.week = this.frequency( input.week, 'week' );
+    out.weekOfYear = this.frequency( input.weekOfYear, 'weekOfYear' );
+    out.weekspanOfYear = this.frequency( input.weekspanOfYear, 'weekspanOfYear' );
+    out.fullWeekOfYear = this.frequency( input.fullWeekOfYear, 'fullWeekOfYear' );
+    out.lastWeekspanOfYear = this.frequency( input.lastWeekspanOfYear, 'lastWeekspanOfYear' );
+    out.lastFullWeekOfYear = this.frequency( input.lastFullWeekOfYear, 'lastFullWeekOfYear' );
+    out.weekOfMonth = this.frequency( input.weekOfMonth, 'weekOfMonth' );
+    out.weekspanOfMonth = this.frequency( input.weekspanOfMonth, 'weekspanOfMonth' );
+    out.fullWeekOfMonth = this.frequency( input.fullWeekOfMonth, 'fullWeekOfMonth' );
+    out.lastWeekspanOfMonth = this.frequency( input.lastWeekspanOfMonth, 'lastWeekspanOfMonth' );
+    out.lastFullWeekOfMonth = this.frequency( input.lastFullWeekOfMonth, 'lastFullWeekOfMonth' );
+    out.dayOfWeek = this.frequency( input.dayOfWeek, 'dayOfWeek' );
+    out.dayOfMonth = this.frequency( input.dayOfMonth, 'dayOfMonth' );
+    out.lastDayOfMonth = this.frequency( input.lastDayOfMonth, 'lastDayOfMonth' );
+    out.dayOfYear = this.frequency( input.dayOfYear, 'dayOfYear' );
     out.updateDurationInDays();
+    out.updateChecks();
+
+    return out;
+  }
+
+  /**
+   * Parses an array of [[FrequencyCheck]] functions and returns an array of
+   * functions for only the checks that were specified by the user.
+   *
+   * @param checks The array of check functions to filter through.
+   * @returns The array of user specified checks.
+   */
+  public static givenFrequency(checks: FrequencyCheck[]): FrequencyCheck[]
+  {
+    let out: FrequencyCheck[] = [];
+
+    for (let check of checks)
+    {
+      if (check.given)
+      {
+        out.push( check );
+      }
+    }
 
     return out;
   }
