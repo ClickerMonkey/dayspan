@@ -988,6 +988,9 @@ img { max-width: 100%; }
 					<a href="dayspan.html#summary" class="tsd-kind-icon">summary</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
+					<a href="dayspan.html#union" class="tsd-kind-icon">union</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class">
 					<a href="dayspan.html#weeks" class="tsd-kind-icon">weeks</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -1015,6 +1018,9 @@ img { max-width: 100%; }
 		</li>
 		<li class=" tsd-kind-class">
 			<a href="schedule.html" class="tsd-kind-icon">Schedule</a>
+		</li>
+		<li class=" tsd-kind-class">
+			<a href="sorts.html" class="tsd-kind-icon">Sorts</a>
 		</li>
 		<li class=" tsd-kind-class">
 			<a href="suffix.html" class="tsd-kind-icon">Suffix</a>
@@ -1077,6 +1083,9 @@ img { max-width: 100%; }
 			<a href="../globals.html#scheduleexclusions" class="tsd-kind-icon">Schedule<wbr>Exclusions</a>
 		</li>
 		<li class=" tsd-kind-type-alias">
+			<a href="../globals.html#sortevent" class="tsd-kind-icon">Sort<wbr>Event</a>
+		</li>
+		<li class=" tsd-kind-type-alias">
 			<a href="../globals.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a>
 		</li>
 		<li class=" tsd-kind-variable">
@@ -1092,6 +1101,13 @@ img { max-width: 100%; }
 </nav>
 <div class="container container-main">
 	<div class="content-wrap">
+		<section class="tsd-panel tsd-comment">
+			<div class="tsd-comment tsd-typography">
+				<div class="lead">
+					<p>A class for a range of time between two <a href="day.html">Day</a> timestamps.</p>
+				</div>
+			</div>
+		</section>
 		<section class="tsd-panel tsd-hierarchy">
 			<h3>Hierarchy</h3>
 			<ul class="tsd-hierarchy">
@@ -1140,6 +1156,7 @@ img { max-width: 100%; }
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="dayspan.html#months" class="tsd-kind-icon">months</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="dayspan.html#seconds" class="tsd-kind-icon">seconds</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="dayspan.html#summary" class="tsd-kind-icon">summary</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class"><a href="dayspan.html#union" class="tsd-kind-icon">union</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="dayspan.html#weeks" class="tsd-kind-icon">weeks</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="dayspan.html#years" class="tsd-kind-icon">years</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="dayspan.html#point" class="tsd-kind-icon">point</a></li>
@@ -1166,16 +1183,31 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L10">DaySpan.ts:10</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L22">DaySpan.ts:22</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Creates a new span of time.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>start: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The starting timestamp.</p>
+									</div>
+								</div>
 							</li>
 							<li>
 								<h5>end: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The ending timestamp.</p>
+									</div>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="dayspan.html" class="tsd-signature-type">DaySpan</a></h4>
@@ -1191,9 +1223,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">end<span class="tsd-signature-symbol">:</span> <a href="day.html" class="tsd-signature-type">Day</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L10">DaySpan.ts:10</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L22">DaySpan.ts:22</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The endind timestamp of the span (inclusive).</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="start" class="tsd-anchor"></a>
@@ -1201,9 +1238,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">start<span class="tsd-signature-symbol">:</span> <a href="day.html" class="tsd-signature-type">Day</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L9">DaySpan.ts:9</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L17">DaySpan.ts:17</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The starting timestamp of the span (inclusive).</p>
+					</div>
+				</div>
 			</section>
 		</section>
 		<section class="tsd-panel-group tsd-member-group ">
@@ -1214,9 +1256,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">is<wbr>Point<span class="tsd-signature-symbol">:</span> </div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L17">DaySpan.ts:17</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L40">DaySpan.ts:40</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Whether this span starts and ends on the same timestamp.</p>
+					</div>
+				</div>
 			</section>
 		</section>
 		<section class="tsd-panel-group tsd-member-group ">
@@ -1231,16 +1278,26 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L21">DaySpan.ts:21</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L52">DaySpan.ts:52</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the given timestamp lies between the start and end
+								timestamp.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The timestamp to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p>True if the day is &gt;= the start and &lt;= the end of this span.</p>
 					</li>
 				</ul>
 			</section>
@@ -1254,19 +1311,36 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L58">DaySpan.ts:58</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L166">DaySpan.ts:166</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Calculates the number of days between the start and end timestamp.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="day.html#daysbetween">Day.daysBetween</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> op: <a href="../enums/op.html" class="tsd-signature-type">Op</a><span class="tsd-signature-symbol"> =&nbsp;Op.DOWN</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The operation to perform on the result.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> absolute: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>Whether the result should always be positive.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						<p>The time between the start and end timestamp.</p>
 					</li>
 				</ul>
 			</section>
@@ -1280,19 +1354,36 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L54">DaySpan.ts:54</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L153">DaySpan.ts:153</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Calculates the number of hours between the start and end timestamp.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="day.html#hoursbetween">Day.hoursBetween</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> op: <a href="../enums/op.html" class="tsd-signature-type">Op</a><span class="tsd-signature-symbol"> =&nbsp;Op.DOWN</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The operation to perform on the result.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> absolute: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>Whether the result should always be positive.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						<p>The time between the start and end timestamp.</p>
 					</li>
 				</ul>
 			</section>
@@ -1306,16 +1397,26 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L109">DaySpan.ts:109</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L274">DaySpan.ts:274</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Calculates the intersection between this span and the given span. If there
+								is no intersection between the two spans then <code>null</code> is returned.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>span: <a href="dayspan.html" class="tsd-signature-type">DaySpan</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The span to calculate the intersection with.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="dayspan.html" class="tsd-signature-type">DaySpan</a></h4>
+						<p>The intersection or <code>null</code> if none exists.</p>
 					</li>
 				</ul>
 			</section>
@@ -1329,16 +1430,25 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L102">DaySpan.ts:102</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L259">DaySpan.ts:259</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the gven span intersects with this span.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>span: <a href="dayspan.html" class="tsd-signature-type">DaySpan</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The span to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the spans intersect, otherwise <code>false</code>.</p>
 					</li>
 				</ul>
 			</section>
@@ -1352,13 +1462,27 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L25">DaySpan.ts:25</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L64">DaySpan.ts:64</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the given timestamp is between the start and end
+								timestamp or lies on the same day as the start or end timestamp.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="day.html#sameday">Day.sameDay</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The timestamp to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -1375,13 +1499,27 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L33">DaySpan.ts:33</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L88">DaySpan.ts:88</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the given timestamp is between the start and end
+								timestamp or lies on the same month as the start or end timestamp.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="day.html#samemonth">Day.sameMonth</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The timestamp to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -1398,13 +1536,27 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L29">DaySpan.ts:29</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L76">DaySpan.ts:76</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the given timestamp is between the start and end
+								timestamp or lies on the same week as the start or end timestamp.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="day.html#sameweek">Day.sameWeek</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The timestamp to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -1421,13 +1573,27 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L37">DaySpan.ts:37</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L100">DaySpan.ts:100</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the given timestamp is between the start and end
+								timestamp or lies on the same year as the start or end timestamp.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="day.html#sameyear">Day.sameYear</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The timestamp to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -1444,19 +1610,36 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L42">DaySpan.ts:42</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L114">DaySpan.ts:114</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Calculates the number of milliseconds between the start and end timestamp.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="day.html#millisbetween">Day.millisBetween</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> op: <a href="../enums/op.html" class="tsd-signature-type">Op</a><span class="tsd-signature-symbol"> =&nbsp;Op.DOWN</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The operation to perform on the result.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> absolute: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>Whether the result should always be positive.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						<p>The time between the start and end timestamp.</p>
 					</li>
 				</ul>
 			</section>
@@ -1470,19 +1653,36 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L50">DaySpan.ts:50</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L140">DaySpan.ts:140</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Calculates the number of minutes between the start and end timestamp.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="day.html#minutesbetween">Day.minutesBetween</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> op: <a href="../enums/op.html" class="tsd-signature-type">Op</a><span class="tsd-signature-symbol"> =&nbsp;Op.DOWN</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The operation to perform on the result.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> absolute: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>Whether the result should always be positive.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						<p>The time between the start and end timestamp.</p>
 					</li>
 				</ul>
 			</section>
@@ -1496,19 +1696,36 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L66">DaySpan.ts:66</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L192">DaySpan.ts:192</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Calculates the number of months between the start and end timestamp.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="day.html#monthsbetween">Day.monthsBetween</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> op: <a href="../enums/op.html" class="tsd-signature-type">Op</a><span class="tsd-signature-symbol"> =&nbsp;Op.DOWN</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The operation to perform on the result.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> absolute: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>Whether the result should always be positive.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						<p>The time between the start and end timestamp.</p>
 					</li>
 				</ul>
 			</section>
@@ -1522,19 +1739,36 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L46">DaySpan.ts:46</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L127">DaySpan.ts:127</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Calculates the number of seconds between the start and end timestamp.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="day.html#secondsbetween">Day.secondsBetween</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> op: <a href="../enums/op.html" class="tsd-signature-type">Op</a><span class="tsd-signature-symbol"> =&nbsp;Op.DOWN</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The operation to perform on the result.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> absolute: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>Whether the result should always be positive.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						<p>The time between the start and end timestamp.</p>
 					</li>
 				</ul>
 			</section>
@@ -1548,31 +1782,91 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L74">DaySpan.ts:74</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L225">DaySpan.ts:225</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Summarizes this span given an approximate unit of time and a few other
+									options. If the start and end are on the same unit, a single value will
+								be returned. Otherwise a start and end will be returned with a <code>delimiter</code>.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>type: <a href="../enums/units.html" class="tsd-signature-type">Units</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The unit of time this span is for.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> dayOfWeek: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> the weekday of the start and end are included.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> short: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> the short form of weekdays and months will be used.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> repeat: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> the year will be repeated on the start and end
+									timestamp even if they are the same year.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> contextual: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> the year will be hidden if it&#39;s the current
+									year.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> delimiter: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot; - &quot;</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The string to separate the start and end timestamps with.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						<p>The summary of this span.</p>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<a name="union" class="tsd-anchor"></a>
+				<h3>union</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<li class="tsd-signature tsd-kind-icon">union<span class="tsd-signature-symbol">(</span>span<span class="tsd-signature-symbol">: </span><a href="dayspan.html" class="tsd-signature-type">DaySpan</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="dayspan.html" class="tsd-signature-type">DaySpan</a></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L288">DaySpan.ts:288</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Calculates the union between this span and the given span.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>span: <a href="dayspan.html" class="tsd-signature-type">DaySpan</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The span to calculate the union with.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <a href="dayspan.html" class="tsd-signature-type">DaySpan</a></h4>
+						<p>The union of the two spans.</p>
 					</li>
 				</ul>
 			</section>
@@ -1586,19 +1880,36 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L62">DaySpan.ts:62</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L179">DaySpan.ts:179</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Calculates the number of weeks between the start and end timestamp.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="day.html#weeksbetween">Day.weeksBetween</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> op: <a href="../enums/op.html" class="tsd-signature-type">Op</a><span class="tsd-signature-symbol"> =&nbsp;Op.DOWN</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The operation to perform on the result.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> absolute: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>Whether the result should always be positive.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						<p>The time between the start and end timestamp.</p>
 					</li>
 				</ul>
 			</section>
@@ -1612,19 +1923,36 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L70">DaySpan.ts:70</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L205">DaySpan.ts:205</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Calculates the number of years between the start and end timestamp.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="day.html#yearsbetween">Day.yearsBetween</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> op: <a href="../enums/op.html" class="tsd-signature-type">Op</a><span class="tsd-signature-symbol"> =&nbsp;Op.DOWN</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The operation to perform on the result.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> absolute: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>Whether the result should always be positive.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						<p>The time between the start and end timestamp.</p>
 					</li>
 				</ul>
 			</section>
@@ -1638,16 +1966,30 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L116">DaySpan.ts:116</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L303">DaySpan.ts:303</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Returns a point <a href="dayspan.html">DaySpan</a> with the same start and end timestamp.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="dayspan.html#ispoint">DaySpan.isPoint</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The timestamp which will be the start and end.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="dayspan.html" class="tsd-signature-type">DaySpan</a></h4>
+						<p>The new instance.</p>
 					</li>
 				</ul>
 			</section>
@@ -1660,9 +2002,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">SUMMARY_<wbr>FORMATS<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L121">DaySpan.ts:121</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L312">DaySpan.ts:312</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Formatting functions which assist the <a href="dayspan.html#summary">DaySpan.summary</a> function.</p>
+					</div>
+				</div>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-object-literal">
 					<a name="summary_formats.__computed" class="tsd-anchor"></a>
 					<h3>__computed</h3>
@@ -1676,7 +2023,7 @@ img { max-width: 100%; }
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L123">DaySpan.ts:123</a></li>
+									<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L314">DaySpan.ts:314</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1696,7 +2043,7 @@ img { max-width: 100%; }
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L126">DaySpan.ts:126</a></li>
+									<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L317">DaySpan.ts:317</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1716,7 +2063,7 @@ img { max-width: 100%; }
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L129">DaySpan.ts:129</a></li>
+									<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L320">DaySpan.ts:320</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1736,7 +2083,7 @@ img { max-width: 100%; }
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/DaySpan.ts#L132">DaySpan.ts:132</a></li>
+									<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/DaySpan.ts#L323">DaySpan.ts:323</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>

@@ -984,6 +984,9 @@ img { max-width: 100%; }
 			<a href="schedule.html" class="tsd-kind-icon">Schedule</a>
 		</li>
 		<li class=" tsd-kind-class">
+			<a href="sorts.html" class="tsd-kind-icon">Sorts</a>
+		</li>
+		<li class=" tsd-kind-class">
 			<a href="suffix.html" class="tsd-kind-icon">Suffix</a>
 		</li>
 		<li class=" tsd-kind-class">
@@ -1044,6 +1047,9 @@ img { max-width: 100%; }
 			<a href="../globals.html#scheduleexclusions" class="tsd-kind-icon">Schedule<wbr>Exclusions</a>
 		</li>
 		<li class=" tsd-kind-type-alias">
+			<a href="../globals.html#sortevent" class="tsd-kind-icon">Sort<wbr>Event</a>
+		</li>
+		<li class=" tsd-kind-type-alias">
 			<a href="../globals.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a>
 		</li>
 		<li class=" tsd-kind-variable">
@@ -1059,6 +1065,13 @@ img { max-width: 100%; }
 </nav>
 <div class="container container-main">
 	<div class="content-wrap">
+		<section class="tsd-panel tsd-comment">
+			<div class="tsd-comment tsd-typography">
+				<div class="lead">
+					<p>An event on a given day and the schedule that generated the event.</p>
+				</div>
+			</div>
+		</section>
 		<section class="tsd-panel tsd-type-parameters">
 			<h3>Type parameters</h3>
 			<ul class="tsd-type-parameters">
@@ -1120,25 +1133,57 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L69">Calendar.ts:69</a></li>
+								<li>Defined in CalendarEvent.ts:83</li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Creates a new event instance given the id, the event paired with the
+									schedule, the schedule, the time span of the event, and the day on the
+								calendar the event belongs to.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>id: <span class="tsd-signature-type">number</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The relatively unique identifier of this event.</p>
+									</div>
+								</div>
 							</li>
 							<li>
 								<h5>event: <span class="tsd-signature-type">T</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The event paired with the schedule.</p>
+									</div>
+								</div>
 							</li>
 							<li>
 								<h5>schedule: <a href="schedule.html" class="tsd-signature-type">Schedule</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The schedule that generated this event.</p>
+									</div>
+								</div>
 							</li>
 							<li>
 								<h5>time: <a href="dayspan.html" class="tsd-signature-type">DaySpan</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The time span of this event.</p>
+									</div>
+								</div>
 							</li>
 							<li>
 								<h5>actualDay: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The day on the calendar this event is for.</p>
+									</div>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="calendarevent.html" class="tsd-signature-type">CalendarEvent</a></h4>
@@ -1154,9 +1199,18 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">col<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L69">Calendar.ts:69</a></li>
+						<li>Defined in CalendarEvent.ts:83</li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The column this event is on in a visual calendar. An event can have its
+							time overlap with another event displaying one of the events in another
+							column. This is only set when <a href="calendar.html#updatecolumns">Calendar.updateColumns</a> is true or
+							manually set. This value makes sense for visual calendars that are
+						displaying event occurrences at specific times positioned accordingly.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="ending" class="tsd-anchor"></a>
@@ -1164,9 +1218,17 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">ending<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L67">Calendar.ts:67</a></li>
+						<li>Defined in CalendarEvent.ts:65</li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Whether this event is the last day of an occurrence. A calendar can
+							generate multiple <a href="calendarevent.html">CalendarEvent</a> instances over each day it covers if
+							<a href="calendar.html#repeatcovers">Calendar.repeatCovers</a> is true. These instances have matching
+						<a href="calendarevent.html#id">CalendarEvent.id</a> values.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="event" class="tsd-anchor"></a>
@@ -1174,9 +1236,16 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">event<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L62">Calendar.ts:62</a></li>
+						<li>Defined in CalendarEvent.ts:28</li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The event paired with the schedule. This can be any value which describes
+							the event. A string for a simple title-only event, or an object with title,
+						colors, icons, notification settings, etc.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="fullday" class="tsd-anchor"></a>
@@ -1184,9 +1253,19 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">full<wbr>Day<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L65">Calendar.ts:65</a></li>
+						<li>Defined in CalendarEvent.ts:49</li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Whether this event is an all day event.</p>
+					</div>
+					<dl class="tsd-comment-tags">
+						<dt>see</dt>
+						<dd><p><a href="schedule.html#isfullday">Schedule.isFullDay</a></p>
+						</dd>
+					</dl>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="id" class="tsd-anchor"></a>
@@ -1194,9 +1273,18 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L61">Calendar.ts:61</a></li>
+						<li>Defined in CalendarEvent.ts:21</li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The relatively unique identifier of this event. It is generated based on
+							the index of the schedule in the calendar and the time of day listed in the
+							schedule. This number will no longer be unique if the schedule has more
+							than <a href="constants.html#max_events_per_day">Constants.MAX_EVENTS_PER_DAY</a> occurrences in a single day
+						(based on number of times in <a href="schedule.html#times">Schedule.times</a>).</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="row" class="tsd-anchor"></a>
@@ -1204,9 +1292,18 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">row<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L68">Calendar.ts:68</a></li>
+						<li>Defined in CalendarEvent.ts:74</li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The row this event is on in a visual calendar. An event can span multiple
+							days and it is desirable to have the occurrence on each day to line up.
+							This is only set when <a href="calendar.html#updaterows">Calendar.updateRows</a> is true or manually set.
+							This value makes sense for visual calendars for all day events or when the
+						visual calendar is not positioning events based on their time span.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="schedule" class="tsd-anchor"></a>
@@ -1214,9 +1311,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">schedule<span class="tsd-signature-symbol">:</span> <a href="schedule.html" class="tsd-signature-type">Schedule</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L63">Calendar.ts:63</a></li>
+						<li>Defined in CalendarEvent.ts:33</li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The schedule which generated this event.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="starting" class="tsd-anchor"></a>
@@ -1224,9 +1326,17 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">starting<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L66">Calendar.ts:66</a></li>
+						<li>Defined in CalendarEvent.ts:57</li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Whether this event is the first day of an occurrence. A calendar can
+							generate multiple <a href="calendarevent.html">CalendarEvent</a> instances over each day it covers if
+							<a href="calendar.html#repeatcovers">Calendar.repeatCovers</a> is true. These instances have matching
+						<a href="calendarevent.html#id">CalendarEvent.id</a> values.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="time" class="tsd-anchor"></a>
@@ -1234,9 +1344,21 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">time<span class="tsd-signature-symbol">:</span> <a href="dayspan.html" class="tsd-signature-type">DaySpan</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L64">Calendar.ts:64</a></li>
+						<li>Defined in CalendarEvent.ts:42</li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The span of time this event occurs. If this is an all day event this span
+							will start at the beginning of the day and end at the beginning of the
+						next day.</p>
+					</div>
+					<dl class="tsd-comment-tags">
+						<dt>see</dt>
+						<dd><p><a href="schedule.html#isfullday">Schedule.isFullDay</a></p>
+						</dd>
+					</dl>
+				</div>
 			</section>
 		</section>
 		<section class="tsd-panel-group tsd-member-group ">
@@ -1247,9 +1369,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">schedule<wbr>Id<span class="tsd-signature-symbol">:</span> </div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L81">Calendar.ts:81</a></li>
+						<li>Defined in CalendarEvent.ts:111</li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The id of the schedule uniqe within the calendar which generated this event.</p>
+					</div>
+				</div>
 			</section>
 		</section>
 		<footer class="with-border-bottom">

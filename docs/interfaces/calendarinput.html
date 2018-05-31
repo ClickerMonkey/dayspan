@@ -949,6 +949,9 @@ img { max-width: 100%; }
 			<a href="../classes/schedule.html" class="tsd-kind-icon">Schedule</a>
 		</li>
 		<li class=" tsd-kind-class">
+			<a href="../classes/sorts.html" class="tsd-kind-icon">Sorts</a>
+		</li>
+		<li class=" tsd-kind-class">
 			<a href="../classes/suffix.html" class="tsd-kind-icon">Suffix</a>
 		</li>
 		<li class=" tsd-kind-class">
@@ -960,6 +963,9 @@ img { max-width: 100%; }
 		<li class="current tsd-kind-interface tsd-has-type-parameter">
 			<a href="calendarinput.html" class="tsd-kind-icon">Calendar<wbr>Input</a>
 			<ul>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="calendarinput.html#eventsorter" class="tsd-kind-icon">event<wbr>Sorter</a>
+				</li>
 				<li class=" tsd-kind-property tsd-parent-kind-interface">
 					<a href="calendarinput.html#eventsoutside" class="tsd-kind-icon">events<wbr>Outside</a>
 				</li>
@@ -977,6 +983,12 @@ img { max-width: 100%; }
 				</li>
 				<li class=" tsd-kind-property tsd-parent-kind-interface">
 					<a href="calendarinput.html#schedules" class="tsd-kind-icon">schedules</a>
+				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="calendarinput.html#updatecolumns" class="tsd-kind-icon">update<wbr>Columns</a>
+				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="calendarinput.html#updaterows" class="tsd-kind-icon">update<wbr>Rows</a>
 				</li>
 			</ul>
 		</li>
@@ -1029,6 +1041,9 @@ img { max-width: 100%; }
 			<a href="../globals.html#scheduleexclusions" class="tsd-kind-icon">Schedule<wbr>Exclusions</a>
 		</li>
 		<li class=" tsd-kind-type-alias">
+			<a href="../globals.html#sortevent" class="tsd-kind-icon">Sort<wbr>Event</a>
+		</li>
+		<li class=" tsd-kind-type-alias">
 			<a href="../globals.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a>
 		</li>
 		<li class=" tsd-kind-variable">
@@ -1067,12 +1082,15 @@ img { max-width: 100%; }
 					<section class="tsd-index-section ">
 						<h3>Properties</h3>
 						<ul class="tsd-index-list">
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="calendarinput.html#eventsorter" class="tsd-kind-icon">event<wbr>Sorter</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="calendarinput.html#eventsoutside" class="tsd-kind-icon">events<wbr>Outside</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="calendarinput.html#fill" class="tsd-kind-icon">fill</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="calendarinput.html#listtimes" class="tsd-kind-icon">list<wbr>Times</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="calendarinput.html#minimumsize" class="tsd-kind-icon">minimum<wbr>Size</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="calendarinput.html#repeatcovers" class="tsd-kind-icon">repeat<wbr>Covers</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="calendarinput.html#schedules" class="tsd-kind-icon">schedules</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="calendarinput.html#updatecolumns" class="tsd-kind-icon">update<wbr>Columns</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="calendarinput.html#updaterows" class="tsd-kind-icon">update<wbr>Rows</a></li>
 						</ul>
 					</section>
 				</div>
@@ -1081,14 +1099,38 @@ img { max-width: 100%; }
 		<section class="tsd-panel-group tsd-member-group ">
 			<h2>Properties</h2>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<a name="eventsorter" class="tsd-anchor"></a>
+				<h3><span class="tsd-flag ts-flagOptional">Optional</span> event<wbr>Sorter</h3>
+				<div class="tsd-signature tsd-kind-icon">event<wbr>Sorter<span class="tsd-signature-symbol">:</span> <a href="../globals.html#sortevent" class="tsd-signature-type">SortEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L75">Calendar.ts:75</a></li>
+					</ul>
+				</aside>
+				<div class="tsd-comment tsd-typography">
+					<dl class="tsd-comment-tags">
+						<dt>see</dt>
+						<dd><p><a href="../classes/calendar.html#eventsorter">Calendar.eventSorter</a></p>
+						</dd>
+					</dl>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 				<a name="eventsoutside" class="tsd-anchor"></a>
 				<h3><span class="tsd-flag ts-flagOptional">Optional</span> events<wbr>Outside</h3>
 				<div class="tsd-signature tsd-kind-icon">events<wbr>Outside<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L104">Calendar.ts:104</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L63">Calendar.ts:63</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<dl class="tsd-comment-tags">
+						<dt>see</dt>
+						<dd><p><a href="../classes/calendar.html#eventsoutside">Calendar.eventsOutside</a></p>
+						</dd>
+					</dl>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 				<a name="fill" class="tsd-anchor"></a>
@@ -1096,9 +1138,16 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">fill<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L100">Calendar.ts:100</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L47">Calendar.ts:47</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<dl class="tsd-comment-tags">
+						<dt>see</dt>
+						<dd><p><a href="../classes/calendar.html#fill">Calendar.fill</a></p>
+						</dd>
+					</dl>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 				<a name="listtimes" class="tsd-anchor"></a>
@@ -1106,9 +1155,16 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">list<wbr>Times<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L103">Calendar.ts:103</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L59">Calendar.ts:59</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<dl class="tsd-comment-tags">
+						<dt>see</dt>
+						<dd><p><a href="../classes/calendar.html#listtimes">Calendar.listTimes</a></p>
+						</dd>
+					</dl>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 				<a name="minimumsize" class="tsd-anchor"></a>
@@ -1116,9 +1172,16 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">minimum<wbr>Size<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L101">Calendar.ts:101</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L51">Calendar.ts:51</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<dl class="tsd-comment-tags">
+						<dt>see</dt>
+						<dd><p><a href="../classes/calendar.html#minimumsize">Calendar.minimumSize</a></p>
+						</dd>
+					</dl>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 				<a name="repeatcovers" class="tsd-anchor"></a>
@@ -1126,9 +1189,16 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">repeat<wbr>Covers<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L102">Calendar.ts:102</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L55">Calendar.ts:55</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<dl class="tsd-comment-tags">
+						<dt>see</dt>
+						<dd><p><a href="../classes/calendar.html#repeatcovers">Calendar.repeatCovers</a></p>
+						</dd>
+					</dl>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 				<a name="schedules" class="tsd-anchor"></a>
@@ -1136,9 +1206,50 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">schedules<span class="tsd-signature-symbol">:</span> <a href="calendarschedule.html" class="tsd-signature-type">CalendarSchedule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Calendar.ts#L105">Calendar.ts:105</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L79">Calendar.ts:79</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<dl class="tsd-comment-tags">
+						<dt>see</dt>
+						<dd><p><a href="../classes/calendar.html#schedules">Calendar.schedules</a></p>
+						</dd>
+					</dl>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<a name="updatecolumns" class="tsd-anchor"></a>
+				<h3><span class="tsd-flag ts-flagOptional">Optional</span> update<wbr>Columns</h3>
+				<div class="tsd-signature tsd-kind-icon">update<wbr>Columns<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L71">Calendar.ts:71</a></li>
+					</ul>
+				</aside>
+				<div class="tsd-comment tsd-typography">
+					<dl class="tsd-comment-tags">
+						<dt>see</dt>
+						<dd><p><a href="../classes/calendar.html#updatecolumns">Calendar.updateColumns</a></p>
+						</dd>
+					</dl>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<a name="updaterows" class="tsd-anchor"></a>
+				<h3><span class="tsd-flag ts-flagOptional">Optional</span> update<wbr>Rows</h3>
+				<div class="tsd-signature tsd-kind-icon">update<wbr>Rows<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L67">Calendar.ts:67</a></li>
+					</ul>
+				</aside>
+				<div class="tsd-comment tsd-typography">
+					<dl class="tsd-comment-tags">
+						<dt>see</dt>
+						<dd><p><a href="../classes/calendar.html#updaterows">Calendar.updateRows</a></p>
+						</dd>
+					</dl>
+				</div>
 			</section>
 		</section>
 		<footer class="with-border-bottom">

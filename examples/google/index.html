@@ -674,9 +674,13 @@
               { text: 'Week of the month (first week has a Thursday)', property: 'weekOfMonth', max: 6 },
               { text: 'Weekspan of the month (starts on first day of month)', property: 'weekspanOfMonth', max: 7, min: 1, offset: -1 },
               { text: 'Full week of the month (0th = the week before if any)', property: 'fullWeekOfMonth', max: 6 },
+              { text: 'Last weekspan of the month (starts on last day of month)', property: 'lastWeekspanOfMonth', max: 7, min: 1, offset: -1 },
+              { text: 'Last full week of the month (0th = the week after if any)', property: 'lastFullWeekOfMonth', max: 6 },
               { text: 'Week of the year (first week has a Thursday)', property: 'weekOfYear', max: 54 },
               { text: 'Weekspan of the year (starts on first day of year)', property: 'weekspanOfYear', max: 53, min: 1, offset: -1 },
               { text: 'Full week of the year (0th = the week before if any)', property: 'fullWeekOfYear', max: 54 },
+              { text: 'Last weekspan of the year (starts on last day of year)', property: 'lastWeekspanOfYear', max: 53, min: 1, offset: -1 },
+              { text: 'Last full week of the year (0th = the week after if any)', property: 'lastFullWeekOfYear', max: 54 }
             ],
             weekOptions: [
               { text: 'Any week', value: 'any'},
@@ -686,12 +690,13 @@
             weekdayOptions: [
               { text: 'Any day of the week', value: 'any'},
               { text: 'On the following days of the week...', value: 'oneof'},
-              { text: 'Ever _ weekday starting on _', value: 'every'},
+              { text: 'Every _ weekday starting on _', value: 'every'},
               { text: 'Weekends', value: 'weekend'},
               { text: 'Weekdays', value: 'weekday'}
             ],
             dayTypes: [
               { text: 'Day of the month', property: 'dayOfMonth', max: 32, min: 1 },
+              { text: 'Last day of the month', property: 'lastDayOfMonth', max: 32, min: 1 },
               { text: 'Day of the year', property: 'dayOfYear', max: 367, min: 1, offset: -1 }
             ],
             dayOptions: [
@@ -1257,40 +1262,8 @@
         }
       });
 
-      var UpdateRowsMixin = {
-        watch: {
-          days: {
-            immediate: true,
-            handler: 'updateRows'
-          }
-        },
-        methods: {
-          updateRows: function() {
-            var parent = this;
-            var eventToRow = {};
-            this.days.forEach(function(day) {
-              day.events.sort(function(a, b) {
-                return a.time.start.time - b.time.start.time;
-              });
-              var rowIndex = 0;
-              day.events.forEach(function(e) {
-                if (!parent.isValidEvent(e)) {
-                  return;
-                }
-                if (e.id in eventToRow) {
-                  rowIndex = (e.row = eventToRow[ e.id ]) + 1;
-                } else {
-                  eventToRow[ e.id ] = e.row = rowIndex++;
-                }
-              });
-            });
-          }
-        }
-      };
-
       Vue.component('dsDayRow', {
         props: ['days', 'calendar'],
-        mixin: [ UpdateRowsMixin ],
         template: '#template_day_row',
         methods: {
           edit: function(eventDay) {
@@ -1307,7 +1280,6 @@
 
       Vue.component('dsWeekHeader', {
         props: ['days', 'calendar'],
-        mixin: [ UpdateRowsMixin ],
         template: '#template_week_header',
         methods: {
           add: function(day) {
@@ -1405,12 +1377,6 @@
       Vue.component('dsDayTimes', {
         props: ['day', 'calendar'],
         template: '#template_day_times',
-        watch: {
-          'day.events': {
-            immediate: true,
-            handler: 'updateColumns'
-          }
-        },
         computed: {
           nowLine: function() {
             var now = this.$root.now.asTime().toMilliseconds();
@@ -1438,38 +1404,6 @@
               day: this.day,
               hour: hour - 1
             });
-          },
-          updateColumns: function() {
-            var marks = [];
-
-            this.day.events.forEach(function(e) {
-              if (e.fullDay) {
-                return;
-              }
-              marks.push({
-                time: e.time.start,
-                event: e,
-                start: true
-              });
-              marks.push({
-                time: e.time.end,
-                event: e,
-                start: false
-              });
-            });
-
-            marks.sort(function(a, b) {
-              return a.time.time - b.time.time;
-            });
-
-            var indent = 0;
-
-            marks.forEach(function(m) {
-              if (m.start) {
-                m.event.col = indent;
-              }
-              indent += m.start ? 1 : -1;
-            });
           }
         }
       });
@@ -1482,6 +1416,7 @@
           calendar: null,
           dayProperty: Store.Load('dayProperty', 'dayOfMonth'),
           currentType: null,
+          loading: false,
           today: ds.Day.today(),
           tomorrow: ds.Day.tomorrow(),
           now: ds.Day.now(),
@@ -1500,14 +1435,19 @@
           dayProperties: {
             'Day Of Week': 'dayOfWeek',
             'Day Of Month': 'dayOfMonth',
+            'Last Day Of Month': 'lastDayOfMonth',
             'Day Of Year': 'dayOfYear',
             'Week': 'week',
             'Week Of Year': 'weekOfYear',
             'Weekspan Of Year': 'weekspanOfYear',
             'Full Week Of Year': 'fullWeekOfYear',
+            'Last Weekspan Of Year': 'lastWeekspanOfYear',
+            'Last Full Week Of Year': 'lastFullWeekOfYear',
             'Week Of Month': 'weekOfMonth',
             'Weekspan Of Month': 'weekspanOfMonth',
-            'Full Week Of Month': 'fullWeekOfMonth'
+            'Full Week Of Month': 'fullWeekOfMonth',
+            'Last Weekspan Of Month': 'lastWeekspanOfMonth',
+            'Last Full Week Of Month': 'lastFullWeekOfMonth'
           },
           weekdays: moment.weekdays(),
           weekdayCodes: moment.weekdaysShort(),
@@ -1541,10 +1481,10 @@
           ]
         },
         watch: {
-          input: Store.Watcher('input'),
-          dayProperty: Store.Watcher('dayProperty'),
           currentType: function() {
-            this.rebuild();
+            if (!this.loading) {
+              this.rebuild();
+            }
           }
         },
         computed: {
@@ -1588,7 +1528,29 @@
           // Update Times
           setTimeout(this.updateTimes, ds.Constants.MILLIS_IN_MINUTE);
         },
+        mounted: function() {
+          this.loadState();
+        },
         methods: {
+          saveState: function() {
+            localStorage.setItem('dayspan', JSON.stringify({
+              type: this.currentType.id,
+              around: this.calendar.span.start.dayIdentifier,
+              schedules: this.schedules
+            }));
+          },
+          loadState: function() {
+            var state = JSON.parse(localStorage.getItem('dayspan'));
+            if (state) {
+              this.loading = true;
+              this.schedules = state.schedules;
+              this.currentType = this.types.find(function(type) {
+                return type.id === state.type;
+              });
+              this.rebuild(ds.Day.fromDayIdentifier(state.around));
+              this.loading = false;
+            }
+          },
           updateTimes: function() {
             this.today = ds.Day.today();
             this.now = ds.Day.now();
@@ -1621,6 +1583,9 @@
                 this.calendar = ds.Calendar.days(type.size, around, 0, {
                   eventsOutside: true,
                   listTimes: true,
+                  updateRows: true,
+                  updateColumns: true,
+                  eventSorter: ds.Sorts.List([ds.Sorts.FullDay, ds.Sorts.Desc(ds.Sorts.Start)]),
                   schedules: this.schedules
                 });
                 break;
@@ -1628,6 +1593,9 @@
                 this.calendar = ds.Calendar.weeks(type.size, around, 0, {
                   eventsOutside: true,
                   listTimes: true,
+                  updateRows: true,
+                  updateColumns: true,
+                  eventSorter: ds.Sorts.List([ds.Sorts.FullDay, ds.Sorts.Desc(ds.Sorts.Start)]),
                   schedules: this.schedules
                 });
                 break;
@@ -1635,6 +1603,9 @@
                 this.calendar = ds.Calendar.months(type.size, around, 0, {
                   eventsOutside: true,
                   fill: true,
+                  updateRows: true,
+                  updateColumns: false,
+                  eventSorter: ds.Sorts.Start,
                   schedules: this.schedules
                 });
                 break;
@@ -1642,10 +1613,15 @@
                 this.calendar = ds.Calendar.years(type.size, around, 0, {
                   eventsOutside: true,
                   fill: true,
+                  updateRows: true,
+                  updateColumns: false,
+                  eventSorter: ds.Sorts.Start,
                   schedules: this.schedules
                 });
                 break;
             }
+
+            this.saveState();
           },
           selectStart: function(day) {
             this.selectionStart = day;
@@ -1669,9 +1645,11 @@
           },
           next: function() {
             this.calendar.unselect().next();
+            this.saveState();
           },
           prev: function() {
             this.calendar.unselect().prev();
+            this.saveState();
           },
           setToday: function() {
             this.rebuild(this.today);
@@ -1692,12 +1670,25 @@
           addAt: function(dayHour) {
             this.$refs.scheduler.addAt(dayHour.day, dayHour.hour);
           },
+          scheduleIndex: function(event) {
+            var schedules = this.schedules;
+            for (var i = schedules.length - 1; i >= 0; i--) {
+              if (schedules[ i ].event === event) {
+                return i;
+              }
+            }
+            return -1;
+          },
           eventSave: function(data) {
             if (data.event) {
               data.event.event.name = data.name;
               data.event.event.color = data.color;
               data.event.schedule.set( data.schedule );
               this.calendar.refreshEvents();
+              var i = this.scheduleIndex(data.event.event);
+              if (i !== -1) {
+                this.schedules[ i ].schedule = data.schedule;
+              }
             } else {
               var entry = {
                 event: { name: data.name, color: data.color },
@@ -1706,21 +1697,22 @@
               this.schedules.push( entry );
               this.calendar.addSchedule( entry );
             }
+            this.saveState();
             this.$forceUpdate();
           },
           eventRemove: function(calendarEvent) {
             this.calendar.removeSchedule( calendarEvent.event );
-            var schedules = this.schedules;
-            for (var i = schedules.length - 1; i >= 0; i--) {
-              if (schedules[ i ].event === calendarEvent.event) {
-                schedules.splice( i, 1 );
-              }
+            var i = this.scheduleIndex( calendarEvent.event );
+            if (i !== -1) {
+              this.schedules.splice( i, 1 );
             }
+            this.saveState();
             this.$forceUpdate();
           },
           eventRemoveOccurrence: function(data) {
             data.event.schedule.exclude[ data.day.dayIdentifier ] = true;
             this.calendar.refreshEvents();
+            this.saveState();
             this.$forceUpdate();
           }
         }

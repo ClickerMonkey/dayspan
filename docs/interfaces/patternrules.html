@@ -949,6 +949,9 @@ img { max-width: 100%; }
 			<a href="../classes/schedule.html" class="tsd-kind-icon">Schedule</a>
 		</li>
 		<li class=" tsd-kind-class">
+			<a href="../classes/sorts.html" class="tsd-kind-icon">Sorts</a>
+		</li>
+		<li class=" tsd-kind-class">
 			<a href="../classes/suffix.html" class="tsd-kind-icon">Suffix</a>
 		</li>
 		<li class=" tsd-kind-class">
@@ -986,6 +989,21 @@ img { max-width: 100%; }
 				</li>
 				<li class=" tsd-kind-property tsd-parent-kind-interface">
 					<a href="patternrules.html#fullweekofyear" class="tsd-kind-icon">full<wbr>Week<wbr>OfYear</a>
+				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="patternrules.html#lastdayofmonth" class="tsd-kind-icon">last<wbr>Day<wbr>OfMonth</a>
+				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="patternrules.html#lastfullweekofmonth" class="tsd-kind-icon">last<wbr>Full<wbr>Week<wbr>OfMonth</a>
+				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="patternrules.html#lastfullweekofyear" class="tsd-kind-icon">last<wbr>Full<wbr>Week<wbr>OfYear</a>
+				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="patternrules.html#lastweekspanofmonth" class="tsd-kind-icon">last<wbr>Weekspan<wbr>OfMonth</a>
+				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="patternrules.html#lastweekspanofyear" class="tsd-kind-icon">last<wbr>Weekspan<wbr>OfYear</a>
 				</li>
 				<li class=" tsd-kind-property tsd-parent-kind-interface">
 					<a href="patternrules.html#month" class="tsd-kind-icon">month</a>
@@ -1047,6 +1065,9 @@ img { max-width: 100%; }
 			<a href="../globals.html#scheduleexclusions" class="tsd-kind-icon">Schedule<wbr>Exclusions</a>
 		</li>
 		<li class=" tsd-kind-type-alias">
+			<a href="../globals.html#sortevent" class="tsd-kind-icon">Sort<wbr>Event</a>
+		</li>
+		<li class=" tsd-kind-type-alias">
 			<a href="../globals.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a>
 		</li>
 		<li class=" tsd-kind-variable">
@@ -1062,6 +1083,14 @@ img { max-width: 100%; }
 </nav>
 <div class="container container-main">
 	<div class="content-wrap">
+		<section class="tsd-panel tsd-comment">
+			<div class="tsd-comment tsd-typography">
+				<div class="lead">
+					<p>The set of rules you can specify for determining if a <a href="scheduleinput.html">ScheduleInput</a>
+					matches a pattern.</p>
+				</div>
+			</div>
+		</section>
 		<section class="tsd-panel tsd-hierarchy">
 			<h3>Hierarchy</h3>
 			<ul class="tsd-hierarchy">
@@ -1082,6 +1111,11 @@ img { max-width: 100%; }
 							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="patternrules.html#dayofyear" class="tsd-kind-icon">day<wbr>OfYear</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="patternrules.html#fullweekofmonth" class="tsd-kind-icon">full<wbr>Week<wbr>OfMonth</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="patternrules.html#fullweekofyear" class="tsd-kind-icon">full<wbr>Week<wbr>OfYear</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="patternrules.html#lastdayofmonth" class="tsd-kind-icon">last<wbr>Day<wbr>OfMonth</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="patternrules.html#lastfullweekofmonth" class="tsd-kind-icon">last<wbr>Full<wbr>Week<wbr>OfMonth</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="patternrules.html#lastfullweekofyear" class="tsd-kind-icon">last<wbr>Full<wbr>Week<wbr>OfYear</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="patternrules.html#lastweekspanofmonth" class="tsd-kind-icon">last<wbr>Weekspan<wbr>OfMonth</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="patternrules.html#lastweekspanofyear" class="tsd-kind-icon">last<wbr>Weekspan<wbr>OfYear</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="patternrules.html#month" class="tsd-kind-icon">month</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="patternrules.html#week" class="tsd-kind-icon">week</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="patternrules.html#weekofmonth" class="tsd-kind-icon">week<wbr>OfMonth</a></li>
@@ -1102,7 +1136,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">day<wbr>OfMonth<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L28">Pattern.ts:28</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L40">Pattern.ts:40</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1112,7 +1146,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">day<wbr>OfWeek<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L27">Pattern.ts:27</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L39">Pattern.ts:39</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1122,7 +1156,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">day<wbr>OfYear<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L29">Pattern.ts:29</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L42">Pattern.ts:42</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1132,7 +1166,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">full<wbr>Week<wbr>OfMonth<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L38">Pattern.ts:38</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L53">Pattern.ts:53</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1142,7 +1176,57 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">full<wbr>Week<wbr>OfYear<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L35">Pattern.ts:35</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L48">Pattern.ts:48</a></li>
+					</ul>
+				</aside>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<a name="lastdayofmonth" class="tsd-anchor"></a>
+				<h3><span class="tsd-flag ts-flagOptional">Optional</span> last<wbr>Day<wbr>OfMonth</h3>
+				<div class="tsd-signature tsd-kind-icon">last<wbr>Day<wbr>OfMonth<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L41">Pattern.ts:41</a></li>
+					</ul>
+				</aside>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<a name="lastfullweekofmonth" class="tsd-anchor"></a>
+				<h3><span class="tsd-flag ts-flagOptional">Optional</span> last<wbr>Full<wbr>Week<wbr>OfMonth</h3>
+				<div class="tsd-signature tsd-kind-icon">last<wbr>Full<wbr>Week<wbr>OfMonth<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L55">Pattern.ts:55</a></li>
+					</ul>
+				</aside>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<a name="lastfullweekofyear" class="tsd-anchor"></a>
+				<h3><span class="tsd-flag ts-flagOptional">Optional</span> last<wbr>Full<wbr>Week<wbr>OfYear</h3>
+				<div class="tsd-signature tsd-kind-icon">last<wbr>Full<wbr>Week<wbr>OfYear<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L50">Pattern.ts:50</a></li>
+					</ul>
+				</aside>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<a name="lastweekspanofmonth" class="tsd-anchor"></a>
+				<h3><span class="tsd-flag ts-flagOptional">Optional</span> last<wbr>Weekspan<wbr>OfMonth</h3>
+				<div class="tsd-signature tsd-kind-icon">last<wbr>Weekspan<wbr>OfMonth<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L54">Pattern.ts:54</a></li>
+					</ul>
+				</aside>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<a name="lastweekspanofyear" class="tsd-anchor"></a>
+				<h3><span class="tsd-flag ts-flagOptional">Optional</span> last<wbr>Weekspan<wbr>OfYear</h3>
+				<div class="tsd-signature tsd-kind-icon">last<wbr>Weekspan<wbr>OfYear<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L49">Pattern.ts:49</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1152,7 +1236,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">month<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L30">Pattern.ts:30</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L43">Pattern.ts:43</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1162,7 +1246,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">week<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L31">Pattern.ts:31</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L44">Pattern.ts:44</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1172,7 +1256,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">week<wbr>OfMonth<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L36">Pattern.ts:36</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L51">Pattern.ts:51</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1182,7 +1266,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">week<wbr>OfYear<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L33">Pattern.ts:33</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L46">Pattern.ts:46</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1192,7 +1276,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">weekspan<wbr>OfMonth<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L37">Pattern.ts:37</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L52">Pattern.ts:52</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1202,7 +1286,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">weekspan<wbr>OfYear<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L34">Pattern.ts:34</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L47">Pattern.ts:47</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1212,7 +1296,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">year<span class="tsd-signature-symbol">:</span> <a href="../globals.html#patternrule" class="tsd-signature-type">PatternRule</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Pattern.ts#L32">Pattern.ts:32</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L45">Pattern.ts:45</a></li>
 					</ul>
 				</aside>
 			</section>

@@ -958,6 +958,9 @@ img { max-width: 100%; }
 					<a href="parse.html#frequency" class="tsd-kind-icon">frequency</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a href="parse.html#givenfrequency" class="tsd-kind-icon">given<wbr>Frequency</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
 					<a href="parse.html#schedule" class="tsd-kind-icon">schedule</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
@@ -973,6 +976,9 @@ img { max-width: 100%; }
 		</li>
 		<li class=" tsd-kind-class">
 			<a href="schedule.html" class="tsd-kind-icon">Schedule</a>
+		</li>
+		<li class=" tsd-kind-class">
+			<a href="sorts.html" class="tsd-kind-icon">Sorts</a>
 		</li>
 		<li class=" tsd-kind-class">
 			<a href="suffix.html" class="tsd-kind-icon">Suffix</a>
@@ -1035,6 +1041,9 @@ img { max-width: 100%; }
 			<a href="../globals.html#scheduleexclusions" class="tsd-kind-icon">Schedule<wbr>Exclusions</a>
 		</li>
 		<li class=" tsd-kind-type-alias">
+			<a href="../globals.html#sortevent" class="tsd-kind-icon">Sort<wbr>Event</a>
+		</li>
+		<li class=" tsd-kind-type-alias">
 			<a href="../globals.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a>
 		</li>
 		<li class=" tsd-kind-variable">
@@ -1077,6 +1086,7 @@ img { max-width: 100%; }
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="parse.html#day" class="tsd-kind-icon">day</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="parse.html#exclusions" class="tsd-kind-icon">exclusions</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="parse.html#frequency" class="tsd-kind-icon">frequency</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="parse.html#givenfrequency" class="tsd-kind-icon">given<wbr>Frequency</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="parse.html#schedule" class="tsd-kind-icon">schedule</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="parse.html#time" class="tsd-kind-icon">time</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="parse.html#times" class="tsd-kind-icon">times</a></li>
@@ -1097,7 +1107,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L262">Parse.ts:262</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Parse.ts#L297">Parse.ts:297</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1135,7 +1145,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L278">Parse.ts:278</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Parse.ts#L313">Parse.ts:313</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1166,7 +1176,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L71">Parse.ts:71</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Parse.ts#L78">Parse.ts:78</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1205,7 +1215,7 @@ Parse.day( <span class="hljs-literal">true</span> );                   <span cla
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L183">Parse.ts:183</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Parse.ts#L190">Parse.ts:190</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1239,13 +1249,13 @@ Parse.day( <span class="hljs-literal">true</span> );                   <span cla
 				<a name="frequency" class="tsd-anchor"></a>
 				<h3><span class="tsd-flag ts-flagStatic">Static</span> frequency</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
-					<li class="tsd-signature tsd-kind-icon">frequency<span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, otherwiseEvery<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, otherwiseOffset<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></li>
+					<li class="tsd-signature tsd-kind-icon">frequency<span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, property<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L22">Parse.ts:22</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Parse.ts#L24">Parse.ts:24</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1262,15 +1272,49 @@ Parse.day( <span class="hljs-literal">true</span> );                   <span cla
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <span class="tsd-signature-type">any</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The input to parse into a function.</p>
+								</div>
 							</li>
 							<li>
-								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> otherwiseEvery: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;1</span></h5>
-							</li>
-							<li>
-								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> otherwiseOffset: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></h5>
+								<h5>property: <span class="tsd-signature-type">string</span></h5>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></h4>
+						<p>A function which determines whether a value matches a frequency.</p>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+				<a name="givenfrequency" class="tsd-anchor"></a>
+				<h3><span class="tsd-flag ts-flagStatic">Static</span> given<wbr>Frequency</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<li class="tsd-signature tsd-kind-icon">given<wbr>Frequency<span class="tsd-signature-symbol">(</span>checks<span class="tsd-signature-symbol">: </span><a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a><span class="tsd-signature-symbol">[]</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Parse.ts#L276">Parse.ts:276</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Parses an array of <a href="../interfaces/frequencycheck.html">FrequencyCheck</a> functions and returns an array of
+								functions for only the checks that were specified by the user.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>checks: <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a><span class="tsd-signature-symbol">[]</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The array of check functions to filter through.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a><span class="tsd-signature-symbol">[]</span></h4>
+						<p>The array of user specified checks.</p>
 					</li>
 				</ul>
 			</section>
@@ -1284,7 +1328,7 @@ Parse.day( <span class="hljs-literal">true</span> );                   <span cla
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L218">Parse.ts:218</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Parse.ts#L225">Parse.ts:225</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1323,7 +1367,7 @@ Parse.day( <span class="hljs-literal">true</span> );                   <span cla
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L120">Parse.ts:120</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Parse.ts#L127">Parse.ts:127</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1372,7 +1416,7 @@ Parse.time( {hour: <span class="hljs-number">2</span>} ); <span class="hljs-comm
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/9113f0d/src/Parse.ts#L151">Parse.ts:151</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Parse.ts#L158">Parse.ts:158</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
