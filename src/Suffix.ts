@@ -25,13 +25,13 @@ export class Suffix
   private static _CACHE: string[];
 
   /**
-   *
+   * The number of values to store in the cache (inclusive).
    */
   private static _CACHE_SIZE: number = 366;
 
 
   /**
-   *
+   * The cache of number & suffix pairs.
    */
   public static get CACHE(): string[]
   {
@@ -39,7 +39,7 @@ export class Suffix
     {
       this._CACHE = [];
 
-      for (let i = 0; i < this._CACHE_SIZE; i++)
+      for (let i = 0; i <= this._CACHE_SIZE; i++)
       {
         this._CACHE[ i ] = this.get( i, true );
       }
@@ -49,7 +49,10 @@ export class Suffix
   }
 
   /**
+   * Determines the suffix for a given number.
    *
+   * @param value The number to find the suffix for.
+   * @returns The suffix determined.
    */
   public static determine(value: number): string
   {
@@ -57,12 +60,17 @@ export class Suffix
   }
 
   /**
+   * Gets the suffix for a number and optionally appends it before the suffix.
    *
+   * @param value The number to get the suffix for.
+   * @param prepend When `true` the value is prepended to the suffix.
+   * @returns The suffix or value & suffix pair determined.
    */
-  public static get(value: number, append: boolean = false): string
+  public static get(value: number, prepend: boolean = false): string
   {
     let suffix: string = this.determine(value);
-    return append ? value + suffix : suffix;
+
+    return prepend ? value + suffix : suffix;
   }
 
 }

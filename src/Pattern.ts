@@ -1,13 +1,14 @@
 
+import { Functions as fn } from './Functions';
 import { Day } from './Day';
 import { Suffix } from './Suffix';
 import { Weekday } from './Weekday';
+import { FrequencyValueEvery } from './Frequency';
 import { ScheduleInput } from './Schedule';
-import { Functions as fn } from './Functions';
 
 
 /**
- * Describes a [[Pattern]] given a day to base it on.
+ * Describes a [[Pattern]] given a [[Day]] to base it on.
  *
  * @param day The day to base the description on.
  * @returns The description of the pattern.
@@ -26,16 +27,17 @@ export type DescribePattern = (day: Day) => string;
  * - When an object with every is given, the input must match the every and offset values (have the same frequency).
  */
 export type PatternRule =
-  number |                          // has array with this number of elements
-  number[] |                        // is array with same values
-  boolean |                         // is true or false
-  {every: number, offset?: number}; // is object with matching every and offset
+  number |                // has array with this number of elements
+  number[] |              // is array with same values
+  boolean |               // is true or false
+  FrequencyValueEvery;    // is object with matching every and offset
 
 /**
  * The set of rules you can specify for determining if a [[ScheduleInput]]
  * matches a pattern.
  */
-export interface PatternRules {
+export interface PatternRules
+{
   dayOfWeek?: PatternRule;
   dayOfMonth?: PatternRule;
   lastDayOfMonth?: PatternRule;
@@ -75,28 +77,39 @@ export class Pattern
   ];
 
   /**
-   *
+   * Whether this pattern should be "listed" or not. Visual schedulers may
+   * provide a shortcut to describing and changing a [[Schedule]] through
+   * patterns and any pattern where listed is `true` could be an option in a
+   * list. The default patterns are all listed.
    */
   public listed: boolean;
 
   /**
-   *
+   * The function which describes this pattern given a [[Day]] to base it on.
    */
   public describe: DescribePattern;
 
   /**
-   *
+   * The name of this pattern. This is not typically displayed to a user, just
+   * to uniquely identify a pattern.
    */
   public name: string;
 
   /**
-   *
+   * The rules for matching a pattern to a [[Schedule]] or applying a pattern to
+   * a schedule.
    */
   public rules: PatternRules;
 
 
   /**
+   * Creates a new pattern.
    *
+   * @param name The unique name of the pattern.
+   * @param listed If the pattern is "listed" [[Pattern.listed]].
+   * @param describe A function to describe the pattern given a [[Day]].
+   * @param rules The rules which describe how to detect and apply the pattern
+   *    to schedule input.
    */
   public constructor(name: string, listed: boolean, describe: DescribePattern, rules: PatternRules)
   {
@@ -107,7 +120,13 @@ export class Pattern
   }
 
   /**
+   * Applies this pattern to schedule input removing and adding any necessary
+   * properties from the input to match this pattern - based around the day
+   * provided.
    *
+   * @param input The input to update to match this pattern.
+   * @param day The day to base the schedule on.
+   * @returns The reference to the input passed in.
    */
   public apply(input: ScheduleInput, day: Day): ScheduleInput
   {
@@ -138,7 +157,14 @@ export class Pattern
   }
 
   /**
+   * Determines whether the given input matches this pattern. Optionally a day
+   * can be provided to make sure the day matches the schedule and pattern
+   * together.
    *
+   * @param input The schedule input to test.
+   * @param exactlyWith A day to further validate against for matching.
+   * @returns `true` if the schedule input was a match to this pattern with the
+   *    day if one was provided, otherwise `false`.
    */
   public isMatch(input: ScheduleInput, exactlyWith?: Day): boolean
   {
@@ -237,7 +263,11 @@ export class Pattern
   }
 
   /**
+   * Returns the pattern with the given name if one exists. If you add your own
+   * patterns make sure to add them to [[PatternMap]].
    *
+   * @param name The name of the pattern to return.
+   * @return The instance to the pattern with the same name.
    */
   public static withName(name: string): Pattern
   {
@@ -245,7 +275,14 @@ export class Pattern
   }
 
   /**
+   * Finds a matching pattern to the given input searching through [[Patterns]]
+   * for matches. Optionally it will only look at patterns where listed = `true`.
    *
+   * @param input The schedule input to use.
+   * @param listedOnly When `true` only patterns with [[Pattern.listed]] set to
+   *    `true` will be looked at, otherwise all patterns are looked at.
+   * @param exactlyWith  A day to further validate against for matching.
+   * @see [[Pattern.isMatch]]
    */
   public static findMatch(input: ScheduleInput, listedOnly: boolean = true, exactlyWith?: Day): Pattern
   {
@@ -260,12 +297,14 @@ export class Pattern
     return null;
   }
 
-
 }
 
 
 /**
+ * The list of patterns that can be searched through for matches to schedule
+ * input.
  *
+ * @see [[Pattern.findMatch]]
  */
 export let Patterns: Pattern[] = [
   new Pattern(
@@ -356,7 +395,9 @@ export let Patterns: Pattern[] = [
 ];
 
 /**
+ * The map of patterns keyed by their name.
  *
+ * @see [[Pattern.withName]]
  */
 export let PatternMap: { [name: string]: Pattern } = {};
 

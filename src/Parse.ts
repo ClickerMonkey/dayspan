@@ -170,6 +170,12 @@ export class Parse
           times.push( time );
         }
       }
+
+      // Sort times from earliest to latest.
+      times.sort((a, b) =>
+      {
+        return a.toMilliseconds() - b.toMilliseconds();
+      });
     }
 
     return times;
@@ -180,7 +186,8 @@ export class Parse
    * array value and returned object key are [[Day.dayIdentifier]].
    *
    * ```typescript
-   * Parse.exclusions( [ 01012018, 05062014 ] ); // {'01012018': true, '05062014': true}
+   * Parse.exclusions( [ 20180101, 20140506 ] );            // {'20180101': true, '20140506': true}
+   * Parse.exclusions( [ 20180101, Day.build(2014,4,6) ] ); // {'20180101': true, '20140506': true}
    * ```
    *
    * @param input The input to parse.

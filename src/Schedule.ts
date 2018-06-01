@@ -7,278 +7,299 @@ import { Constants } from './Constants';
 import { Parse } from './Parse';
 import { Time, TimeInput } from './Time';
 import { Suffix } from './Suffix';
+
 // @ts-ignore
 import * as moment from 'moment';
 
 
-
 /**
- *
+ * Input given by a user which describes an event schedule.
  */
 export interface ScheduleInput
 {
+
   /**
-   *
+   * @see [[Schedule.start]]
    */
   start?: DayInput;
 
   /**
-   *
+   * @see [[Schedule.end]]
    */
   end?: DayInput;
 
   /**
-   *
+   * A shortcut to setting the [[Schedule.start]], [[Schedule.end]],
+   * [[Schedule.year]], [[Schedule.month]], and [[Schedule.dayOfMonth]].
    */
   on?: DayInput;
 
   /**
-   *
+   * @see [[Schedule.times]]
    */
   times?: TimeInput[];
 
   /**
-   *
+   * @see [[Schedule.duration]]
    */
   duration?: number;
 
   /**
-   *
+   * @see [[Schedule.durationUnit]]
    */
   durationUnit?: DurationInput;
 
   /**
+   * An array of days which should be excluded from the schedule.
    *
+   * @see [[Schedule.exclude]]
    */
   exclude?: DayInput[];
 
   /**
-   *
+   * @see [[Schedule.month]]
    */
   month?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.year]]
    */
   year?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.week]]
    */
   week?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.dayOfWeek]]
    */
   dayOfWeek?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.dayOfMonth]]
    */
   dayOfMonth?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.lastDayOfMonth]]
    */
   lastDayOfMonth?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.dayOfYear]]
    */
   dayOfYear?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.weekOfYear]]
    */
   weekOfYear?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.weekspanOfYear]]
    */
   weekspanOfYear?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.fullWeekOfYear]]
    */
   fullWeekOfYear?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.lastWeekspanOfYear]]
    */
   lastWeekspanOfYear?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.lastFullWeekOfYear]]
    */
   lastFullWeekOfYear?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.weekOfMonth]]
    */
   weekOfMonth?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.weekspanOfMonth]]
    */
   weekspanOfMonth?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.fullWeekOfMonth]]
    */
   fullWeekOfMonth?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.lastWeekspanOfMonth]]
    */
   lastWeekspanOfMonth?: FrequencyValue;
 
   /**
-   *
+   * @see [[Schedule.lastFullWeekOfMonth]]
    */
   lastFullWeekOfMonth?: FrequencyValue;
 }
 
 
 /**
- *
+ * A map of excluded days where the key is the [[Day.dayIdentifier]] and the
+ * value is `true`.
  */
 export type ScheduleExclusions = { [dayIdentifier: number]: boolean };
 
 
 /**
- *
+ * A class which describes when an event occurs over what time and if it repeats.
  */
 export class Schedule
 {
 
   /**
-   *
+   * The earliest an event can occur in the schedule, or `null` if there are no
+   * restrictions when the earliest event can occur. This day is inclusive.
    */
   public start: Day;
 
   /**
-   *
+   * The latest an event can occur in the schedule, or `null` if there are no
+   * restrictions when the latest event can occur. This day is inclusive.
    */
   public end: Day;
 
   /**
-   *
+   * The length of events in this schedule.
    */
   public duration: number;
 
   /**
-   *
+   * The unit which describes the duration of the event.
    */
   public durationUnit: DurationInput;
 
   /**
-   *
+   * The times at which the events occur on the days they should. If there are
+   * no times specified its assumed to be an all day event - potentially over
+   * multiple days or weeks based on [[Schedule.duration]] and
+   * [[Schedule.durationUnit]].
    */
   public times: Time[];
 
   /**
-   *
+   * The number of days an event in this schedule lasts PAST the starting day.
+   * If this is a full day event with a duration greater than zero this value
+   * will be greater than one. If this event occurs at a specific time with a
+   * given duration that is taken into account and if it passes over into the
+   * next day this value will be greater than one. This value is used to look
+   * back in time when trying to figure out what events start or overlap on a
+   * given day.
    */
   public durationInDays: number;
 
   /**
-   *
+   * A map of excluded days where the key is [[Day.dayIdentifier]] and the value
+   * is `true` unless otherwise overriden.
    */
   public exclude: ScheduleExclusions;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.dayOfWeek]].
    */
   public dayOfWeek: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.dayOfMonth]].
    */
   public dayOfMonth: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.lastDayOfMonth]].
    */
   public lastDayOfMonth: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.dayOfYear]].
    */
   public dayOfYear: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.month]].
    */
   public month: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.week]].
    */
   public week: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.weekOfYear]].
    */
   public weekOfYear: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.weekspanOfYear]].
    */
   public weekspanOfYear: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.fullWeekOfYear]].
    */
   public fullWeekOfYear: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.lastWeekspanOfYear]].
    */
   public lastWeekspanOfYear: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.lastFullWeekOfYear]].
    */
   public lastFullWeekOfYear: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.weekOfMonth]].
    */
   public weekOfMonth: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.weekspanOfMonth]].
    */
   public weekspanOfMonth: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.fullWeekOfMonth]].
    */
   public fullWeekOfMonth: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.lastWeekspanOfMonth]].
    */
   public lastWeekspanOfMonth: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.lastFullWeekOfMonth]].
    */
   public lastFullWeekOfMonth: FrequencyCheck;
 
   /**
-   *
+   * How frequent the event occurs based on [[Day.year]].
    */
   public year: FrequencyCheck;
 
   /**
+   * The array of frequency functions which had valid frequencies.
    *
+   * @see [[FrequencyCheck.given]]
    */
   public checks: FrequencyCheck[];
 
 
   /**
+   * Creates a schedule based on the given input.
    *
+   * @param input The input which describes the schedule of events.
    */
   public constructor(input?: ScheduleInput)
   {
@@ -289,7 +310,10 @@ export class Schedule
   }
 
   /**
+   * Sets the schedule with the given input.
    *
+   * @param input The input which describes the schedule of events.
+   * @see [[Parse.schedule]]
    */
   public set(input: ScheduleInput): this
   {
@@ -299,7 +323,8 @@ export class Schedule
   }
 
   /**
-   *
+   * Returns the last event time specified or `undefined` if this schedule is
+   * for an all day event.
    */
   public get lastTime(): Time
   {
@@ -307,7 +332,9 @@ export class Schedule
   }
 
   /**
-   *
+   * Updates the [[Schedule.durationInDays]] variable based on the
+   * [[Schedule.lastTime]] (if any), the [[Schedule.duration]] and it's
+   * [[Schedule.durationUnit]].
    */
   public updateDurationInDays(): this
   {
@@ -322,7 +349,8 @@ export class Schedule
   }
 
   /**
-   *
+   * Updates [[Schedule.checks]] based on the frequencies that were specified
+   * in the schedule input.
    */
   public updateChecks(): this
   {
@@ -350,7 +378,13 @@ export class Schedule
   }
 
   /**
+   * Determines whether the given day lies between the earliest and latest
+   * valid day in the schedule.
    *
+   * @param day The day to test.
+   * @returns `true` if the day lies in the schedule, otherwise `false`.
+   * @see [[Schedule.start]]
+   * @see [[Schedule.end]]
    */
   public matchesSpan(day: Day): boolean
   {
@@ -359,7 +393,14 @@ export class Schedule
   }
 
   /**
+   * Determines whether the given range overlaps with the earliest and latest
+   * valid days in this schedule (if any).
    *
+   * @param start The first day in the range.
+   * @param end The last day in the range.
+   * @returns `true` if the range intersects with the schedule, otherwise `false`.
+   * @see [[Schedule.start]]
+   * @see [[Schedule.end]]
    */
   public matchesRange(start: Day, end: Day): boolean
   {
@@ -368,7 +409,10 @@ export class Schedule
   }
 
   /**
+   * Determines whether the given day is explicitly excluded in the schedule.
    *
+   * @param day The day to test.
+   * @returns `true` if the day was excluded, otherwise `false`.
    */
   public isExcluded(day: Day): boolean
   {
@@ -376,7 +420,10 @@ export class Schedule
   }
 
   /**
+   * Determines whether the given day is NOT explicitly excluded in the schedule.
    *
+   * @param day The day to test.
+   * @returns `true` if the day is NOT explicitly excluded, otherwise `false`.
    */
   public isIncluded(day: Day): boolean
   {
@@ -384,11 +431,18 @@ export class Schedule
   }
 
   /**
+   * Determines whether the given day is a day on the schedule for the start
+   * of an event. If an event is more than one day and the day given is not the
+   * start this may return `false`.
    *
+   * @param day The day to test.
+   * @returns `true` if the day marks the start of an event on the schedule.
+   * @see [[Schedule.isExcluded]]
+   * @see [[Schedule.matchesSpan]]
    */
   public matchesDay(day: Day): boolean
   {
-    if (!this.isIncluded( day ) || !this.matchesSpan( day ))
+    if (this.isExcluded( day ) || !this.matchesSpan( day ))
     {
       return false;
     }
@@ -411,7 +465,8 @@ export class Schedule
    * schedule.
    *
    * @param day The day to test.
-   * @param
+   * @returns `true` if the day is covered by an event on this schedule,
+   *    otherwise `false`.
    */
   public coversDay(day: Day): boolean
   {
@@ -419,7 +474,14 @@ export class Schedule
   }
 
   /**
+   * Finds the next day an event occurs on the schedule given a day to start,
+   * optionally including it, and a maximum number of days to look ahead.
    *
+   * @param day The day to start to search from.
+   * @param includeDay If the given day should be included in the search.
+   * @param lookAhead The maximum number of days to look ahead from the given
+   *     day for event occurrences.
+   * @returns The next day on the schedule or `null` if none exists.
    */
   public nextDay(day: Day, includeDay: boolean = false, lookAhead: number = 366): Day
   {
@@ -435,7 +497,17 @@ export class Schedule
   }
 
   /**
+   * Finds the next specified number of days that events occur on the schedule
+   * given a day to start, optionally including it, and a maximum number of days
+   * to look ahead.
    *
+   * @param day The day to start to search from.
+   * @param max The maximum number of days to return in the result.
+   * @param includeDay If the given day should be included in the search.
+   * @param lookAhead The maximum number of days to look ahead from the given
+   *     day for event occurrences.
+   * @returns An array containing the next days on the schedule that events
+   *    start or an empty array if there are none.
    */
   public nextDays(day: Day, max: number, includeDay: boolean = false, lookAhead: number = 366): Day[]
   {
@@ -447,7 +519,14 @@ export class Schedule
   }
 
   /**
+   * Finds the previous day an event occurs on the schedule given a day to start,
+   * optionally including it, and a maximum number of days to look behind.
    *
+   * @param day The day to start to search from.
+   * @param includeDay If the given day should be included in the search.
+   * @param lookAhead The maximum number of days to look behind from the given
+   *     day for event occurrences.
+   * @returns The previous day on the schedule or `null` if none exists.
    */
   public prevDay(day: Day, includeDay: boolean = false, lookBack: number = 366): Day
   {
@@ -463,7 +542,17 @@ export class Schedule
   }
 
   /**
+   * Finds the previous specified number of days that events occur on the
+   * schedule given a day to start, optionally including it, and a maximum
+   * number of days to look behind.
    *
+   * @param day The day to start to search from.
+   * @param max The maximum number of days to return in the result.
+   * @param includeDay If the given day should be included in the search.
+   * @param lookAhead The maximum number of days to look behind from the given
+   *     day for event occurrences.
+   * @returns An array containing the previous days on the schedule that events
+   *    start or an empty array if there are none.
    */
   public prevDays(day: Day, max: number, includeDay: boolean = false, lookBack: number = 366): Day[]
   {
@@ -475,7 +564,18 @@ export class Schedule
   }
 
   /**
+   * Iterates over days that events start in the schedule given a day to start,
+   * a maximum number of days to find, and a direction to look.
    *
+   * @param day The day to start to search from.
+   * @param max The maximum number of times to invoke the `onDay` callback.
+   * @param next If `true` this searches forward, otherwise `false` is backwards.
+   * @param onDay A function to invoke for each matching day found. If this
+   *    function returns `false` the iteration stops immediately.
+   * @param includeDay If the given day should be included in the search.
+   * @param lookup The maximum number of days to look through from the given
+   *     day for event occurrences.
+   * @see [[Schedule.matchesDay]]
    */
   public iterateDays(day: Day, max: number, next: boolean, onDay: DayIterator, includeDay: boolean = false, lookup: number = 366): this
   {
@@ -506,7 +606,11 @@ export class Schedule
   }
 
   /**
+   * Determines if the given day is on the schedule and the time specified on
+   * the day matches one of the times on the schedule.
    *
+   * @param day The day to test.
+   * @returns `true` if the day and time match the schedule, otherwise false.
    */
   public matchesTime(day: Day): boolean
   {
@@ -527,7 +631,46 @@ export class Schedule
   }
 
   /**
+   * Determines if the given timestamp lies in an event occurrence on this
+   * schedule.
    *
+   * @param day The timestamp to test against the schedule.
+   * @return `true` if the timestamp lies in an event occurrent start and end
+   *    timestamps, otherwise `false`.
+   */
+  public coversTime(day: Day): boolean
+  {
+    let start: Day = this.findStartingDay(day);
+
+    if (!start)
+    {
+      return false;
+    }
+
+    if (this.isFullDay())
+    {
+      return this.getFullSpan(start).contains(day);
+    }
+    else
+    {
+      for (let time of this.times)
+      {
+        if (this.getTimeSpan(start, time).contains(day))
+        {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Returns whether the events in the schedule are all day long or start at
+   * specific times. Full day events start at the start of the day and end at
+   * the start of the next day (if the duration = `1` and durationUnit = 'days').
+   * Full day events have no times specified and should have a durationUnit of
+   * either `days` or `weeks`.
    */
   public isFullDay(): boolean
   {
@@ -535,7 +678,11 @@ export class Schedule
   }
 
   /**
+   * Returns a span of time for a schedule with full day events starting on the
+   * start of the given day with the desired duration in days or weeks.
    *
+   * @param day The day the span starts on.
+   * @returns The span of time starting on the given day.
    */
   public getFullSpan(day: Day): DaySpan
   {
@@ -546,7 +693,12 @@ export class Schedule
   }
 
   /**
+   * Returns a span of time starting on the given day at the given day with the
+   * duration specified on this schedule.
    *
+   * @param day The day the span starts on.
+   * @param time The time of day the span starts.
+   * @returns The span of time calculated.
    */
   public getTimeSpan(day: Day, time: Time): DaySpan
   {
@@ -557,7 +709,13 @@ export class Schedule
   }
 
   /**
+   * Returns an array of spans of times that cover the the given day taking into
+   * account multi-day events. This does not check if the day is even on the
+   * schedule, it assumes it was already passed to [[Schedule.coversDay]] and it
+   * returned `true`.
    *
+   * @param day The day to return spans over.
+   * @returns An array of spans for each event occurrence over the given day.
    */
   public getSpansOver(day: Day): DaySpan[]
   {
@@ -579,7 +737,7 @@ export class Schedule
       {
         let span: DaySpan = this.getTimeSpan( start, time );
 
-        if (span.matchesDay(start))
+        if (span.matchesDay(day))
         {
           spans.push( span );
         }
@@ -590,7 +748,12 @@ export class Schedule
   }
 
   /**
+   * Returns a span of time over the given day. This does not check if the day
+   * is even on the schedule, it assumes it was already passed to
+   * [[Schedule.coversDay]] and it returned `true`.
    *
+   * @param day The day to return a span over.
+   * @returns A span over the given day.
    */
   public getSpanOver(day: Day): DaySpan
   {
@@ -600,7 +763,16 @@ export class Schedule
   }
 
   /**
+   * Returns an array of spans of times that start on the given day. This can
+   * optionally check to see if th day is on the schedule, or just assume the
+   * day is.
    *
+   * @param day The day to return a span that starts on.
+   * @param check When `true` [[Schedule.matchesDay]] is passed the given day
+   *    and an empty array is returned if the day is not on the schedule.
+   *    Otherwise its assumed the given day is on the schedule.
+   * @returns An array of spans for each event occurrence that start on the
+   *    given day.
    */
   public getSpansOn(day: Day, check: boolean = false): DaySpan[]
   {
@@ -619,9 +791,7 @@ export class Schedule
     {
       for (let time of this.times)
       {
-        let span: DaySpan = this.getTimeSpan( day, time );
-
-        spans.push(span);
+        spans.push(this.getTimeSpan( day, time ));
       }
     }
 
@@ -629,7 +799,12 @@ export class Schedule
   }
 
   /**
+   * If the given day potentially overlaps an event occurrence on the schedule
+   * this will find the day when the event occurrence starts.
    *
+   * @param day The day to check against the schedule for a starting day.
+   * @returns The day that is a start of an event that potentially overlaps
+   *    the given day.
    */
   public findStartingDay(day: Day): Day
   {
@@ -650,9 +825,14 @@ export class Schedule
   }
 
   /**
+   * Converts the map of exclusions to an array of [[Day]] instances or
+   * [[Day.dayIdentifier]]s.
    *
+   * @param returnDays When `true` [[Day]] instances are returned, otherwise
+   *    [[Day.dayIdentifier]]s are returned.
+   * @return THe array of excluded days or an empty array if none are excluded.
    */
-  public getExclusions(returnDays: boolean = true)
+  public getExclusions(returnDays: boolean = true): DayInput[]
   {
     let exclusions: DayInput[] = [];
 
@@ -667,7 +847,20 @@ export class Schedule
   }
 
   /**
+   * Converts the schedule instance back into input.
    *
+   * @param returnDays When `true` the start, end, and array of exclusions will
+   *    have [[Day]] instances, otherwise the UNIX timestamp and dayIdentifiers
+   *    will be used when `false`.
+   * @param returnTimes When `true` the times returned in the input will be
+   *    instances of [[Time]] otherwise the `timeFormat` is used to convert the
+   *    times to strings.
+   * @param timeFormat The time format to use when returning the times as strings.
+   * @param alwaysDuration If the duration values (`duration` and
+   *    `durationUnit`) should always be returned in the input.
+   * @returns The input that describes this schedule.
+   * @see [[Schedule.getExclusions]]
+   * @see [[Time.format]]
    */
   public toInput(returnDays: boolean = false, returnTimes: boolean = false, timeFormat: string = '', alwaysDuration: boolean = false): ScheduleInput
   {
@@ -709,7 +902,20 @@ export class Schedule
   }
 
   /**
+   * Describes the schedule in a human friendly string taking into account all
+   * possible values specified in this schedule.
    *
+   * @param thing A brief description of the things (events) on the schedule.
+   * @param includeRange When `true` the [[Schedule.start]] and [[Schedule.end]]
+   *    are possibly included in the description if they have values.
+   * @param includeTimes When `true` the [[Schedule.times]] are possibly included
+   *    in the description.
+   * @param includeDuration When `true` the [[Schedule.duration]] and
+   *    [[Schedule.durationUnit]] are added to the description if
+   *    [[Schedule.duration]] is not equal to `1`.
+   * @param includeExcludes When `true` the [[Schedule.exclusions]] are added
+   *    to the description if there are any.
+   * @returns The descroption of the schedule.
    */
   public describe(thing: string = 'event',
     includeRange: boolean = true,
@@ -793,7 +999,19 @@ export class Schedule
   }
 
   /**
+   * Describes the given frequency.
    *
+   * @param value The frequency to describe.
+   * @param unit The unit of the frequency.
+   * @param map How the values in the frequency should be described.
+   * @param everyOffset A value to add to a [[FrequencyValueEvery]] offset to
+   *    account for zero-based values that should be shifted for human
+   *    friendliness.
+   * @param the If the word 'the' should be used to describe the unit.
+   * @param on The word which preceeds values of the given unit.
+   * @param required If the description should always return a non-empty string
+   *    even if the frequency was not specified in the original input.
+   * @returns A string description of the frequency.
    */
   private describeRule(value: FrequencyValue, unit: string, map: (x: number) => any, everyOffset: number = 0, the: boolean = true, on: string = ' on ', required: boolean = false): string
   {
@@ -831,7 +1049,12 @@ export class Schedule
   }
 
   /**
+   * Describes the array by adding commas where appropriate and 'and' before the
+   * last value of the array (if its more than `1`).
    *
+   * @param array The array of items to describe.
+   * @param map The function which converts an item to a string.
+   * @returns The final description of the array items.
    */
   private describeArray<T>(array: T[], map: (item: T) => string): string
   {
