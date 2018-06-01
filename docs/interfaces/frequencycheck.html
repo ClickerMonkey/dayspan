@@ -1041,6 +1041,16 @@ img { max-width: 100%; }
 </nav>
 <div class="container container-main">
 	<div class="content-wrap">
+		<section class="tsd-panel tsd-comment">
+			<div class="tsd-comment tsd-typography">
+				<div class="lead">
+					<p>A function which takes a value and returns whether it coincides with the
+						desired frequency (based on <a href="frequencycheck.html#input">FrequencyCheck.input</a> and parsed by
+						<a href="../classes/parse.html#frequency">Parse.frequency</a>). This is loosely tied to a property on the <a href="../classes/day.html">Day</a>
+					object through the <a href="frequencycheck.html#property">FrequencyCheck.property</a> value.</p>
+				</div>
+			</div>
+		</section>
 		<section class="tsd-panel tsd-hierarchy">
 			<h3>Hierarchy</h3>
 			<ul class="tsd-hierarchy">
@@ -1058,18 +1068,25 @@ img { max-width: 100%; }
 				<li class="tsd-description">
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in Frequency.ts:34</li>
+							<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Frequency.ts#L41">Frequency.ts:41</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Tests if the value coincides with the specified frequency.</p>
+						</div>
 					</div>
 					<h4 class="tsd-parameters-title">Parameters</h4>
 					<ul class="tsd-parameters">
 						<li>
 							<h5>value: <span class="tsd-signature-type">number</span></h5>
+							<div class="tsd-comment tsd-typography">
+								<p>The number to test.</p>
+							</div>
 						</li>
 					</ul>
 					<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+					<p><code>true</code> if the value occurs, otherwise <code>false</code>.</p>
 				</li>
 			</ul>
 		</section>
@@ -1096,9 +1113,16 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">given<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in Frequency.ts:52</li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Frequency.ts#L62">Frequency.ts:62</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Whether the <a href="frequencycheck.html#input">FrequencyCheck.input</a> given was a valid frequency value and
+							this function will produce desirable results. If given is false, the input
+						was missing or was not valid and this function will always return true.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 				<a name="input" class="tsd-anchor"></a>
@@ -1106,9 +1130,15 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">input<span class="tsd-signature-symbol">:</span> <a href="../globals.html#frequencyvalue" class="tsd-signature-type">FrequencyValue</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in Frequency.ts:47</li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Frequency.ts#L55">Frequency.ts:55</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The original input passed to <a href="../classes/parse.html#frequency">Parse.frequency</a> which generated this
+						function.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 				<a name="property" class="tsd-anchor"></a>
@@ -1116,9 +1146,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">property<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in Frequency.ts:57</li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Frequency.ts#L67">Frequency.ts:67</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The property on the <a href="../classes/day.html">Day</a> object this function evaluates.</p>
+					</div>
+				</div>
 			</section>
 		</section>
 		<footer class="with-border-bottom">

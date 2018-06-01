@@ -975,10 +975,10 @@ img { max-width: 100%; }
 				<li class=" tsd-kind-property tsd-parent-kind-class">
 					<a href="calendar.html#updaterows" class="tsd-kind-icon">update<wbr>Rows</a>
 				</li>
-				<li class=" tsd-kind-accessor tsd-parent-kind-class">
+				<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 					<a href="calendar.html#end" class="tsd-kind-icon">end</a>
 				</li>
-				<li class=" tsd-kind-accessor tsd-parent-kind-class">
+				<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 					<a href="calendar.html#start" class="tsd-kind-icon">start</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -1194,6 +1194,14 @@ img { max-width: 100%; }
 </nav>
 <div class="container container-main">
 	<div class="content-wrap">
+		<section class="tsd-panel tsd-comment">
+			<div class="tsd-comment tsd-typography">
+				<div class="lead">
+					<p>A collection of <a href="calendarday.html">CalendarDay</a>s, the schedules on the calendar, and all
+					<a href="calendarevent.html">CalendarEvent</a>s generated based on the schedules.</p>
+				</div>
+			</div>
+		</section>
 		<section class="tsd-panel tsd-type-parameters">
 			<h3>Type parameters</h3>
 			<ul class="tsd-type-parameters">
@@ -1246,8 +1254,8 @@ img { max-width: 100%; }
 					<section class="tsd-index-section ">
 						<h3>Accessors</h3>
 						<ul class="tsd-index-list">
-							<li class="tsd-kind-accessor tsd-parent-kind-class"><a href="calendar.html#end" class="tsd-kind-icon">end</a></li>
-							<li class="tsd-kind-accessor tsd-parent-kind-class"><a href="calendar.html#start" class="tsd-kind-icon">start</a></li>
+							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="calendar.html#end" class="tsd-kind-icon">end</a></li>
+							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="calendar.html#start" class="tsd-kind-icon">start</a></li>
 						</ul>
 					</section>
 					<section class="tsd-index-section ">
@@ -1303,31 +1311,92 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L178">Calendar.ts:178</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L221">Calendar.ts:221</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Creates a new calendar given a span, type, size, moving functions, and
+								optionally some default properties for the calendar.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="calendar.html#start">Calendar.start</a></p>
+								</dd>
+								<dt>see</dt>
+								<dd><p><a href="calendar.html#end">Calendar.end</a></p>
+								</dd>
+								<dt>see</dt>
+								<dd><p><a href="calendar.html#type">Calendar.type</a></p>
+								</dd>
+								<dt>see</dt>
+								<dd><p><a href="calendar.html#size">Calendar.size</a></p>
+								</dd>
+								<dt>see</dt>
+								<dd><p><a href="calendar.html#movestart">Calendar.moveStart</a></p>
+								</dd>
+								<dt>see</dt>
+								<dd><p><a href="calendar.html#moveend">Calendar.moveEnd</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>start: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The first day on the calendar.</p>
+									</div>
+								</div>
 							</li>
 							<li>
 								<h5>end: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The last day on the calendar.</p>
+									</div>
+								</div>
 							</li>
 							<li>
 								<h5>type: <a href="../enums/units.html" class="tsd-signature-type">Units</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The calendar type used for describing the calendar and splitting it.</p>
+									</div>
+								</div>
 							</li>
 							<li>
 								<h5>size: <span class="tsd-signature-type">number</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The number of calendar types in this calendar.</p>
+									</div>
+								</div>
 							</li>
 							<li>
 								<h5>moveStart: <a href="../globals.html#calendarmover" class="tsd-signature-type">CalendarMover</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The function to move the start day.</p>
+									</div>
+								</div>
 							</li>
 							<li>
 								<h5>moveEnd: <a href="../globals.html#calendarmover" class="tsd-signature-type">CalendarMover</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The function to move the end by.</p>
+									</div>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagOptional">Optional</span> input: <a href="../interfaces/calendarinput.html" class="tsd-signature-type">CalendarInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The default properties for this calendar.</p>
+									</div>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="calendar.html" class="tsd-signature-type">Calendar</a></h4>
@@ -1343,9 +1412,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">days<span class="tsd-signature-symbol">:</span> <a href="calendarday.html" class="tsd-signature-type">CalendarDay</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[]</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L173">Calendar.ts:173</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L216">Calendar.ts:216</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The array of days in this calendar and their events.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="eventsorter" class="tsd-anchor"></a>
@@ -1353,9 +1427,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">event<wbr>Sorter<span class="tsd-signature-symbol">:</span> <a href="../globals.html#sortevent" class="tsd-signature-type">SortEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;null</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L162">Calendar.ts:162</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L203">Calendar.ts:203</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The function (if any) which sorts the events on a calendar day.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="eventsoutside" class="tsd-anchor"></a>
@@ -1363,9 +1442,17 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">events<wbr>Outside<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L147">Calendar.ts:147</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L185">Calendar.ts:185</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>When <code>true</code> events will be added to days &quot;outside&quot; the calendar. Days
+							outside the calendar are days filled in when <a href="calendar.html#fill">Calendar.fill</a> is <code>true</code>.
+							More specifically days that are in <a href="calendar.html#filled">Calendar.filled</a> and not in
+						<a href="calendar.html#span">Calendar.span</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="fill" class="tsd-anchor"></a>
@@ -1373,9 +1460,15 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">fill<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L127">Calendar.ts:127</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L156">Calendar.ts:156</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>If the calendar should be filled in so the first day of the calendar is
+						Sunday and the last day is Saturday.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="filled" class="tsd-anchor"></a>
@@ -1383,9 +1476,17 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">filled<span class="tsd-signature-symbol">:</span> <a href="dayspan.html" class="tsd-signature-type">DaySpan</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L96">Calendar.ts:96</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L117">Calendar.ts:117</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The full span of days represented on the calendar. This may be different
+							than the <a href="calendar.html#span">Calendar.span</a> when <a href="calendar.html#fill">Calendar.fill</a> is <code>true</code> and the
+							calendar is representing months or years and the days need to start on
+						Sunday and end on Saturday.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="length" class="tsd-anchor"></a>
@@ -1393,9 +1494,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">length<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L101">Calendar.ts:101</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L122">Calendar.ts:122</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The number of days in the calendar specified by <a href="calendar.html#span">Calendar.span</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="listtimes" class="tsd-anchor"></a>
@@ -1403,9 +1509,17 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">list<wbr>Times<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L142">Calendar.ts:142</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L177">Calendar.ts:177</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>When <code>true</code> an event instance will be created for each time specified on
+							the schedule. If the schedule specifies an all day event then only one
+							event is added to a day. This is typically done when displaying days or
+						weeks and events can be displayed on a timeline.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="minimumsize" class="tsd-anchor"></a>
@@ -1413,9 +1527,16 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">minimum<wbr>Size<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L132">Calendar.ts:132</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L163">Calendar.ts:163</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The minimum number of days in the calendar no matter what the type or size
+							is. This can be used to display a month with a constant number of weeks -
+						because not all months contain the same number of weeks.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="moveend" class="tsd-anchor"></a>
@@ -1423,9 +1544,15 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">move<wbr>End<span class="tsd-signature-symbol">:</span> <a href="../globals.html#calendarmover" class="tsd-signature-type">CalendarMover</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L121">Calendar.ts:121</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L149">Calendar.ts:149</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The function used to move the end day of the calendar when functions like
+						<a href="calendar.html#next">Calendar.next</a> or <a href="calendar.html#prev">Calendar.prev</a> are called.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="movestart" class="tsd-anchor"></a>
@@ -1433,9 +1560,15 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">move<wbr>Start<span class="tsd-signature-symbol">:</span> <a href="../globals.html#calendarmover" class="tsd-signature-type">CalendarMover</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L116">Calendar.ts:116</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L143">Calendar.ts:143</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The function used to move the start day of the calendar when functions like
+						<a href="calendar.html#next">Calendar.next</a> or <a href="calendar.html#prev">Calendar.prev</a> are called.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="repeatcovers" class="tsd-anchor"></a>
@@ -1443,9 +1576,15 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">repeat<wbr>Covers<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L137">Calendar.ts:137</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L169">Calendar.ts:169</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>When <code>true</code> a <a href="calendarevent.html">CalendarEvent</a> instance exists on each <a href="calendarday.html">CalendarDay</a>
+						the event covers even if the event didn&#39;t start on that day.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="schedules" class="tsd-anchor"></a>
@@ -1453,9 +1592,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">schedules<span class="tsd-signature-symbol">:</span> <a href="../interfaces/calendarschedule.html" class="tsd-signature-type">CalendarSchedule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[]</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L178">Calendar.ts:178</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L221">Calendar.ts:221</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The array of schedule and user event pairs added to the calendar.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="selection" class="tsd-anchor"></a>
@@ -1463,9 +1607,16 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">selection<span class="tsd-signature-symbol">:</span> <a href="dayspan.html" class="tsd-signature-type">DaySpan</a><span class="tsd-signature-symbol"> =&nbsp;null</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L168">Calendar.ts:168</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L211">Calendar.ts:211</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>A selection of days on the calendar. If no days are selected this is <code>null</code>.
+							This is merely used to keep the selection flags in <a href="calendarday.html">CalendarDay</a> updated
+						via <a href="calendar.html#refreshselection">Calendar.refreshSelection</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="size" class="tsd-anchor"></a>
@@ -1473,9 +1624,20 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">size<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L111">Calendar.ts:111</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L137">Calendar.ts:137</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The size of the calendar. When the calendar type is...</p>
+					</div>
+					<ul>
+						<li><a href="../enums/units.html#day">Units.DAY</a>: The number of days in the calendar.</li>
+						<li><a href="../enums/units.html#week">Units.WEEK</a>: The number of weeks in the calendar.</li>
+						<li><a href="../enums/units.html#month">Units.MONTH</a>: The number of months in the calendar.</li>
+						<li><a href="../enums/units.html#year">Units.YEAR</a>: The number of years in the calendar.</li>
+					</ul>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="span" class="tsd-anchor"></a>
@@ -1483,9 +1645,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">span<span class="tsd-signature-symbol">:</span> <a href="dayspan.html" class="tsd-signature-type">DaySpan</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L91">Calendar.ts:91</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L109">Calendar.ts:109</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The span of days in the calendar.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="type" class="tsd-anchor"></a>
@@ -1493,9 +1660,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <a href="../enums/units.html" class="tsd-signature-type">Units</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L106">Calendar.ts:106</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L127">Calendar.ts:127</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The type of calendar.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="updatecolumns" class="tsd-anchor"></a>
@@ -1503,9 +1675,16 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">update<wbr>Columns<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L157">Calendar.ts:157</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L198">Calendar.ts:198</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>When <code>true</code> <a href="calendarevent.html#col">CalendarEvent.col</a> will be set so when visually displaying
+							the event based on start and end time any events that overlap with each
+						other will be &quot;indented&quot; to see the event below it.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="updaterows" class="tsd-anchor"></a>
@@ -1513,34 +1692,50 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">update<wbr>Rows<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L152">Calendar.ts:152</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L191">Calendar.ts:191</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>When <code>true</code> <a href="calendarevent.html#row">CalendarEvent.row</a> will be set so when visually displaying
+						the event with others multi-day events will align and not overlap.</p>
+					</div>
+				</div>
 			</section>
 		</section>
 		<section class="tsd-panel-group tsd-member-group ">
 			<h2>Accessors</h2>
-			<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class">
+			<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
 				<a name="end" class="tsd-anchor"></a>
 				<h3>end</h3>
 				<div class="tsd-signature tsd-kind-icon">end<span class="tsd-signature-symbol">:</span> </div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L322">Calendar.ts:322</a></li>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L330">Calendar.ts:330</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L399">Calendar.ts:399</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Returns the end day of the calendar. If this calendar is filled, this
+						may not represent the very last day in the calendar.</p>
+					</div>
+				</div>
 			</section>
-			<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class">
+			<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
 				<a name="start" class="tsd-anchor"></a>
 				<h3>start</h3>
 				<div class="tsd-signature tsd-kind-icon">start<span class="tsd-signature-symbol">:</span> </div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L306">Calendar.ts:306</a></li>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L314">Calendar.ts:314</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L390">Calendar.ts:390</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Returns the start day of the calendar. If this calendar is filled, this
+						may not represent the very first day in the calendar.</p>
+					</div>
+				</div>
 			</section>
 		</section>
 		<section class="tsd-panel-group tsd-member-group ">
@@ -1555,19 +1750,40 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L735">Calendar.ts:735</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L867">Calendar.ts:867</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Adds the given schedule to this calendar if it doesn&#39;t exist already (or
+								<code>allowDuplicates</code> is <code>true</code>).</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="calendar.html#refreshevents">Calendar.refreshEvents</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>schedule: <a href="../globals.html#calendarscheduleinput" class="tsd-signature-type">CalendarScheduleInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The schedule &amp; event pair to add to the calendar.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> allowDuplicates: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>If a schedule &amp; event pair can be added more than once.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> delayRefresh: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> the <a href="calendar.html#refreshevents">Calendar.refreshEvents</a> will not be
+									called after the schedule is added.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -1584,19 +1800,40 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L762">Calendar.ts:762</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L901">Calendar.ts:901</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Adds the given schedules to this calendar if they don&#39;t exist already (or
+								<code>allowDuplicates</code> is <code>true</code>).</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="calendar.html#refreshevents">Calendar.refreshEvents</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>schedules: <a href="../globals.html#calendarscheduleinput" class="tsd-signature-type">CalendarScheduleInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The schedule &amp; event pairs to add to the calendar.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> allowDuplicates: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>If a schedule &amp; event pair can be added more than once.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> delayRefresh: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> the <a href="calendar.html#refreshevents">Calendar.refreshEvents</a> will not be
+									called after the schedules are added.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -1607,28 +1844,53 @@ img { max-width: 100%; }
 				<a name="eventsforday" class="tsd-anchor"></a>
 				<h3>events<wbr>For<wbr>Day</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-					<li class="tsd-signature tsd-kind-icon">events<wbr>For<wbr>Day<span class="tsd-signature-symbol">(</span>day<span class="tsd-signature-symbol">: </span><a href="day.html" class="tsd-signature-type">Day</a>, getTimes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span>, covers<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="calendarevent.html" class="tsd-signature-type">CalendarEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></li>
+					<li class="tsd-signature tsd-kind-icon">events<wbr>For<wbr>Day<span class="tsd-signature-symbol">(</span>day<span class="tsd-signature-symbol">: </span><a href="day.html" class="tsd-signature-type">Day</a>, getTimes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span>, covers<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span>, sorter<span class="tsd-signature-symbol">?: </span><a href="../globals.html#sortevent" class="tsd-signature-type">SortEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="calendarevent.html" class="tsd-signature-type">CalendarEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L633">Calendar.ts:633</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L736">Calendar.ts:736</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Returns the events for the given day optionally looking at schedule times,
+									optionally looking at events which cover multiple days, and optioanlly
+								sorted with the given function.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to find events for.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> getTimes: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> an event is added to the result for each time
+									specified in the schedule.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> covers: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> events which don&#39;t start on the given day but do
+									overlap are added to the result.</p>
+								</div>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> sorter: <a href="../globals.html#sortevent" class="tsd-signature-type">SortEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;this.eventSorter</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The function to sort the events by, if any.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="calendarevent.html" class="tsd-signature-type">CalendarEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></h4>
+						<p>An array of events that occurred on the given day.</p>
 					</li>
 				</ul>
 			</section>
@@ -1642,16 +1904,25 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L676">Calendar.ts:676</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L787">Calendar.ts:787</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Finds the schedule &amp; event pair given one of the ways to identify the pair.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <a href="../globals.html#calendarscheduleidentifier" class="tsd-signature-type">CalendarScheduleIdentifier</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The value to use to search for a pair.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="../interfaces/calendarschedule.html" class="tsd-signature-type">CalendarSchedule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						<p>The refrence to the pair or null if not found.</p>
 					</li>
 				</ul>
 			</section>
@@ -1665,13 +1936,21 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L618">Calendar.ts:618</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L711">Calendar.ts:711</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Iterates over all days in this calendar and passes each day to <code>iterator</code>.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>iterator: <span class="tsd-signature-type">function</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The function to pass <a href="calendarday.html">CalendarDay</a>s to.</p>
+								</div>
 								<ul class="tsd-parameters">
 									<li class="tsd-parameter-siganture">
 										<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
@@ -1700,19 +1979,34 @@ img { max-width: 100%; }
 				<a name="move" class="tsd-anchor"></a>
 				<h3>move</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-					<li class="tsd-signature tsd-kind-icon">move<span class="tsd-signature-symbol">(</span>jump<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+					<li class="tsd-signature tsd-kind-icon">move<span class="tsd-signature-symbol">(</span>jump<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, delayRefresh<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L802">Calendar.ts:802</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L952">Calendar.ts:952</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Shifts the calendar days by the given amount.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> jump: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;this.size</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The amount to shift the calendar by.</p>
+								</div>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> delayRefresh: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> <a href="calendar.html#refresh">Calendar.refresh</a> will not be called
+									after calendar is moved.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -1723,19 +2017,34 @@ img { max-width: 100%; }
 				<a name="next" class="tsd-anchor"></a>
 				<h3>next</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-					<li class="tsd-signature tsd-kind-icon">next<span class="tsd-signature-symbol">(</span>jump<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+					<li class="tsd-signature tsd-kind-icon">next<span class="tsd-signature-symbol">(</span>jump<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, delayRefresh<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L814">Calendar.ts:814</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L972">Calendar.ts:972</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Moves the calenndar to the next set of days.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> jump: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;this.size</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The amount to shift the calendar by.</p>
+								</div>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> delayRefresh: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> <a href="calendar.html#refresh">Calendar.refresh</a> will not be called
+									after calendar is moved.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -1746,19 +2055,34 @@ img { max-width: 100%; }
 				<a name="prev" class="tsd-anchor"></a>
 				<h3>prev</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-					<li class="tsd-signature tsd-kind-icon">prev<span class="tsd-signature-symbol">(</span>jump<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+					<li class="tsd-signature tsd-kind-icon">prev<span class="tsd-signature-symbol">(</span>jump<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, delayRefresh<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L822">Calendar.ts:822</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L984">Calendar.ts:984</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Moves the calenndar to the previous set of days.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> jump: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;this.size</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The amount to shift the calendar by.</p>
+								</div>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> delayRefresh: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> <a href="calendar.html#refresh">Calendar.refresh</a> will not be called
+									after calendar is moved.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -1775,13 +2099,23 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L365">Calendar.ts:365</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L449">Calendar.ts:449</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Refreshes the days and events in this calendar based on the start and end
+								days, the calendar properties, and its schedules.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> today: <a href="day.html" class="tsd-signature-type">Day</a><span class="tsd-signature-symbol"> =&nbsp;Day.today()</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The current day to update the calendar days via
+									<a href="calendarday.html#updatecurrent">CalendarDay.updateCurrent</a>.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -1798,9 +2132,14 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L550">Calendar.ts:550</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L641">Calendar.ts:641</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Refreshes the <a href="calendarevent.html#col">CalendarEvent.col</a> property as described in the link.</p>
+							</div>
+						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
 					</li>
 				</ul>
@@ -1815,13 +2154,21 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L434">Calendar.ts:434</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L521">Calendar.ts:521</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Updates the days with the current day via <a href="calendarday.html#updatecurrent">CalendarDay.updateCurrent</a>.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> today: <a href="day.html" class="tsd-signature-type">Day</a><span class="tsd-signature-symbol"> =&nbsp;Day.today()</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The new current day.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -1838,9 +2185,23 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L463">Calendar.ts:463</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L559">Calendar.ts:559</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Updates the <a href="calendarday.html#events">CalendarDay.events</a> based on the schedules in this calendar
+								and the following properties:</p>
+							</div>
+							<ul>
+								<li><a href="calendar.html#eventsforday">Calendar.eventsForDay</a></li>
+								<li><a href="calendar.html#eventsoutside">Calendar.eventsOutside</a></li>
+								<li><a href="calendar.html#listtimes">Calendar.listTimes</a></li>
+								<li><a href="calendar.html#repeatcovers">Calendar.repeatCovers</a></li>
+								<li><a href="calendar.html#updaterows">Calendar.updateRows</a></li>
+								<li><a href="calendar.html#updatecolumns">Calendar.updateColumns</a></li>
+							</ul>
+						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
 					</li>
 				</ul>
@@ -1855,9 +2216,14 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L494">Calendar.ts:494</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L585">Calendar.ts:585</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Refreshes the <a href="calendarevent.html#row">CalendarEvent.row</a> property as described in the link.</p>
+							</div>
+						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
 					</li>
 				</ul>
@@ -1872,9 +2238,15 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L445">Calendar.ts:445</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L533">Calendar.ts:533</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Updates the selection flags in <a href="calendarday.html">CalendarDay</a> based on the
+								<a href="calendar.html#selection">Calendar.selection</a> property.</p>
+							</div>
+						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
 					</li>
 				</ul>
@@ -1889,16 +2261,33 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L716">Calendar.ts:716</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L841">Calendar.ts:841</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Removes the given schedule if it exists on the calendar.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="calendar.html#refreshevents">Calendar.refreshEvents</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>schedule: <a href="../globals.html#calendarscheduleidentifier" class="tsd-signature-type">CalendarScheduleIdentifier</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The schedule to remove if it exists.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> delayRefresh: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> the <a href="calendar.html#refreshevents">Calendar.refreshEvents</a> will not be
+									called after the schedules are removed.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -1915,16 +2304,38 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L692">Calendar.ts:692</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L811">Calendar.ts:811</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Removes the list of schedules if they exist in the calendar.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="calendar.html#removeschedule">Calendar.removeSchedule</a></p>
+								</dd>
+								<dt>see</dt>
+								<dd><p><a href="calendar.html#refreshevents">Calendar.refreshEvents</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> schedules: <a href="../globals.html#calendarscheduleidentifier" class="tsd-signature-type">CalendarScheduleIdentifier</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;null</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The array of schedules to remove if they exist. If no
+										schedules are passed (via <code>null</code>) then all schedules will be removed
+									from the calendar.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> delayRefresh: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> the <a href="calendar.html#refreshevents">Calendar.refreshEvents</a> will not be
+									called after the schedules are removed.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -1941,9 +2352,14 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L390">Calendar.ts:390</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L475">Calendar.ts:475</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Updates <a href="calendar.html#days">Calendar.days</a> to match the span of days in the calendar.</p>
+							</div>
+						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
 					</li>
 				</ul>
@@ -1958,9 +2374,15 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L379">Calendar.ts:379</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L464">Calendar.ts:464</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Updates the <a href="calendar.html#filled">Calendar.filled</a> span based on <a href="calendar.html#start">Calendar.start</a>,
+								<a href="calendar.html#end">Calendar.end</a>, and <a href="calendar.html#fill">Calendar.fill</a> properties.</p>
+							</div>
+						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
 					</li>
 				</ul>
@@ -1975,16 +2397,33 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L780">Calendar.ts:780</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L924">Calendar.ts:924</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Sets the selection point or range of the calendar and updates the flags
+								in the days.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="calendar.html#refreshselection">Calendar.refreshSelection</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>start: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The start of the selection.</p>
+								</div>
 							</li>
 							<li>
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> end: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> end: <a href="day.html" class="tsd-signature-type">Day</a><span class="tsd-signature-symbol"> =&nbsp;start</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The end of the selection.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -2001,16 +2440,26 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L346">Calendar.ts:346</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L426">Calendar.ts:426</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Splits up this calendar into an array of calendars. The resulting array
+								will return <a href="calendar.html#size">Calendar.size</a> number of calendars.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> by: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;1</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The new size of the resulting calendars.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="calendar.html" class="tsd-signature-type">Calendar</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></h4>
+						<p>An array of calendars split from this calendar.</p>
 					</li>
 				</ul>
 			</section>
@@ -2024,25 +2473,50 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L338">Calendar.ts:338</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L414">Calendar.ts:414</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Returns the summary of the span of time this calendar represents.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="dayspan.html#summary">DaySpan.summary</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> dayOfWeek: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p><a href="dayspan.html#summary">DaySpan.summary</a></p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> short: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p><a href="dayspan.html#summary">DaySpan.summary</a></p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> repeat: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p><a href="dayspan.html#summary">DaySpan.summary</a></p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> contextual: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p><a href="dayspan.html#summary">DaySpan.summary</a></p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> delimiter: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot; - &quot;</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p><a href="dayspan.html#summary">DaySpan.summary</a></p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -2059,9 +2533,19 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L791">Calendar.ts:791</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L937">Calendar.ts:937</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Sets the selection of the calendar to nothing.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="calendar.html#refreshselection">Calendar.refreshSelection</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
 					</li>
 				</ul>
@@ -2076,13 +2560,22 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L265">Calendar.ts:265</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L339">Calendar.ts:339</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Sets the <a href="calendar.html#eventsoutside">Calendar.eventsOutside</a> value and returns <code>this</code> for method
+								chaining.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>eventsOutside: <span class="tsd-signature-type">boolean</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The new value.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -2099,16 +2592,28 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L204">Calendar.ts:204</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L266">Calendar.ts:266</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Overwrites the properties in this calendar with the given input and
+								optionally refreshes all days and their events with the new settings.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <a href="../interfaces/calendarinput.html" class="tsd-signature-type">CalendarInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The properties to overwrite on this calendar.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> refresh: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>Whether the calendar should have its days and events synced.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -2125,13 +2630,22 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L254">Calendar.ts:254</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L325">Calendar.ts:325</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Sets the <a href="calendar.html#listtimes">Calendar.listTimes</a> value and returns <code>this</code> for method
+								chaining.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>listTimes: <span class="tsd-signature-type">boolean</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The new value.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -2148,13 +2662,22 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L232">Calendar.ts:232</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L297">Calendar.ts:297</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Sets the <a href="calendar.html#minimumsize">Calendar.minimumSize</a> value and returns <code>this</code> for method
+								chaining.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>minimumSize: <span class="tsd-signature-type">number</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The new value.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -2171,13 +2694,22 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L243">Calendar.ts:243</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L311">Calendar.ts:311</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Sets the <a href="calendar.html#repeatcovers">Calendar.repeatCovers</a> value and returns <code>this</code> for method
+								chaining.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>repeatCovers: <span class="tsd-signature-type">boolean</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The new value.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -2194,16 +2726,29 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L291">Calendar.ts:291</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L374">Calendar.ts:374</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Sets the <a href="calendar.html#updatecolumns">Calendar.updateColumns</a> value and returns <code>this</code> for method
+								chaining.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>updateColumns: <span class="tsd-signature-type">boolean</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The new value.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> refresh: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>If the columns should be updated now if <code>updateColumns</code> is
+									<code>true</code>.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -2220,16 +2765,28 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L276">Calendar.ts:276</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L354">Calendar.ts:354</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Sets the <a href="calendar.html#updaterows">Calendar.updateRows</a> value and returns <code>this</code> for method
+								chaining.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>updateRows: <span class="tsd-signature-type">boolean</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The new value.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> refresh: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>If the rows should be updated now if <code>updateRows</code> is <code>true</code>.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -2246,9 +2803,14 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L831">Calendar.ts:831</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L1002">Calendar.ts:1002</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Creates a calendar based around days optionally focused around a given day.</p>
+							</div>
+						</div>
 						<h4 class="tsd-type-parameters-title">Type parameters</h4>
 						<ul class="tsd-type-parameters">
 							<li>
@@ -2259,18 +2821,34 @@ img { max-width: 100%; }
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> days: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;1</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The number of days in the calendar.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> around: <a href="day.html" class="tsd-signature-type">Day</a><span class="tsd-signature-symbol"> =&nbsp;Day.today()</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to focus the calendar on.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> focus: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0.4999</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The value which describes how days are added around the given
+										day. The default value will center the calendar around the given day.
+										When the value is <code>0</code> the given day is the first day in the calendar,
+									and when the value is <code>1</code> the given day is the last day in the calendar.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagOptional">Optional</span> input: <a href="../interfaces/calendarinput.html" class="tsd-signature-type">CalendarInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The default properties for the calendar.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="calendar.html" class="tsd-signature-type">Calendar</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						<p>A new calendar instance.</p>
 					</li>
 				</ul>
 			</section>
@@ -2284,9 +2862,14 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L855">Calendar.ts:855</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L1044">Calendar.ts:1044</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Creates a calendar based around months optionally focused around a given day.</p>
+							</div>
+						</div>
 						<h4 class="tsd-type-parameters-title">Type parameters</h4>
 						<ul class="tsd-type-parameters">
 							<li>
@@ -2300,15 +2883,28 @@ img { max-width: 100%; }
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> around: <a href="day.html" class="tsd-signature-type">Day</a><span class="tsd-signature-symbol"> =&nbsp;Day.today()</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to focus the calendar on.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> focus: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0.4999</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The value which describes how months are added around the given
+										day. The default value will center the calendar around the given day.
+										When the value is <code>0</code> the given day is the first day in the calendar,
+									and when the value is <code>1</code> the given day is the last day in the calendar.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> input: <a href="../interfaces/calendarinput.html" class="tsd-signature-type">CalendarInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;{fill: true}</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The default properties for the calendar.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="calendar.html" class="tsd-signature-type">Calendar</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						<p>A new calendar instance.</p>
 					</li>
 				</ul>
 			</section>
@@ -2322,9 +2918,14 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L843">Calendar.ts:843</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L1023">Calendar.ts:1023</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Creates a calendar based around weeks optionally focused around a given day.</p>
+							</div>
+						</div>
 						<h4 class="tsd-type-parameters-title">Type parameters</h4>
 						<ul class="tsd-type-parameters">
 							<li>
@@ -2338,15 +2939,28 @@ img { max-width: 100%; }
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> around: <a href="day.html" class="tsd-signature-type">Day</a><span class="tsd-signature-symbol"> =&nbsp;Day.today()</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to focus the calendar on.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> focus: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0.4999</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The value which describes how weeks are added around the given
+										day. The default value will center the calendar around the given day.
+										When the value is <code>0</code> the given day is the first day in the calendar,
+									and when the value is <code>1</code> the given day is the last day in the calendar.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagOptional">Optional</span> input: <a href="../interfaces/calendarinput.html" class="tsd-signature-type">CalendarInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The default properties for the calendar.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="calendar.html" class="tsd-signature-type">Calendar</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						<p>A new calendar instance.</p>
 					</li>
 				</ul>
 			</section>
@@ -2360,9 +2974,14 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Calendar.ts#L868">Calendar.ts:868</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Calendar.ts#L1066">Calendar.ts:1066</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Creates a calendar based around years optionally focused around a given day.</p>
+							</div>
+						</div>
 						<h4 class="tsd-type-parameters-title">Type parameters</h4>
 						<ul class="tsd-type-parameters">
 							<li>
@@ -2376,15 +2995,28 @@ img { max-width: 100%; }
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> around: <a href="day.html" class="tsd-signature-type">Day</a><span class="tsd-signature-symbol"> =&nbsp;Day.today()</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to focus the calendar on.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> focus: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0.4999</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The value which describes how years are added around the given
+										day. The default value will center the calendar around the given day.
+										When the value is <code>0</code> the given day is the first day in the calendar,
+									and when the value is <code>1</code> the given day is the last day in the calendar.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> input: <a href="../interfaces/calendarinput.html" class="tsd-signature-type">CalendarInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;{fill: true}</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The default properties for the calendar.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="calendar.html" class="tsd-signature-type">Calendar</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						<p>A new calendar instance.</p>
 					</li>
 				</ul>
 			</section>

@@ -1033,6 +1033,9 @@ img { max-width: 100%; }
 					<a href="schedule.html#coversday" class="tsd-kind-icon">covers<wbr>Day</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
+					<a href="schedule.html#coverstime" class="tsd-kind-icon">covers<wbr>Time</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class">
 					<a href="schedule.html#describe" class="tsd-kind-icon">describe</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -1188,6 +1191,13 @@ img { max-width: 100%; }
 </nav>
 <div class="container container-main">
 	<div class="content-wrap">
+		<section class="tsd-panel tsd-comment">
+			<div class="tsd-comment tsd-typography">
+				<div class="lead">
+					<p>A class which describes when an event occurs over what time and if it repeats.</p>
+				</div>
+			</div>
+		</section>
 		<section class="tsd-panel tsd-hierarchy">
 			<h3>Hierarchy</h3>
 			<ul class="tsd-hierarchy">
@@ -1246,6 +1256,7 @@ img { max-width: 100%; }
 						<h3>Methods</h3>
 						<ul class="tsd-index-list">
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#coversday" class="tsd-kind-icon">covers<wbr>Day</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#coverstime" class="tsd-kind-icon">covers<wbr>Time</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#describe" class="tsd-kind-icon">describe</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#findstartingday" class="tsd-kind-icon">find<wbr>Starting<wbr>Day</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#getexclusions" class="tsd-kind-icon">get<wbr>Exclusions</a></li>
@@ -1287,13 +1298,23 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L277">Schedule.ts:277</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L296">Schedule.ts:296</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Creates a schedule based on the given input.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagOptional">Optional</span> input: <a href="../interfaces/scheduleinput.html" class="tsd-signature-type">ScheduleInput</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The input which describes the schedule of events.</p>
+									</div>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="schedule.html" class="tsd-signature-type">Schedule</a></h4>
@@ -1309,9 +1330,19 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">checks<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a><span class="tsd-signature-symbol">[]</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L277">Schedule.ts:277</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L296">Schedule.ts:296</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The array of frequency functions which had valid frequencies.</p>
+					</div>
+					<dl class="tsd-comment-tags">
+						<dt>see</dt>
+						<dd><p><a href="../interfaces/frequencycheck.html#given">FrequencyCheck.given</a></p>
+						</dd>
+					</dl>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="dayofmonth" class="tsd-anchor"></a>
@@ -1319,9 +1350,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">day<wbr>OfMonth<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L197">Schedule.ts:197</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L214">Schedule.ts:214</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#dayofmonth">Day.dayOfMonth</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="dayofweek" class="tsd-anchor"></a>
@@ -1329,9 +1365,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">day<wbr>OfWeek<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L192">Schedule.ts:192</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L209">Schedule.ts:209</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#dayofweek">Day.dayOfWeek</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="dayofyear" class="tsd-anchor"></a>
@@ -1339,9 +1380,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">day<wbr>OfYear<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L207">Schedule.ts:207</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L224">Schedule.ts:224</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#dayofyear">Day.dayOfYear</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="duration" class="tsd-anchor"></a>
@@ -1349,9 +1395,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">duration<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L167">Schedule.ts:167</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L174">Schedule.ts:174</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The length of events in this schedule.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="durationindays" class="tsd-anchor"></a>
@@ -1359,9 +1410,20 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">duration<wbr>InDays<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L182">Schedule.ts:182</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L198">Schedule.ts:198</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The number of days an event in this schedule lasts PAST the starting day.
+							If this is a full day event with a duration greater than zero this value
+							will be greater than one. If this event occurs at a specific time with a
+							given duration that is taken into account and if it passes over into the
+							next day this value will be greater than one. This value is used to look
+							back in time when trying to figure out what events start or overlap on a
+						given day.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="durationunit" class="tsd-anchor"></a>
@@ -1369,9 +1431,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">duration<wbr>Unit<span class="tsd-signature-symbol">:</span> <a href="../globals.html#durationinput" class="tsd-signature-type">DurationInput</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L172">Schedule.ts:172</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L179">Schedule.ts:179</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The unit which describes the duration of the event.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="end" class="tsd-anchor"></a>
@@ -1379,9 +1446,15 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">end<span class="tsd-signature-symbol">:</span> <a href="day.html" class="tsd-signature-type">Day</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L162">Schedule.ts:162</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L169">Schedule.ts:169</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The latest an event can occur in the schedule, or <code>null</code> if there are no
+						restrictions when the latest event can occur. This day is inclusive.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="exclude" class="tsd-anchor"></a>
@@ -1389,9 +1462,15 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">exclude<span class="tsd-signature-symbol">:</span> <a href="../globals.html#scheduleexclusions" class="tsd-signature-type">ScheduleExclusions</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L187">Schedule.ts:187</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L204">Schedule.ts:204</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>A map of excluded days where the key is <a href="day.html#dayidentifier">Day.dayIdentifier</a> and the value
+						is <code>true</code> unless otherwise overriden.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="fullweekofmonth" class="tsd-anchor"></a>
@@ -1399,9 +1478,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">full<wbr>Week<wbr>OfMonth<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L257">Schedule.ts:257</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L274">Schedule.ts:274</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#fullweekofmonth">Day.fullWeekOfMonth</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="fullweekofyear" class="tsd-anchor"></a>
@@ -1409,9 +1493,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">full<wbr>Week<wbr>OfYear<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L232">Schedule.ts:232</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L249">Schedule.ts:249</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#fullweekofyear">Day.fullWeekOfYear</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="lastdayofmonth" class="tsd-anchor"></a>
@@ -1419,9 +1508,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">last<wbr>Day<wbr>OfMonth<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L202">Schedule.ts:202</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L219">Schedule.ts:219</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#lastdayofmonth">Day.lastDayOfMonth</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="lastfullweekofmonth" class="tsd-anchor"></a>
@@ -1429,9 +1523,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">last<wbr>Full<wbr>Week<wbr>OfMonth<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L267">Schedule.ts:267</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L284">Schedule.ts:284</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#lastfullweekofmonth">Day.lastFullWeekOfMonth</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="lastfullweekofyear" class="tsd-anchor"></a>
@@ -1439,9 +1538,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">last<wbr>Full<wbr>Week<wbr>OfYear<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L242">Schedule.ts:242</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L259">Schedule.ts:259</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#lastfullweekofyear">Day.lastFullWeekOfYear</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="lastweekspanofmonth" class="tsd-anchor"></a>
@@ -1449,9 +1553,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">last<wbr>Weekspan<wbr>OfMonth<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L262">Schedule.ts:262</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L279">Schedule.ts:279</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#lastweekspanofmonth">Day.lastWeekspanOfMonth</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="lastweekspanofyear" class="tsd-anchor"></a>
@@ -1459,9 +1568,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">last<wbr>Weekspan<wbr>OfYear<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L237">Schedule.ts:237</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L254">Schedule.ts:254</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#lastweekspanofyear">Day.lastWeekspanOfYear</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="month" class="tsd-anchor"></a>
@@ -1469,9 +1583,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">month<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L212">Schedule.ts:212</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L229">Schedule.ts:229</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#month">Day.month</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="start" class="tsd-anchor"></a>
@@ -1479,9 +1598,15 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">start<span class="tsd-signature-symbol">:</span> <a href="day.html" class="tsd-signature-type">Day</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L157">Schedule.ts:157</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L163">Schedule.ts:163</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The earliest an event can occur in the schedule, or <code>null</code> if there are no
+						restrictions when the earliest event can occur. This day is inclusive.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="times" class="tsd-anchor"></a>
@@ -1489,9 +1614,17 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">times<span class="tsd-signature-symbol">:</span> <a href="time.html" class="tsd-signature-type">Time</a><span class="tsd-signature-symbol">[]</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L177">Schedule.ts:177</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L187">Schedule.ts:187</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The times at which the events occur on the days they should. If there are
+							no times specified its assumed to be an all day event - potentially over
+							multiple days or weeks based on <a href="schedule.html#duration">Schedule.duration</a> and
+						<a href="schedule.html#durationunit">Schedule.durationUnit</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="week" class="tsd-anchor"></a>
@@ -1499,9 +1632,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">week<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L217">Schedule.ts:217</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L234">Schedule.ts:234</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#week">Day.week</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="weekofmonth" class="tsd-anchor"></a>
@@ -1509,9 +1647,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">week<wbr>OfMonth<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L247">Schedule.ts:247</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L264">Schedule.ts:264</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#weekofmonth">Day.weekOfMonth</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="weekofyear" class="tsd-anchor"></a>
@@ -1519,9 +1662,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">week<wbr>OfYear<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L222">Schedule.ts:222</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L239">Schedule.ts:239</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#weekofyear">Day.weekOfYear</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="weekspanofmonth" class="tsd-anchor"></a>
@@ -1529,9 +1677,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">weekspan<wbr>OfMonth<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L252">Schedule.ts:252</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L269">Schedule.ts:269</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#weekspanofmonth">Day.weekspanOfMonth</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="weekspanofyear" class="tsd-anchor"></a>
@@ -1539,9 +1692,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">weekspan<wbr>OfYear<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L227">Schedule.ts:227</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L244">Schedule.ts:244</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#weekspanofyear">Day.weekspanOfYear</a>.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="year" class="tsd-anchor"></a>
@@ -1549,9 +1707,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">year<span class="tsd-signature-symbol">:</span> <a href="../interfaces/frequencycheck.html" class="tsd-signature-type">FrequencyCheck</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L272">Schedule.ts:272</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L289">Schedule.ts:289</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>How frequent the event occurs based on <a href="day.html#year">Day.year</a>.</p>
+					</div>
+				</div>
 			</section>
 		</section>
 		<section class="tsd-panel-group tsd-member-group ">
@@ -1562,9 +1725,15 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">last<wbr>Time<span class="tsd-signature-symbol">:</span> </div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L304">Schedule.ts:304</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L329">Schedule.ts:329</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Returns the last event time specified or <code>undefined</code> if this schedule is
+						for an all day event.</p>
+					</div>
+				</div>
 			</section>
 		</section>
 		<section class="tsd-panel-group tsd-member-group ">
@@ -1579,7 +1748,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L416">Schedule.ts:416</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L471">Schedule.ts:471</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1600,6 +1769,42 @@ img { max-width: 100%; }
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the day is covered by an event on this schedule,
+						otherwise <code>false</code>.</p>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<a name="coverstime" class="tsd-anchor"></a>
+				<h3>covers<wbr>Time</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<li class="tsd-signature tsd-kind-icon">covers<wbr>Time<span class="tsd-signature-symbol">(</span>day<span class="tsd-signature-symbol">: </span><a href="day.html" class="tsd-signature-type">Day</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L641">Schedule.ts:641</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines if the given timestamp lies in an event occurrence on this
+								schedule.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The timestamp to test against the schedule.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the timestamp lies in an event occurrent start and end
+						timestamps, otherwise <code>false</code>.</p>
 					</li>
 				</ul>
 			</section>
@@ -1613,28 +1818,55 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L714">Schedule.ts:714</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L920">Schedule.ts:920</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Describes the schedule in a human friendly string taking into account all
+								possible values specified in this schedule.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> thing: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;event&quot;</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>A brief description of the things (events) on the schedule.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> includeRange: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> the <a href="schedule.html#start">Schedule.start</a> and <a href="schedule.html#end">Schedule.end</a>
+									are possibly included in the description if they have values.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> includeTimes: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> the <a href="schedule.html#times">Schedule.times</a> are possibly included
+									in the description.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> includeDuration: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> the <a href="schedule.html#duration">Schedule.duration</a> and
+										<a href="schedule.html#durationunit">Schedule.durationUnit</a> are added to the description if
+									<a href="schedule.html#duration">Schedule.duration</a> is not equal to <code>1</code>.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> includeExcludes: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> the [[Schedule.exclusions]] are added
+									to the description if there are any.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						<p>The descroption of the schedule.</p>
 					</li>
 				</ul>
 			</section>
@@ -1648,16 +1880,27 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L634">Schedule.ts:634</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L809">Schedule.ts:809</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>If the given day potentially overlaps an event occurrence on the schedule
+								this will find the day when the event occurrence starts.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to check against the schedule for a starting day.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="day.html" class="tsd-signature-type">Day</a></h4>
+						<p>The day that is a start of an event that potentially overlaps
+						the given day.</p>
 					</li>
 				</ul>
 			</section>
@@ -1665,22 +1908,33 @@ img { max-width: 100%; }
 				<a name="getexclusions" class="tsd-anchor"></a>
 				<h3>get<wbr>Exclusions</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-					<li class="tsd-signature tsd-kind-icon">get<wbr>Exclusions<span class="tsd-signature-symbol">(</span>returnDays<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><a href="day.html" class="tsd-signature-type">Day</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span></li>
+					<li class="tsd-signature tsd-kind-icon">get<wbr>Exclusions<span class="tsd-signature-symbol">(</span>returnDays<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../globals.html#dayinput" class="tsd-signature-type">DayInput</a><span class="tsd-signature-symbol">[]</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L655">Schedule.ts:655</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L835">Schedule.ts:835</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Converts the map of exclusions to an array of <a href="day.html">Day</a> instances or
+								<a href="day.html#dayidentifier">Day.dayIdentifier</a>s.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> returnDays: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> <a href="day.html">Day</a> instances are returned, otherwise
+									<a href="day.html#dayidentifier">Day.dayIdentifier</a>s are returned.</p>
+								</div>
 							</li>
 						</ul>
-						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><a href="day.html" class="tsd-signature-type">Day</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span></h4>
+						<h4 class="tsd-returns-title">Returns <a href="../globals.html#dayinput" class="tsd-signature-type">DayInput</a><span class="tsd-signature-symbol">[]</span></h4>
+						<p>THe array of excluded days or an empty array if none are excluded.</p>
 					</li>
 				</ul>
 			</section>
@@ -1694,16 +1948,26 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L540">Schedule.ts:540</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L687">Schedule.ts:687</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Returns a span of time for a schedule with full day events starting on the
+								start of the given day with the desired duration in days or weeks.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day the span starts on.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="dayspan.html" class="tsd-signature-type">DaySpan</a></h4>
+						<p>The span of time starting on the given day.</p>
 					</li>
 				</ul>
 			</section>
@@ -1717,16 +1981,27 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L595">Schedule.ts:595</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L758">Schedule.ts:758</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Returns a span of time over the given day. This does not check if the day
+									is even on the schedule, it assumes it was already passed to
+								<a href="schedule.html#coversday">Schedule.coversDay</a> and it returned <code>true</code>.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to return a span over.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="dayspan.html" class="tsd-signature-type">DaySpan</a></h4>
+						<p>A span over the given day.</p>
 					</li>
 				</ul>
 			</section>
@@ -1740,19 +2015,36 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L605">Schedule.ts:605</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L777">Schedule.ts:777</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Returns an array of spans of times that start on the given day. This can
+									optionally check to see if th day is on the schedule, or just assume the
+								day is.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to return a span that starts on.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> check: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> <a href="schedule.html#matchesday">Schedule.matchesDay</a> is passed the given day
+										and an empty array is returned if the day is not on the schedule.
+									Otherwise its assumed the given day is on the schedule.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="dayspan.html" class="tsd-signature-type">DaySpan</a><span class="tsd-signature-symbol">[]</span></h4>
+						<p>An array of spans for each event occurrence that start on the
+						given day.</p>
 					</li>
 				</ul>
 			</section>
@@ -1766,16 +2058,28 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L562">Schedule.ts:562</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L720">Schedule.ts:720</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Returns an array of spans of times that cover the the given day taking into
+									account multi-day events. This does not check if the day is even on the
+									schedule, it assumes it was already passed to <a href="schedule.html#coversday">Schedule.coversDay</a> and it
+								returned <code>true</code>.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to return spans over.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="dayspan.html" class="tsd-signature-type">DaySpan</a><span class="tsd-signature-symbol">[]</span></h4>
+						<p>An array of spans for each event occurrence over the given day.</p>
 					</li>
 				</ul>
 			</section>
@@ -1789,19 +2093,32 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L551">Schedule.ts:551</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L703">Schedule.ts:703</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Returns a span of time starting on the given day at the given day with the
+								duration specified on this schedule.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day the span starts on.</p>
+								</div>
 							</li>
 							<li>
 								<h5>time: <a href="time.html" class="tsd-signature-type">Time</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The time of day the span starts.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="dayspan.html" class="tsd-signature-type">DaySpan</a></h4>
+						<p>The span of time calculated.</p>
 					</li>
 				</ul>
 			</section>
@@ -1815,16 +2132,25 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L373">Schedule.ts:373</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L417">Schedule.ts:417</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the given day is explicitly excluded in the schedule.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the day was excluded, otherwise <code>false</code>.</p>
 					</li>
 				</ul>
 			</section>
@@ -1838,9 +2164,18 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L532">Schedule.ts:532</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L675">Schedule.ts:675</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Returns whether the events in the schedule are all day long or start at
+									specific times. Full day events start at the start of the day and end at
+									the start of the next day (if the duration = <code>1</code> and durationUnit = &#39;days&#39;).
+									Full day events have no times specified and should have a durationUnit of
+								either <code>days</code> or <code>weeks</code>.</p>
+							</div>
+						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 					</li>
 				</ul>
@@ -1855,16 +2190,25 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L381">Schedule.ts:381</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L428">Schedule.ts:428</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the given day is NOT explicitly excluded in the schedule.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the day is NOT explicitly excluded, otherwise <code>false</code>.</p>
 					</li>
 				</ul>
 			</section>
@@ -1878,28 +2222,59 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L480">Schedule.ts:480</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L580">Schedule.ts:580</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Iterates over days that events start in the schedule given a day to start,
+								a maximum number of days to find, and a direction to look.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="schedule.html#matchesday">Schedule.matchesDay</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to start to search from.</p>
+								</div>
 							</li>
 							<li>
 								<h5>max: <span class="tsd-signature-type">number</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The maximum number of times to invoke the <code>onDay</code> callback.</p>
+								</div>
 							</li>
 							<li>
 								<h5>next: <span class="tsd-signature-type">boolean</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>If <code>true</code> this searches forward, otherwise <code>false</code> is backwards.</p>
+								</div>
 							</li>
 							<li>
 								<h5>onDay: <a href="../globals.html#dayiterator" class="tsd-signature-type">DayIterator</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>A function to invoke for each matching day found. If this
+									function returns <code>false</code> the iteration stops immediately.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> includeDay: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>If the given day should be included in the search.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> lookup: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;366</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The maximum number of days to look through from the given
+									day for event occurrences.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -1916,16 +2291,35 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L389">Schedule.ts:389</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L443">Schedule.ts:443</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the given day is a day on the schedule for the start
+									of an event. If an event is more than one day and the day given is not the
+								start this may return <code>false</code>.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="schedule.html#isexcluded">Schedule.isExcluded</a></p>
+								</dd>
+								<dt>see</dt>
+								<dd><p><a href="schedule.html#matchesspan">Schedule.matchesSpan</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the day marks the start of an event on the schedule.</p>
 					</li>
 				</ul>
 			</section>
@@ -1939,19 +2333,40 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L364">Schedule.ts:364</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L405">Schedule.ts:405</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the given range overlaps with the earliest and latest
+								valid days in this schedule (if any).</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="schedule.html#start">Schedule.start</a></p>
+								</dd>
+								<dt>see</dt>
+								<dd><p><a href="schedule.html#end">Schedule.end</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>start: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The first day in the range.</p>
+								</div>
 							</li>
 							<li>
 								<h5>end: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The last day in the range.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the range intersects with the schedule, otherwise <code>false</code>.</p>
 					</li>
 				</ul>
 			</section>
@@ -1965,16 +2380,34 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L355">Schedule.ts:355</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L389">Schedule.ts:389</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the given day lies between the earliest and latest
+								valid day in the schedule.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="schedule.html#start">Schedule.start</a></p>
+								</dd>
+								<dt>see</dt>
+								<dd><p><a href="schedule.html#end">Schedule.end</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the day lies in the schedule, otherwise <code>false</code>.</p>
 					</li>
 				</ul>
 			</section>
@@ -1988,16 +2421,26 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L511">Schedule.ts:511</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L615">Schedule.ts:615</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines if the given day is on the schedule and the time specified on
+								the day matches one of the times on the schedule.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the day and time match the schedule, otherwise false.</p>
 					</li>
 				</ul>
 			</section>
@@ -2011,22 +2454,39 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L424">Schedule.ts:424</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L486">Schedule.ts:486</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Finds the next day an event occurs on the schedule given a day to start,
+								optionally including it, and a maximum number of days to look ahead.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to start to search from.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> includeDay: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>If the given day should be included in the search.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> lookAhead: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;366</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The maximum number of days to look ahead from the given
+									day for event occurrences.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="day.html" class="tsd-signature-type">Day</a></h4>
+						<p>The next day on the schedule or <code>null</code> if none exists.</p>
 					</li>
 				</ul>
 			</section>
@@ -2040,25 +2500,47 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L440">Schedule.ts:440</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L512">Schedule.ts:512</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Finds the next specified number of days that events occur on the schedule
+									given a day to start, optionally including it, and a maximum number of days
+								to look ahead.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to start to search from.</p>
+								</div>
 							</li>
 							<li>
 								<h5>max: <span class="tsd-signature-type">number</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The maximum number of days to return in the result.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> includeDay: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>If the given day should be included in the search.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> lookAhead: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;366</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The maximum number of days to look ahead from the given
+									day for event occurrences.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="day.html" class="tsd-signature-type">Day</a><span class="tsd-signature-symbol">[]</span></h4>
+						<p>An array containing the next days on the schedule that events
+						start or an empty array if there are none.</p>
 					</li>
 				</ul>
 			</section>
@@ -2072,22 +2554,35 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L452">Schedule.ts:452</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L531">Schedule.ts:531</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Finds the previous day an event occurs on the schedule given a day to start,
+								optionally including it, and a maximum number of days to look behind.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to start to search from.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> includeDay: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>If the given day should be included in the search.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> lookBack: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;366</span></h5>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="day.html" class="tsd-signature-type">Day</a></h4>
+						<p>The previous day on the schedule or <code>null</code> if none exists.</p>
 					</li>
 				</ul>
 			</section>
@@ -2101,25 +2596,43 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L468">Schedule.ts:468</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L557">Schedule.ts:557</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Finds the previous specified number of days that events occur on the
+									schedule given a day to start, optionally including it, and a maximum
+								number of days to look behind.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to start to search from.</p>
+								</div>
 							</li>
 							<li>
 								<h5>max: <span class="tsd-signature-type">number</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The maximum number of days to return in the result.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> includeDay: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>If the given day should be included in the search.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> lookBack: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;366</span></h5>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="day.html" class="tsd-signature-type">Day</a><span class="tsd-signature-symbol">[]</span></h4>
+						<p>An array containing the previous days on the schedule that events
+						start or an empty array if there are none.</p>
 					</li>
 				</ul>
 			</section>
@@ -2133,13 +2646,26 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L294">Schedule.ts:294</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L318">Schedule.ts:318</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Sets the schedule with the given input.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="parse.html#schedule">Parse.schedule</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <a href="../interfaces/scheduleinput.html" class="tsd-signature-type">ScheduleInput</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The input which describes the schedule of events.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
@@ -2156,25 +2682,56 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L672">Schedule.ts:672</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L865">Schedule.ts:865</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Converts the schedule instance back into input.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="schedule.html#getexclusions">Schedule.getExclusions</a></p>
+								</dd>
+								<dt>see</dt>
+								<dd><p><a href="time.html#format">Time.format</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> returnDays: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> the start, end, and array of exclusions will
+										have <a href="day.html">Day</a> instances, otherwise the UNIX timestamp and dayIdentifiers
+									will be used when <code>false</code>.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> returnTimes: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> the times returned in the input will be
+										instances of <a href="time.html">Time</a> otherwise the <code>timeFormat</code> is used to convert the
+									times to strings.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> timeFormat: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;&quot;</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The time format to use when returning the times as strings.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> alwaysDuration: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>If the duration values (<code>duration</code> and
+									<code>durationUnit</code>) should always be returned in the input.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="../interfaces/scheduleinput.html" class="tsd-signature-type">ScheduleInput</a></h4>
+						<p>The input that describes this schedule.</p>
 					</li>
 				</ul>
 			</section>
@@ -2188,9 +2745,15 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L327">Schedule.ts:327</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L355">Schedule.ts:355</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Updates <a href="schedule.html#checks">Schedule.checks</a> based on the frequencies that were specified
+								in the schedule input.</p>
+							</div>
+						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
 					</li>
 				</ul>
@@ -2205,9 +2768,16 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Schedule.ts#L312">Schedule.ts:312</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Schedule.ts#L339">Schedule.ts:339</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Updates the <a href="schedule.html#durationindays">Schedule.durationInDays</a> variable based on the
+									<a href="schedule.html#lasttime">Schedule.lastTime</a> (if any), the <a href="schedule.html#duration">Schedule.duration</a> and it&#39;s
+								<a href="schedule.html#durationunit">Schedule.durationUnit</a>.</p>
+							</div>
+						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
 					</li>
 				</ul>

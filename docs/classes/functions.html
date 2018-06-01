@@ -1117,13 +1117,18 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Functions.ts#L103">Functions.ts:103</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Functions.ts#L150">Functions.ts:150</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 							<div class="lead">
 								<p>Returns the first argument which is defined.</p>
 							</div>
+							<pre><code class="lang-typescript">Functions.coalesce(<span class="hljs-number">3</span>, <span class="hljs-number">4</span>);                <span class="hljs-comment">// 3</span>
+Functions.coalesce(<span class="hljs-literal">undefined</span>, <span class="hljs-number">4</span>);        <span class="hljs-comment">// 4</span>
+Functions.coalesce(<span class="hljs-literal">null</span>, <span class="hljs-number">4</span>);             <span class="hljs-comment">// null</span>
+Functions.coalesce(<span class="hljs-built_in">void</span> <span class="hljs-number">0</span>, <span class="hljs-built_in">void</span> <span class="hljs-number">0</span>, <span class="hljs-number">5</span>);   <span class="hljs-comment">// 5</span>
+</code></pre>
 							<dl class="tsd-comment-tags">
 								<dt>see</dt>
 								<dd><p><a href="functions.html#isdefined">Functions.isDefined</a></p>
@@ -1163,7 +1168,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Functions.ts#L17">Functions.ts:17</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Functions.ts#L17">Functions.ts:17</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1181,7 +1186,7 @@ img { max-width: 100%; }
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
-						<p>True if the variable is an array, otherwise false.</p>
+						<p><code>true</code> if the variable is an array, otherwise <code>false</code>.</p>
 					</li>
 				</ul>
 			</section>
@@ -1195,19 +1200,33 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Functions.ts#L25">Functions.ts:25</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Functions.ts#L31">Functions.ts:31</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the two arrays given are stricly equivalent. If the
+									arrays are not the same length or contain the same values in the same order
+								then <code>false</code> is returned.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>x: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The first array to test.</p>
+								</div>
 							</li>
 							<li>
 								<h5>y: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The second array to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if they have the same exact values, otherwise <code>false</code>.</p>
 					</li>
 				</ul>
 			</section>
@@ -1221,7 +1240,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Functions.ts#L74">Functions.ts:74</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Functions.ts#L87">Functions.ts:87</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1239,7 +1258,7 @@ img { max-width: 100%; }
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
-						<p>True if the variable is defined, otherwise false.</p>
+						<p><code>true</code> if the variable is defined, otherwise <code>false</code>.</p>
 					</li>
 				</ul>
 			</section>
@@ -1253,16 +1272,35 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Functions.ts#L82">Functions.ts:82</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Functions.ts#L110">Functions.ts:110</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the given input appears to be a valid
+								<a href="../interfaces/frequencyvalueevery.html">FrequencyValueEvery</a>.</p>
+							</div>
+							<pre><code class="lang-typescript">Functions.isFrequencyValueEvery({});                   <span class="hljs-comment">// false</span>
+Functions.isFrequencyValueEvery([]);                   <span class="hljs-comment">// false</span>
+Functions.isFrequencyValueEvery([<span class="hljs-number">1</span>]);                  <span class="hljs-comment">// false</span>
+Functions.isFrequencyValueEvery(<span class="hljs-literal">null</span>);                 <span class="hljs-comment">// false</span>
+Functions.isFrequencyValueEvery({every:<span class="hljs-number">2</span>});            <span class="hljs-comment">// true</span>
+Functions.isFrequencyValueEvery({offset:<span class="hljs-number">1</span>});           <span class="hljs-comment">// false</span>
+Functions.isFrequencyValueEvery({every:<span class="hljs-number">2</span>, offset:<span class="hljs-number">1</span>});  <span class="hljs-comment">// true</span>
+</code></pre>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <span class="tsd-signature-type">any</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The variable to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the variable appears to be a <a href="../interfaces/frequencyvalueevery.html">FrequencyValueEvery</a>,
+						otherwise false.</p>
 					</li>
 				</ul>
 			</section>
@@ -1276,16 +1314,32 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Functions.ts#L90">Functions.ts:90</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Functions.ts#L130">Functions.ts:130</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the given input appears to be a valid
+								<a href="../globals.html#frequencyvalueoneof">FrequencyValueOneOf</a>.</p>
+							</div>
+							<pre><code class="lang-typescript">Functions.isFrequencyValueOneOf({});    <span class="hljs-comment">// false</span>
+Functions.isFrequencyValueOneOf([]);    <span class="hljs-comment">// false</span>
+Functions.isFrequencyValueOneOf([<span class="hljs-number">1</span>]);   <span class="hljs-comment">// true</span>
+Functions.isFrequencyValueOneOf(<span class="hljs-literal">null</span>);  <span class="hljs-comment">// false</span>
+</code></pre>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <span class="tsd-signature-type">any</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The variable to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the variable appears to be a <a href="../globals.html#frequencyvalueoneof">FrequencyValueOneOf</a>,
+						otherwise false.</p>
 					</li>
 				</ul>
 			</section>
@@ -1299,16 +1353,26 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Functions.ts#L55">Functions.ts:55</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Functions.ts#L65">Functions.ts:65</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the given input is a finite number (a number which is
+								not infinite or not the result of a divide-by-zero operation).</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <span class="tsd-signature-type">any</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The variable to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the variable is a finite number, otherwise <code>false</code>.</p>
 					</li>
 				</ul>
 			</section>
@@ -1322,16 +1386,25 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Functions.ts#L63">Functions.ts:63</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Functions.ts#L76">Functions.ts:76</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the given input is an object and NOT an array.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <span class="tsd-signature-type">any</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The variable to test.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the variable is a plain object, otherwise <code>false</code>.</p>
 					</li>
 				</ul>
 			</section>
@@ -1345,7 +1418,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Functions.ts#L47">Functions.ts:47</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Functions.ts#L53">Functions.ts:53</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1363,7 +1436,7 @@ img { max-width: 100%; }
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
-						<p>True if the variable is a string, otherwise false.</p>
+						<p><code>true</code> if the variable is a string, otherwise <code>false</code>.</p>
 					</li>
 				</ul>
 			</section>
@@ -1377,25 +1450,48 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Functions.ts#L111">Functions.ts:111</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Functions.ts#L171">Functions.ts:171</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Pads the string <code>x</code> up to <code>length</code> characters with the given <code>padding</code>
+								optionally placing the <code>padding</code> <code>before</code> <code>x</code>.</p>
+							</div>
+							<pre><code class="lang-typescript">Functions.pad(<span class="hljs-string">'hey'</span>, <span class="hljs-number">5</span>, <span class="hljs-string">'_'</span>, <span class="hljs-literal">false</span>);   <span class="hljs-comment">// 'hey__'</span>
+Functions.pad(<span class="hljs-string">'hey'</span>, <span class="hljs-number">5</span>, <span class="hljs-string">'_'</span>, <span class="hljs-literal">true</span>);    <span class="hljs-comment">// '__hey'</span>
+Functions.pad(<span class="hljs-string">'heyman'</span>, <span class="hljs-number">5</span>, <span class="hljs-string">'_'</span>, <span class="hljs-literal">true</span>); <span class="hljs-comment">// 'heyman'</span>
+</code></pre>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>x: <span class="tsd-signature-type">string</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The string to pad.</p>
+								</div>
 							</li>
 							<li>
 								<h5>length: <span class="tsd-signature-type">number</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The length to pad to.</p>
+								</div>
 							</li>
 							<li>
 								<h5>padding: <span class="tsd-signature-type">string</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The string to pad with.</p>
+								</div>
 							</li>
 							<li>
 								<h5>before: <span class="tsd-signature-type">boolean</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>If the padding should go before the string to pad.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						<p>The padded string if any padding needed be added.</p>
 					</li>
 				</ul>
 			</section>
@@ -1409,22 +1505,44 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Functions.ts#L124">Functions.ts:124</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Functions.ts#L198">Functions.ts:198</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Pads the number <code>x</code> up to <code>length</code> digits where the padding is <code>0</code> and it
+									goes before <code>x</code>. This function will only return the first <code>length</code>
+									characters of the padding string representation of the number but can return
+								an alternative number of <code>first</code> characters.</p>
+							</div>
+							<pre><code class="lang-typescript">Functions.padNumber(<span class="hljs-number">29</span>, <span class="hljs-number">3</span>);      <span class="hljs-comment">// '029'</span>
+Functions.padNumber(<span class="hljs-number">29</span>, <span class="hljs-number">3</span>, <span class="hljs-number">2</span>);   <span class="hljs-comment">// '02'</span>
+Functions.padNumber(<span class="hljs-number">9573</span>, <span class="hljs-number">3</span>);    <span class="hljs-comment">// '957'</span>
+</code></pre>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>x: <span class="tsd-signature-type">number</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The number to pad with zeros in the beginning.</p>
+								</div>
 							</li>
 							<li>
 								<h5>length: <span class="tsd-signature-type">number</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The number of digits the number should be padded to.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> first: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;length</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The number of digits to return from the start of the string.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						<p>A padded number.</p>
 					</li>
 				</ul>
 			</section>

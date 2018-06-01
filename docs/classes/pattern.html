@@ -1121,22 +1121,48 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L95">Pattern.ts:95</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Pattern.ts#L102">Pattern.ts:102</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Creates a new pattern.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>name: <span class="tsd-signature-type">string</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The unique name of the pattern.</p>
+									</div>
+								</div>
 							</li>
 							<li>
 								<h5>listed: <span class="tsd-signature-type">boolean</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>If the pattern is &quot;listed&quot; <a href="pattern.html#listed">Pattern.listed</a>.</p>
+									</div>
+								</div>
 							</li>
 							<li>
 								<h5>describe: <a href="../globals.html#describepattern" class="tsd-signature-type">DescribePattern</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>A function to describe the pattern given a <a href="day.html">Day</a>.</p>
+									</div>
+								</div>
 							</li>
 							<li>
 								<h5>rules: <a href="../interfaces/patternrules.html" class="tsd-signature-type">PatternRules</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>The rules which describe how to detect and apply the pattern
+										to schedule input.</p>
+									</div>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="pattern.html" class="tsd-signature-type">Pattern</a></h4>
@@ -1152,9 +1178,14 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">describe<span class="tsd-signature-symbol">:</span> <a href="../globals.html#describepattern" class="tsd-signature-type">DescribePattern</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L85">Pattern.ts:85</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Pattern.ts#L90">Pattern.ts:90</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The function which describes this pattern given a <a href="day.html">Day</a> to base it on.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="listed" class="tsd-anchor"></a>
@@ -1162,9 +1193,17 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">listed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L80">Pattern.ts:80</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Pattern.ts#L85">Pattern.ts:85</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Whether this pattern should be &quot;listed&quot; or not. Visual schedulers may
+							provide a shortcut to describing and changing a <a href="schedule.html">Schedule</a> through
+							patterns and any pattern where listed is <code>true</code> could be an option in a
+						list. The default patterns are all listed.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="name" class="tsd-anchor"></a>
@@ -1172,9 +1211,15 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L90">Pattern.ts:90</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Pattern.ts#L96">Pattern.ts:96</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The name of this pattern. This is not typically displayed to a user, just
+						to uniquely identify a pattern.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="rules" class="tsd-anchor"></a>
@@ -1182,9 +1227,15 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">rules<span class="tsd-signature-symbol">:</span> <a href="../interfaces/patternrules.html" class="tsd-signature-type">PatternRules</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L95">Pattern.ts:95</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Pattern.ts#L102">Pattern.ts:102</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The rules for matching a pattern to a <a href="schedule.html">Schedule</a> or applying a pattern to
+						a schedule.</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static">
 				<a name="props" class="tsd-anchor"></a>
@@ -1192,7 +1243,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">PROPS<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[&#x27;dayOfWeek&#x27;, &#x27;dayOfMonth&#x27;, &#x27;lastDayOfMonth&#x27;, &#x27;dayOfYear&#x27;,&#x27;month&#x27;, &#x27;week&#x27;, &#x27;year&#x27;,&#x27;weekOfYear&#x27;, &#x27;weekspanOfYear&#x27;, &#x27;fullWeekOfYear&#x27;, &#x27;lastWeekspanOfYear&#x27;, &#x27;lastFullWeekOfYear&#x27;,&#x27;weekOfMonth&#x27;, &#x27;weekspanOfMonth&#x27;, &#x27;fullWeekOfMonth&#x27;, &#x27;lastWeekspanOfMonth&#x27;, &#x27;lastFullWeekOfMonth&#x27;]</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L69">Pattern.ts:69</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Pattern.ts#L71">Pattern.ts:71</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -1215,19 +1266,33 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L112">Pattern.ts:112</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Pattern.ts#L131">Pattern.ts:131</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Applies this pattern to schedule input removing and adding any necessary
+									properties from the input to match this pattern - based around the day
+								provided.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <a href="../interfaces/scheduleinput.html" class="tsd-signature-type">ScheduleInput</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The input to update to match this pattern.</p>
+								</div>
 							</li>
 							<li>
 								<h5>day: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The day to base the schedule on.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="../interfaces/scheduleinput.html" class="tsd-signature-type">ScheduleInput</a></h4>
+						<p>The reference to the input passed in.</p>
 					</li>
 				</ul>
 			</section>
@@ -1241,19 +1306,34 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L143">Pattern.ts:143</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Pattern.ts#L169">Pattern.ts:169</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether the given input matches this pattern. Optionally a day
+									can be provided to make sure the day matches the schedule and pattern
+								together.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <a href="../interfaces/scheduleinput.html" class="tsd-signature-type">ScheduleInput</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The schedule input to test.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagOptional">Optional</span> exactlyWith: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>A day to further validate against for matching.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the schedule input was a match to this pattern with the
+						day if one was provided, otherwise <code>false</code>.</p>
 					</li>
 				</ul>
 			</section>
@@ -1267,19 +1347,40 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L250">Pattern.ts:250</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Pattern.ts#L287">Pattern.ts:287</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Finds a matching pattern to the given input searching through <a href="../globals.html#patterns">Patterns</a>
+								for matches. Optionally it will only look at patterns where listed = <code>true</code>.</p>
+							</div>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="pattern.html#ismatch">Pattern.isMatch</a></p>
+								</dd>
+							</dl>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>input: <a href="../interfaces/scheduleinput.html" class="tsd-signature-type">ScheduleInput</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The schedule input to use.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> listedOnly: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>When <code>true</code> only patterns with <a href="pattern.html#listed">Pattern.listed</a> set to
+									<code>true</code> will be looked at, otherwise all patterns are looked at.</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagOptional">Optional</span> exactlyWith: <a href="day.html" class="tsd-signature-type">Day</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>A day to further validate against for matching.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="pattern.html" class="tsd-signature-type">Pattern</a></h4>
@@ -1296,16 +1397,26 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bd62273/src/Pattern.ts#L242">Pattern.ts:242</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Pattern.ts#L272">Pattern.ts:272</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Returns the pattern with the given name if one exists. If you add your own
+								patterns make sure to add them to <a href="../globals.html#patternmap">PatternMap</a>.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>name: <span class="tsd-signature-type">string</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The name of the pattern to return.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="pattern.html" class="tsd-signature-type">Pattern</a></h4>
+						<p>The instance to the pattern with the same name.</p>
 					</li>
 				</ul>
 			</section>

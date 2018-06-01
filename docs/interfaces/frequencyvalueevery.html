@@ -1075,12 +1075,13 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">every<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in Frequency.ts:12</li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Frequency.ts#L13">Frequency.ts:13</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>How every</p>
+						<p>How often the value occurs. For example, if this value is <code>2</code> the event will
+						occur on every other unit of time.</p>
 					</div>
 				</div>
 			</section>
@@ -1090,9 +1091,17 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">offset<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in Frequency.ts:17</li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/006d183/src/Frequency.ts#L21">Frequency.ts:21</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The offset of the frequency which is between <code>0</code> and less than <code>every</code>.
+							This is <code>0</code> by default which means the frequency starts on <code>0</code> and occurs
+							on <code>every</code>, <code>every * 2</code>, <code>every * 3</code>, etc. For example if this value is <code>1</code>
+						and <code>every</code> is 3 the sequence will be: 1, 4, 7, 11, ...</p>
+					</div>
+				</div>
 			</section>
 		</section>
 		<footer class="with-border-bottom">
