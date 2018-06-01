@@ -16,12 +16,12 @@ let cal = Calendar.months<string>();
 // Every Monday 9:00 - 9:30
 cal.addSchedule({
   event: 'Weekly Meeting',
-  schedule: new Schedule({
+  schedule: {
     dayOfWeek: [Weekday.MONDAY],
     times: [9],
     duration: 30,
     durationUnit: 'minutes'
-  })
+  }
 });
 
 // Dr. Appointment on 01/04/2018
@@ -75,12 +75,12 @@ var cal = ds.Calendar.months();
 // Every Monday 9:00 - 9:30
 cal.addSchedule({
   event: 'Weekly Meeting',
-  schedule: new ds.Schedule({
+  schedule: {
     dayOfWeek: [ds.Weekday.MONDAY],
     times: [9],
     duration: 30,
     durationUnit: 'minutes'
-  })
+  }
 });
 
 // Dr. Appointment on 01/04/2018
