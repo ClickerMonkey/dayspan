@@ -1,6 +1,6 @@
 
 import { Functions as fn } from './Functions';
-import { Day } from './Day';
+import { Day, DayProperty } from './Day';
 import { Suffix } from './Suffix';
 import { Weekday } from './Weekday';
 import { FrequencyValueEvery } from './Frequency';
@@ -68,7 +68,7 @@ export class Pattern
    * The properties in the [[ScheduleInput]] which are compared against the
    * rules of a pattern.
    */
-  public static PROPS: string[] =
+  public static PROPS: DayProperty[] =
   [
     'dayOfWeek', 'dayOfMonth', 'lastDayOfMonth', 'dayOfYear',
     'month', 'week', 'year',
@@ -128,7 +128,7 @@ export class Pattern
    * @param day The day to base the schedule on.
    * @returns The reference to the input passed in.
    */
-  public apply(input: ScheduleInput, day: Day): ScheduleInput
+  public apply<M>(input: ScheduleInput<M>, day: Day): ScheduleInput<M>
   {
     for (let prop of Pattern.PROPS)
     {
@@ -166,7 +166,7 @@ export class Pattern
    * @returns `true` if the schedule input was a match to this pattern with the
    *    day if one was provided, otherwise `false`.
    */
-  public isMatch(input: ScheduleInput, exactlyWith?: Day): boolean
+  public isMatch<M>(input: ScheduleInput<M>, exactlyWith?: Day): boolean
   {
     let exactly: boolean = fn.isDefined( exactlyWith );
 
@@ -252,7 +252,7 @@ export class Pattern
           return false;
         }
 
-        if (exactly && (exactlyWith[ prop ] % rule.every) !== ruleOffset)
+        if (exactly && (<number>exactlyWith[ prop ] % rule.every) !== ruleOffset)
         {
           return false;
         }
@@ -284,7 +284,7 @@ export class Pattern
    * @param exactlyWith  A day to further validate against for matching.
    * @see [[Pattern.isMatch]]
    */
-  public static findMatch(input: ScheduleInput, listedOnly: boolean = true, exactlyWith?: Day): Pattern
+  public static findMatch<M>(input: ScheduleInput<M>, listedOnly: boolean = true, exactlyWith?: Day): Pattern
   {
     for (let pattern of Patterns)
     {

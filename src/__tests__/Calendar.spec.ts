@@ -10,7 +10,7 @@ describe('Calendar', () => {
 
   it('days 1', () => {
     let d = Day.build(2018, Month.APRIL, 11);
-    let c = Calendar.days<string>(1, d);
+    let c = Calendar.days<string, any>(1, d);
 
     expect( c.length ).toBe( 1 );
     expect( c.days.length ).toBe( 1 );
@@ -28,7 +28,7 @@ describe('Calendar', () => {
 
   it('days 3', () => {
     let d = Day.build(2018, Month.APRIL, 11);
-    let c = Calendar.days<string>(3, d);
+    let c = Calendar.days<string, any>(3, d);
 
     expect( c.length ).toBe( 3 );
     expect( c.days.length ).toBe( 3 );
@@ -56,15 +56,15 @@ describe('Calendar', () => {
     expect( c.days[2].dayOfMonth ).toBe( 15 );
   })
 
-  it('schedule', () => {
-
+  it('schedule', () =>
+  {
     let d = Day.build(2018, Month.MAY, 11);
-    let c = Calendar.months<string>(1, d);
+    let c = Calendar.months<string, any>(1, d);
     c.listTimes = true;
 
     // Every Monday 9:00 - 9:30
-    c.addSchedule({
-      event: 'Weekly Meeting',
+    c.addEvent({
+      data: 'Weekly Meeting',
       schedule: new Schedule({
         dayOfWeek: [Weekday.MONDAY],
         times: [9],
@@ -73,13 +73,13 @@ describe('Calendar', () => {
       })
     });
 
-    expect( c.findSchedule('Weekly Meeting') ).toBeDefined();
+    expect( c.findEvent('Weekly Meeting') ).toBeDefined();
     expect( c.length ).toBe( 31 );
     expect( c.days.length ).toBe( 35 );
 
     expect( c.days[7].events.length ).toBe( 0 );
     expect( c.days[8].events.length ).toBe( 1 );
-    expect( c.days[8].events[0].event ).toBe( 'Weekly Meeting' );
+    expect( c.days[8].events[0].event.data ).toBe( 'Weekly Meeting' );
     expect( c.days[8].events[0].time.start.time ).toBe( Day.build(2018, Month.MAY, 7, 9, 0).time );
     expect( c.days[8].events[0].time.end.time ).toBe( Day.build(2018, Month.MAY, 7, 9, 30).time );
     expect( c.days[9].events.length ).toBe( 0 );

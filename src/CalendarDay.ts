@@ -1,5 +1,5 @@
 
-import { Op } from './Op';
+import { Op } from './Operation';
 import { Day } from './Day';
 import { DaySpan } from './DaySpan';
 import { CalendarEvent } from './CalendarEvent';
@@ -8,8 +8,11 @@ import { CalendarEvent } from './CalendarEvent';
 /**
  * A day in a [[Calendar]] with extra information relative to any selection on
  * the calendar, the current date, or events on the day.
+ *
+ * @typeparam T The type of data stored in the [[Event]] class.
+ * @typeparam M The type of metadata stored in the schedule.
  */
-export class CalendarDay<T> extends Day
+export class CalendarDay<T, M> extends Day
 {
 
   /**
@@ -71,7 +74,7 @@ export class CalendarDay<T> extends Day
    * The list of events on this day based on the settings and schedules in the
    * calendar.
    */
-  public events: CalendarEvent<T>[] = [];
+  public events: CalendarEvent<T, M>[] = [];
 
 
   /**

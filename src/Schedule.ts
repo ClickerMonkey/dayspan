@@ -1,12 +1,16 @@
 
 import { Functions as fn } from './Functions';
 import { FrequencyValue, FrequencyCheck, FrequencyValueEvery, FrequencyValueOneOf } from './Frequency';
-import { Day, DayInput, DayIterator, DurationInput } from './Day';
+import { Day, DayInput, DurationInput } from './Day';
+import { Identifier, IdentifierInput } from './Identifier';
 import { DaySpan } from './DaySpan';
 import { Constants } from './Constants';
 import { Parse } from './Parse';
 import { Time, TimeInput } from './Time';
 import { Suffix } from './Suffix';
+import { ScheduleModifier, ScheduleModifierSpan } from './ScheduleModifier';
+import { Units } from './Units';
+import { Iterator } from './Iterator';
 
 // @ts-ignore
 import * as moment from 'moment';
@@ -14,8 +18,10 @@ import * as moment from 'moment';
 
 /**
  * Input given by a user which describes an event schedule.
+ *
+ * @typeparam M The type of metadata stored in the schedule.
  */
-export interface ScheduleInput
+export interface ScheduleInput<M>
 {
 
   /**
@@ -50,11 +56,30 @@ export interface ScheduleInput
   durationUnit?: DurationInput;
 
   /**
-   * An array of days which should be excluded from the schedule.
+   * An array of days or identifiers which should be excluded from the schedule.
    *
    * @see [[Schedule.exclude]]
    */
-  exclude?: DayInput[];
+  exclude?: (Day | IdentifierInput)[];
+
+  /**
+   * An array of days or identifiers which should be included in the schedule.
+   *
+   * @see [[Schedule.include]]
+   */
+  include?: (Day | IdentifierInput)[];
+
+  /**
+   * An array of days or identifiers which should be canceled in the schedule.
+   *
+   * @see [[Schedule.cancel]]
+   */
+  cancel?: (Day | IdentifierInput)[];
+
+  /**
+   * @see [[Schedule.meta]]
+   */
+  meta?: { [identifier: string]: M };
 
   /**
    * @see [[Schedule.month]]
@@ -144,16 +169,11 @@ export interface ScheduleInput
 
 
 /**
- * A map of excluded days where the key is the [[Day.dayIdentifier]] and the
- * value is `true`.
- */
-export type ScheduleExclusions = { [dayIdentifier: number]: boolean };
-
-
-/**
  * A class which describes when an event occurs over what time and if it repeats.
+ *
+ * @typeparam M The type of metadata stored in the schedule.
  */
-export class Schedule
+export class Schedule<M>
 {
 
   /**
@@ -198,10 +218,30 @@ export class Schedule
   public durationInDays: number;
 
   /**
-   * A map of excluded days where the key is [[Day.dayIdentifier]] and the value
-   * is `true` unless otherwise overriden.
+   * A set of identifiers which mark what days or times are excluded on the
+   * schedule. This typically represents the set of event occurrences removed.
    */
-  public exclude: ScheduleExclusions;
+  public exclude: ScheduleModifier<boolean>;
+
+  /**
+   * A set of identifiers which mark what days or times are included outside
+   * the normal series of days on the schedule. This typically represents
+   * an event occurrence which is moved so its added to the exclude and include
+   * sets.
+   */
+  public include: ScheduleModifier<boolean>;
+
+  /**
+   * A set of identifiers which mark what days, times, weeks, months, etc that
+   * should have all event occurrences cancelled.
+   */
+  public cancel: ScheduleModifier<boolean>;
+
+  /**
+   * A map of metadata keyed by an identifier. The metadata is placed in
+   * [[CalendarEvent]].
+   */
+  public meta: ScheduleModifier<M>;
 
   /**
    * How frequent the event occurs based on [[Day.dayOfWeek]].
@@ -301,8 +341,13 @@ export class Schedule
    *
    * @param input The input which describes the schedule of events.
    */
-  public constructor(input?: ScheduleInput)
+  public constructor(input?: ScheduleInput<M>)
   {
+    this.exclude = new ScheduleModifier<boolean>();
+    this.include = new ScheduleModifier<boolean>();
+    this.cancel = new ScheduleModifier<boolean>();
+    this.meta = new ScheduleModifier<M>();
+
     if (fn.isDefined(input))
     {
       this.set(input);
@@ -315,9 +360,9 @@ export class Schedule
    * @param input The input which describes the schedule of events.
    * @see [[Parse.schedule]]
    */
-  public set(input: ScheduleInput): this
+  public set(input: ScheduleInput<M>): this
   {
-    Parse.schedule(input, this);
+    Parse.schedule<M>(input, this);
 
     return this;
   }
@@ -404,265 +449,81 @@ export class Schedule
    */
   public matchesRange(start: Day, end: Day): boolean
   {
-    return (this.start === null || start.isSameOrBefore(this.start)) &&
-      (this.end === null || end.isBefore(this.end));
-  }
-
-  /**
-   * Determines whether the given day is explicitly excluded in the schedule.
-   *
-   * @param day The day to test.
-   * @returns `true` if the day was excluded, otherwise `false`.
-   */
-  public isExcluded(day: Day): boolean
-  {
-    return !!this.exclude[ day.dayIdentifier ];
-  }
-
-  /**
-   * Determines whether the given day is NOT explicitly excluded in the schedule.
-   *
-   * @param day The day to test.
-   * @returns `true` if the day is NOT explicitly excluded, otherwise `false`.
-   */
-  public isIncluded(day: Day): boolean
-  {
-    return !this.exclude[ day.dayIdentifier ];
-  }
-
-  /**
-   * Determines whether the given day is a day on the schedule for the start
-   * of an event. If an event is more than one day and the day given is not the
-   * start this may return `false`.
-   *
-   * @param day The day to test.
-   * @returns `true` if the day marks the start of an event on the schedule.
-   * @see [[Schedule.isExcluded]]
-   * @see [[Schedule.matchesSpan]]
-   */
-  public matchesDay(day: Day): boolean
-  {
-    if (this.isExcluded( day ) || !this.matchesSpan( day ))
+    if (this.start && end.isBefore(this.start))
     {
       return false;
     }
 
-    for (let check of this.checks)
+    if (this.end && start.isAfter(this.end))
     {
-      if (!check( day[ check.property ] ))
-      {
-        return false;
-      }
+      return false;
     }
 
     return true;
   }
 
   /**
-   * Determines if the given day is covered by this schedule. A schedule can
-   * specify events that span multiple days - so even though the day does not
-   * match the starting day of a span - it can be a day that is within the
-   * schedule.
+   * Determines whether the given day is explicitly excluded in the schedule.
    *
    * @param day The day to test.
-   * @returns `true` if the day is covered by an event on this schedule,
-   *    otherwise `false`.
+   * @param lookAtTime lookAtTime If the specific time of the given day should
+   *    be looked at.
+   * @returns `true` if the day was excluded, otherwise `false`.
    */
-  public coversDay(day: Day): boolean
+  public isExcluded(day: Day, lookAtTime: boolean = true): boolean
   {
-    return !!this.findStartingDay( day );
+    return this.exclude.get( day, false, lookAtTime );
   }
 
   /**
-   * Finds the next day an event occurs on the schedule given a day to start,
-   * optionally including it, and a maximum number of days to look ahead.
-   *
-   * @param day The day to start to search from.
-   * @param includeDay If the given day should be included in the search.
-   * @param lookAhead The maximum number of days to look ahead from the given
-   *     day for event occurrences.
-   * @returns The next day on the schedule or `null` if none exists.
-   */
-  public nextDay(day: Day, includeDay: boolean = false, lookAhead: number = 366): Day
-  {
-    let next: Day = null;
-    let setNext: DayIterator = d => {
-      next = d;
-      return false;
-    };
-
-    this.iterateDays(day, 1, true, setNext, includeDay, lookAhead);
-
-    return next;
-  }
-
-  /**
-   * Finds the next specified number of days that events occur on the schedule
-   * given a day to start, optionally including it, and a maximum number of days
-   * to look ahead.
-   *
-   * @param day The day to start to search from.
-   * @param max The maximum number of days to return in the result.
-   * @param includeDay If the given day should be included in the search.
-   * @param lookAhead The maximum number of days to look ahead from the given
-   *     day for event occurrences.
-   * @returns An array containing the next days on the schedule that events
-   *    start or an empty array if there are none.
-   */
-  public nextDays(day: Day, max: number, includeDay: boolean = false, lookAhead: number = 366): Day[]
-  {
-    let nexts: Day[] = [];
-
-    this.iterateDays(day, max, true, d => nexts.push(d), includeDay, lookAhead);
-
-    return nexts;
-  }
-
-  /**
-   * Finds the previous day an event occurs on the schedule given a day to start,
-   * optionally including it, and a maximum number of days to look behind.
-   *
-   * @param day The day to start to search from.
-   * @param includeDay If the given day should be included in the search.
-   * @param lookAhead The maximum number of days to look behind from the given
-   *     day for event occurrences.
-   * @returns The previous day on the schedule or `null` if none exists.
-   */
-  public prevDay(day: Day, includeDay: boolean = false, lookBack: number = 366): Day
-  {
-    let prev: Day = null;
-    let setPrev: DayIterator = d => {
-      prev = d;
-      return false;
-    };
-
-    this.iterateDays(day, 1, false, setPrev, includeDay, lookBack);
-
-    return prev;
-  }
-
-  /**
-   * Finds the previous specified number of days that events occur on the
-   * schedule given a day to start, optionally including it, and a maximum
-   * number of days to look behind.
-   *
-   * @param day The day to start to search from.
-   * @param max The maximum number of days to return in the result.
-   * @param includeDay If the given day should be included in the search.
-   * @param lookAhead The maximum number of days to look behind from the given
-   *     day for event occurrences.
-   * @returns An array containing the previous days on the schedule that events
-   *    start or an empty array if there are none.
-   */
-  public prevDays(day: Day, max: number, includeDay: boolean = false, lookBack: number = 366): Day[]
-  {
-    let prevs: Day[] = [];
-
-    this.iterateDays(day, max, false, d => prevs.push(d), includeDay, lookBack);
-
-    return prevs;
-  }
-
-  /**
-   * Iterates over days that events start in the schedule given a day to start,
-   * a maximum number of days to find, and a direction to look.
-   *
-   * @param day The day to start to search from.
-   * @param max The maximum number of times to invoke the `onDay` callback.
-   * @param next If `true` this searches forward, otherwise `false` is backwards.
-   * @param onDay A function to invoke for each matching day found. If this
-   *    function returns `false` the iteration stops immediately.
-   * @param includeDay If the given day should be included in the search.
-   * @param lookup The maximum number of days to look through from the given
-   *     day for event occurrences.
-   * @see [[Schedule.matchesDay]]
-   */
-  public iterateDays(day: Day, max: number, next: boolean, onDay: DayIterator, includeDay: boolean = false, lookup: number = 366): this
-  {
-    let iterated: number = 0;
-
-    for (let days = 0; days < lookup; days++)
-    {
-      if (!includeDay || days > 0)
-      {
-        day = next ? day.next() : day.prev();
-      }
-
-      if (this.matchesDay(day))
-      {
-        if (onDay( day ) === false)
-        {
-          break;
-        }
-
-        if (++iterated >= max)
-        {
-          break;
-        }
-      }
-    }
-
-    return this;
-  }
-
-  /**
-   * Determines if the given day is on the schedule and the time specified on
-   * the day matches one of the times on the schedule.
+   * Determines whether the given day is explicitly included in the schedule.
    *
    * @param day The day to test.
-   * @returns `true` if the day and time match the schedule, otherwise false.
+   * @param lookAtTime lookAtTime If the specific time of the given day should
+   *    be looked at.
+   * @returns `true` if the day is NOT explicitly included, otherwise `false`.
    */
-  public matchesTime(day: Day): boolean
+  public isIncluded(day: Day, lookAtTime: boolean = true): boolean
   {
-    if (!this.matchesDay( day ))
-    {
-      return false;
-    }
-
-    for (let time of this.times)
-    {
-      if (day.sameTime(time))
-      {
-        return true;
-      }
-    }
-
-    return false;
+    return this.include.get( day, false, lookAtTime );
   }
 
   /**
-   * Determines if the given timestamp lies in an event occurrence on this
-   * schedule.
+   * Determines whether the given day is cancelled in the schedule.
    *
-   * @param day The timestamp to test against the schedule.
-   * @return `true` if the timestamp lies in an event occurrent start and end
-   *    timestamps, otherwise `false`.
+   * @param day The day to test.
+   * @param lookAtTime lookAtTime If the specific time of the given day should
+   *    be looked at.
+   * @returns `true` if the day was cancelled, otherwise `false`.
    */
-  public coversTime(day: Day): boolean
+  public isCancelled(day: Day, lookAtTime: boolean = true): boolean
   {
-    let start: Day = this.findStartingDay(day);
+    return this.cancel.get( day, false, lookAtTime );
+  }
 
-    if (!start)
-    {
-      return false;
-    }
+  /**
+   * Returns the metadata for the given day or `null` if there is none.
+   *
+   * @param day The day to return the metadata for.
+   * @param otherwise The data to return if none exists for the given day.
+   * @param lookAtTime lookAtTime If the specific time of the given day should
+   *    be looked at.
+   * @returns The metadata or `null`.
+   */
+  public getMeta(day: Day, otherwise: M = null, lookAtTime: boolean = true): M
+  {
+    return this.meta.get( day, otherwise, lookAtTime );
+  }
 
-    if (this.isFullDay())
-    {
-      return this.getFullSpan(start).contains(day);
-    }
-    else
-    {
-      for (let time of this.times)
-      {
-        if (this.getTimeSpan(start, time).contains(day))
-        {
-          return true;
-        }
-      }
-    }
-
-    return false;
+  /**
+   * Returns all metadata for the given day or an empty array if there is none.
+   *
+   * @param day The day to return the metadata for.
+   * @returns The array of metadata ordered by priority or an empty array.
+   */
+  public getMetas(day: Day): M[]
+  {
+    return this.meta.getAll( day );
   }
 
   /**
@@ -709,148 +570,369 @@ export class Schedule
   }
 
   /**
-   * Returns an array of spans of times that cover the the given day taking into
-   * account multi-day events. This does not check if the day is even on the
-   * schedule, it assumes it was already passed to [[Schedule.coversDay]] and it
-   * returned `true`.
+   * Determines whether the given day is a day on the schedule for the start
+   * of an event. If an event is more than one day and the day given is not the
+   * start this may return `false`. This does not test for event instances
+   * that exist through [[Schedule.include]].
    *
-   * @param day The day to return spans over.
-   * @returns An array of spans for each event occurrence over the given day.
+   * @param day The day to test.
+   * @returns `true` if the day marks the start of an event on the schedule.
+   * @see [[Schedule.isIncluded]]
+   * @see [[Schedule.isFullyExcluded]]
+   * @see [[Schedule.matchesSpan]]
    */
-  public getSpansOver(day: Day): DaySpan[]
+  public matchesDay(day: Day): boolean
   {
-    let spans: DaySpan[] = [];
-    let start: Day = this.findStartingDay( day );
-
-    if (!start)
+    if (this.isIncluded( day, false ))
     {
-      return spans;
+      return true;
+    }
+
+    if (!this.matchesSpan( day ) || this.isFullyExcluded( day ))
+    {
+      return false;
+    }
+
+    for (let check of this.checks)
+    {
+      if (!check( <number>day[ check.property ] ))
+      {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Determines whether the given day has events added through
+   * [[Schedule.include]].
+   *
+   * @param day The day to look for included times on.
+   * @returns `true` if there are included event instances on the given day,
+   *    otherwise `false`.
+   */
+  public hasIncludedTime(day: Day): boolean
+  {
+    return !this.iterateIncludeTimes( day ).isEmpty();
+  }
+
+  /**
+   * Determines whether the given day is fully excluded from the schedule. A
+   * fully excluded day is one that has a day-wide exclusion, or the schedule
+   * is not an all-day event and all times in the schedule are specifically
+   * excluded.
+   *
+   * @param day The day to test.*
+   * @returns `true` if he day is fully excluded, otherwise `false`.
+   */
+  public isFullyExcluded(day: Day): boolean
+  {
+    if (this.isExcluded(day, false))
+    {
+      return true;
     }
 
     if (this.isFullDay())
     {
-      spans.push(this.getFullSpan(start));
+      return false;
     }
-    else
-    {
-      for (let time of this.times)
-      {
-        let span: DaySpan = this.getTimeSpan( start, time );
 
-        if (span.matchesDay(day))
+    for (let time of this.times)
+    {
+      if (!this.isExcluded( day.withTime( time ) ))
+      {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Finds the next day an event occurs on the schedule given a day to start,
+   * optionally including it, and a maximum number of days to look ahead.
+   *
+   * @param day The day to start to search from.
+   * @param includeDay If the given day should be included in the search.
+   * @param lookAhead The maximum number of days to look ahead from the given
+   *     day for event occurrences.
+   * @returns The next day on the schedule or `null` if none exists.
+   */
+  public nextDay(day: Day, includeDay: boolean = false, lookAhead: number = 366): Day
+  {
+    return this.iterateDaycast(day, 1, true, includeDay, lookAhead).first();
+  }
+
+  /**
+   * Finds the next specified number of days that events occur on the schedule
+   * given a day to start, optionally including it, and a maximum number of days
+   * to look ahead.
+   *
+   * @param day The day to start to search from.
+   * @param max The maximum number of days to return in the result.
+   * @param includeDay If the given day should be included in the search.
+   * @param lookAhead The maximum number of days to look ahead from the given
+   *     day for event occurrences.
+   * @returns An array containing the next days on the schedule that events
+   *    start or an empty array if there are none.
+   */
+  public nextDays(day: Day, max: number, includeDay: boolean = false, lookAhead: number = 366): Day[]
+  {
+    return this.iterateDaycast(day, max, true, includeDay, lookAhead).list();
+  }
+
+  /**
+   * Finds the previous day an event occurs on the schedule given a day to start,
+   * optionally including it, and a maximum number of days to look behind.
+   *
+   * @param day The day to start to search from.
+   * @param includeDay If the given day should be included in the search.
+   * @param lookBack The maximum number of days to look behind from the given
+   *     day for event occurrences.
+   * @returns The previous day on the schedule or `null` if none exists.
+   */
+  public prevDay(day: Day, includeDay: boolean = false, lookBack: number = 366): Day
+  {
+    return this.iterateDaycast(day, 1, false, includeDay, lookBack).first();
+  }
+
+  /**
+   * Finds the previous specified number of days that events occur on the
+   * schedule given a day to start, optionally including it, and a maximum
+   * number of days to look behind.
+   *
+   * @param day The day to start to search from.
+   * @param max The maximum number of days to return in the result.
+   * @param includeDay If the given day should be included in the search.
+   * @param lookAhead The maximum number of days to look behind from the given
+   *     day for event occurrences.
+   * @returns An array containing the previous days on the schedule that events
+   *    start or an empty array if there are none.
+   */
+  public prevDays(day: Day, max: number, includeDay: boolean = false, lookBack: number = 366): Day[]
+  {
+    return this.iterateDaycast(day, max, false, includeDay, lookBack).list();
+  }
+
+  /**
+   * Iterates over days that events start in the schedule given a day to start,
+   * a maximum number of days to find, and a direction to look.
+   *
+   * @param day The day to start to search from.
+   * @param max The maximum number of days to iterate.
+   * @param next If `true` this searches forward, otherwise `false` is backwards.
+   * @param includeDay If the given day should be included in the search.
+   * @param lookup The maximum number of days to look through from the given
+   *     day for event occurrences.
+   * @returns A new Iterator for the days found in the cast.
+   * @see [[Schedule.iterateSpans]]
+   */
+  public iterateDaycast(day: Day, max: number, next: boolean, includeDay: boolean = false, lookup: number = 366): Iterator<Day>
+  {
+    return new Iterator<Day>((callback, iterator) =>
+    {
+      let iterated: number = 0;
+
+      for (let days = 0; days < lookup; days++)
+      {
+        if (!includeDay || days > 0)
         {
-          spans.push( span );
+          day = next ? day.next() : day.prev();
+        }
+
+        if (!this.iterateSpans( day, false ).isEmpty())
+        {
+          callback( day, iterator );
+
+          if (!iterator.iterating || ++iterated >= max)
+          {
+            return;
+          }
         }
       }
-    }
-
-    return spans;
+    });
   }
 
   /**
-   * Returns a span of time over the given day. This does not check if the day
-   * is even on the schedule, it assumes it was already passed to
-   * [[Schedule.coversDay]] and it returned `true`.
+   * Iterates through the spans (event instances) that start on or covers the
+   * given day.
    *
-   * @param day The day to return a span over.
-   * @returns A span over the given day.
+   * @param day The day to look for spans on.
+   * @param covers If `true` spans which span multiple days will be looked at
+   *    to see if they intersect with the given day, otherwise `false` will
+   *    only look at the given day for the start of events.
+   * @returns A new Iterator for all the spans found.
    */
-  public getSpanOver(day: Day): DaySpan
+  public iterateSpans(day: Day, covers: boolean = false): Iterator<DaySpan>
   {
-    let start: Day = this.findStartingDay( day );
-
-    return start ? this.getFullSpan( start ) : null;
-  }
-
-  /**
-   * Returns an array of spans of times that start on the given day. This can
-   * optionally check to see if th day is on the schedule, or just assume the
-   * day is.
-   *
-   * @param day The day to return a span that starts on.
-   * @param check When `true` [[Schedule.matchesDay]] is passed the given day
-   *    and an empty array is returned if the day is not on the schedule.
-   *    Otherwise its assumed the given day is on the schedule.
-   * @returns An array of spans for each event occurrence that start on the
-   *    given day.
-   */
-  public getSpansOn(day: Day, check: boolean = false): DaySpan[]
-  {
-    let spans: DaySpan[] = [];
-
-    if (check && !this.matchesDay(day))
+    return new Iterator<DaySpan>((callback, iterator) =>
     {
-      return spans;
-    }
+      let current: Day = day;
+      let lookBehind: number = covers ? this.durationInDays : 0;
 
-    if (this.isFullDay())
-    {
-      spans.push(this.getFullSpan( day ));
-    }
-    else
-    {
-      for (let time of this.times)
+      // If the events start at the end of the day and may last multiple days....
+      if (this.isFullDay())
       {
-        spans.push(this.getTimeSpan( day, time ));
+        // If the schedule has events which span multiple days we need to look
+        // backwards for events that overlap with the given day.
+        while (lookBehind >= 0)
+        {
+          // If the current day matches the schedule rules...
+          if (this.matchesDay( current ))
+          {
+            // Build a DaySpan with the given start day and the schedules duration.
+            let span: DaySpan = this.getFullSpan( current );
+
+            // If that dayspan intersects with the given day, it's a winner!
+            if (span.matchesDay( day ))
+            {
+              callback( span, iterator );
+
+              if (!iterator.iterating)
+              {
+                return;
+              }
+            }
+          }
+
+          current = current.prev();
+          lookBehind--;
+        }
       }
-    }
-
-    return spans;
-  }
-
-  /**
-   * If the given day potentially overlaps an event occurrence on the schedule
-   * this will find the day when the event occurrence starts.
-   *
-   * @param day The day to check against the schedule for a starting day.
-   * @returns The day that is a start of an event that potentially overlaps
-   *    the given day.
-   */
-  public findStartingDay(day: Day): Day
-  {
-    let behind: number = this.durationInDays;
-
-    while (behind >= 0)
-    {
-      if (this.matchesDay(day))
+      // This schedule has events which start at certain times
+      else
       {
-        return day;
+        // If the schedule has events which span multiple days we need to look
+        // backwards for events that overlap with the given day.
+        while (lookBehind >= 0)
+        {
+          // If the current day matches the schedule rules...
+          if (this.matchesDay( current ))
+          {
+            // Iterate through each daily occurrence in the schedule...
+            for (let time of this.times)
+            {
+              let span: DaySpan = this.getTimeSpan( current, time );
+
+              // If the event intersects with the given day and the occurrence
+              // has not specifically been excluded...
+              if (span.matchesDay( day ) && !this.isExcluded( span.start, true ))
+              {
+                callback( span, iterator );
+
+                if (!iterator.iterating)
+                {
+                  return;
+                }
+              }
+            }
+          }
+          else
+          {
+            // The current day does not match the schedule, however the schedule
+            // might have moved/random event occurrents on the current day.
+            // We only want the ones that overlap with the given day.
+            this.iterateIncludeTimes(current, day).iterate((span, timeIterator) =>
+            {
+              callback( span, iterator );
+
+              if (!iterator.iterating)
+              {
+                timeIterator.stop();
+              }
+            })
+
+            if (!iterator.iterating)
+            {
+              return;
+            }
+          }
+
+          current = current.prev();
+          lookBehind--;
+        }
       }
-
-      day = day.prev();
-      behind--;
-    }
-
-    return null;
+    });
   }
 
   /**
-   * Converts the map of exclusions to an array of [[Day]] instances or
-   * [[Day.dayIdentifier]]s.
+   * Determines if the given day is on the schedule and the time specified on
+   * the day matches one of the times on the schedule.
    *
-   * @param returnDays When `true` [[Day]] instances are returned, otherwise
-   *    [[Day.dayIdentifier]]s are returned.
-   * @return THe array of excluded days or an empty array if none are excluded.
+   * @param day The day to test.
+   * @returns `true` if the day and time match the schedule, otherwise false.
    */
-  public getExclusions(returnDays: boolean = true): DayInput[]
+  public matchesTime(day: Day): boolean
   {
-    let exclusions: DayInput[] = [];
+    return !!this.iterateSpans( day, true ).first( span => span.start.sameMinute( day ) );
+  }
 
-    for (let dayIdentifierKey in this.exclude)
+  /**
+   * Determines if the given day is covered by this schedule. A schedule can
+   * specify events that span multiple days - so even though the day does not
+   * match the starting day of a span - it can be a day that is within the
+   * schedule.
+   *
+   * @param day The day to test.
+   * @returns `true` if the day is covered by an event on this schedule,
+   *    otherwise `false`.
+   */
+  public coversDay(day: Day): boolean
+  {
+    return !this.iterateSpans( day, true ).isEmpty();
+  }
+
+  /**
+   * Determines if the given timestamp lies in an event occurrence on this
+   * schedule.
+   *
+   * @param day The timestamp to test against the schedule.
+   * @return `true` if the timestamp lies in an event occurrent start and end
+   *    timestamps, otherwise `false`.
+   */
+  public coversTime(day: Day): boolean
+  {
+    return !!this.iterateSpans( day, true ).first( span => span.contains( day ) );
+  }
+
+  /**
+   * Iterates timed events that were explicitly specified on the given day.
+   * Those events could span multiple days so may be tested against another day.
+   *
+   * @param day The day to look for included timed events.
+   * @param matchAgainst The day to test against the timed event.
+   * @returns A new Iterator for all the included spans found.
+   */
+  public iterateIncludeTimes(day: Day, matchAgainst: Day = day): Iterator<DaySpan>
+  {
+    let isIncludedTime = (result: [IdentifierInput, boolean]) =>
     {
-      let dayIdentifier: number = parseInt(dayIdentifierKey);
+      let [id, included] = result;
 
-      exclusions.push( returnDays ? Day.fromDayIdentifier(dayIdentifier)  : dayIdentifier );
-    }
+      return included && Identifier.Time.is( id );
+    };
 
-    return exclusions;
+    let getSpan = (result: [IdentifierInput, boolean]) =>
+    {
+      let [id] = result;
+      let time: Day = Identifier.Time.start( id );
+      let span: DaySpan = this.getTimeSpan( time, time.asTime() );
+
+      if (span.matchesDay( matchAgainst ))
+      {
+        return span;
+      }
+    };
+
+    return this.include.query( day.dayIdentifier ).map<DaySpan>( getSpan, isIncludedTime );
   }
 
   /**
    * Converts the schedule instance back into input.
    *
    * @param returnDays When `true` the start, end, and array of exclusions will
-   *    have [[Day]] instances, otherwise the UNIX timestamp and dayIdentifiers
+   *    have [[Day]] instances, otherwise the UTC timestamp and dayIdentifiers
    *    will be used when `false`.
    * @param returnTimes When `true` the times returned in the input will be
    *    instances of [[Time]] otherwise the `timeFormat` is used to convert the
@@ -862,11 +944,14 @@ export class Schedule
    * @see [[Schedule.getExclusions]]
    * @see [[Time.format]]
    */
-  public toInput(returnDays: boolean = false, returnTimes: boolean = false, timeFormat: string = '', alwaysDuration: boolean = false): ScheduleInput
+  public toInput(returnDays: boolean = false, returnTimes: boolean = false, timeFormat: string = '', alwaysDuration: boolean = false): ScheduleInput<M>
   {
     let defaultUnit: string = Constants.DURATION_DEFAULT_UNIT( this.isFullDay() );
-    let out: ScheduleInput = {};
-    let exclusions: DayInput[] = this.getExclusions( returnDays );
+    let exclusions: IdentifierInput[] = this.exclude.identifiers(v => v);
+    let inclusions: IdentifierInput[] = this.include.identifiers(v => v);
+    let cancels: IdentifierInput[] = this.cancel.identifiers(v => v);
+    let hasMeta: boolean = !this.meta.isEmpty();
+    let out: ScheduleInput<M> = {};
     let times: TimeInput[]  = [];
 
     for (let time of this.times)
@@ -880,6 +965,9 @@ export class Schedule
     if (alwaysDuration || this.duration !== Constants.DURATION_DEFAULT) out.duration = this.duration;
     if (alwaysDuration || this.durationUnit !== defaultUnit) out.durationUnit = this.durationUnit;
     if (exclusions.length) out.exclude = exclusions;
+    if (inclusions.length) out.include = inclusions;
+    if (cancels.length) out.cancel = cancels;
+    if (hasMeta) out.meta = this.meta.map;
     if (this.dayOfWeek.input) out.dayOfWeek = this.dayOfWeek.input;
     if (this.dayOfMonth.input) out.dayOfMonth = this.dayOfMonth.input;
     if (this.lastDayOfMonth.input) out.lastDayOfMonth = this.lastDayOfMonth.input;
@@ -913,7 +1001,11 @@ export class Schedule
    * @param includeDuration When `true` the [[Schedule.duration]] and
    *    [[Schedule.durationUnit]] are added to the description if
    *    [[Schedule.duration]] is not equal to `1`.
-   * @param includeExcludes When `true` the [[Schedule.exclusions]] are added
+   * @param includeExcludes When `true` the [[Schedule.exclude]] are added
+   *    to the description if there are any.
+   * @param includeIncludes When `true` the [[Schedule.include]] are added
+   *    to the description if there are any.
+   * @param includeCancels When `true` the [[Schedule.cancel]] are added
    *    to the description if there are any.
    * @returns The descroption of the schedule.
    */
@@ -921,7 +1013,9 @@ export class Schedule
     includeRange: boolean = true,
     includeTimes: boolean = true,
     includeDuration: boolean = false,
-    includeExcludes: boolean = false): string
+    includeExcludes: boolean = false,
+    includeIncludes: boolean = false,
+    includeCancels: boolean = false): string
   {
     let out: string = '';
 
@@ -986,12 +1080,34 @@ export class Schedule
 
     if (includeExcludes)
     {
-      let excludes: Day[] = <Day[]>this.getExclusions( true );
+      let excludes: ScheduleModifierSpan<boolean>[] = this.exclude.spans();
 
       if (excludes.length)
       {
         out += ' excluding ';
-        out += this.describeArray( excludes, x => x.format('MM/DD/YYYY') );
+        out += this.describeArray( excludes, x => x.span.summary(Units.DAY) );
+      }
+    }
+
+    if (includeIncludes)
+    {
+      let includes: ScheduleModifierSpan<boolean>[] = this.include.spans();
+
+      if (includes.length)
+      {
+        out += ' including ';
+        out += this.describeArray( includes, x => x.span.summary(Units.DAY) );
+      }
+    }
+
+    if (includeCancels)
+    {
+      let cancels: ScheduleModifierSpan<boolean>[] = this.cancel.spans();
+
+      if (cancels.length)
+      {
+        out += ' with cancellations on ';
+        out += this.describeArray( cancels, x => x.span.summary(Units.DAY) );
       }
     }
 

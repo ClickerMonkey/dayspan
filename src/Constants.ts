@@ -141,8 +141,9 @@ export class Constants
    * @param all If the event is all day.
    * @return The default unit for the event.
    */
-  public static DURATION_DEFAULT_UNIT: (all: boolean) => string = all => all ? Constants.DURATION_DEFAULT_UNIT_ALL : Constants.DURATION_DEFAULT_UNIT_TIMES;
-
+  public static DURATION_DEFAULT_UNIT: (all: boolean) => string =
+    all => all ? Constants.DURATION_DEFAULT_UNIT_ALL :
+                 Constants.DURATION_DEFAULT_UNIT_TIMES;
 
   /**
    * The number of milliseconds for various duration units. These are worse case

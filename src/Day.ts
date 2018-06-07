@@ -1,6 +1,7 @@
 
+import { Identifier, IdentifierInput } from './Identifier';
 import { Constants } from './Constants';
-import { Op, operate } from './Op';
+import { Op, operate } from './Operation';
 import { Parse } from './Parse';
 import { Time } from './Time';
 
@@ -9,30 +10,32 @@ import * as moment from 'moment';
 
 
 /**
- *
+ * Valid durations that can be specified.
  */
 export type DurationInput = moment.unitOfTime.DurationConstructor;
 
 /**
+ * All valid types which may be converted to a [[Day]] instance.
  *
+ * - `number`: A UNIX timestamp.
+ * - `string`: A string representation of a date.
+ * - `Day`: An existing [[Day]] instance.
+ * - `number[]`: An array of numbers specifying any of: [year, month, dayOfMonth, hour, minute, second, millisecond].
+ * - `object`: An object with any of the following properties: year, month, dayOfMonth, hour, minute, second, millisecond.
+ * - `true`: This will be interpreted as [[Day.today]]
  */
 export type DayInput = number | string | Day | number[] | object | true;
 
 /**
- *
+ * One of the properties on the [[Day]] object.
  */
-export type DayIterator = (day: Day) => any;
+export type DayProperty = keyof Day;
 
 /**
- *
+ * A class which represents a point in time as
  */
 export class Day
 {
-
-  /**
-   *
-   */
-  public static readonly LOAD_TIME: Day = Day.now();
 
   /**
    *
@@ -161,22 +164,27 @@ export class Day
   /**
    *
    */
-  public readonly dayIdentifier: number;
+  public readonly timeIdentifier: IdentifierInput;
 
   /**
    *
    */
-  public readonly weekIdentifier: number;
+  public readonly dayIdentifier: IdentifierInput;
 
   /**
    *
    */
-  public readonly monthIdentifier: number;
+  public readonly weekIdentifier: IdentifierInput;
 
   /**
    *
    */
-  public readonly quarterIdentifier: number;
+  public readonly monthIdentifier: IdentifierInput;
+
+  /**
+   *
+   */
+  public readonly quarterIdentifier: IdentifierInput;
 
 
 
@@ -186,7 +194,7 @@ export class Day
   public constructor(date: moment.Moment)
   {
     this.date                 = date;
-    this.time                 = date.unix();
+    this.time                 = date.valueOf();
     this.millis               = date.millisecond();
     this.seconds              = date.second();
     this.minute               = date.minute();
@@ -212,10 +220,11 @@ export class Day
     this.lastWeekspanOfMonth  = Day.getLastWeekspanOfMonth( date );
     this.lastFullWeekOfMonth  = Day.getLastFullWeekOfMonth( date );
 
-    this.dayIdentifier        = Day.getDayIdentifier( date );
-    this.weekIdentifier       = Day.getWeekIdentifier( date );
-    this.monthIdentifier      = Day.getMonthIdentifier( date );
-    this.quarterIdentifier    = Day.getQuarterIdentifier( date );
+    this.timeIdentifier       = Identifier.Time.get( this );
+    this.dayIdentifier        = Identifier.Day.get( this);
+    this.weekIdentifier       = Identifier.Week.get( this);
+    this.monthIdentifier      = Identifier.Month.get( this);
+    this.quarterIdentifier    = Identifier.Quarter.get( this );
   }
 
   // Same
@@ -231,28 +240,32 @@ export class Day
   /**
    *
    */
-  public sameMonth(day: Day): boolean {
+  public sameMonth(day: Day): boolean
+  {
     return this.monthIdentifier === day.monthIdentifier;
   }
 
   /**
    *
    */
-  public sameWeek(day: Day): boolean {
+  public sameWeek(day: Day): boolean
+  {
     return this.weekIdentifier === day.weekIdentifier;
   }
 
   /**
    *
    */
-  public sameYear(day: Day): boolean {
+  public sameYear(day: Day): boolean
+  {
     return this.year === day.year;
   }
 
   /**
    *
    */
-  public sameQuarter(day: Day): boolean {
+  public sameQuarter(day: Day): boolean
+  {
     return this.quarterIdentifier === day.quarterIdentifier;
   }
 
@@ -267,7 +280,7 @@ export class Day
    *
    */
   public sameMinute(day: Day): boolean {
-    return this.dayIdentifier === day.dayIdentifier && this.hour === day.hour && this.minute === day.minute;
+    return this.timeIdentifier === day.timeIdentifier;
   }
 
   /**
@@ -709,6 +722,10 @@ export class Day
     return this.fromMoment(moment(millis));
   }
 
+  public static unixSeconds(millis: number): Day {
+    return this.fromMoment(moment.unix(millis));
+  }
+
   public static parse(input: DayInput): Day {
     return Parse.day(input);
   }
@@ -829,26 +846,6 @@ export class Day
   public static getLastDayOfMonth(date: moment.Moment): number
   {
     return date.daysInMonth() - date.date() + 1;
-  }
-
-  public static getWeekIdentifier(date: moment.Moment): number
-  {
-    return date.week() + date.year() * 100;
-  }
-
-  public static getMonthIdentifier(date: moment.Moment): number
-  {
-    return (date.month() + 1) + date.year() * 100;
-  }
-
-  public static getDayIdentifier(date: moment.Moment): number
-  {
-    return date.date() + (date.month() + 1) * 100 + date.year() * 10000;
-  }
-
-  public static getQuarterIdentifier(date: moment.Moment): number
-  {
-    return date.quarter() + date.year() * 10;
   }
 
 }

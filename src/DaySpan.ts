@@ -1,6 +1,6 @@
 
 import { Day } from './Day';
-import { Op } from './Op';
+import { Op } from './Operation';
 import { Units } from './Units';
 
 
@@ -52,6 +52,20 @@ export class DaySpan
   public contains(day: Day): boolean
   {
     return day.time >= this.start.time && day.time <= this.end.time;
+  }
+
+  /**
+   * Compares the given timestamp to this span. If the timestamp is before this
+   * span then `-1` is returned, if the timestamp is after this span then `1`
+   * us returned, otherwise `0` is returned when the timestamp is in this span.
+   *
+   * @param day The timestamp to compare to.
+   * @returns `-1`, `0`, or `1` depending on the given timestamp relative to
+   *    this span.
+   */
+  public compareTo(day: Day): number
+  {
+    return day.time < this.start.time ? -1 : (day.time > this.end.time ? 1 : 0);
   }
 
   /**

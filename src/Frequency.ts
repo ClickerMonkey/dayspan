@@ -1,4 +1,5 @@
 
+import { DayProperty } from './Day';
 
 /**
  * A frequency that occurs at a constant rate with an optional offset.
@@ -64,6 +65,6 @@ export interface FrequencyCheck
   /**
    * The property on the [[Day]] object this function evaluates.
    */
-  property?: string;
+  property?: DayProperty;
 
 }

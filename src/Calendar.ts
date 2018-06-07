@@ -1,46 +1,18 @@
 
 import { Functions as fn } from './Functions';
-import { Day } from './Day';
+import { Day, DayInput } from './Day';
 import { DaySpan } from './DaySpan';
-import { Schedule, ScheduleInput } from './Schedule';
-import { Op } from './Op';
+import { Schedule } from './Schedule';
+import { EventInput, Event } from './Event';
+import { Op } from './Operation';
 import { Units } from './Units';
 import { Parse } from './Parse';
 import { SortEvent } from './Sort';
 import { Constants } from './Constants';
 import { CalendarDay } from './CalendarDay';
 import { CalendarEvent } from './CalendarEvent';
+import { Iterator } from './Iterator';
 
-
-/**
- * A pairing of a user specified event object and the schedule which defines
- * when it occurs on a calendar.
- */
-export interface CalendarSchedule<T>
-{
-
-  /**
-   * The schedule of events.
-   */
-  schedule: Schedule;
-
-  /**
-   * The user supplied event object.
-   */
-  event: T;
-
-}
-
-/**
- * A type which an be used to identify a schedule/event pair for removal or
- * retrieval.
- */
-export type CalendarScheduleIdentifier<T> = CalendarSchedule<T> | Schedule | T;
-
-/**
- * The input which can be passed to the calendar when adding a schedule and event.
- */
-export type CalendarScheduleInput<T> = CalendarSchedule<T> | { schedule: ScheduleInput, event: T };
 
 /**
  * A function which moves a given day by some amount and some unit. This is
@@ -52,10 +24,14 @@ export type CalendarScheduleInput<T> = CalendarSchedule<T> | { schedule: Schedul
  */
 export type CalendarMover = (day: Day, amount: number) => Day;
 
+
 /**
  * Input used to initialize or mass change the properties of a [[Calendar]].
+ *
+ * @typeparam T The type of data stored in the [[Event]] class.
+ * @typeparam M The type of metadata stored in the schedule.
  */
-export interface CalendarInput<T>
+export interface CalendarInput<T, M>
 {
 
   /**
@@ -89,18 +65,51 @@ export interface CalendarInput<T>
   /**
    * @see [[Calendar.eventSorter]]
    */
-  eventSorter?: SortEvent<T>;
+  eventSorter?: SortEvent<T, M>;
   /**
-   * @see [[Calendar.schedules]]
+   * @see [[Calendar.events]]
    */
-  schedules?: CalendarSchedule<T>[];
+  events?: EventInput<T, M>[];
+  /**
+   * @see [[Calendar.type]]
+   */
+  type?: Units;
+  /**
+   * @see [[Calendar.size]]
+   */
+  size?: number; // 1
+  /**
+   * When morphing a calendar to a fewer number of days, do we want to keep
+   * today in the calendar if it is already in the calendar?
+   */
+  preferToday?: boolean; // true
+  /**
+   * What day should the calendar be based around (contain)?
+   */
+  around?: DayInput; // null
+  /**
+   * When morphing a calendar and `preferToday` is false OR today is not in the
+   * calendar AND `around` is not specified, we will pick a day at this number
+   * in the current calendar (a value between 0 and 1 signifying the start and
+   * and of the current calendar).
+   */
+  otherwiseFocus?: number; // 0.499999
+  /**
+   * When morphing or creating passing a value of `true` will avoid calling
+   * [[Calendar.refresh]] as is typically done right after each of those
+   * functions.
+   */
+  delayRefresh?: boolean; // false
 }
 
 /**
- * A collection of [[CalendarDay]]s, the schedules on the calendar, and all
- * [[CalendarEvent]]s generated based on the schedules.
+ * A collection of [[CalendarDay]]s, the events on the calendar, and all
+ * [[CalendarEvent]]s generated based on the events.
+ *
+ * @typeparam T The type of data stored in the [[Event]] class.
+ * @typeparam M The type of metadata stored in the schedule.
  */
-export class Calendar<T>
+export class Calendar<T, M>
 {
 
   /**
@@ -200,8 +209,7 @@ export class Calendar<T>
   /**
    * The function (if any) which sorts the events on a calendar day.
    */
-  public eventSorter: SortEvent<T> = null;
-
+  public eventSorter: SortEvent<T, M> = null;
 
   /**
    * A selection of days on the calendar. If no days are selected this is `null`.
@@ -213,12 +221,18 @@ export class Calendar<T>
   /**
    * The array of days in this calendar and their events.
    */
-  public days: CalendarDay<T>[] = [];
+  public days: CalendarDay<T, M>[] = [];
 
   /**
-   * The array of schedule and user event pairs added to the calendar.
+   * The array of scheduled events added to the calendar.
    */
-  public schedules: CalendarSchedule<T>[] = [];
+  public events: Event<T, M>[] = [];
+
+  /**
+   * The array of visible events on the calendar. This is built based on the
+   * span of the schedule in the given event and also the [[Event.visible]] flag.
+   */
+  public visible: Event<T, M>[] = [];
 
 
   /**
@@ -239,7 +253,7 @@ export class Calendar<T>
    * @see [[Calendar.moveStart]]
    * @see [[Calendar.moveEnd]]
    */
-  public constructor(start: Day, end: Day, type: Units, size: number, moveStart: CalendarMover, moveEnd: CalendarMover, input?: CalendarInput<T>)
+  public constructor(start: Day, end: Day, type: Units, size: number, moveStart: CalendarMover, moveEnd: CalendarMover, input?: CalendarInput<T, M>)
   {
     this.span = new DaySpan(start, end);
     this.filled = new DaySpan(start, end);
@@ -250,37 +264,81 @@ export class Calendar<T>
 
     if (fn.isDefined(input))
     {
-      this.withInput(input, false);
+      this.set( input );
     }
-
-    this.refresh();
+    else
+    {
+      this.refresh();
+    }
   }
 
   /**
-   * Overwrites the properties in this calendar with the given input and
-   * optionally refreshes all days and their events with the new settings.
+   * Changes the calendar possibly morphing it to a different type or size if
+   * specified in the given input. If the type and size are not morphed then
+   * the following properties may be updated:
    *
-   * @param input The properties to overwrite on this calendar.
-   * @param refresh Whether the calendar should have its days and events synced.
+   * - [[Calendar.fill]]
+   * - [[Calendar.minimumSize]]
+   * - [[Calendar.repeatCovers]]
+   * - [[Calendar.listTimes]]
+   * - [[Calendar.eventsOutside]]
+   * - [[Calendar.updateRows]]
+   * - [[Calendar.updateColumns]]
+   * - [[Calendar.eventSorter]]
+   * - [[Calendar.events]]
+   *
+   * If `delayRefresh` is not given with `true` then [[Calendar.refresh]] will
+   * be called once the calendar properties have been updated.
+   *
+   * @param input The new properties for this calendar to overwrite with.
    */
-  public withInput(input: CalendarInput<T>, refresh: boolean = true): this
+  public set(input: CalendarInput<T, M>): this
   {
-    this.fill = fn.coalesce( input.fill, this.fill );
-    this.minimumSize = fn.coalesce( input.minimumSize, this.minimumSize );
-    this.repeatCovers = fn.coalesce( input.repeatCovers, this.repeatCovers );
-    this.listTimes = fn.coalesce( input.listTimes, this.listTimes );
-    this.eventsOutside = fn.coalesce( input.eventsOutside, this.eventsOutside );
-    this.updateRows = fn.coalesce( input.updateRows, this.updateRows );
-    this.updateColumns = fn.coalesce( input.updateColumns, this.updateColumns );
-    this.eventSorter = fn.coalesce( input.eventSorter, this.eventSorter );
+    let typeChange: boolean = fn.isDefined(input.type) && input.type !== this.type;
+    let sizeChange: boolean = fn.isDefined(input.size) && input.size !== this.size;
 
-    if (fn.isArray(input.schedules))
+    if (typeChange || sizeChange)
     {
-      this.removeSchedules();
-      this.addSchedules(input.schedules, false, true);
+      let focus: number     = fn.coalesce( input.otherwiseFocus, 0.4999 );
+      let prefer: boolean   = fn.coalesce( input.preferToday, true );
+      let size: number      = fn.coalesce( input.size, this.size );
+      let type: Units       = fn.coalesce( input.type, this.type );
+      let around: Day       = fn.coalesce( input.around, this.days[ Math.floor( (this.days.length - 1) * focus ) ] );
+      let today: Day        = Day.today();
+
+      if (!around || (prefer && this.span.matchesDay(today)))
+      {
+        around = today;
+      }
+
+      let meta              = Calendar.TYPES[ type ];
+      let start: Day        = meta.getStart( Day.parse( around ), size, focus );
+      let end: Day          = meta.getEnd( start, size, focus );
+
+      this.span.start = start;
+      this.span.end = end;
+      this.type = type;
+      this.size = size;
+      this.moveStart = meta.moveStart;
+      this.moveEnd = meta.moveEnd;
     }
 
-    if (refresh)
+    this.fill           = fn.coalesce( input.fill, this.fill );
+    this.minimumSize    = fn.coalesce( input.minimumSize, this.minimumSize );
+    this.repeatCovers   = fn.coalesce( input.repeatCovers, this.repeatCovers );
+    this.listTimes      = fn.coalesce( input.listTimes, this.listTimes );
+    this.eventsOutside  = fn.coalesce( input.eventsOutside, this.eventsOutside );
+    this.updateRows     = fn.coalesce( input.updateRows, this.updateRows );
+    this.updateColumns  = fn.coalesce( input.updateColumns, this.updateColumns );
+    this.eventSorter    = fn.coalesce( input.eventSorter, this.eventSorter );
+
+    if (fn.isArray(input.events))
+    {
+      this.removeEvents();
+      this.addEvents(input.events, false, true);
+    }
+
+    if (!input.delayRefresh)
     {
       this.refresh();
     }
@@ -423,15 +481,15 @@ export class Calendar<T>
    * @param by The new size of the resulting calendars.
    * @returns An array of calendars split from this calendar.
    */
-  public split(by: number = 1): Calendar<T>[]
+  public split(by: number = 1): Calendar<T, M>[]
   {
-    let split: Calendar<T>[] = [];
+    let split: Calendar<T, M>[] = [];
     let start: Day = this.start;
     let end: Day = this.moveEnd( this.end, by - this.size );
 
     for (let i = 0; i < this.size; i++)
     {
-      split.push(new Calendar<T>(start, end, this.type, by, this.moveStart, this.moveEnd, this));
+      split.push(new Calendar(start, end, this.type, by, this.moveStart, this.moveEnd, this));
       start = this.moveStart( start, by );
       end = this.moveEnd( end, by );
     }
@@ -441,7 +499,7 @@ export class Calendar<T>
 
   /**
    * Refreshes the days and events in this calendar based on the start and end
-   * days, the calendar properties, and its schedules.
+   * days, the calendar properties, and its eventss.
    *
    * @param today The current day to update the calendar days via
    *    [[CalendarDay.updateCurrent]].
@@ -452,6 +510,7 @@ export class Calendar<T>
     this.resetDays();
     this.refreshCurrent(today);
     this.refreshSelection();
+    this.refreshVisible();
     this.refreshEvents();
 
     return this;
@@ -476,7 +535,7 @@ export class Calendar<T>
   {
     this.resetFilled();
 
-    let days: CalendarDay<T>[] = this.days;
+    let days: CalendarDay<T, M>[] = this.days;
     let filled: DaySpan = this.filled;
     let current: Day = filled.start;
     let daysBetween: number = filled.days(Op.UP);
@@ -484,11 +543,11 @@ export class Calendar<T>
 
     for (let i = 0; i < total; i++)
     {
-      let day: CalendarDay<T> = days[ i ];
+      let day: CalendarDay<T, M> = days[ i ];
 
       if (!day || !day.sameDay( current ))
       {
-        day = new CalendarDay<T>( current.date );
+        day = new CalendarDay<T, M>( current.date );
 
         if (i < days.length)
         {
@@ -514,16 +573,34 @@ export class Calendar<T>
   }
 
   /**
+   * Updates the list of visible schedules.
+   */
+  public refreshVisible(): this
+  {
+    let start: Day = this.filled.start;
+    let end: Day = this.filled.end;
+
+    this.visible = this.events.filter(e =>
+    {
+      return e.visible && e.schedule.matchesRange(start, end);
+    });
+
+    return this;
+  }
+
+  /**
    * Updates the days with the current day via [[CalendarDay.updateCurrent]].
    *
    * @param today The new current day.
    */
   public refreshCurrent(today: Day = Day.today()): this
   {
-    return this.iterateDays(d =>
+    this.iterateDays().iterate(d =>
     {
       d.updateCurrent(today);
     });
+
+    return this;
   }
 
   /**
@@ -532,7 +609,7 @@ export class Calendar<T>
    */
   public refreshSelection(): this
   {
-    return this.iterateDays(d =>
+    this.iterateDays().iterate(d =>
     {
       if (this.selection)
       {
@@ -543,10 +620,12 @@ export class Calendar<T>
         d.clearSelected();
       }
     });
+
+    return this;
   }
 
   /**
-   * Updates the [[CalendarDay.events]] based on the schedules in this calendar
+   * Updates the [[CalendarDay.events]] based on the events in this calendar
    * and the following properties:
    *
    * - [[Calendar.eventsForDay]]
@@ -558,7 +637,7 @@ export class Calendar<T>
    */
   public refreshEvents(): this
   {
-    this.iterateDays(d =>
+    this.iterateDays().iterate(d =>
     {
       if (d.inCalendar || this.eventsOutside)
       {
@@ -590,7 +669,7 @@ export class Calendar<T>
     let eventToRow: EventToRowMap = {};
     let onlyFullDay: boolean = this.listTimes;
 
-    this.iterateDays(d =>
+    this.iterateDays().iterate(d =>
     {
       if (d.dayOfWeek === 0)
       {
@@ -642,12 +721,12 @@ export class Calendar<T>
   {
     interface Marker {
       time: number,
-      event: CalendarEvent<T>,
+      event: CalendarEvent<T, M>,
       start: boolean,
       parent: Marker;
     }
 
-    this.iterateDays(d =>
+    this.iterateDays().iterate(d =>
     {
       let markers: Marker[] = [];
 
@@ -708,21 +787,27 @@ export class Calendar<T>
    *
    * @param iterator The function to pass [[CalendarDay]]s to.
    */
-  public iterateDays(iterator: (day: CalendarDay<T>) => any): this
+  public iterateDays(): Iterator<CalendarDay<T, M>>
   {
-    let days: CalendarDay<T>[] = this.days;
-
-    for (let i = 0; i < days.length; i++)
+    return new Iterator<CalendarDay<T, M>>((callback, iterator) =>
     {
-      iterator( days[ i ] );
-    }
+      let days: CalendarDay<T, M>[] = this.days;
 
-    return this;
+      for (let i = 0; i < days.length; i++)
+      {
+        callback( days[ i ], iterator );
+
+        if (!iterator.iterating)
+        {
+          break;
+        }
+      }
+    });
   }
 
   /**
    * Returns the events for the given day optionally looking at schedule times,
-   * optionally looking at events which cover multiple days, and optioanlly
+   * optionally looking at events which cover multiple days, and optionally
    * sorted with the given function.
    *
    * @param day The day to find events for.
@@ -733,41 +818,27 @@ export class Calendar<T>
    * @param sorter The function to sort the events by, if any.
    * @returns An array of events that occurred on the given day.
    */
-  public eventsForDay(day: Day, getTimes: boolean = true, covers: boolean = true, sorter: SortEvent<T> = this.eventSorter): CalendarEvent<T>[]
+  public eventsForDay(day: Day, getTimes: boolean = true, covers: boolean = true, sorter: SortEvent<T, M> = this.eventSorter): CalendarEvent<T, M>[]
   {
-    let events: CalendarEvent<T>[] = [];
-    let entries: CalendarSchedule<T>[] = this.schedules;
+    let events: CalendarEvent<T, M>[] = [];
+    let entries: Event<T, M>[] = this.visible;
 
     for (let entryIndex = 0; entryIndex < entries.length; entryIndex++)
     {
-      let entry: CalendarSchedule<T> = entries[ entryIndex ];
-      let schedule: Schedule = entry.schedule;
-      let event: T = entry.event;
+      let entry: Event<T, M> = entries[ entryIndex ];
+      let schedule: Schedule<M> = entry.schedule;
       let eventId: number = entryIndex * Constants.MAX_EVENTS_PER_DAY;
+      let timeIndex: number = 0;
 
-      if ((covers && schedule.coversDay(day)) || (!covers && schedule.matchesDay(day)))
+      schedule.iterateSpans( day, covers ).iterate((span, iterator) =>
       {
-        if (getTimes)
-        {
-          let times: DaySpan[] = covers ?
-            entry.schedule.getSpansOver(day) :
-            entry.schedule.getSpansOn(day);
+        events.push(new CalendarEvent(eventId + timeIndex++, entry, span, day));
 
-          for (let timeIndex = 0; timeIndex < times.length; timeIndex++)
-          {
-            events.push(new CalendarEvent<T>(eventId + timeIndex, event, schedule, times[ timeIndex ], day));
-          }
-        }
-        else
+        if (!getTimes)
         {
-          let over: DaySpan = schedule.getSpanOver(day);
-
-          if (over)
-          {
-            events.push(new CalendarEvent<T>(eventId, event, schedule, over, day));
-          }
+          iterator.stop();
         }
-      }
+      });
     }
 
     if (sorter)
@@ -779,18 +850,18 @@ export class Calendar<T>
   }
 
   /**
-   * Finds the schedule & event pair given one of the ways to identify the pair.
+   * Finds the event given one of the ways to identify the event.
    *
-   * @param input The value to use to search for a pair.
-   * @returns The refrence to the pair or null if not found.
+   * @param input The value to use to search for an event.
+   * @returns The refrence to the event or null if not found.
    */
-  public findSchedule(input: CalendarScheduleIdentifier<T>): CalendarSchedule<T>
+  public findEvent(id: any): Event<T, M>
   {
-    for (let schedule of this.schedules)
+    for (let event of this.events)
     {
-      if (schedule === input || schedule.schedule === input || schedule.event === input)
+      if (event === id || event.schedule === id || event.data === id || event.id === id)
       {
-        return schedule;
+        return event;
       }
     }
 
@@ -798,29 +869,31 @@ export class Calendar<T>
   }
 
   /**
-   * Removes the list of schedules if they exist in the calendar.
+   * Removes the list of events if they exist in the calendar.
    *
-   * @param schedules The array of schedules to remove if they exist. If no
-   *    schedules are passed (via `null`) then all schedules will be removed
+   * @param events The array of events to remove if they exist. If no
+   *    events are passed (via `null`) then all events will be removed
    *    from the calendar.
    * @param delayRefresh When `true` the [[Calendar.refreshEvents]] will not be
-   *    called after the schedules are removed.
-   * @see [[Calendar.removeSchedule]]
+   *    called after the events are removed.
+   * @see [[Calendar.removeEvent]]
    * @see [[Calendar.refreshEvents]]
    */
-  public removeSchedules(schedules: CalendarScheduleIdentifier<T>[] = null, delayRefresh: boolean = false): this
+  public removeEvents(events: any[] = null, delayRefresh: boolean = false): this
   {
-    if (schedules)
+    if (events)
     {
-      for (let schedule of schedules)
+      for (let event of events)
       {
-        this.removeSchedule( schedule, true );
+        this.removeEvent( event, true );
       }
     }
     else
     {
-      this.schedules = [];
+      this.events = [];
     }
+
+    this.refreshVisible();
 
     if (!delayRefresh)
     {
@@ -831,46 +904,49 @@ export class Calendar<T>
   }
 
   /**
-   * Removes the given schedule if it exists on the calendar.
+   * Removes the given event if it exists on the calendar.
    *
-   * @param schedule The schedule to remove if it exists.
+   * @param event The event to remove if it exists.
    * @param delayRefresh When `true` the [[Calendar.refreshEvents]] will not be
-   *    called after the schedules are removed.
+   *    called after the event is removed.
    * @see [[Calendar.refreshEvents]]
    */
-  public removeSchedule(schedule: CalendarScheduleIdentifier<T>, delayRefresh: boolean = false): this
+  public removeEvent(event: any, delayRefresh: boolean = false): this
   {
-    let found: CalendarSchedule<T> = this.findSchedule(schedule);
+    let found: Event<T, M> = this.findEvent(event);
 
     if (found)
     {
-      this.schedules.splice( this.schedules.indexOf(found), 1 );
+      this.events.splice( this.events.indexOf(found), 1 );
+
+      this.refreshVisible();
 
       if (!delayRefresh)
       {
         this.refreshEvents();
       }
     }
+
     return this;
   }
 
   /**
-   * Adds the given schedule to this calendar if it doesn't exist already (or
+   * Adds the given event to this calendar if it doesn't exist already (or
    * `allowDuplicates` is `true`).
    *
-   * @param schedule The schedule & event pair to add to the calendar.
-   * @param allowDuplicates If a schedule & event pair can be added more than once.
+   * @param event The event to add to the calendar.
+   * @param allowDuplicates If an event can be added more than once.
    * @param delayRefresh When `true` the [[Calendar.refreshEvents]] will not be
-   *    called after the schedule is added.
+   *    called after the event is added.
    * @see [[Calendar.refreshEvents]]
    */
-  public addSchedule(schedule: CalendarScheduleInput<T>, allowDuplicates: boolean = false, delayRefresh: boolean = false): this
+  public addEvent(event: EventInput<T, M>, allowDuplicates: boolean = false, delayRefresh: boolean = false): this
   {
-    let parsed: CalendarSchedule<T> = Parse.calendarSchedule(schedule);
+    let parsed: Event<T, M> = Parse.event<T, M>(event);
 
     if (!allowDuplicates)
     {
-      let existing = this.findSchedule(parsed);
+      let existing = this.findEvent(parsed);
 
       if (existing)
       {
@@ -878,7 +954,9 @@ export class Calendar<T>
       }
     }
 
-    this.schedules.push(parsed);
+    this.events.push(parsed);
+
+    this.refreshVisible();
 
     if (!delayRefresh)
     {
@@ -889,20 +967,20 @@ export class Calendar<T>
   }
 
   /**
-   * Adds the given schedules to this calendar if they don't exist already (or
+   * Adds the given events to this calendar if they don't exist already (or
    * `allowDuplicates` is `true`).
    *
-   * @param schedules The schedule & event pairs to add to the calendar.
-   * @param allowDuplicates If a schedule & event pair can be added more than once.
+   * @param events The events to add to the calendar.
+   * @param allowDuplicates If an event can be added more than once.
    * @param delayRefresh When `true` the [[Calendar.refreshEvents]] will not be
-   *    called after the schedules are added.
+   *    called after the events are added.
    * @see [[Calendar.refreshEvents]]
    */
-  public addSchedules(schedules: CalendarScheduleInput<T>[], allowDuplicates: boolean = false, delayRefresh: boolean = false): this
+  public addEvents(events: EventInput<T, M>[], allowDuplicates: boolean = false, delayRefresh: boolean = false): this
   {
-    for (let schedule of schedules)
+    for (let event of events)
     {
-      this.addSchedule(schedule, allowDuplicates, true);
+      this.addEvent(event, allowDuplicates, true);
     }
 
     if (!delayRefresh)
@@ -986,6 +1064,117 @@ export class Calendar<T>
     return this.move( -jump, delayRefresh );
   }
 
+  /**
+   * Converts this calendar to input which can be used to later recreate this
+   * calendar. The only properties of the calendar which will be loss is the
+   * [[Calendar.eventSorter]] property because it is a function.
+   *
+   * @param plain If the returned input should be plain objects as opposed
+   *    to [[Day]] and [[Event]] instances.
+   * @param plainData A function to convert [[Event.data]] to a plain object if
+   *    it is not already.
+   * @param plainMeta A function to convert values in [[Schedule.meta]] to plain
+   *    objects if they are not alreday.
+   * @returns The input generated from this calendar.
+   */
+  public toInput(plain: boolean = false,
+      plainData: (data: T) => any = d => d,
+      plainMeta: (meta: M) => any = m => m): CalendarInput<T, M>
+  {
+    let out: CalendarInput<T, M> = {};
+
+    out.type = this.type;
+    out.size = this.size;
+    out.fill = this.fill;
+    out.minimumSize = this.minimumSize;
+    out.repeatCovers = this.repeatCovers;
+    out.listTimes = this.listTimes;
+    out.eventsOutside = this.eventsOutside;
+    out.updateRows = this.updateRows;
+    out.updateColumns = this.updateColumns;
+    out.around = plain ? this.span.start.dayIdentifier : this.span.start;
+    out.events = [];
+
+    for (let event of this.events)
+    {
+      if (plain)
+      {
+        let plainEvent: any = {};
+
+        if (fn.isDefined(event.id))
+        {
+          plainEvent.id = event.id;
+        }
+
+        if (fn.isDefined(event.data))
+        {
+          plainEvent.data = plainData( event.data );
+        }
+
+        if (!event.visible)
+        {
+          plainEvent.visible = event.visible;
+        }
+
+        plainEvent.schedule = event.schedule.toInput();
+
+        let meta = plainEvent.schedule.meta;
+
+        if (meta)
+        {
+          for (let identifier in meta)
+          {
+            meta[ identifier ] = plainMeta( meta[ identifier ] );
+          }
+        }
+
+        out.events.push( plainEvent );
+      }
+      else
+      {
+        out.events.push( event );
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Creates a calendar based on the given input.
+   *
+   * @param input The input which has at least the `type` specified.
+   * @returns A new calendar instance.
+   */
+  public static fromInput<T, M>(input: CalendarInput<T, M>): Calendar<T, M>
+  {
+    let initial: Day = Day.today();
+
+    return new Calendar(initial, initial, null, 1, null, null, input);
+  }
+
+  /**
+   * Creates a calendar based around a given unit optionally focused around a
+   * given day.
+   *
+   * @param type The unit of the calendar.
+   * @param days The number of units in the calendar.
+   * @param around The day to focus the calendar on.
+   * @param focus The value which describes how months are added around the given
+   *    day. The default value will center the calendar around the given day.
+   *    When the value is `0` the given day is the first day in the calendar,
+   *    and when the value is `1` the given day is the last day in the calendar.
+   * @param input The default properties for the calendar.
+   * @returns A new calendar instance.
+   */
+  public static forType<T, M>(type: Units, size: number = 1, around: Day = Day.today(), focus: number = 0.49999, input?: CalendarInput<T, M>): Calendar<T, M>
+  {
+    let meta = this.TYPES[ type ];
+    let start: Day = meta.getStart( around, size, focus );
+    let end: Day = meta.getEnd( start, size, focus );
+
+    return new Calendar<T, M>(start, end, type, size, meta.moveStart, meta.moveEnd, input || meta.defaultInput);
+  }
+
 
   /**
    * Creates a calendar based around days optionally focused around a given day.
@@ -998,14 +1187,11 @@ export class Calendar<T>
    *    and when the value is `1` the given day is the last day in the calendar.
    * @param input The default properties for the calendar.
    * @returns A new calendar instance.
+   * @see [[Calendar.forType]]
    */
-  public static days<T>(days: number = 1, around: Day = Day.today(), focus: number = 0.4999, input?: CalendarInput<T>): Calendar<T>
+  public static days<T, M>(days: number = 1, around: Day = Day.today(), focus: number = 0.4999, input?: CalendarInput<T, M>): Calendar<T, M>
   {
-    let start: Day = around.start().relativeDays( -Math.floor( days * focus ) );
-    let end: Day = start.relativeDays( days - 1 ).end();
-    let mover: CalendarMover = (day, amount) => day.relativeDays(amount);
-
-    return new Calendar(start, end, Units.DAY, days, mover, mover, input);
+    return this.forType( Units.DAY, days, around, focus, input );
   }
 
   /**
@@ -1019,14 +1205,11 @@ export class Calendar<T>
    *    and when the value is `1` the given day is the last day in the calendar.
    * @param input The default properties for the calendar.
    * @returns A new calendar instance.
+   * @see [[Calendar.forType]]
    */
-  public static weeks<T>(weeks: number = 1, around: Day = Day.today(), focus: number = 0.4999, input?: CalendarInput<T>): Calendar<T>
+  public static weeks<T, M>(weeks: number = 1, around: Day = Day.today(), focus: number = 0.4999, input?: CalendarInput<T, M>): Calendar<T, M>
   {
-    let start: Day = around.start().startOfWeek().relativeWeeks( -Math.floor( weeks * focus ) );
-    let end: Day = start.relativeWeeks( weeks - 1 ).endOfWeek();
-    let mover: CalendarMover = (day, amount) => day.relativeWeeks(amount);
-
-    return new Calendar(start, end, Units.WEEK, weeks, mover, mover, input);
+    return this.forType( Units.WEEK, weeks, around, focus, input );
   }
 
   /**
@@ -1040,15 +1223,11 @@ export class Calendar<T>
    *    and when the value is `1` the given day is the last day in the calendar.
    * @param input The default properties for the calendar.
    * @returns A new calendar instance.
+   * @see [[Calendar.forType]]
    */
-  public static months<T>(months: number = 1, around: Day = Day.today(), focus: number = 0.4999, input: CalendarInput<T> = {fill: true}): Calendar<T>
+  public static months<T, M>(months: number = 1, around: Day = Day.today(), focus: number = 0.4999, input?: CalendarInput<T, M>): Calendar<T, M>
   {
-    let start: Day = around.start().startOfMonth().relativeMonths( -Math.floor( months * focus ) );
-    let end: Day = start.relativeMonths( months - 1 ).endOfMonth();
-    let moveStart: CalendarMover = (day, amount) => day.relativeMonths(amount);
-    let moveEnd: CalendarMover = (day, amount) => day.startOfMonth().relativeMonths(amount).endOfMonth();
-
-    return new Calendar(start, end, Units.MONTH, months, moveStart, moveEnd, input);
+    return this.forType( Units.MONTH, months, around, focus, input );
   }
 
   /**
@@ -1062,14 +1241,83 @@ export class Calendar<T>
    *    and when the value is `1` the given day is the last day in the calendar.
    * @param input The default properties for the calendar.
    * @returns A new calendar instance.
+   * @see [[Calendar.forType]]
    */
-  public static years<T>(years: number = 1, around: Day = Day.today(), focus: number = 0.4999, input: CalendarInput<T> = {fill: true}): Calendar<T>
+  public static years<T, M>(years: number = 1, around: Day = Day.today(), focus: number = 0.4999, input?: CalendarInput<T, M>): Calendar<T, M>
   {
-    let start: Day = around.start().startOfYear().relativeYears( -Math.floor( years * focus ) );
-    let end: Day = start.relativeYears( years - 1 ).endOfYear();
-    let mover: CalendarMover = (day, amount) => day.relativeYears(amount);
-
-    return new Calendar(start, end, Units.YEAR, years, mover, mover, input);
+    return this.forType( Units.YEAR, years, around, focus, input );
   }
+
+  /**
+   * A map of functions and properties by [[Units]] used to create or morph
+   * Calendars.
+   */
+  public static TYPES =
+  {
+    [Units.DAY]:
+    {
+      getStart(around: Day, size: number, focus: number): Day {
+        return around.start().relativeDays( -Math.floor( size * focus ) )
+      },
+      getEnd(start: Day, size: number, focus: number): Day {
+        return start.relativeDays( size - 1 ).end();
+      },
+      moveStart(day: Day, amount: number): Day {
+        return day.relativeDays(amount);
+      },
+      moveEnd(day: Day, amount: number): Day {
+        return day.relativeDays(amount);
+      },
+      defaultInput: <any>undefined
+    },
+    [Units.WEEK]:
+    {
+      getStart(around: Day, size: number, focus: number): Day {
+        return around.start().startOfWeek().relativeWeeks( -Math.floor( size * focus ) );
+      },
+      getEnd(start: Day, size: number, focus: number): Day {
+        return start.relativeWeeks( size - 1 ).endOfWeek();
+      },
+      moveStart(day: Day, amount: number): Day {
+        return day.relativeWeeks(amount);
+      },
+      moveEnd(day: Day, amount: number): Day {
+        return day.relativeWeeks(amount);
+      },
+      defaultInput: <any>undefined
+    },
+    [Units.MONTH]:
+    {
+      getStart(around: Day, size: number, focus: number): Day {
+        return around.start().startOfMonth().relativeMonths( -Math.floor( size * focus ) );
+      },
+      getEnd(start: Day, size: number, focus: number): Day {
+        return start.relativeMonths( size - 1 ).endOfMonth();
+      },
+      moveStart(day: Day, amount: number): Day {
+        return day.relativeMonths(amount);
+      },
+      moveEnd(day: Day, amount: number): Day {
+        return day.startOfMonth().relativeMonths(amount).endOfMonth();
+      },
+      defaultInput: { fill: true }
+    },
+    [Units.YEAR]:
+    {
+      getStart(around: Day, size: number, focus: number): Day {
+        return around.start().startOfYear().relativeYears( -Math.floor( size * focus ) );
+      },
+      getEnd(start: Day, size: number, focus: number): Day {
+        return start.relativeYears( size - 1 ).endOfYear();
+      },
+      moveStart(day: Day, amount: number): Day {
+        return day.relativeYears(amount);
+      },
+      moveEnd(day: Day, amount: number): Day {
+        return day.relativeYears(amount);
+      },
+      defaultInput: { fill: true }
+    }
+  };
 
 }

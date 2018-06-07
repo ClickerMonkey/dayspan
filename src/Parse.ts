@@ -1,10 +1,11 @@
 
 import { Functions as fn } from './Functions';
 import { FrequencyCheck } from './Frequency';
-import { Schedule, ScheduleInput, ScheduleExclusions } from './Schedule';
+import { Schedule, ScheduleInput } from './Schedule';
+import { ScheduleModifier } from './ScheduleModifier';
 import { Constants } from './Constants';
-import { Day, DayInput, DurationInput } from './Day';
-import { CalendarScheduleInput, CalendarSchedule } from './Calendar';
+import { Day, DayProperty, DayInput, DurationInput } from './Day';
+import { Event } from './Event';
 import { Time } from './Time';
 
 
@@ -18,10 +19,11 @@ export class Parse
    * Parses a value and converts it to a [[FrequencyCheck]].
    *
    * @param input The input to parse into a function.
+   * @param property The [[Day]] property the frequency is for.
    * @returns A function which determines whether a value matches a frequency.
    * @see [[Schedule]]
    */
-  public static frequency(input: any, property: string): FrequencyCheck
+  public static frequency(input: any, property: DayProperty): FrequencyCheck
   {
     let check: FrequencyCheck = (value: number) => {
       return true;
@@ -64,7 +66,7 @@ export class Parse
    * Parses [[DayInput]] into a [[Day]] instance.
    *
    * ```typescript
-   * Parse.day( 65342300 );               // unix timestamp
+   * Parse.day( 65342300 );               // UTC timestamp
    * Parse.day( '01/02/2014' );           // strings in many formats
    * Parse.day( day );                    // return a passed instance
    * Parse.day( [2018, 0, 2] );           // array: 01/02/2018
@@ -186,39 +188,49 @@ export class Parse
    * array value and returned object key are [[Day.dayIdentifier]].
    *
    * ```typescript
-   * Parse.exclusions( [ 20180101, 20140506 ] );            // {'20180101': true, '20140506': true}
-   * Parse.exclusions( [ 20180101, Day.build(2014,4,6) ] ); // {'20180101': true, '20140506': true}
+   * Parse.modifier( [ 20180101, 20140506 ] );            // {'20180101': true, '20140506': true}
+   * Parse.modifier( [ 20180101, Day.build(2014,4,6) ] ); // {'20180101': true, '20140506': true}
    * ```
    *
    * @param input The input to parse.
    * @returns The object with identifier keys and `true` values.
    * @see [[Day.dayIdentifier]]
    */
-  public static exclusions(input: any): ScheduleExclusions
+  public static modifier<T>(input: any, value: T,
+    out: ScheduleModifier<T> = new ScheduleModifier<T>()): ScheduleModifier<T>
   {
-    let exclusions: ScheduleExclusions = {};
+    let map = {};
 
     if (fn.isArray(input))
     {
-      for (let dayIdentifier of input)
+      for (let identifier of input)
       {
-        if (fn.isNumber(dayIdentifier))
+        if (identifier instanceof Day)
         {
-          exclusions[ dayIdentifier ] = true;
+          map[ identifier.dayIdentifier ] = value;
         }
-        else
+        else if (fn.isNumber(identifier))
         {
-          let day: Day = this.day( dayIdentifier );
-
-          if (day)
-          {
-            exclusions[ day.dayIdentifier ] = true;
-          }
+          map[ <number>identifier ] = value;
+        }
+        else if (fn.isString(identifier))
+        {
+          map[ <string>identifier ] = value;
         }
       }
     }
 
-    return exclusions;
+    if (fn.isObject(input))
+    {
+      for (let identifier in input)
+      {
+        map[ identifier ] = input[ identifier ];
+      }
+    }
+
+    out.map = map;
+
+    return out;
   }
 
   /**
@@ -229,8 +241,14 @@ export class Parse
    * @param out The schedule to set the values of and return.
    * @returns An instance of the parsed [[Schedule]].
    */
-  public static schedule(input: ScheduleInput, out: Schedule = new Schedule()): Schedule
+  public static schedule<M>(input: ScheduleInput<M> | Schedule<M>,
+    out: Schedule<M> = new Schedule<M>()): Schedule<M>
   {
+    if (input instanceof Schedule)
+    {
+      return input;
+    }
+
     let on: Day = this.day( input.on );
     let times: Time[] = this.times( input.times );
     let fullDay: boolean = times.length === 0;
@@ -249,7 +267,10 @@ export class Parse
     out.durationUnit = <DurationInput>fn.coalesce( input.durationUnit, Constants.DURATION_DEFAULT_UNIT( fullDay ) );
     out.start = this.day( input.start );
     out.end = this.day( input.end );
-    out.exclude = this.exclusions( input.exclude );
+    out.exclude = this.modifier( input.exclude, true, out.exclude );
+    out.include = this.modifier( input.include, true, out.include );
+    out.cancel = this.modifier( input.cancel, true, out.cancel );
+    out.meta = this.modifier( input.meta, null, out.meta );
     out.year = this.frequency( input.year, 'year' );
     out.month = this.frequency( input.month, 'month' );
     out.week = this.frequency( input.week, 'week' );
@@ -296,28 +317,32 @@ export class Parse
   }
 
   /**
-   * Parses [[CalendarScheduleInput]] and returns a [[CalendarSchedule]].
+   * Parses [[EventInput]] and returns an [[Event]].
    *
    * @param input The input to parse.
    * @returns The parsed value.
    */
-  public static calendarSchedule<T>(input: CalendarScheduleInput<T>): CalendarSchedule<T>
+  public static event<T, M>(input: any): Event<T, M>
   {
-    if (input.schedule instanceof Schedule)
+    if (input instanceof Event)
     {
-      return <CalendarSchedule<T>>input;
+      return input;
     }
 
-    return {
-      schedule: this.schedule( input.schedule ),
-      event: input.event
-    };
+    if (!input.schedule)
+    {
+      return null;
+    }
+
+    let schedule: Schedule<M> = this.schedule<M>( input.schedule );
+
+    return new Event( schedule, input.data, input.id, input.visible );
   }
 
   /**
    * Parses a schedule from a CRON pattern. TODO
    */
-  public static cron(pattern: string, out: Schedule = new Schedule()): Schedule
+  public static cron<M>(pattern: string, out: Schedule<M> = new Schedule<M>()): Schedule<M>
   {
     return out;
   }
