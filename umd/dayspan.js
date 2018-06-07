@@ -274,153 +274,7 @@ var Functions = (function () {
 }());
 
 
-// CONCATENATED MODULE: ./src/Constants.ts
-
-/**
- * A class that stores commonly used values.
- */
-var Constants = (function () {
-    function Constants() {
-    }
-    /**
-     * The number of milliseconds in a second.
-     */
-    Constants.MILLIS_IN_SECOND = 1000;
-    /**
-     * The number of milliseconds in a minute.
-     */
-    Constants.MILLIS_IN_MINUTE = Constants.MILLIS_IN_SECOND * 60;
-    /**
-     * The number of milliseconds in an hour.
-     */
-    Constants.MILLIS_IN_HOUR = Constants.MILLIS_IN_MINUTE * 60;
-    /**
-     * The number of milliseconds in a day (not including DST days).
-     */
-    Constants.MILLIS_IN_DAY = Constants.MILLIS_IN_HOUR * 24;
-    /**
-     * The number of milliseconds in a week (not including ones that include DST).
-     */
-    Constants.MILLIS_IN_WEEK = Constants.MILLIS_IN_DAY * 7;
-    /**
-     * The number of days in a week.
-     */
-    Constants.DAYS_IN_WEEK = 7;
-    /**
-     * The number of months in a year.
-     */
-    Constants.MONTHS_IN_YEAR = 12;
-    /**
-     * The number of hours in a day (not including DST days).
-     */
-    Constants.HOURS_IN_DAY = 24;
-    /**
-     * The first month of the year.
-     */
-    Constants.MONTH_MIN = 0;
-    /**
-     * The last month of the year.
-     */
-    Constants.MONTH_MAX = 11;
-    /**
-     * The first day of a month.
-     */
-    Constants.DAY_MIN = 1;
-    /**
-     * The last day of the longest month.
-     */
-    Constants.DAY_MAX = 31;
-    /**
-     * The first hour of the day.
-     */
-    Constants.HOUR_MIN = 0;
-    /**
-     * The last hour of the day.
-     */
-    Constants.HOUR_MAX = 23;
-    /**
-     * The first minute of the hour.
-     */
-    Constants.MINUTE_MIN = 0;
-    /**
-     * The last minute of the hour.
-     */
-    Constants.MINUTE_MAX = 59;
-    /**
-     * The first second of the minute.
-     */
-    Constants.SECOND_MIN = 0;
-    /**
-     * The last second of the minute.
-     */
-    Constants.SECOND_MAX = 59;
-    /**
-     * The first millisecond of the second.
-     */
-    Constants.MILLIS_MIN = 0;
-    /**
-     * The last millisecond of the second.
-     */
-    Constants.MILLIS_MAX = 999;
-    /**
-     * The first day of the week.
-     */
-    Constants.WEEKDAY_MIN = 0;
-    /**
-     * The last day of the week.
-     */
-    Constants.WEEKDAY_MAX = 6;
-    /**
-     * The default duration for an event.
-     */
-    Constants.DURATION_DEFAULT = 1;
-    /**
-     * The default duration unit for an all day event.
-     */
-    Constants.DURATION_DEFAULT_UNIT_ALL = 'days';
-    /**
-     * The default duration unit for an event at a given time.
-     */
-    Constants.DURATION_DEFAULT_UNIT_TIMES = 'hours';
-    /**
-     * Computes the duration unit given its for an all day event.
-     *
-     * @param all If the event is all day.
-     * @return The default unit for the event.
-     */
-    Constants.DURATION_DEFAULT_UNIT = function (all) { return all ? Constants.DURATION_DEFAULT_UNIT_ALL : Constants.DURATION_DEFAULT_UNIT_TIMES; };
-    /**
-     * The number of milliseconds for various duration units. These are worse case
-     * scenario and do not include DST changes.
-     */
-    Constants.DURATION_TO_MILLIS = {
-        minute: Constants.MILLIS_IN_MINUTE,
-        minutes: Constants.MILLIS_IN_MINUTE,
-        hour: Constants.MILLIS_IN_HOUR,
-        hours: Constants.MILLIS_IN_HOUR,
-        day: Constants.MILLIS_IN_DAY,
-        days: Constants.MILLIS_IN_DAY,
-        week: Constants.MILLIS_IN_WEEK,
-        weeks: Constants.MILLIS_IN_WEEK,
-        month: Constants.MILLIS_IN_DAY * Constants.DAY_MAX,
-        months: Constants.MILLIS_IN_DAY * Constants.DAY_MAX
-    };
-    /**
-     * The maximum estimated number of events per day. This is used to calculate
-     * [[CalendarEvent.id]] to give each event a unique ID. If you think you will
-     * have more events than this per day, you can enlarge the value.
-     */
-    Constants.MAX_EVENTS_PER_DAY = 24;
-    /**
-     * The day of the week which determines the first week of the year or month.
-     * By default this day is Thursday.
-     */
-    Constants.WEEK_OF_MONTH_MINIMUM_WEEKDAY = 4;
-    return Constants;
-}());
-
-
-// CONCATENATED MODULE: ./src/Op.ts
+// CONCATENATED MODULE: ./src/Operation.ts
 
 /**
  * An operation that can be performed on a single number.
@@ -544,6 +398,18 @@ var DaySpan_DaySpan = (function () {
      */
     DaySpan.prototype.contains = function (day) {
         return day.time >= this.start.time && day.time <= this.end.time;
+    };
+    /**
+     * Compares the given timestamp to this span. If the timestamp is before this
+     * span then `-1` is returned, if the timestamp is after this span then `1`
+     * us returned, otherwise `0` is returned when the timestamp is in this span.
+     *
+     * @param day The timestamp to compare to.
+     * @returns `-1`, `0`, or `1` depending on the given timestamp relative to
+     *    this span.
+     */
+    DaySpan.prototype.compareTo = function (day) {
+        return day.time < this.start.time ? -1 : (day.time > this.end.time ? 1 : 0);
     };
     /**
      * Determines whether the given timestamp is between the start and end
@@ -794,6 +660,666 @@ var DaySpan_DaySpan = (function () {
 
 var DaySpan__a;
 
+// CONCATENATED MODULE: ./src/Identifier.ts
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+
+/**
+ * A class for detecting, parsing, and building identifiers to and from days.
+ *
+ * An identifier is a simple value which represents a span of time. It may
+ * represent an entire year, a quarter (3 months) of a year, a week of a year,
+ * a month in a year, a specific day of a month of a year, or a specific hour,
+ * minute, day, and month of a year.
+ *
+ * For example:
+ * - `2018`: The year 2018
+ * - `201801`: January 2018
+ * - `2014023`: The 23rd week of 2014
+ * - `20170311`: March 11th, 2017
+ * - `201406151651`: June 15th 2016 at 4:51 pm
+ * - `'0525'`: Year 525 of the first age, Elrond and Elros are born
+ */
+var Identifier_Identifier = (function () {
+    function Identifier() {
+    }
+    /**
+     * Determines whether the given identifier is this type.
+     *
+     * @param id The identifier to test.
+     * @returns `true` if the identifier is this type, otherwise `false`.
+     */
+    Identifier.prototype.is = function (id) {
+        return (id + '').length === this.getLength();
+    };
+    /**
+     * Computes the identifier given values taken from a [[Day]].
+     *
+     * @param values The values to compute.
+     * @returns The computed identifier.
+     */
+    Identifier.prototype.compute = function () {
+        var values = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            values[_i] = arguments[_i];
+        }
+        var scales = this.getScales();
+        var total = 0;
+        for (var i = 0; i < values.length; i++) {
+            total += values[i] * scales[i];
+        }
+        return this.is(total) ? total : Functions.padNumber(total, this.getLength());
+    };
+    /**
+     * Decomputes the given identifier and returns values which describe a span
+     * of time.
+     *
+     * @param id The identifier to decompute.
+     * @returns The original values which computed the identifier.
+     */
+    Identifier.prototype.decompute = function (id) {
+        var scales = this.getScales();
+        var total = Functions.isNumber(id) ? id : parseInt(id);
+        var values = [];
+        for (var i = 0; i < scales.length - 1; i++) {
+            var curr = scales[i + 0];
+            var next = scales[i + 1];
+            var mod = next / curr;
+            var value = total % mod;
+            values.push(value);
+            total = Math.floor(total / mod);
+        }
+        values.push(total);
+        return values;
+    };
+    /**
+     * Finds which identifier type matches the given identifier, if any.
+     *
+     * @param id The identifier to find the type of.
+     * @returns The found identifier type, otherwise `null` if none exists.
+     */
+    Identifier.find = function (id) {
+        if (this.Time.is(id))
+            return this.Time;
+        if (this.Day.is(id))
+            return this.Day;
+        if (this.Week.is(id))
+            return this.Week;
+        if (this.Month.is(id))
+            return this.Month;
+        if (this.Year.is(id))
+            return this.Year;
+        return null;
+    };
+    /**
+     * Determines whether the given time span `outer` contains the time span
+     * `inner`.
+     *
+     * @param outer The potentially larger time span `inner` must be contained in.
+     * @param inner The time span to test is contained inside `outer`.
+     * @returns `true` if `inner` is equal to or contained in `outer`, otherwise
+     *    `false`.
+     */
+    Identifier.contains = function (outer, inner) {
+        var outerString = outer + '';
+        return (inner + '').substring(0, outerString.length) === outerString;
+    };
+    /**
+     * The identifier type for an hour of time on a specific day.
+     */
+    Identifier.Time = null;
+    /**
+     * The identifier type for a specific day.
+     */
+    Identifier.Day = null;
+    /**
+     * The identifier type for a specific week of a year.
+     */
+    Identifier.Week = null;
+    /**
+     * The identifier type for a specific month of a year.
+     */
+    Identifier.Month = null;
+    /**
+     * The identifier type for a specific quarter of a year.
+     */
+    Identifier.Quarter = null;
+    /**
+     * The identifier type for a specific year.
+     */
+    Identifier.Year = null;
+    return Identifier;
+}());
+
+// YYYYMMddHHmm (12)
+var Identifier_IdentifierTime = (function (_super) {
+    __extends(IdentifierTime, _super);
+    function IdentifierTime() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    IdentifierTime.prototype.getScales = function () {
+        return IdentifierTime.SCALES;
+    };
+    IdentifierTime.prototype.getLength = function () {
+        return IdentifierTime.LENGTH;
+    };
+    IdentifierTime.prototype.get = function (day) {
+        return this.compute(day.minute, day.hour, day.dayOfMonth, day.month + 1, day.year);
+    };
+    IdentifierTime.prototype.object = function (id) {
+        var values = this.decompute(id);
+        return {
+            minute: values[0],
+            hour: values[1],
+            day: values[2],
+            month: values[3] - 1,
+            year: values[4]
+        };
+    };
+    IdentifierTime.prototype.start = function (id) {
+        var obj = this.object(id);
+        var start = Day_Day.build(obj.year, obj.month, obj.day, obj.hour, obj.minute);
+        return start;
+    };
+    IdentifierTime.prototype.span = function (id, endInclusive) {
+        if (endInclusive === void 0) { endInclusive = false; }
+        var start = this.start(id);
+        var end = start.endOfHour(endInclusive);
+        return new DaySpan_DaySpan(start, end);
+    };
+    IdentifierTime.prototype.describe = function (id, short) {
+        if (short === void 0) { short = false; }
+        var start = this.start(id);
+        var format = short ? IdentifierTime.DESCRIBE_FORMAT_SHORT : IdentifierTime.DESCRIBE_FORMAT_LONG;
+        return start.format(format);
+    };
+    IdentifierTime.prototype.matches = function (day, id) {
+        return day.timeIdentifier === id;
+        /*
+        let obj: IdentifierObject = this.object(id);
+    
+        return (
+          day.year === obj.year &&
+          day.month === obj.month &&
+          day.dayOfMonth === obj.day &&
+          day.hour === obj.hour &&
+          day.minute === obj.minute
+        );
+        */
+    };
+    IdentifierTime.DESCRIBE_FORMAT_LONG = 'LLL';
+    IdentifierTime.DESCRIBE_FORMAT_SHORT = 'lll';
+    IdentifierTime.SCALES = [
+        1 /* minute */,
+        100 /* hour   */,
+        10000 /* day    */,
+        1000000 /* month  */,
+        100000000 /* year   */
+    ];
+    IdentifierTime.LENGTH = 12;
+    return IdentifierTime;
+}(Identifier_Identifier));
+// YYYYMMdd (8)
+var Identifier_IdentifierDay = (function (_super) {
+    __extends(IdentifierDay, _super);
+    function IdentifierDay() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    IdentifierDay.prototype.getScales = function () {
+        return IdentifierDay.SCALES;
+    };
+    IdentifierDay.prototype.getLength = function () {
+        return IdentifierDay.LENGTH;
+    };
+    IdentifierDay.prototype.get = function (day) {
+        return this.compute(day.dayOfMonth, day.month + 1, day.year);
+    };
+    IdentifierDay.prototype.object = function (id) {
+        var values = this.decompute(id);
+        return {
+            day: values[0],
+            month: values[1] - 1,
+            year: values[2]
+        };
+    };
+    IdentifierDay.prototype.start = function (id) {
+        var obj = this.object(id);
+        var start = Day_Day.build(obj.year, obj.month, obj.day);
+        return start;
+    };
+    IdentifierDay.prototype.span = function (id, endInclusive) {
+        if (endInclusive === void 0) { endInclusive = false; }
+        var start = this.start(id);
+        var end = start.end(endInclusive);
+        return new DaySpan_DaySpan(start, end);
+    };
+    IdentifierDay.prototype.describe = function (id, short) {
+        if (short === void 0) { short = false; }
+        var start = this.start(id);
+        var format = short ? IdentifierDay.DESCRIBE_FORMAT_SHORT : IdentifierDay.DESCRIBE_FORMAT_LONG;
+        return start.format(format);
+    };
+    IdentifierDay.prototype.matches = function (day, id) {
+        return day.dayIdentifier === id;
+        /*
+        let obj: IdentifierObject = this.object(id);
+    
+        return (
+          day.year === obj.year &&
+          day.month === obj.month &&
+          day.dayOfMonth === obj.day
+        );
+        */
+    };
+    IdentifierDay.DESCRIBE_FORMAT_LONG = 'LL';
+    IdentifierDay.DESCRIBE_FORMAT_SHORT = 'll';
+    IdentifierDay.SCALES = [
+        1 /* day     */,
+        100 /* month   */,
+        10000 /* year    */
+    ];
+    IdentifierDay.LENGTH = 8;
+    return IdentifierDay;
+}(Identifier_Identifier));
+// YYYY0ww (7)
+var Identifier_IdentifierWeek = (function (_super) {
+    __extends(IdentifierWeek, _super);
+    function IdentifierWeek() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    IdentifierWeek.prototype.getScales = function () {
+        return IdentifierWeek.SCALES;
+    };
+    IdentifierWeek.prototype.getLength = function () {
+        return IdentifierWeek.LENGTH;
+    };
+    IdentifierWeek.prototype.get = function (day) {
+        return this.compute(day.week, day.year);
+    };
+    IdentifierWeek.prototype.object = function (id) {
+        var values = this.decompute(id);
+        return {
+            week: values[0],
+            year: values[1]
+        };
+    };
+    IdentifierWeek.prototype.start = function (id) {
+        var obj = this.object(id);
+        var start = Day_Day.build(obj.year, 0).withWeek(obj.week);
+        return start;
+    };
+    IdentifierWeek.prototype.span = function (id, endInclusive) {
+        if (endInclusive === void 0) { endInclusive = false; }
+        var start = this.start(id);
+        var end = start.endOfWeek(endInclusive);
+        return new DaySpan_DaySpan(start, end);
+    };
+    IdentifierWeek.prototype.describe = function (id, short) {
+        if (short === void 0) { short = false; }
+        var start = this.start(id);
+        var format = short ? IdentifierWeek.DESCRIBE_FORMAT_SHORT : IdentifierWeek.DESCRIBE_FORMAT_LONG;
+        return start.format(format);
+    };
+    IdentifierWeek.prototype.matches = function (day, id) {
+        return day.weekIdentifier === id;
+        /*
+        let obj: IdentifierObject = this.object(id);
+    
+        return (
+          day.year === obj.year &&
+          day.week === obj.week
+        );
+        */
+    };
+    IdentifierWeek.DESCRIBE_FORMAT_LONG = 'wo [week of] YYYY';
+    IdentifierWeek.DESCRIBE_FORMAT_SHORT = 'wo [week of] YYYY';
+    IdentifierWeek.SCALES = [
+        1 /* week   */,
+        1000 /* year   */
+    ];
+    IdentifierWeek.LENGTH = 7;
+    return IdentifierWeek;
+}(Identifier_Identifier));
+// YYYYMM (6)
+var Identifier_IdentifierMonth = (function (_super) {
+    __extends(IdentifierMonth, _super);
+    function IdentifierMonth() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    IdentifierMonth.prototype.getScales = function () {
+        return IdentifierMonth.SCALES;
+    };
+    IdentifierMonth.prototype.getLength = function () {
+        return IdentifierMonth.LENGTH;
+    };
+    IdentifierMonth.prototype.get = function (day) {
+        return this.compute(day.month + 1, day.year);
+    };
+    IdentifierMonth.prototype.object = function (id) {
+        var values = this.decompute(id);
+        return {
+            month: values[0] - 1,
+            year: values[1]
+        };
+    };
+    IdentifierMonth.prototype.start = function (id) {
+        var obj = this.object(id);
+        var start = Day_Day.build(obj.year, obj.month);
+        return start;
+    };
+    IdentifierMonth.prototype.span = function (id, endInclusive) {
+        if (endInclusive === void 0) { endInclusive = false; }
+        var start = this.start(id);
+        var end = start.endOfMonth(endInclusive);
+        return new DaySpan_DaySpan(start, end);
+    };
+    IdentifierMonth.prototype.describe = function (id, short) {
+        if (short === void 0) { short = false; }
+        var start = this.start(id);
+        var format = short ? IdentifierMonth.DESCRIBE_FORMAT_SHORT : IdentifierMonth.DESCRIBE_FORMAT_LONG;
+        return start.format(format);
+    };
+    IdentifierMonth.prototype.matches = function (day, id) {
+        return day.monthIdentifier === id;
+        /*
+        let obj: IdentifierObject = this.object(id);
+    
+        return (
+          day.year === obj.year &&
+          day.month === obj.month
+        );
+        */
+    };
+    IdentifierMonth.DESCRIBE_FORMAT_LONG = 'MMMM YYYY';
+    IdentifierMonth.DESCRIBE_FORMAT_SHORT = 'MMM YYYY';
+    IdentifierMonth.SCALES = [
+        1 /* month  */,
+        100 /* year   */
+    ];
+    IdentifierMonth.LENGTH = 6;
+    return IdentifierMonth;
+}(Identifier_Identifier));
+// YYYYQ (5)
+var Identifier_IdentifierQuarter = (function (_super) {
+    __extends(IdentifierQuarter, _super);
+    function IdentifierQuarter() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    IdentifierQuarter.prototype.getScales = function () {
+        return IdentifierQuarter.SCALES;
+    };
+    IdentifierQuarter.prototype.getLength = function () {
+        return IdentifierQuarter.LENGTH;
+    };
+    IdentifierQuarter.prototype.get = function (day) {
+        return this.compute(day.quarter, day.year);
+    };
+    IdentifierQuarter.prototype.object = function (id) {
+        var values = this.decompute(id);
+        return {
+            quarter: values[0],
+            year: values[1]
+        };
+    };
+    IdentifierQuarter.prototype.start = function (id) {
+        var obj = this.object(id);
+        var start = Day_Day.build(obj.year, (obj.quarter - 1) * 3);
+        return start;
+    };
+    IdentifierQuarter.prototype.span = function (id, endInclusive) {
+        if (endInclusive === void 0) { endInclusive = false; }
+        var start = this.start(id);
+        var end = start.relativeMonths(3).endOfMonth(endInclusive);
+        return new DaySpan_DaySpan(start, end);
+    };
+    IdentifierQuarter.prototype.describe = function (id, short) {
+        if (short === void 0) { short = false; }
+        var start = this.start(id);
+        var format = short ? IdentifierQuarter.DESCRIBE_FORMAT_SHORT : IdentifierQuarter.DESCRIBE_FORMAT_LONG;
+        return start.format(format);
+    };
+    IdentifierQuarter.prototype.matches = function (day, id) {
+        return day.quarterIdentifier === id;
+        /*
+        let obj: IdentifierObject = this.object(id);
+    
+        return (
+          day.year === obj.year &&
+          day.quarter === obj.quarter
+        );
+        */
+    };
+    IdentifierQuarter.DESCRIBE_FORMAT_LONG = 'Qo [quarter] YYYY';
+    IdentifierQuarter.DESCRIBE_FORMAT_SHORT = 'Qo [quarter] YYYY';
+    IdentifierQuarter.SCALES = [
+        1 /* quarter  */,
+        10 /* year   */
+    ];
+    IdentifierQuarter.LENGTH = 5;
+    return IdentifierQuarter;
+}(Identifier_Identifier));
+// YYYY (4)
+var Identifier_IdentifierYear = (function (_super) {
+    __extends(IdentifierYear, _super);
+    function IdentifierYear() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    IdentifierYear.prototype.getScales = function () {
+        return IdentifierYear.SCALES;
+    };
+    IdentifierYear.prototype.getLength = function () {
+        return IdentifierYear.LENGTH;
+    };
+    IdentifierYear.prototype.get = function (day) {
+        return this.compute(day.year);
+    };
+    IdentifierYear.prototype.object = function (id) {
+        var values = this.decompute(id);
+        return {
+            year: values[0]
+        };
+    };
+    IdentifierYear.prototype.start = function (id) {
+        var obj = this.object(id);
+        var start = Day_Day.build(obj.year, 0);
+        return start;
+    };
+    IdentifierYear.prototype.span = function (id, endInclusive) {
+        if (endInclusive === void 0) { endInclusive = false; }
+        var start = this.start(id);
+        var end = start.endOfYear(endInclusive);
+        return new DaySpan_DaySpan(start, end);
+    };
+    IdentifierYear.prototype.describe = function (id, short) {
+        if (short === void 0) { short = false; }
+        var start = this.start(id);
+        var format = short ? IdentifierYear.DESCRIBE_FORMAT_SHORT : IdentifierYear.DESCRIBE_FORMAT_LONG;
+        return start.format(format);
+    };
+    IdentifierYear.prototype.matches = function (day, id) {
+        return day.year === id;
+        /*
+        let obj: IdentifierObject = this.object(id);
+    
+        return (
+          day.year === obj.year
+        );
+        */
+    };
+    IdentifierYear.DESCRIBE_FORMAT_LONG = 'YYYY';
+    IdentifierYear.DESCRIBE_FORMAT_SHORT = 'YYYY';
+    IdentifierYear.SCALES = [
+        1 /* year  */
+    ];
+    IdentifierYear.LENGTH = 4;
+    return IdentifierYear;
+}(Identifier_Identifier));
+// Sets the Identifier types
+Identifier_Identifier.Time = new Identifier_IdentifierTime();
+Identifier_Identifier.Day = new Identifier_IdentifierDay();
+Identifier_Identifier.Week = new Identifier_IdentifierWeek();
+Identifier_Identifier.Month = new Identifier_IdentifierMonth();
+Identifier_Identifier.Quarter = new Identifier_IdentifierQuarter();
+Identifier_Identifier.Year = new Identifier_IdentifierYear();
+
+// CONCATENATED MODULE: ./src/Constants.ts
+
+/**
+ * A class that stores commonly used values.
+ */
+var Constants = (function () {
+    function Constants() {
+    }
+    /**
+     * The number of milliseconds in a second.
+     */
+    Constants.MILLIS_IN_SECOND = 1000;
+    /**
+     * The number of milliseconds in a minute.
+     */
+    Constants.MILLIS_IN_MINUTE = Constants.MILLIS_IN_SECOND * 60;
+    /**
+     * The number of milliseconds in an hour.
+     */
+    Constants.MILLIS_IN_HOUR = Constants.MILLIS_IN_MINUTE * 60;
+    /**
+     * The number of milliseconds in a day (not including DST days).
+     */
+    Constants.MILLIS_IN_DAY = Constants.MILLIS_IN_HOUR * 24;
+    /**
+     * The number of milliseconds in a week (not including ones that include DST).
+     */
+    Constants.MILLIS_IN_WEEK = Constants.MILLIS_IN_DAY * 7;
+    /**
+     * The number of days in a week.
+     */
+    Constants.DAYS_IN_WEEK = 7;
+    /**
+     * The number of months in a year.
+     */
+    Constants.MONTHS_IN_YEAR = 12;
+    /**
+     * The number of hours in a day (not including DST days).
+     */
+    Constants.HOURS_IN_DAY = 24;
+    /**
+     * The first month of the year.
+     */
+    Constants.MONTH_MIN = 0;
+    /**
+     * The last month of the year.
+     */
+    Constants.MONTH_MAX = 11;
+    /**
+     * The first day of a month.
+     */
+    Constants.DAY_MIN = 1;
+    /**
+     * The last day of the longest month.
+     */
+    Constants.DAY_MAX = 31;
+    /**
+     * The first hour of the day.
+     */
+    Constants.HOUR_MIN = 0;
+    /**
+     * The last hour of the day.
+     */
+    Constants.HOUR_MAX = 23;
+    /**
+     * The first minute of the hour.
+     */
+    Constants.MINUTE_MIN = 0;
+    /**
+     * The last minute of the hour.
+     */
+    Constants.MINUTE_MAX = 59;
+    /**
+     * The first second of the minute.
+     */
+    Constants.SECOND_MIN = 0;
+    /**
+     * The last second of the minute.
+     */
+    Constants.SECOND_MAX = 59;
+    /**
+     * The first millisecond of the second.
+     */
+    Constants.MILLIS_MIN = 0;
+    /**
+     * The last millisecond of the second.
+     */
+    Constants.MILLIS_MAX = 999;
+    /**
+     * The first day of the week.
+     */
+    Constants.WEEKDAY_MIN = 0;
+    /**
+     * The last day of the week.
+     */
+    Constants.WEEKDAY_MAX = 6;
+    /**
+     * The default duration for an event.
+     */
+    Constants.DURATION_DEFAULT = 1;
+    /**
+     * The default duration unit for an all day event.
+     */
+    Constants.DURATION_DEFAULT_UNIT_ALL = 'days';
+    /**
+     * The default duration unit for an event at a given time.
+     */
+    Constants.DURATION_DEFAULT_UNIT_TIMES = 'hours';
+    /**
+     * Computes the duration unit given its for an all day event.
+     *
+     * @param all If the event is all day.
+     * @return The default unit for the event.
+     */
+    Constants.DURATION_DEFAULT_UNIT = function (all) { return all ? Constants.DURATION_DEFAULT_UNIT_ALL :
+        Constants.DURATION_DEFAULT_UNIT_TIMES; };
+    /**
+     * The number of milliseconds for various duration units. These are worse case
+     * scenario and do not include DST changes.
+     */
+    Constants.DURATION_TO_MILLIS = {
+        minute: Constants.MILLIS_IN_MINUTE,
+        minutes: Constants.MILLIS_IN_MINUTE,
+        hour: Constants.MILLIS_IN_HOUR,
+        hours: Constants.MILLIS_IN_HOUR,
+        day: Constants.MILLIS_IN_DAY,
+        days: Constants.MILLIS_IN_DAY,
+        week: Constants.MILLIS_IN_WEEK,
+        weeks: Constants.MILLIS_IN_WEEK,
+        month: Constants.MILLIS_IN_DAY * Constants.DAY_MAX,
+        months: Constants.MILLIS_IN_DAY * Constants.DAY_MAX
+    };
+    /**
+     * The maximum estimated number of events per day. This is used to calculate
+     * [[CalendarEvent.id]] to give each event a unique ID. If you think you will
+     * have more events than this per day, you can enlarge the value.
+     */
+    Constants.MAX_EVENTS_PER_DAY = 24;
+    /**
+     * The day of the week which determines the first week of the year or month.
+     * By default this day is Thursday.
+     */
+    Constants.WEEK_OF_MONTH_MINIMUM_WEEKDAY = 4;
+    return Constants;
+}());
+
+
 // CONCATENATED MODULE: ./src/Suffix.ts
 
 /**
@@ -860,9 +1386,401 @@ var Suffix = (function () {
 }());
 
 
+// CONCATENATED MODULE: ./src/Iterator.ts
+
+
+/**
+ * A class that allows an iteratable source to be iterated any number of times
+ * by providing the following functionality:
+ *
+ * - [[Iterator.isEmpty]]: Determines whether the source contains any items.
+ * - [[Iterator.first]]: Gets the first item in the source.
+ * - [[Iterator.count]]: Counds the number of items in the source.
+ * - [[Iterator.list]]: Builds a list of the items in the source.
+ * - [[Iterator.map]]: Maps each item in the source to another item by returning
+ *    a new Iterator.
+ * - [[Iterator.iterate]]: Invokes a function for each item in the source.
+ *
+ * ```typescript
+ * let iter = object.iterateThings();
+ * iter.isEmpty();              // no items?
+ * iter.isEmpty(d => d.flag);   // no items that meet some criteria?
+ * iter.count();                // number of items
+ * iter.count(d => d.flag);     // number of items that meet some criteria
+ * iter.first();                // first item
+ * iter.first(d => d.flag);     // first item that meets some criteria
+ * iter.list();                 // get all items as array
+ * iter.list(myArray);          // add all items to given array
+ * iter.list([], d => d.flag);  // get all items as array that meet some criteria
+ * iter.map<S>(d => d.subitem); // return an iterator for subitems if they exist
+ * iter.iterate(d => log(d));   // do something for each item
+ * ```
+ *
+ * @typeparam The type of item being iterated.
+ */
+var Iterator_Iterator = (function () {
+    /**
+     * Creates a new Iterator given a source.
+     *
+     * @param source The source of items to iterator.
+     */
+    function Iterator(source) {
+        /**
+         * A result of the iteration passed to [[Iterator.stop]].
+         */
+        this.result = undefined;
+        /**
+         * Whether or not this iterator is currently iterating over the source.
+         */
+        this.iterating = false;
+        this.source = source;
+    }
+    /**
+     * Stops iteration and optionally sets the result of the iteration.
+     *
+     * @param result The result of the iteration.
+     */
+    Iterator.prototype.stop = function (result) {
+        this.result = result;
+        this.iterating = false;
+        return this;
+    };
+    /**
+     * Determines with this iterator is empty. A filter function can be specified
+     * to only check for items which match certain criteria.
+     *
+     * @param filter A function to the checks items for certain criteria.
+     * @returns `true` if no valid items exist in the source.
+     */
+    Iterator.prototype.isEmpty = function (filter) {
+        if (filter === void 0) { filter = null; }
+        var empty = true;
+        this.iterate(function (item, iterator) {
+            if (filter && !filter(item)) {
+                return;
+            }
+            empty = false;
+            iterator.stop();
+        });
+        return empty;
+    };
+    /**
+     * Counts the number of items in the iterator. A filter function can be
+     * specified to only count items which match certain criteria.
+     *
+     * @param filter A function to count items for certain criteria.
+     * @returns The number of items in the source that optionally match the given
+     *    criteria.
+     */
+    Iterator.prototype.count = function (filter) {
+        if (filter === void 0) { filter = null; }
+        var total = 0;
+        this.iterate(function (item, iterator) {
+            if (filter && !filter(item)) {
+                return;
+            }
+            total++;
+        });
+        return total;
+    };
+    /**
+     * Returns the first item in the iterator. A filter function can be specified
+     * to only return the first item which matches certain criteria.
+     *
+     * @param filter A function to compare items to to match certain criteria.
+     * @returns The first item found that optonally matches the given criteria.
+     */
+    Iterator.prototype.first = function (filter) {
+        if (filter === void 0) { filter = null; }
+        var first = null;
+        this.iterate(function (item, iterator) {
+            if (filter && !filter(item)) {
+                return;
+            }
+            first = item;
+            iterator.stop();
+        });
+        return first;
+    };
+    /**
+     * Builds a list of items from the source. A filter function can be specified
+     * so the resulting list only contain items that match certain criteria.
+     *
+     * @param out The array to place the items in.
+     * @param filter The function which determines which items are added to the list.
+     * @returns The reference to `out` which has had items added to it which
+     *    optionally match the given criteria.
+     */
+    Iterator.prototype.list = function (out, filter) {
+        if (out === void 0) { out = []; }
+        if (filter === void 0) { filter = null; }
+        this.iterate(function (item, iterator) {
+            if (filter && !filter(item)) {
+                return;
+            }
+            out.push(item);
+        });
+        return out;
+    };
+    /**
+     * Returns an iterator where this iterator is the source and the returned
+     * iterator is built from mapped items pulled from items in the source
+     * of this iterator. If the given callback `outerCallback` does not return
+     * a mapped value then the returned iterator will not see the item. A filter
+     * function can be specified to only look at mapping items which match
+     * certain criteria.
+     *
+     * @param outerCallback The function which maps an item to another.
+     * @param filter The function which determines if an item should be mapped.
+     * @returns A new iterator for the mapped items from this iterator.
+     */
+    Iterator.prototype.map = function (outerCallback, filter) {
+        var _this = this;
+        if (filter === void 0) { filter = null; }
+        return new Iterator(function (innerCallback, inner) {
+            _this.iterate(function (outerItem, outer) {
+                if (filter && !filter(outerItem)) {
+                    return;
+                }
+                var innerItem = outerCallback(outerItem, outer);
+                if (Functions.isDefined(innerItem)) {
+                    innerCallback(innerItem, inner);
+                }
+                if (!outer.iterating) {
+                    inner.stop();
+                }
+            });
+        });
+    };
+    /**
+     * Invokes the callback for each item in the source of this iterator. The
+     * second argument in the callback is the reference to this iterator and
+     * [[Iterator.stop]] can be called at anytime to cease iteration.
+     *
+     * @param callback The function to invoke for each item in this iterator.
+     */
+    Iterator.prototype.iterate = function (callback) {
+        this.result = undefined;
+        this.iterating = true;
+        this.source(callback, this);
+        this.iterating = false;
+        return this;
+    };
+    return Iterator;
+}());
+
+
+// CONCATENATED MODULE: ./src/ScheduleModifier.ts
+
+
+
+/**
+ * A class that can modify the events of a schedule by storing [[Identifier]]s
+ * and an associated value.
+ *
+ * @typeparam T The type of data that modifies the schedule.
+ */
+var ScheduleModifier_ScheduleModifier = (function () {
+    function ScheduleModifier() {
+    }
+    /**
+     * Returns `true` if this modifier lacks any modifications, otherwise `false`.
+     */
+    ScheduleModifier.prototype.isEmpty = function () {
+        // @ts-ignore
+        for (var id in this.map) {
+            return !id;
+        }
+        return true;
+    };
+    /**
+     * Gets the most specific value in this modifier for the given day, if none
+     * exists `otherwise` is returned. A modifier can have multiple values for a
+     * given day because [[Identifier]]s represent a span of time.
+     *
+     * @param day The day to get a value for.
+     * @param otherwise What to return if no value exists for the given day.
+     * @param lookAtTime If the specific time of the given day should be looked at.
+     * @returns The most specific value for the given day, or `otherwise`.
+     */
+    ScheduleModifier.prototype.get = function (day, otherwise, lookAtTime) {
+        if (lookAtTime === void 0) { lookAtTime = true; }
+        var map = this.map;
+        return (lookAtTime && map[day.timeIdentifier]) ||
+            map[day.dayIdentifier] ||
+            map[day.monthIdentifier] ||
+            map[day.weekIdentifier] ||
+            map[day.quarterIdentifier] ||
+            otherwise;
+    };
+    /**
+     * Gets all values in this modifier for the given day. If none exist, an empty
+     * array is returned. The values returned in the array are returned in most
+     * specific to least specific.
+     *
+     * @param day The day to get the values for.
+     * @returns An array of values (modifications) for the given day.
+     */
+    ScheduleModifier.prototype.getAll = function (day) {
+        var map = this.map;
+        var all = [];
+        if (map[day.timeIdentifier])
+            all.push(map[day.timeIdentifier]);
+        if (map[day.dayIdentifier])
+            all.push(map[day.dayIdentifier]);
+        if (map[day.monthIdentifier])
+            all.push(map[day.monthIdentifier]);
+        if (map[day.weekIdentifier])
+            all.push(map[day.weekIdentifier]);
+        if (map[day.quarterIdentifier])
+            all.push(map[day.quarterIdentifier]);
+        return all;
+    };
+    /**
+     * Queries the modifier for all values/modifications which fall in the time
+     * span that the given identifier represents. All identifiers and their value
+     * are passed to the given callback.
+     *
+     * @param prefix The identifier
+     *
+     */
+    ScheduleModifier.prototype.query = function (query) {
+        var _this = this;
+        return new Iterator_Iterator(function (callback, iterator) {
+            var map = _this.map;
+            for (var id in map) {
+                if (Identifier_Identifier.contains(query, id)) {
+                    var value = map[id];
+                    callback([id, value], iterator);
+                    if (!iterator.iterating) {
+                        break;
+                    }
+                }
+            }
+        });
+    };
+    /**
+     * Moves the value/modification from one identifier to another.
+     *
+     * @param from The day to take the identifier from.
+     * @param fromType The identifier type.
+     * @param to The day to move the value to.
+     * @param toType The identifier type to move the value to.
+     */
+    ScheduleModifier.prototype.move = function (from, fromType, to, toType) {
+        var fromIdentifier = fromType.get(from);
+        var toIdentifer = toType.get(to);
+        this.map[toIdentifer] = this.map[fromIdentifier];
+        delete this.map[fromIdentifier];
+        return this;
+    };
+    /**
+     * Sets the value/modification in this map given a day, the value, and the
+     * identifier type.
+     *
+     * @param day The day to take an identifier from.
+     * @param value The value/modification to set.
+     * @param type The identifier type.
+     */
+    ScheduleModifier.prototype.set = function (day, value, type) {
+        this.map[type.get(day)] = value;
+        return this;
+    };
+    /**
+     * Removes the value/modification from this modifier based on the identifier
+     * pulled from the day.
+     *
+     * @param day The day to take an identifier from.
+     * @param type The identifier type.
+     */
+    ScheduleModifier.prototype.unset = function (day, type) {
+        delete this.map[type.get(day)];
+        return this;
+    };
+    /**
+     * Returns all identifiers stored in this modifier.
+     */
+    ScheduleModifier.prototype.identifiers = function (filter) {
+        var map = this.map;
+        var out = [];
+        for (var id in map) {
+            if (!filter || filter(map[id], id)) {
+                out.push(id);
+            }
+        }
+        return out;
+    };
+    /**
+     * Builds a list of spans and the associated values. The spans are calculated
+     * from the identiier key via [[Identifier.span]].
+     *
+     * @param endInclusive If the end date in the spans should be the last
+     *    millisecond of the timespan or the first millisecond of the next.
+     * @returns An array of spans calculated from the identifiers with the
+     *    associated values/modifications.
+     */
+    ScheduleModifier.prototype.spans = function (endInclusive) {
+        if (endInclusive === void 0) { endInclusive = false; }
+        var map = this.map;
+        var out = [];
+        for (var id in map) {
+            var type = Identifier_Identifier.find(id);
+            if (type) {
+                out.push({
+                    span: type.span(id, endInclusive),
+                    value: map[id]
+                });
+            }
+        }
+        return out;
+    };
+    /**
+     * Builds a map of the values/modifications keyed by the descripton of the
+     * identifier computed via [[Identifier.describe]].
+     *
+     * @param short If the description should use shorter language or longer.
+     * @returns The built map of description to values/modifications.
+     */
+    ScheduleModifier.prototype.describeMap = function (short) {
+        if (short === void 0) { short = false; }
+        var map = this.map;
+        var out = {};
+        for (var id in map) {
+            var type = Identifier_Identifier.find(id);
+            if (type) {
+                out[type.describe(id, short)] = map[id];
+            }
+        }
+        return out;
+    };
+    /**
+     * Builds a list of the descriptions of the identifiers in this modifier.
+     *
+     * @param short If the description should use shorter language or longer.
+     * @returns The built list of descriptions.
+     */
+    ScheduleModifier.prototype.describeList = function (short) {
+        if (short === void 0) { short = false; }
+        var map = this.map;
+        var out = [];
+        for (var id in map) {
+            var type = Identifier_Identifier.find(id);
+            if (type) {
+                out.push(type.describe(id, short));
+            }
+        }
+        return out;
+    };
+    return ScheduleModifier;
+}());
+
+
 // CONCATENATED MODULE: ./src/Schedule.ts
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_moment__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_moment__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_moment__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_9_moment__);
+
+
+
 
 
 
@@ -874,6 +1792,8 @@ var Suffix = (function () {
 
 /**
  * A class which describes when an event occurs over what time and if it repeats.
+ *
+ * @typeparam M The type of metadata stored in the schedule.
  */
 var Schedule_Schedule = (function () {
     /**
@@ -882,6 +1802,10 @@ var Schedule_Schedule = (function () {
      * @param input The input which describes the schedule of events.
      */
     function Schedule(input) {
+        this.exclude = new ScheduleModifier_ScheduleModifier();
+        this.include = new ScheduleModifier_ScheduleModifier();
+        this.cancel = new ScheduleModifier_ScheduleModifier();
+        this.meta = new ScheduleModifier_ScheduleModifier();
         if (Functions.isDefined(input)) {
             this.set(input);
         }
@@ -970,221 +1894,72 @@ var Schedule_Schedule = (function () {
      * @see [[Schedule.end]]
      */
     Schedule.prototype.matchesRange = function (start, end) {
-        return (this.start === null || start.isSameOrBefore(this.start)) &&
-            (this.end === null || end.isBefore(this.end));
+        if (this.start && end.isBefore(this.start)) {
+            return false;
+        }
+        if (this.end && start.isAfter(this.end)) {
+            return false;
+        }
+        return true;
     };
     /**
      * Determines whether the given day is explicitly excluded in the schedule.
      *
      * @param day The day to test.
+     * @param lookAtTime lookAtTime If the specific time of the given day should
+     *    be looked at.
      * @returns `true` if the day was excluded, otherwise `false`.
      */
-    Schedule.prototype.isExcluded = function (day) {
-        return !!this.exclude[day.dayIdentifier];
+    Schedule.prototype.isExcluded = function (day, lookAtTime) {
+        if (lookAtTime === void 0) { lookAtTime = true; }
+        return this.exclude.get(day, false, lookAtTime);
     };
     /**
-     * Determines whether the given day is NOT explicitly excluded in the schedule.
+     * Determines whether the given day is explicitly included in the schedule.
      *
      * @param day The day to test.
-     * @returns `true` if the day is NOT explicitly excluded, otherwise `false`.
+     * @param lookAtTime lookAtTime If the specific time of the given day should
+     *    be looked at.
+     * @returns `true` if the day is NOT explicitly included, otherwise `false`.
      */
-    Schedule.prototype.isIncluded = function (day) {
-        return !this.exclude[day.dayIdentifier];
+    Schedule.prototype.isIncluded = function (day, lookAtTime) {
+        if (lookAtTime === void 0) { lookAtTime = true; }
+        return this.include.get(day, false, lookAtTime);
     };
     /**
-     * Determines whether the given day is a day on the schedule for the start
-     * of an event. If an event is more than one day and the day given is not the
-     * start this may return `false`.
+     * Determines whether the given day is cancelled in the schedule.
      *
      * @param day The day to test.
-     * @returns `true` if the day marks the start of an event on the schedule.
-     * @see [[Schedule.isExcluded]]
-     * @see [[Schedule.matchesSpan]]
+     * @param lookAtTime lookAtTime If the specific time of the given day should
+     *    be looked at.
+     * @returns `true` if the day was cancelled, otherwise `false`.
      */
-    Schedule.prototype.matchesDay = function (day) {
-        if (this.isExcluded(day) || !this.matchesSpan(day)) {
-            return false;
-        }
-        for (var _i = 0, _a = this.checks; _i < _a.length; _i++) {
-            var check = _a[_i];
-            if (!check(day[check.property])) {
-                return false;
-            }
-        }
-        return true;
+    Schedule.prototype.isCancelled = function (day, lookAtTime) {
+        if (lookAtTime === void 0) { lookAtTime = true; }
+        return this.cancel.get(day, false, lookAtTime);
     };
     /**
-     * Determines if the given day is covered by this schedule. A schedule can
-     * specify events that span multiple days - so even though the day does not
-     * match the starting day of a span - it can be a day that is within the
-     * schedule.
+     * Returns the metadata for the given day or `null` if there is none.
      *
-     * @param day The day to test.
-     * @returns `true` if the day is covered by an event on this schedule,
-     *    otherwise `false`.
+     * @param day The day to return the metadata for.
+     * @param otherwise The data to return if none exists for the given day.
+     * @param lookAtTime lookAtTime If the specific time of the given day should
+     *    be looked at.
+     * @returns The metadata or `null`.
      */
-    Schedule.prototype.coversDay = function (day) {
-        return !!this.findStartingDay(day);
+    Schedule.prototype.getMeta = function (day, otherwise, lookAtTime) {
+        if (otherwise === void 0) { otherwise = null; }
+        if (lookAtTime === void 0) { lookAtTime = true; }
+        return this.meta.get(day, otherwise, lookAtTime);
     };
     /**
-     * Finds the next day an event occurs on the schedule given a day to start,
-     * optionally including it, and a maximum number of days to look ahead.
+     * Returns all metadata for the given day or an empty array if there is none.
      *
-     * @param day The day to start to search from.
-     * @param includeDay If the given day should be included in the search.
-     * @param lookAhead The maximum number of days to look ahead from the given
-     *     day for event occurrences.
-     * @returns The next day on the schedule or `null` if none exists.
+     * @param day The day to return the metadata for.
+     * @returns The array of metadata ordered by priority or an empty array.
      */
-    Schedule.prototype.nextDay = function (day, includeDay, lookAhead) {
-        if (includeDay === void 0) { includeDay = false; }
-        if (lookAhead === void 0) { lookAhead = 366; }
-        var next = null;
-        var setNext = function (d) {
-            next = d;
-            return false;
-        };
-        this.iterateDays(day, 1, true, setNext, includeDay, lookAhead);
-        return next;
-    };
-    /**
-     * Finds the next specified number of days that events occur on the schedule
-     * given a day to start, optionally including it, and a maximum number of days
-     * to look ahead.
-     *
-     * @param day The day to start to search from.
-     * @param max The maximum number of days to return in the result.
-     * @param includeDay If the given day should be included in the search.
-     * @param lookAhead The maximum number of days to look ahead from the given
-     *     day for event occurrences.
-     * @returns An array containing the next days on the schedule that events
-     *    start or an empty array if there are none.
-     */
-    Schedule.prototype.nextDays = function (day, max, includeDay, lookAhead) {
-        if (includeDay === void 0) { includeDay = false; }
-        if (lookAhead === void 0) { lookAhead = 366; }
-        var nexts = [];
-        this.iterateDays(day, max, true, function (d) { return nexts.push(d); }, includeDay, lookAhead);
-        return nexts;
-    };
-    /**
-     * Finds the previous day an event occurs on the schedule given a day to start,
-     * optionally including it, and a maximum number of days to look behind.
-     *
-     * @param day The day to start to search from.
-     * @param includeDay If the given day should be included in the search.
-     * @param lookAhead The maximum number of days to look behind from the given
-     *     day for event occurrences.
-     * @returns The previous day on the schedule or `null` if none exists.
-     */
-    Schedule.prototype.prevDay = function (day, includeDay, lookBack) {
-        if (includeDay === void 0) { includeDay = false; }
-        if (lookBack === void 0) { lookBack = 366; }
-        var prev = null;
-        var setPrev = function (d) {
-            prev = d;
-            return false;
-        };
-        this.iterateDays(day, 1, false, setPrev, includeDay, lookBack);
-        return prev;
-    };
-    /**
-     * Finds the previous specified number of days that events occur on the
-     * schedule given a day to start, optionally including it, and a maximum
-     * number of days to look behind.
-     *
-     * @param day The day to start to search from.
-     * @param max The maximum number of days to return in the result.
-     * @param includeDay If the given day should be included in the search.
-     * @param lookAhead The maximum number of days to look behind from the given
-     *     day for event occurrences.
-     * @returns An array containing the previous days on the schedule that events
-     *    start or an empty array if there are none.
-     */
-    Schedule.prototype.prevDays = function (day, max, includeDay, lookBack) {
-        if (includeDay === void 0) { includeDay = false; }
-        if (lookBack === void 0) { lookBack = 366; }
-        var prevs = [];
-        this.iterateDays(day, max, false, function (d) { return prevs.push(d); }, includeDay, lookBack);
-        return prevs;
-    };
-    /**
-     * Iterates over days that events start in the schedule given a day to start,
-     * a maximum number of days to find, and a direction to look.
-     *
-     * @param day The day to start to search from.
-     * @param max The maximum number of times to invoke the `onDay` callback.
-     * @param next If `true` this searches forward, otherwise `false` is backwards.
-     * @param onDay A function to invoke for each matching day found. If this
-     *    function returns `false` the iteration stops immediately.
-     * @param includeDay If the given day should be included in the search.
-     * @param lookup The maximum number of days to look through from the given
-     *     day for event occurrences.
-     * @see [[Schedule.matchesDay]]
-     */
-    Schedule.prototype.iterateDays = function (day, max, next, onDay, includeDay, lookup) {
-        if (includeDay === void 0) { includeDay = false; }
-        if (lookup === void 0) { lookup = 366; }
-        var iterated = 0;
-        for (var days = 0; days < lookup; days++) {
-            if (!includeDay || days > 0) {
-                day = next ? day.next() : day.prev();
-            }
-            if (this.matchesDay(day)) {
-                if (onDay(day) === false) {
-                    break;
-                }
-                if (++iterated >= max) {
-                    break;
-                }
-            }
-        }
-        return this;
-    };
-    /**
-     * Determines if the given day is on the schedule and the time specified on
-     * the day matches one of the times on the schedule.
-     *
-     * @param day The day to test.
-     * @returns `true` if the day and time match the schedule, otherwise false.
-     */
-    Schedule.prototype.matchesTime = function (day) {
-        if (!this.matchesDay(day)) {
-            return false;
-        }
-        for (var _i = 0, _a = this.times; _i < _a.length; _i++) {
-            var time = _a[_i];
-            if (day.sameTime(time)) {
-                return true;
-            }
-        }
-        return false;
-    };
-    /**
-     * Determines if the given timestamp lies in an event occurrence on this
-     * schedule.
-     *
-     * @param day The timestamp to test against the schedule.
-     * @return `true` if the timestamp lies in an event occurrent start and end
-     *    timestamps, otherwise `false`.
-     */
-    Schedule.prototype.coversTime = function (day) {
-        var start = this.findStartingDay(day);
-        if (!start) {
-            return false;
-        }
-        if (this.isFullDay()) {
-            return this.getFullSpan(start).contains(day);
-        }
-        else {
-            for (var _i = 0, _a = this.times; _i < _a.length; _i++) {
-                var time = _a[_i];
-                if (this.getTimeSpan(start, time).contains(day)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    Schedule.prototype.getMetas = function (day) {
+        return this.meta.getAll(day);
     };
     /**
      * Returns whether the events in the schedule are all day long or start at
@@ -1222,116 +1997,306 @@ var Schedule_Schedule = (function () {
         return new DaySpan_DaySpan(start, end);
     };
     /**
-     * Returns an array of spans of times that cover the the given day taking into
-     * account multi-day events. This does not check if the day is even on the
-     * schedule, it assumes it was already passed to [[Schedule.coversDay]] and it
-     * returned `true`.
+     * Determines whether the given day is a day on the schedule for the start
+     * of an event. If an event is more than one day and the day given is not the
+     * start this may return `false`. This does not test for event instances
+     * that exist through [[Schedule.include]].
      *
-     * @param day The day to return spans over.
-     * @returns An array of spans for each event occurrence over the given day.
+     * @param day The day to test.
+     * @returns `true` if the day marks the start of an event on the schedule.
+     * @see [[Schedule.isIncluded]]
+     * @see [[Schedule.isFullyExcluded]]
+     * @see [[Schedule.matchesSpan]]
      */
-    Schedule.prototype.getSpansOver = function (day) {
-        var spans = [];
-        var start = this.findStartingDay(day);
-        if (!start) {
-            return spans;
+    Schedule.prototype.matchesDay = function (day) {
+        if (this.isIncluded(day, false)) {
+            return true;
+        }
+        if (!this.matchesSpan(day) || this.isFullyExcluded(day)) {
+            return false;
+        }
+        for (var _i = 0, _a = this.checks; _i < _a.length; _i++) {
+            var check = _a[_i];
+            if (!check(day[check.property])) {
+                return false;
+            }
+        }
+        return true;
+    };
+    /**
+     * Determines whether the given day has events added through
+     * [[Schedule.include]].
+     *
+     * @param day The day to look for included times on.
+     * @returns `true` if there are included event instances on the given day,
+     *    otherwise `false`.
+     */
+    Schedule.prototype.hasIncludedTime = function (day) {
+        return !this.iterateIncludeTimes(day).isEmpty();
+    };
+    /**
+     * Determines whether the given day is fully excluded from the schedule. A
+     * fully excluded day is one that has a day-wide exclusion, or the schedule
+     * is not an all-day event and all times in the schedule are specifically
+     * excluded.
+     *
+     * @param day The day to test.*
+     * @returns `true` if he day is fully excluded, otherwise `false`.
+     */
+    Schedule.prototype.isFullyExcluded = function (day) {
+        if (this.isExcluded(day, false)) {
+            return true;
         }
         if (this.isFullDay()) {
-            spans.push(this.getFullSpan(start));
+            return false;
         }
-        else {
-            for (var _i = 0, _a = this.times; _i < _a.length; _i++) {
-                var time = _a[_i];
-                var span = this.getTimeSpan(start, time);
-                if (span.matchesDay(day)) {
-                    spans.push(span);
+        for (var _i = 0, _a = this.times; _i < _a.length; _i++) {
+            var time = _a[_i];
+            if (!this.isExcluded(day.withTime(time))) {
+                return false;
+            }
+        }
+        return true;
+    };
+    /**
+     * Finds the next day an event occurs on the schedule given a day to start,
+     * optionally including it, and a maximum number of days to look ahead.
+     *
+     * @param day The day to start to search from.
+     * @param includeDay If the given day should be included in the search.
+     * @param lookAhead The maximum number of days to look ahead from the given
+     *     day for event occurrences.
+     * @returns The next day on the schedule or `null` if none exists.
+     */
+    Schedule.prototype.nextDay = function (day, includeDay, lookAhead) {
+        if (includeDay === void 0) { includeDay = false; }
+        if (lookAhead === void 0) { lookAhead = 366; }
+        return this.iterateDaycast(day, 1, true, includeDay, lookAhead).first();
+    };
+    /**
+     * Finds the next specified number of days that events occur on the schedule
+     * given a day to start, optionally including it, and a maximum number of days
+     * to look ahead.
+     *
+     * @param day The day to start to search from.
+     * @param max The maximum number of days to return in the result.
+     * @param includeDay If the given day should be included in the search.
+     * @param lookAhead The maximum number of days to look ahead from the given
+     *     day for event occurrences.
+     * @returns An array containing the next days on the schedule that events
+     *    start or an empty array if there are none.
+     */
+    Schedule.prototype.nextDays = function (day, max, includeDay, lookAhead) {
+        if (includeDay === void 0) { includeDay = false; }
+        if (lookAhead === void 0) { lookAhead = 366; }
+        return this.iterateDaycast(day, max, true, includeDay, lookAhead).list();
+    };
+    /**
+     * Finds the previous day an event occurs on the schedule given a day to start,
+     * optionally including it, and a maximum number of days to look behind.
+     *
+     * @param day The day to start to search from.
+     * @param includeDay If the given day should be included in the search.
+     * @param lookBack The maximum number of days to look behind from the given
+     *     day for event occurrences.
+     * @returns The previous day on the schedule or `null` if none exists.
+     */
+    Schedule.prototype.prevDay = function (day, includeDay, lookBack) {
+        if (includeDay === void 0) { includeDay = false; }
+        if (lookBack === void 0) { lookBack = 366; }
+        return this.iterateDaycast(day, 1, false, includeDay, lookBack).first();
+    };
+    /**
+     * Finds the previous specified number of days that events occur on the
+     * schedule given a day to start, optionally including it, and a maximum
+     * number of days to look behind.
+     *
+     * @param day The day to start to search from.
+     * @param max The maximum number of days to return in the result.
+     * @param includeDay If the given day should be included in the search.
+     * @param lookAhead The maximum number of days to look behind from the given
+     *     day for event occurrences.
+     * @returns An array containing the previous days on the schedule that events
+     *    start or an empty array if there are none.
+     */
+    Schedule.prototype.prevDays = function (day, max, includeDay, lookBack) {
+        if (includeDay === void 0) { includeDay = false; }
+        if (lookBack === void 0) { lookBack = 366; }
+        return this.iterateDaycast(day, max, false, includeDay, lookBack).list();
+    };
+    /**
+     * Iterates over days that events start in the schedule given a day to start,
+     * a maximum number of days to find, and a direction to look.
+     *
+     * @param day The day to start to search from.
+     * @param max The maximum number of days to iterate.
+     * @param next If `true` this searches forward, otherwise `false` is backwards.
+     * @param includeDay If the given day should be included in the search.
+     * @param lookup The maximum number of days to look through from the given
+     *     day for event occurrences.
+     * @returns A new Iterator for the days found in the cast.
+     * @see [[Schedule.iterateSpans]]
+     */
+    Schedule.prototype.iterateDaycast = function (day, max, next, includeDay, lookup) {
+        var _this = this;
+        if (includeDay === void 0) { includeDay = false; }
+        if (lookup === void 0) { lookup = 366; }
+        return new Iterator_Iterator(function (callback, iterator) {
+            var iterated = 0;
+            for (var days = 0; days < lookup; days++) {
+                if (!includeDay || days > 0) {
+                    day = next ? day.next() : day.prev();
+                }
+                if (!_this.iterateSpans(day, false).isEmpty()) {
+                    callback(day, iterator);
+                    if (!iterator.iterating || ++iterated >= max) {
+                        return;
+                    }
                 }
             }
-        }
-        return spans;
+        });
     };
     /**
-     * Returns a span of time over the given day. This does not check if the day
-     * is even on the schedule, it assumes it was already passed to
-     * [[Schedule.coversDay]] and it returned `true`.
+     * Iterates through the spans (event instances) that start on or covers the
+     * given day.
      *
-     * @param day The day to return a span over.
-     * @returns A span over the given day.
+     * @param day The day to look for spans on.
+     * @param covers If `true` spans which span multiple days will be looked at
+     *    to see if they intersect with the given day, otherwise `false` will
+     *    only look at the given day for the start of events.
+     * @returns A new Iterator for all the spans found.
      */
-    Schedule.prototype.getSpanOver = function (day) {
-        var start = this.findStartingDay(day);
-        return start ? this.getFullSpan(start) : null;
-    };
-    /**
-     * Returns an array of spans of times that start on the given day. This can
-     * optionally check to see if th day is on the schedule, or just assume the
-     * day is.
-     *
-     * @param day The day to return a span that starts on.
-     * @param check When `true` [[Schedule.matchesDay]] is passed the given day
-     *    and an empty array is returned if the day is not on the schedule.
-     *    Otherwise its assumed the given day is on the schedule.
-     * @returns An array of spans for each event occurrence that start on the
-     *    given day.
-     */
-    Schedule.prototype.getSpansOn = function (day, check) {
-        if (check === void 0) { check = false; }
-        var spans = [];
-        if (check && !this.matchesDay(day)) {
-            return spans;
-        }
-        if (this.isFullDay()) {
-            spans.push(this.getFullSpan(day));
-        }
-        else {
-            for (var _i = 0, _a = this.times; _i < _a.length; _i++) {
-                var time = _a[_i];
-                spans.push(this.getTimeSpan(day, time));
+    Schedule.prototype.iterateSpans = function (day, covers) {
+        var _this = this;
+        if (covers === void 0) { covers = false; }
+        return new Iterator_Iterator(function (callback, iterator) {
+            var current = day;
+            var lookBehind = covers ? _this.durationInDays : 0;
+            // If the events start at the end of the day and may last multiple days....
+            if (_this.isFullDay()) {
+                // If the schedule has events which span multiple days we need to look
+                // backwards for events that overlap with the given day.
+                while (lookBehind >= 0) {
+                    // If the current day matches the schedule rules...
+                    if (_this.matchesDay(current)) {
+                        // Build a DaySpan with the given start day and the schedules duration.
+                        var span = _this.getFullSpan(current);
+                        // If that dayspan intersects with the given day, it's a winner!
+                        if (span.matchesDay(day)) {
+                            callback(span, iterator);
+                            if (!iterator.iterating) {
+                                return;
+                            }
+                        }
+                    }
+                    current = current.prev();
+                    lookBehind--;
+                }
             }
-        }
-        return spans;
-    };
-    /**
-     * If the given day potentially overlaps an event occurrence on the schedule
-     * this will find the day when the event occurrence starts.
-     *
-     * @param day The day to check against the schedule for a starting day.
-     * @returns The day that is a start of an event that potentially overlaps
-     *    the given day.
-     */
-    Schedule.prototype.findStartingDay = function (day) {
-        var behind = this.durationInDays;
-        while (behind >= 0) {
-            if (this.matchesDay(day)) {
-                return day;
+            else {
+                // If the schedule has events which span multiple days we need to look
+                // backwards for events that overlap with the given day.
+                while (lookBehind >= 0) {
+                    // If the current day matches the schedule rules...
+                    if (_this.matchesDay(current)) {
+                        // Iterate through each daily occurrence in the schedule...
+                        for (var _i = 0, _a = _this.times; _i < _a.length; _i++) {
+                            var time = _a[_i];
+                            var span = _this.getTimeSpan(current, time);
+                            // If the event intersects with the given day and the occurrence
+                            // has not specifically been excluded...
+                            if (span.matchesDay(day) && !_this.isExcluded(span.start, true)) {
+                                callback(span, iterator);
+                                if (!iterator.iterating) {
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        // The current day does not match the schedule, however the schedule
+                        // might have moved/random event occurrents on the current day.
+                        // We only want the ones that overlap with the given day.
+                        _this.iterateIncludeTimes(current, day).iterate(function (span, timeIterator) {
+                            callback(span, iterator);
+                            if (!iterator.iterating) {
+                                timeIterator.stop();
+                            }
+                        });
+                        if (!iterator.iterating) {
+                            return;
+                        }
+                    }
+                    current = current.prev();
+                    lookBehind--;
+                }
             }
-            day = day.prev();
-            behind--;
-        }
-        return null;
+        });
     };
     /**
-     * Converts the map of exclusions to an array of [[Day]] instances or
-     * [[Day.dayIdentifier]]s.
+     * Determines if the given day is on the schedule and the time specified on
+     * the day matches one of the times on the schedule.
      *
-     * @param returnDays When `true` [[Day]] instances are returned, otherwise
-     *    [[Day.dayIdentifier]]s are returned.
-     * @return THe array of excluded days or an empty array if none are excluded.
+     * @param day The day to test.
+     * @returns `true` if the day and time match the schedule, otherwise false.
      */
-    Schedule.prototype.getExclusions = function (returnDays) {
-        if (returnDays === void 0) { returnDays = true; }
-        var exclusions = [];
-        for (var dayIdentifierKey in this.exclude) {
-            var dayIdentifier = parseInt(dayIdentifierKey);
-            exclusions.push(returnDays ? Day_Day.fromDayIdentifier(dayIdentifier) : dayIdentifier);
-        }
-        return exclusions;
+    Schedule.prototype.matchesTime = function (day) {
+        return !!this.iterateSpans(day, true).first(function (span) { return span.start.sameMinute(day); });
+    };
+    /**
+     * Determines if the given day is covered by this schedule. A schedule can
+     * specify events that span multiple days - so even though the day does not
+     * match the starting day of a span - it can be a day that is within the
+     * schedule.
+     *
+     * @param day The day to test.
+     * @returns `true` if the day is covered by an event on this schedule,
+     *    otherwise `false`.
+     */
+    Schedule.prototype.coversDay = function (day) {
+        return !this.iterateSpans(day, true).isEmpty();
+    };
+    /**
+     * Determines if the given timestamp lies in an event occurrence on this
+     * schedule.
+     *
+     * @param day The timestamp to test against the schedule.
+     * @return `true` if the timestamp lies in an event occurrent start and end
+     *    timestamps, otherwise `false`.
+     */
+    Schedule.prototype.coversTime = function (day) {
+        return !!this.iterateSpans(day, true).first(function (span) { return span.contains(day); });
+    };
+    /**
+     * Iterates timed events that were explicitly specified on the given day.
+     * Those events could span multiple days so may be tested against another day.
+     *
+     * @param day The day to look for included timed events.
+     * @param matchAgainst The day to test against the timed event.
+     * @returns A new Iterator for all the included spans found.
+     */
+    Schedule.prototype.iterateIncludeTimes = function (day, matchAgainst) {
+        var _this = this;
+        if (matchAgainst === void 0) { matchAgainst = day; }
+        var isIncludedTime = function (result) {
+            var id = result[0], included = result[1];
+            return included && Identifier_Identifier.Time.is(id);
+        };
+        var getSpan = function (result) {
+            var id = result[0];
+            var time = Identifier_Identifier.Time.start(id);
+            var span = _this.getTimeSpan(time, time.asTime());
+            if (span.matchesDay(matchAgainst)) {
+                return span;
+            }
+        };
+        return this.include.query(day.dayIdentifier).map(getSpan, isIncludedTime);
     };
     /**
      * Converts the schedule instance back into input.
      *
      * @param returnDays When `true` the start, end, and array of exclusions will
-     *    have [[Day]] instances, otherwise the UNIX timestamp and dayIdentifiers
+     *    have [[Day]] instances, otherwise the UTC timestamp and dayIdentifiers
      *    will be used when `false`.
      * @param returnTimes When `true` the times returned in the input will be
      *    instances of [[Time]] otherwise the `timeFormat` is used to convert the
@@ -1349,8 +2314,11 @@ var Schedule_Schedule = (function () {
         if (timeFormat === void 0) { timeFormat = ''; }
         if (alwaysDuration === void 0) { alwaysDuration = false; }
         var defaultUnit = Constants.DURATION_DEFAULT_UNIT(this.isFullDay());
+        var exclusions = this.exclude.identifiers(function (v) { return v; });
+        var inclusions = this.include.identifiers(function (v) { return v; });
+        var cancels = this.cancel.identifiers(function (v) { return v; });
+        var hasMeta = !this.meta.isEmpty();
         var out = {};
-        var exclusions = this.getExclusions(returnDays);
         var times = [];
         for (var _i = 0, _a = this.times; _i < _a.length; _i++) {
             var time = _a[_i];
@@ -1368,6 +2336,12 @@ var Schedule_Schedule = (function () {
             out.durationUnit = this.durationUnit;
         if (exclusions.length)
             out.exclude = exclusions;
+        if (inclusions.length)
+            out.include = inclusions;
+        if (cancels.length)
+            out.cancel = cancels;
+        if (hasMeta)
+            out.meta = this.meta.map;
         if (this.dayOfWeek.input)
             out.dayOfWeek = this.dayOfWeek.input;
         if (this.dayOfMonth.input)
@@ -1416,16 +2390,22 @@ var Schedule_Schedule = (function () {
      * @param includeDuration When `true` the [[Schedule.duration]] and
      *    [[Schedule.durationUnit]] are added to the description if
      *    [[Schedule.duration]] is not equal to `1`.
-     * @param includeExcludes When `true` the [[Schedule.exclusions]] are added
+     * @param includeExcludes When `true` the [[Schedule.exclude]] are added
+     *    to the description if there are any.
+     * @param includeIncludes When `true` the [[Schedule.include]] are added
+     *    to the description if there are any.
+     * @param includeCancels When `true` the [[Schedule.cancel]] are added
      *    to the description if there are any.
      * @returns The descroption of the schedule.
      */
-    Schedule.prototype.describe = function (thing, includeRange, includeTimes, includeDuration, includeExcludes) {
+    Schedule.prototype.describe = function (thing, includeRange, includeTimes, includeDuration, includeExcludes, includeIncludes, includeCancels) {
         if (thing === void 0) { thing = 'event'; }
         if (includeRange === void 0) { includeRange = true; }
         if (includeTimes === void 0) { includeTimes = true; }
         if (includeDuration === void 0) { includeDuration = false; }
         if (includeExcludes === void 0) { includeExcludes = false; }
+        if (includeIncludes === void 0) { includeIncludes = false; }
+        if (includeCancels === void 0) { includeCancels = false; }
         var out = '';
         if (includeRange) {
             if (this.start) {
@@ -1444,12 +2424,12 @@ var Schedule_Schedule = (function () {
         else {
             out += 'The ' + thing + ' will occur';
         }
-        out += this.describeRule(this.dayOfWeek.input, 'day of the week', function (x) { return __WEBPACK_IMPORTED_MODULE_6_moment__["weekdays"]()[x]; }, 1, false);
+        out += this.describeRule(this.dayOfWeek.input, 'day of the week', function (x) { return __WEBPACK_IMPORTED_MODULE_9_moment__["weekdays"]()[x]; }, 1, false);
         out += this.describeRule(this.lastDayOfMonth.input, 'last day of the month', function (x) { return Suffix.CACHE[x]; });
         out += this.describeRule(this.dayOfMonth.input, 'day of the month', function (x) { return Suffix.CACHE[x]; });
         out += this.describeRule(this.dayOfYear.input, 'day of the year', function (x) { return Suffix.CACHE[x]; }, 1);
         out += this.describeRule(this.year.input, 'year', function (x) { return x; }, 0, false, ' in ');
-        out += this.describeRule(this.month.input, 'month', function (x) { return __WEBPACK_IMPORTED_MODULE_6_moment__["months"]()[x]; }, 0, false, ' in ');
+        out += this.describeRule(this.month.input, 'month', function (x) { return __WEBPACK_IMPORTED_MODULE_9_moment__["months"]()[x]; }, 0, false, ' in ');
         out += this.describeRule(this.weekOfYear.input, 'week of the year', function (x) { return Suffix.CACHE[x]; });
         out += this.describeRule(this.weekspanOfYear.input, 'weekspan of the year', function (x) { return Suffix.CACHE[x + 1]; }, 1);
         out += this.describeRule(this.fullWeekOfYear.input, 'full week of the year', function (x) { return Suffix.CACHE[x]; });
@@ -1471,10 +2451,24 @@ var Schedule_Schedule = (function () {
             }
         }
         if (includeExcludes) {
-            var excludes = this.getExclusions(true);
+            var excludes = this.exclude.spans();
             if (excludes.length) {
                 out += ' excluding ';
-                out += this.describeArray(excludes, function (x) { return x.format('MM/DD/YYYY'); });
+                out += this.describeArray(excludes, function (x) { return x.span.summary(Units.DAY); });
+            }
+        }
+        if (includeIncludes) {
+            var includes = this.include.spans();
+            if (includes.length) {
+                out += ' including ';
+                out += this.describeArray(includes, function (x) { return x.span.summary(Units.DAY); });
+            }
+        }
+        if (includeCancels) {
+            var cancels = this.cancel.spans();
+            if (cancels.length) {
+                out += ' with cancellations on ';
+                out += this.describeArray(cancels, function (x) { return x.span.summary(Units.DAY); });
             }
         }
         return out;
@@ -1542,6 +2536,34 @@ var Schedule_Schedule = (function () {
         return out;
     };
     return Schedule;
+}());
+
+
+// CONCATENATED MODULE: ./src/Event.ts
+
+/**
+ * A pairing of a user specified event object and the schedule which defines
+ * when it occurs on a calendar.
+ *
+ * @typeparam T The type of data stored in the [[Event]] class.
+ * @typeparam M The type of metadata stored in the schedule.
+ */
+var Event = (function () {
+    /**
+     * Creates a new event.
+     *
+     * @param schedule The schedule which defines when the event occurs.
+     * @param data User specified object which describes this event.
+     * @param id User specified ID which identifies this event.
+     */
+    function Event(schedule, data, id, visible) {
+        if (visible === void 0) { visible = true; }
+        this.schedule = schedule;
+        this.data = data;
+        this.id = id;
+        this.visible = visible;
+    }
+    return Event;
 }());
 
 
@@ -1785,6 +2807,8 @@ var Time_Time = (function () {
 
 
 
+
+
 /**
  * The class which takes user input and parses it to specific structures.
  */
@@ -1795,6 +2819,7 @@ var Parse_Parse = (function () {
      * Parses a value and converts it to a [[FrequencyCheck]].
      *
      * @param input The input to parse into a function.
+     * @param property The [[Day]] property the frequency is for.
      * @returns A function which determines whether a value matches a frequency.
      * @see [[Schedule]]
      */
@@ -1829,7 +2854,7 @@ var Parse_Parse = (function () {
      * Parses [[DayInput]] into a [[Day]] instance.
      *
      * ```typescript
-     * Parse.day( 65342300 );               // unix timestamp
+     * Parse.day( 65342300 );               // UTC timestamp
      * Parse.day( '01/02/2014' );           // strings in many formats
      * Parse.day( day );                    // return a passed instance
      * Parse.day( [2018, 0, 2] );           // array: 01/02/2018
@@ -1926,31 +2951,38 @@ var Parse_Parse = (function () {
      * array value and returned object key are [[Day.dayIdentifier]].
      *
      * ```typescript
-     * Parse.exclusions( [ 20180101, 20140506 ] );            // {'20180101': true, '20140506': true}
-     * Parse.exclusions( [ 20180101, Day.build(2014,4,6) ] ); // {'20180101': true, '20140506': true}
+     * Parse.modifier( [ 20180101, 20140506 ] );            // {'20180101': true, '20140506': true}
+     * Parse.modifier( [ 20180101, Day.build(2014,4,6) ] ); // {'20180101': true, '20140506': true}
      * ```
      *
      * @param input The input to parse.
      * @returns The object with identifier keys and `true` values.
      * @see [[Day.dayIdentifier]]
      */
-    Parse.exclusions = function (input) {
-        var exclusions = {};
+    Parse.modifier = function (input, value, out) {
+        if (out === void 0) { out = new ScheduleModifier_ScheduleModifier(); }
+        var map = {};
         if (Functions.isArray(input)) {
             for (var _i = 0, input_2 = input; _i < input_2.length; _i++) {
-                var dayIdentifier = input_2[_i];
-                if (Functions.isNumber(dayIdentifier)) {
-                    exclusions[dayIdentifier] = true;
+                var identifier = input_2[_i];
+                if (identifier instanceof Day_Day) {
+                    map[identifier.dayIdentifier] = value;
                 }
-                else {
-                    var day = this.day(dayIdentifier);
-                    if (day) {
-                        exclusions[day.dayIdentifier] = true;
-                    }
+                else if (Functions.isNumber(identifier)) {
+                    map[identifier] = value;
+                }
+                else if (Functions.isString(identifier)) {
+                    map[identifier] = value;
                 }
             }
         }
-        return exclusions;
+        if (Functions.isObject(input)) {
+            for (var identifier in input) {
+                map[identifier] = input[identifier];
+            }
+        }
+        out.map = map;
+        return out;
     };
     /**
      * Parses an object which specifies a schedule where events may or may not
@@ -1962,6 +2994,9 @@ var Parse_Parse = (function () {
      */
     Parse.schedule = function (input, out) {
         if (out === void 0) { out = new Schedule_Schedule(); }
+        if (input instanceof Schedule_Schedule) {
+            return input;
+        }
         var on = this.day(input.on);
         var times = this.times(input.times);
         var fullDay = times.length === 0;
@@ -1977,7 +3012,10 @@ var Parse_Parse = (function () {
         out.durationUnit = Functions.coalesce(input.durationUnit, Constants.DURATION_DEFAULT_UNIT(fullDay));
         out.start = this.day(input.start);
         out.end = this.day(input.end);
-        out.exclude = this.exclusions(input.exclude);
+        out.exclude = this.modifier(input.exclude, true, out.exclude);
+        out.include = this.modifier(input.include, true, out.include);
+        out.cancel = this.modifier(input.cancel, true, out.cancel);
+        out.meta = this.modifier(input.meta, null, out.meta);
         out.year = this.frequency(input.year, 'year');
         out.month = this.frequency(input.month, 'month');
         out.week = this.frequency(input.week, 'week');
@@ -2017,19 +3055,20 @@ var Parse_Parse = (function () {
         return out;
     };
     /**
-     * Parses [[CalendarScheduleInput]] and returns a [[CalendarSchedule]].
+     * Parses [[EventInput]] and returns an [[Event]].
      *
      * @param input The input to parse.
      * @returns The parsed value.
      */
-    Parse.calendarSchedule = function (input) {
-        if (input.schedule instanceof Schedule_Schedule) {
+    Parse.event = function (input) {
+        if (input instanceof Event) {
             return input;
         }
-        return {
-            schedule: this.schedule(input.schedule),
-            event: input.event
-        };
+        if (!input.schedule) {
+            return null;
+        }
+        var schedule = this.schedule(input.schedule);
+        return new Event(schedule, input.data, input.id, input.visible);
     };
     /**
      * Parses a schedule from a CRON pattern. TODO
@@ -2043,8 +3082,9 @@ var Parse_Parse = (function () {
 
 
 // CONCATENATED MODULE: ./src/Day.ts
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_moment__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_moment__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_moment__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_moment__);
+
 
 
 
@@ -2053,7 +3093,7 @@ var Parse_Parse = (function () {
 // @ts-ignore
 
 /**
- *
+ * A class which represents a point in time as
  */
 var Day_Day = (function () {
     /**
@@ -2061,7 +3101,7 @@ var Day_Day = (function () {
      */
     function Day(date) {
         this.date = date;
-        this.time = date.unix();
+        this.time = date.valueOf();
         this.millis = date.millisecond();
         this.seconds = date.second();
         this.minute = date.minute();
@@ -2084,10 +3124,11 @@ var Day_Day = (function () {
         this.fullWeekOfMonth = Day.getFullWeekOfMonth(date);
         this.lastWeekspanOfMonth = Day.getLastWeekspanOfMonth(date);
         this.lastFullWeekOfMonth = Day.getLastFullWeekOfMonth(date);
-        this.dayIdentifier = Day.getDayIdentifier(date);
-        this.weekIdentifier = Day.getWeekIdentifier(date);
-        this.monthIdentifier = Day.getMonthIdentifier(date);
-        this.quarterIdentifier = Day.getQuarterIdentifier(date);
+        this.timeIdentifier = Identifier_Identifier.Time.get(this);
+        this.dayIdentifier = Identifier_Identifier.Day.get(this);
+        this.weekIdentifier = Identifier_Identifier.Week.get(this);
+        this.monthIdentifier = Identifier_Identifier.Month.get(this);
+        this.quarterIdentifier = Identifier_Identifier.Quarter.get(this);
     }
     // Same
     /**
@@ -2130,7 +3171,7 @@ var Day_Day = (function () {
      *
      */
     Day.prototype.sameMinute = function (day) {
-        return this.dayIdentifier === day.dayIdentifier && this.hour === day.hour && this.minute === day.minute;
+        return this.timeIdentifier === day.timeIdentifier;
     };
     /**
      *
@@ -2484,7 +3525,7 @@ var Day_Day = (function () {
     };
     // Instances
     Day.now = function () {
-        return new Day(__WEBPACK_IMPORTED_MODULE_4_moment__());
+        return new Day(__WEBPACK_IMPORTED_MODULE_5_moment__());
     };
     Day.today = function () {
         return this.now().start();
@@ -2496,25 +3537,28 @@ var Day_Day = (function () {
         return moment && moment.isValid() ? new Day(moment) : null;
     };
     Day.unix = function (millis) {
-        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_4_moment__(millis));
+        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_5_moment__(millis));
+    };
+    Day.unixSeconds = function (millis) {
+        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_5_moment__["unix"](millis));
     };
     Day.parse = function (input) {
         return Parse_Parse.day(input);
     };
     Day.fromString = function (input) {
-        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_4_moment__(input));
+        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_5_moment__(input));
     };
     Day.fromFormat = function (input, formats) {
-        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_4_moment__(input, formats));
+        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_5_moment__(input, formats));
     };
     Day.fromObject = function (input) {
-        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_4_moment__(input));
+        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_5_moment__(input));
     };
     Day.fromDate = function (input) {
-        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_4_moment__(input));
+        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_5_moment__(input));
     };
     Day.fromArray = function (input) {
-        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_4_moment__(input));
+        return this.fromMoment(__WEBPACK_IMPORTED_MODULE_5_moment__(input));
     };
     Day.fromDayIdentifier = function (id) {
         var date = id % 100;
@@ -2528,7 +3572,7 @@ var Day_Day = (function () {
         if (minute === void 0) { minute = Constants.MINUTE_MIN; }
         if (second === void 0) { second = Constants.SECOND_MIN; }
         if (millisecond === void 0) { millisecond = Constants.MILLIS_MIN; }
-        return new Day(__WEBPACK_IMPORTED_MODULE_4_moment__({ year: year, month: month, date: date, hour: hour, minute: minute, second: second, millisecond: millisecond }));
+        return new Day(__WEBPACK_IMPORTED_MODULE_5_moment__({ year: year, month: month, date: date, hour: hour, minute: minute, second: second, millisecond: millisecond }));
     };
     Day.getWeekspanOfYear = function (date) {
         return Math.floor((date.dayOfYear() - 1) / Constants.DAYS_IN_WEEK);
@@ -2576,29 +3620,13 @@ var Day_Day = (function () {
     Day.getLastDayOfMonth = function (date) {
         return date.daysInMonth() - date.date() + 1;
     };
-    Day.getWeekIdentifier = function (date) {
-        return date.week() + date.year() * 100;
-    };
-    Day.getMonthIdentifier = function (date) {
-        return (date.month() + 1) + date.year() * 100;
-    };
-    Day.getDayIdentifier = function (date) {
-        return date.date() + (date.month() + 1) * 100 + date.year() * 10000;
-    };
-    Day.getQuarterIdentifier = function (date) {
-        return date.quarter() + date.year() * 10;
-    };
-    /**
-     *
-     */
-    Day.LOAD_TIME = Day.now();
     return Day;
 }());
 
 
 // CONCATENATED MODULE: ./src/CalendarDay.ts
 
-var __extends = (this && this.__extends) || (function () {
+var CalendarDay___extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
         function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
@@ -2613,9 +3641,12 @@ var __extends = (this && this.__extends) || (function () {
 /**
  * A day in a [[Calendar]] with extra information relative to any selection on
  * the calendar, the current date, or events on the day.
+ *
+ * @typeparam T The type of data stored in the [[Event]] class.
+ * @typeparam M The type of metadata stored in the schedule.
  */
 var CalendarDay_CalendarDay = (function (_super) {
-    __extends(CalendarDay, _super);
+    CalendarDay___extends(CalendarDay, _super);
     function CalendarDay() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         /**
@@ -2711,8 +3742,12 @@ var CalendarDay_CalendarDay = (function (_super) {
 // CONCATENATED MODULE: ./src/CalendarEvent.ts
 
 
+
 /**
  * An event on a given day and the schedule that generated the event.
+ *
+ * @typeparam T The type of data stored in the [[Event]] class.
+ * @typeparam M The type of metadata stored in the schedule and in this class.
  */
 var CalendarEvent_CalendarEvent = (function () {
     /**
@@ -2721,12 +3756,11 @@ var CalendarEvent_CalendarEvent = (function () {
      * calendar the event belongs to.
      *
      * @param id The relatively unique identifier of this event.
-     * @param event The event paired with the schedule.
-     * @param schedule The schedule that generated this event.
+     * @param event The event which created this instance.
      * @param time The time span of this event.
      * @param actualDay The day on the calendar this event is for.
      */
-    function CalendarEvent(id, event, schedule, time, actualDay) {
+    function CalendarEvent(id, event, time, actualDay) {
         /**
          * The row this event is on in a visual calendar. An event can span multiple
          * days and it is desirable to have the occurrence on each day to line up.
@@ -2745,9 +3779,11 @@ var CalendarEvent_CalendarEvent = (function () {
         this.col = 0;
         this.id = id;
         this.event = event;
-        this.schedule = schedule;
         this.time = time;
-        this.fullDay = schedule.isFullDay();
+        this.day = actualDay;
+        this.fullDay = event.schedule.isFullDay();
+        this.meta = event.schedule.getMeta(time.start);
+        this.cancelled = event.schedule.isCancelled(time.start);
         this.starting = time.isPoint || time.start.sameDay(actualDay);
         this.ending = time.isPoint || time.end.relative(-1).sameDay(actualDay);
     }
@@ -2761,6 +3797,177 @@ var CalendarEvent_CalendarEvent = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(CalendarEvent.prototype, "start", {
+        /**
+         * The start timestamp of the event.
+         */
+        get: function () {
+            return this.time.start;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CalendarEvent.prototype, "end", {
+        /**
+         * The end timestamp of the event.
+         */
+        get: function () {
+            return this.time.end;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CalendarEvent.prototype, "schedule", {
+        /**
+         * The schedule which generated this event.
+         */
+        get: function () {
+            return this.event.schedule;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CalendarEvent.prototype, "data", {
+        /**
+         * The related event data.
+         */
+        get: function () {
+            return this.event.data;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CalendarEvent.prototype, "identifier", {
+        /**
+         * An [[IdentifierInput]] for the start of this event.
+         */
+        get: function () {
+            return this.identifierType.get(this.start);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CalendarEvent.prototype, "identifierType", {
+        /**
+         * The [[Identifier]] for this event. Either [[Identifier.Day]] or
+         * [[Identifier.Time]].
+         */
+        get: function () {
+            return this.fullDay ? Identifier_Identifier.Day : Identifier_Identifier.Time;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CalendarEvent.prototype, "startDelta", {
+        /**
+         * Returns a delta value between 0 and 1 which represents where the
+         * [[Calendar.start]] is relative to [[Calendar.day]]. The delta value would
+         * be less than 0 if the start of the event is before [[Calendar.day]].
+         */
+        get: function () {
+            return (this.start.time - this.day.time) / Constants.MILLIS_IN_DAY;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CalendarEvent.prototype, "endDelta", {
+        /**
+         * Returns a delta value between 0 and 1 which represents where the
+         * [[Calendar.end]] is relative to [[Calendar.day]]. The delta value would
+         * be greater than 1 if the end of the event is after [[Calendar.day]].
+         */
+        get: function () {
+            return (this.end.time - this.day.time) / Constants.MILLIS_IN_DAY;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /**
+     * Calculates the bounds for this event if it were placed in a rectangle which
+     * represents a day (24 hour period). By default the returned values are
+     * between 0 and 1 and can be scaled by the proper rectangle dimensions or the
+     * rectangle dimensions can be passed to this function.
+     *
+     * @param dayHeight The height of the rectangle of the day.
+     * @param dayWidth The width of the rectangle of the day.
+     * @param columnOffset The offset in the rectangle of the day to adjust this
+     *    event by if it intersects or is contained in a previous event. This also
+     *    reduces the width of the returned bounds to keep the bounds in the
+     *    rectangle of the day.
+     * @param clip `true` if the bounds should stay in the day rectangle, `false`
+     *    and the bounds may go outside the rectangle of the day for multi-day
+     *    events.
+     * @param offsetX How much to translate the left & right properties by.
+     * @param offsetY How much to translate the top & bottom properties by.
+     * @returns The calculated bounds for this event.
+     */
+    CalendarEvent.prototype.getTimeBounds = function (dayHeight, dayWidth, columnOffset, clip, offsetX, offsetY) {
+        if (dayHeight === void 0) { dayHeight = 1; }
+        if (dayWidth === void 0) { dayWidth = 1; }
+        if (columnOffset === void 0) { columnOffset = 0.1; }
+        if (clip === void 0) { clip = true; }
+        if (offsetX === void 0) { offsetX = 0; }
+        if (offsetY === void 0) { offsetY = 0; }
+        var startRaw = this.startDelta;
+        var endRaw = this.endDelta;
+        var start = clip ? Math.max(0, startRaw) : startRaw;
+        var end = clip ? Math.min(1, endRaw) : endRaw;
+        var left = this.col * columnOffset;
+        var right = dayWidth - left;
+        var top = start * dayHeight;
+        var bottom = end * dayHeight;
+        return {
+            top: top + offsetY,
+            bottom: bottom + offsetY,
+            height: bottom - top,
+            left: left + offsetX,
+            right: right + offsetX,
+            width: right
+        };
+    };
+    /**
+     * Changes the cancellation status of this event. By default this cancels
+     * this event - but `false` may be passed to undo a cancellation.
+     *
+     * @param cancelled Whether the event should be cancelled.
+     */
+    CalendarEvent.prototype.cancel = function (cancelled) {
+        if (cancelled === void 0) { cancelled = true; }
+        this.schedule.cancel.set(this.start, cancelled, this.identifierType);
+        this.cancelled = cancelled;
+        return this;
+    };
+    /**
+     * Changes the exclusion status of this event. By default this excludes this
+     * event - but `false`  may be passed to undo an exclusion.
+     *
+     * @param excluded Whether the event should be excluded.
+     */
+    CalendarEvent.prototype.exclude = function (excluded) {
+        if (excluded === void 0) { excluded = true; }
+        this.schedule.exclude.set(this.start, excluded, this.identifierType);
+        return this;
+    };
+    /**
+     * Moves this event to potentially another day and time. A move is
+     * accomplished by excluding the current event and adding an inclusion of the
+     * new day & time. Any [[CalendarEvent.meta]] on this event will be moved to
+     * the new event.
+     *
+     * @param toTime The timestamp to move this event to.
+     */
+    CalendarEvent.prototype.move = function (toTime) {
+        var schedule = this.schedule;
+        var type = this.identifierType;
+        var fromTime = this.start;
+        schedule.exclude.set(fromTime, true, type);
+        schedule.include.set(toTime, true, type);
+        if (this.meta !== null) {
+            schedule.meta.unset(fromTime, type);
+            schedule.meta.set(toTime, this.meta, type);
+        }
+        return this;
+    };
     return CalendarEvent;
 }());
 
@@ -2776,9 +3983,13 @@ var CalendarEvent_CalendarEvent = (function () {
 
 
 
+
 /**
- * A collection of [[CalendarDay]]s, the schedules on the calendar, and all
- * [[CalendarEvent]]s generated based on the schedules.
+ * A collection of [[CalendarDay]]s, the events on the calendar, and all
+ * [[CalendarEvent]]s generated based on the events.
+ *
+ * @typeparam T The type of data stored in the [[Event]] class.
+ * @typeparam M The type of metadata stored in the schedule.
  */
 var Calendar_Calendar = (function () {
     /**
@@ -2856,9 +4067,14 @@ var Calendar_Calendar = (function () {
          */
         this.days = [];
         /**
-         * The array of schedule and user event pairs added to the calendar.
+         * The array of scheduled events added to the calendar.
          */
-        this.schedules = [];
+        this.events = [];
+        /**
+         * The array of visible events on the calendar. This is built based on the
+         * span of the schedule in the given event and also the [[Event.visible]] flag.
+         */
+        this.visible = [];
         this.span = new DaySpan_DaySpan(start, end);
         this.filled = new DaySpan_DaySpan(start, end);
         this.type = type;
@@ -2866,19 +4082,55 @@ var Calendar_Calendar = (function () {
         this.moveStart = moveStart;
         this.moveEnd = moveEnd;
         if (Functions.isDefined(input)) {
-            this.withInput(input, false);
+            this.set(input);
         }
-        this.refresh();
+        else {
+            this.refresh();
+        }
     }
     /**
-     * Overwrites the properties in this calendar with the given input and
-     * optionally refreshes all days and their events with the new settings.
+     * Changes the calendar possibly morphing it to a different type or size if
+     * specified in the given input. If the type and size are not morphed then
+     * the following properties may be updated:
      *
-     * @param input The properties to overwrite on this calendar.
-     * @param refresh Whether the calendar should have its days and events synced.
+     * - [[Calendar.fill]]
+     * - [[Calendar.minimumSize]]
+     * - [[Calendar.repeatCovers]]
+     * - [[Calendar.listTimes]]
+     * - [[Calendar.eventsOutside]]
+     * - [[Calendar.updateRows]]
+     * - [[Calendar.updateColumns]]
+     * - [[Calendar.eventSorter]]
+     * - [[Calendar.events]]
+     *
+     * If `delayRefresh` is not given with `true` then [[Calendar.refresh]] will
+     * be called once the calendar properties have been updated.
+     *
+     * @param input The new properties for this calendar to overwrite with.
      */
-    Calendar.prototype.withInput = function (input, refresh) {
-        if (refresh === void 0) { refresh = true; }
+    Calendar.prototype.set = function (input) {
+        var typeChange = Functions.isDefined(input.type) && input.type !== this.type;
+        var sizeChange = Functions.isDefined(input.size) && input.size !== this.size;
+        if (typeChange || sizeChange) {
+            var focus_1 = Functions.coalesce(input.otherwiseFocus, 0.4999);
+            var prefer = Functions.coalesce(input.preferToday, true);
+            var size = Functions.coalesce(input.size, this.size);
+            var type = Functions.coalesce(input.type, this.type);
+            var around = Functions.coalesce(input.around, this.days[Math.floor((this.days.length - 1) * focus_1)]);
+            var today = Day_Day.today();
+            if (!around || (prefer && this.span.matchesDay(today))) {
+                around = today;
+            }
+            var meta = Calendar.TYPES[type];
+            var start = meta.getStart(Day_Day.parse(around), size, focus_1);
+            var end = meta.getEnd(start, size, focus_1);
+            this.span.start = start;
+            this.span.end = end;
+            this.type = type;
+            this.size = size;
+            this.moveStart = meta.moveStart;
+            this.moveEnd = meta.moveEnd;
+        }
         this.fill = Functions.coalesce(input.fill, this.fill);
         this.minimumSize = Functions.coalesce(input.minimumSize, this.minimumSize);
         this.repeatCovers = Functions.coalesce(input.repeatCovers, this.repeatCovers);
@@ -2887,11 +4139,11 @@ var Calendar_Calendar = (function () {
         this.updateRows = Functions.coalesce(input.updateRows, this.updateRows);
         this.updateColumns = Functions.coalesce(input.updateColumns, this.updateColumns);
         this.eventSorter = Functions.coalesce(input.eventSorter, this.eventSorter);
-        if (Functions.isArray(input.schedules)) {
-            this.removeSchedules();
-            this.addSchedules(input.schedules, false, true);
+        if (Functions.isArray(input.events)) {
+            this.removeEvents();
+            this.addEvents(input.events, false, true);
         }
-        if (refresh) {
+        if (!input.delayRefresh) {
             this.refresh();
         }
         return this;
@@ -3032,7 +4284,7 @@ var Calendar_Calendar = (function () {
     };
     /**
      * Refreshes the days and events in this calendar based on the start and end
-     * days, the calendar properties, and its schedules.
+     * days, the calendar properties, and its eventss.
      *
      * @param today The current day to update the calendar days via
      *    [[CalendarDay.updateCurrent]].
@@ -3043,6 +4295,7 @@ var Calendar_Calendar = (function () {
         this.resetDays();
         this.refreshCurrent(today);
         this.refreshSelection();
+        this.refreshVisible();
         this.refreshEvents();
         return this;
     };
@@ -3085,15 +4338,27 @@ var Calendar_Calendar = (function () {
         return this;
     };
     /**
+     * Updates the list of visible schedules.
+     */
+    Calendar.prototype.refreshVisible = function () {
+        var start = this.filled.start;
+        var end = this.filled.end;
+        this.visible = this.events.filter(function (e) {
+            return e.visible && e.schedule.matchesRange(start, end);
+        });
+        return this;
+    };
+    /**
      * Updates the days with the current day via [[CalendarDay.updateCurrent]].
      *
      * @param today The new current day.
      */
     Calendar.prototype.refreshCurrent = function (today) {
         if (today === void 0) { today = Day_Day.today(); }
-        return this.iterateDays(function (d) {
+        this.iterateDays().iterate(function (d) {
             d.updateCurrent(today);
         });
+        return this;
     };
     /**
      * Updates the selection flags in [[CalendarDay]] based on the
@@ -3101,7 +4366,7 @@ var Calendar_Calendar = (function () {
      */
     Calendar.prototype.refreshSelection = function () {
         var _this = this;
-        return this.iterateDays(function (d) {
+        this.iterateDays().iterate(function (d) {
             if (_this.selection) {
                 d.updateSelected(_this.selection);
             }
@@ -3109,9 +4374,10 @@ var Calendar_Calendar = (function () {
                 d.clearSelected();
             }
         });
+        return this;
     };
     /**
-     * Updates the [[CalendarDay.events]] based on the schedules in this calendar
+     * Updates the [[CalendarDay.events]] based on the events in this calendar
      * and the following properties:
      *
      * - [[Calendar.eventsForDay]]
@@ -3123,7 +4389,7 @@ var Calendar_Calendar = (function () {
      */
     Calendar.prototype.refreshEvents = function () {
         var _this = this;
-        this.iterateDays(function (d) {
+        this.iterateDays().iterate(function (d) {
             if (d.inCalendar || _this.eventsOutside) {
                 d.events = _this.eventsForDay(d, _this.listTimes, _this.repeatCovers);
             }
@@ -3142,7 +4408,7 @@ var Calendar_Calendar = (function () {
     Calendar.prototype.refreshRows = function () {
         var eventToRow = {};
         var onlyFullDay = this.listTimes;
-        this.iterateDays(function (d) {
+        this.iterateDays().iterate(function (d) {
             if (d.dayOfWeek === 0) {
                 eventToRow = {};
             }
@@ -3175,7 +4441,7 @@ var Calendar_Calendar = (function () {
      * Refreshes the [[CalendarEvent.col]] property as described in the link.
      */
     Calendar.prototype.refreshColumns = function () {
-        this.iterateDays(function (d) {
+        this.iterateDays().iterate(function (d) {
             var markers = [];
             for (var _i = 0, _a = d.events; _i < _a.length; _i++) {
                 var event_3 = _a[_i];
@@ -3222,16 +4488,21 @@ var Calendar_Calendar = (function () {
      *
      * @param iterator The function to pass [[CalendarDay]]s to.
      */
-    Calendar.prototype.iterateDays = function (iterator) {
-        var days = this.days;
-        for (var i = 0; i < days.length; i++) {
-            iterator(days[i]);
-        }
-        return this;
+    Calendar.prototype.iterateDays = function () {
+        var _this = this;
+        return new Iterator_Iterator(function (callback, iterator) {
+            var days = _this.days;
+            for (var i = 0; i < days.length; i++) {
+                callback(days[i], iterator);
+                if (!iterator.iterating) {
+                    break;
+                }
+            }
+        });
     };
     /**
      * Returns the events for the given day optionally looking at schedule times,
-     * optionally looking at events which cover multiple days, and optioanlly
+     * optionally looking at events which cover multiple days, and optionally
      * sorted with the given function.
      *
      * @param day The day to find events for.
@@ -3247,28 +4518,21 @@ var Calendar_Calendar = (function () {
         if (covers === void 0) { covers = true; }
         if (sorter === void 0) { sorter = this.eventSorter; }
         var events = [];
-        var entries = this.schedules;
-        for (var entryIndex = 0; entryIndex < entries.length; entryIndex++) {
+        var entries = this.visible;
+        var _loop_1 = function (entryIndex) {
             var entry = entries[entryIndex];
             var schedule = entry.schedule;
-            var event_4 = entry.event;
             var eventId = entryIndex * Constants.MAX_EVENTS_PER_DAY;
-            if ((covers && schedule.coversDay(day)) || (!covers && schedule.matchesDay(day))) {
-                if (getTimes) {
-                    var times = covers ?
-                        entry.schedule.getSpansOver(day) :
-                        entry.schedule.getSpansOn(day);
-                    for (var timeIndex = 0; timeIndex < times.length; timeIndex++) {
-                        events.push(new CalendarEvent_CalendarEvent(eventId + timeIndex, event_4, schedule, times[timeIndex], day));
-                    }
+            var timeIndex = 0;
+            schedule.iterateSpans(day, covers).iterate(function (span, iterator) {
+                events.push(new CalendarEvent_CalendarEvent(eventId + timeIndex++, entry, span, day));
+                if (!getTimes) {
+                    iterator.stop();
                 }
-                else {
-                    var over = schedule.getSpanOver(day);
-                    if (over) {
-                        events.push(new CalendarEvent_CalendarEvent(eventId, event_4, schedule, over, day));
-                    }
-                }
-            }
+            });
+        };
+        for (var entryIndex = 0; entryIndex < entries.length; entryIndex++) {
+            _loop_1(entryIndex);
         }
         if (sorter) {
             events.sort(sorter);
@@ -3276,61 +4540,63 @@ var Calendar_Calendar = (function () {
         return events;
     };
     /**
-     * Finds the schedule & event pair given one of the ways to identify the pair.
+     * Finds the event given one of the ways to identify the event.
      *
-     * @param input The value to use to search for a pair.
-     * @returns The refrence to the pair or null if not found.
+     * @param input The value to use to search for an event.
+     * @returns The refrence to the event or null if not found.
      */
-    Calendar.prototype.findSchedule = function (input) {
-        for (var _i = 0, _a = this.schedules; _i < _a.length; _i++) {
-            var schedule = _a[_i];
-            if (schedule === input || schedule.schedule === input || schedule.event === input) {
-                return schedule;
+    Calendar.prototype.findEvent = function (id) {
+        for (var _i = 0, _a = this.events; _i < _a.length; _i++) {
+            var event_4 = _a[_i];
+            if (event_4 === id || event_4.schedule === id || event_4.data === id || event_4.id === id) {
+                return event_4;
             }
         }
         return null;
     };
     /**
-     * Removes the list of schedules if they exist in the calendar.
+     * Removes the list of events if they exist in the calendar.
      *
-     * @param schedules The array of schedules to remove if they exist. If no
-     *    schedules are passed (via `null`) then all schedules will be removed
+     * @param events The array of events to remove if they exist. If no
+     *    events are passed (via `null`) then all events will be removed
      *    from the calendar.
      * @param delayRefresh When `true` the [[Calendar.refreshEvents]] will not be
-     *    called after the schedules are removed.
-     * @see [[Calendar.removeSchedule]]
+     *    called after the events are removed.
+     * @see [[Calendar.removeEvent]]
      * @see [[Calendar.refreshEvents]]
      */
-    Calendar.prototype.removeSchedules = function (schedules, delayRefresh) {
-        if (schedules === void 0) { schedules = null; }
+    Calendar.prototype.removeEvents = function (events, delayRefresh) {
+        if (events === void 0) { events = null; }
         if (delayRefresh === void 0) { delayRefresh = false; }
-        if (schedules) {
-            for (var _i = 0, schedules_1 = schedules; _i < schedules_1.length; _i++) {
-                var schedule = schedules_1[_i];
-                this.removeSchedule(schedule, true);
+        if (events) {
+            for (var _i = 0, events_1 = events; _i < events_1.length; _i++) {
+                var event_5 = events_1[_i];
+                this.removeEvent(event_5, true);
             }
         }
         else {
-            this.schedules = [];
+            this.events = [];
         }
+        this.refreshVisible();
         if (!delayRefresh) {
             this.refreshEvents();
         }
         return this;
     };
     /**
-     * Removes the given schedule if it exists on the calendar.
+     * Removes the given event if it exists on the calendar.
      *
-     * @param schedule The schedule to remove if it exists.
+     * @param event The event to remove if it exists.
      * @param delayRefresh When `true` the [[Calendar.refreshEvents]] will not be
-     *    called after the schedules are removed.
+     *    called after the event is removed.
      * @see [[Calendar.refreshEvents]]
      */
-    Calendar.prototype.removeSchedule = function (schedule, delayRefresh) {
+    Calendar.prototype.removeEvent = function (event, delayRefresh) {
         if (delayRefresh === void 0) { delayRefresh = false; }
-        var found = this.findSchedule(schedule);
+        var found = this.findEvent(event);
         if (found) {
-            this.schedules.splice(this.schedules.indexOf(found), 1);
+            this.events.splice(this.events.indexOf(found), 1);
+            this.refreshVisible();
             if (!delayRefresh) {
                 this.refreshEvents();
             }
@@ -3338,47 +4604,48 @@ var Calendar_Calendar = (function () {
         return this;
     };
     /**
-     * Adds the given schedule to this calendar if it doesn't exist already (or
+     * Adds the given event to this calendar if it doesn't exist already (or
      * `allowDuplicates` is `true`).
      *
-     * @param schedule The schedule & event pair to add to the calendar.
-     * @param allowDuplicates If a schedule & event pair can be added more than once.
+     * @param event The event to add to the calendar.
+     * @param allowDuplicates If an event can be added more than once.
      * @param delayRefresh When `true` the [[Calendar.refreshEvents]] will not be
-     *    called after the schedule is added.
+     *    called after the event is added.
      * @see [[Calendar.refreshEvents]]
      */
-    Calendar.prototype.addSchedule = function (schedule, allowDuplicates, delayRefresh) {
+    Calendar.prototype.addEvent = function (event, allowDuplicates, delayRefresh) {
         if (allowDuplicates === void 0) { allowDuplicates = false; }
         if (delayRefresh === void 0) { delayRefresh = false; }
-        var parsed = Parse_Parse.calendarSchedule(schedule);
+        var parsed = Parse_Parse.event(event);
         if (!allowDuplicates) {
-            var existing = this.findSchedule(parsed);
+            var existing = this.findEvent(parsed);
             if (existing) {
                 return this;
             }
         }
-        this.schedules.push(parsed);
+        this.events.push(parsed);
+        this.refreshVisible();
         if (!delayRefresh) {
             this.refreshEvents();
         }
         return this;
     };
     /**
-     * Adds the given schedules to this calendar if they don't exist already (or
+     * Adds the given events to this calendar if they don't exist already (or
      * `allowDuplicates` is `true`).
      *
-     * @param schedules The schedule & event pairs to add to the calendar.
-     * @param allowDuplicates If a schedule & event pair can be added more than once.
+     * @param events The events to add to the calendar.
+     * @param allowDuplicates If an event can be added more than once.
      * @param delayRefresh When `true` the [[Calendar.refreshEvents]] will not be
-     *    called after the schedules are added.
+     *    called after the events are added.
      * @see [[Calendar.refreshEvents]]
      */
-    Calendar.prototype.addSchedules = function (schedules, allowDuplicates, delayRefresh) {
+    Calendar.prototype.addEvents = function (events, allowDuplicates, delayRefresh) {
         if (allowDuplicates === void 0) { allowDuplicates = false; }
         if (delayRefresh === void 0) { delayRefresh = false; }
-        for (var _i = 0, schedules_2 = schedules; _i < schedules_2.length; _i++) {
-            var schedule = schedules_2[_i];
-            this.addSchedule(schedule, allowDuplicates, true);
+        for (var _i = 0, events_2 = events; _i < events_2.length; _i++) {
+            var event_6 = events_2[_i];
+            this.addEvent(event_6, allowDuplicates, true);
         }
         if (!delayRefresh) {
             this.refreshEvents();
@@ -3451,6 +4718,96 @@ var Calendar_Calendar = (function () {
         return this.move(-jump, delayRefresh);
     };
     /**
+     * Converts this calendar to input which can be used to later recreate this
+     * calendar. The only properties of the calendar which will be loss is the
+     * [[Calendar.eventSorter]] property because it is a function.
+     *
+     * @param plain If the returned input should be plain objects as opposed
+     *    to [[Day]] and [[Event]] instances.
+     * @param plainData A function to convert [[Event.data]] to a plain object if
+     *    it is not already.
+     * @param plainMeta A function to convert values in [[Schedule.meta]] to plain
+     *    objects if they are not alreday.
+     * @returns The input generated from this calendar.
+     */
+    Calendar.prototype.toInput = function (plain, plainData, plainMeta) {
+        if (plain === void 0) { plain = false; }
+        if (plainData === void 0) { plainData = function (d) { return d; }; }
+        if (plainMeta === void 0) { plainMeta = function (m) { return m; }; }
+        var out = {};
+        out.type = this.type;
+        out.size = this.size;
+        out.fill = this.fill;
+        out.minimumSize = this.minimumSize;
+        out.repeatCovers = this.repeatCovers;
+        out.listTimes = this.listTimes;
+        out.eventsOutside = this.eventsOutside;
+        out.updateRows = this.updateRows;
+        out.updateColumns = this.updateColumns;
+        out.around = plain ? this.span.start.dayIdentifier : this.span.start;
+        out.events = [];
+        for (var _i = 0, _a = this.events; _i < _a.length; _i++) {
+            var event_7 = _a[_i];
+            if (plain) {
+                var plainEvent = {};
+                if (Functions.isDefined(event_7.id)) {
+                    plainEvent.id = event_7.id;
+                }
+                if (Functions.isDefined(event_7.data)) {
+                    plainEvent.data = plainData(event_7.data);
+                }
+                if (!event_7.visible) {
+                    plainEvent.visible = event_7.visible;
+                }
+                plainEvent.schedule = event_7.schedule.toInput();
+                var meta = plainEvent.schedule.meta;
+                if (meta) {
+                    for (var identifier in meta) {
+                        meta[identifier] = plainMeta(meta[identifier]);
+                    }
+                }
+                out.events.push(plainEvent);
+            }
+            else {
+                out.events.push(event_7);
+            }
+        }
+        return out;
+    };
+    /**
+     * Creates a calendar based on the given input.
+     *
+     * @param input The input which has at least the `type` specified.
+     * @returns A new calendar instance.
+     */
+    Calendar.fromInput = function (input) {
+        var initial = Day_Day.today();
+        return new Calendar(initial, initial, null, 1, null, null, input);
+    };
+    /**
+     * Creates a calendar based around a given unit optionally focused around a
+     * given day.
+     *
+     * @param type The unit of the calendar.
+     * @param days The number of units in the calendar.
+     * @param around The day to focus the calendar on.
+     * @param focus The value which describes how months are added around the given
+     *    day. The default value will center the calendar around the given day.
+     *    When the value is `0` the given day is the first day in the calendar,
+     *    and when the value is `1` the given day is the last day in the calendar.
+     * @param input The default properties for the calendar.
+     * @returns A new calendar instance.
+     */
+    Calendar.forType = function (type, size, around, focus, input) {
+        if (size === void 0) { size = 1; }
+        if (around === void 0) { around = Day_Day.today(); }
+        if (focus === void 0) { focus = 0.49999; }
+        var meta = this.TYPES[type];
+        var start = meta.getStart(around, size, focus);
+        var end = meta.getEnd(start, size, focus);
+        return new Calendar(start, end, type, size, meta.moveStart, meta.moveEnd, input || meta.defaultInput);
+    };
+    /**
      * Creates a calendar based around days optionally focused around a given day.
      *
      * @param days The number of days in the calendar.
@@ -3461,15 +4818,13 @@ var Calendar_Calendar = (function () {
      *    and when the value is `1` the given day is the last day in the calendar.
      * @param input The default properties for the calendar.
      * @returns A new calendar instance.
+     * @see [[Calendar.forType]]
      */
     Calendar.days = function (days, around, focus, input) {
         if (days === void 0) { days = 1; }
         if (around === void 0) { around = Day_Day.today(); }
         if (focus === void 0) { focus = 0.4999; }
-        var start = around.start().relativeDays(-Math.floor(days * focus));
-        var end = start.relativeDays(days - 1).end();
-        var mover = function (day, amount) { return day.relativeDays(amount); };
-        return new Calendar(start, end, Units.DAY, days, mover, mover, input);
+        return this.forType(Units.DAY, days, around, focus, input);
     };
     /**
      * Creates a calendar based around weeks optionally focused around a given day.
@@ -3482,15 +4837,13 @@ var Calendar_Calendar = (function () {
      *    and when the value is `1` the given day is the last day in the calendar.
      * @param input The default properties for the calendar.
      * @returns A new calendar instance.
+     * @see [[Calendar.forType]]
      */
     Calendar.weeks = function (weeks, around, focus, input) {
         if (weeks === void 0) { weeks = 1; }
         if (around === void 0) { around = Day_Day.today(); }
         if (focus === void 0) { focus = 0.4999; }
-        var start = around.start().startOfWeek().relativeWeeks(-Math.floor(weeks * focus));
-        var end = start.relativeWeeks(weeks - 1).endOfWeek();
-        var mover = function (day, amount) { return day.relativeWeeks(amount); };
-        return new Calendar(start, end, Units.WEEK, weeks, mover, mover, input);
+        return this.forType(Units.WEEK, weeks, around, focus, input);
     };
     /**
      * Creates a calendar based around months optionally focused around a given day.
@@ -3503,17 +4856,13 @@ var Calendar_Calendar = (function () {
      *    and when the value is `1` the given day is the last day in the calendar.
      * @param input The default properties for the calendar.
      * @returns A new calendar instance.
+     * @see [[Calendar.forType]]
      */
     Calendar.months = function (months, around, focus, input) {
         if (months === void 0) { months = 1; }
         if (around === void 0) { around = Day_Day.today(); }
         if (focus === void 0) { focus = 0.4999; }
-        if (input === void 0) { input = { fill: true }; }
-        var start = around.start().startOfMonth().relativeMonths(-Math.floor(months * focus));
-        var end = start.relativeMonths(months - 1).endOfMonth();
-        var moveStart = function (day, amount) { return day.relativeMonths(amount); };
-        var moveEnd = function (day, amount) { return day.startOfMonth().relativeMonths(amount).endOfMonth(); };
-        return new Calendar(start, end, Units.MONTH, months, moveStart, moveEnd, input);
+        return this.forType(Units.MONTH, months, around, focus, input);
     };
     /**
      * Creates a calendar based around years optionally focused around a given day.
@@ -3526,20 +4875,84 @@ var Calendar_Calendar = (function () {
      *    and when the value is `1` the given day is the last day in the calendar.
      * @param input The default properties for the calendar.
      * @returns A new calendar instance.
+     * @see [[Calendar.forType]]
      */
     Calendar.years = function (years, around, focus, input) {
         if (years === void 0) { years = 1; }
         if (around === void 0) { around = Day_Day.today(); }
         if (focus === void 0) { focus = 0.4999; }
-        if (input === void 0) { input = { fill: true }; }
-        var start = around.start().startOfYear().relativeYears(-Math.floor(years * focus));
-        var end = start.relativeYears(years - 1).endOfYear();
-        var mover = function (day, amount) { return day.relativeYears(amount); };
-        return new Calendar(start, end, Units.YEAR, years, mover, mover, input);
+        return this.forType(Units.YEAR, years, around, focus, input);
     };
+    /**
+     * A map of functions and properties by [[Units]] used to create or morph
+     * Calendars.
+     */
+    Calendar.TYPES = (Calendar__a = {},
+        Calendar__a[Units.DAY] = {
+            getStart: function (around, size, focus) {
+                return around.start().relativeDays(-Math.floor(size * focus));
+            },
+            getEnd: function (start, size, focus) {
+                return start.relativeDays(size - 1).end();
+            },
+            moveStart: function (day, amount) {
+                return day.relativeDays(amount);
+            },
+            moveEnd: function (day, amount) {
+                return day.relativeDays(amount);
+            },
+            defaultInput: undefined
+        },
+        Calendar__a[Units.WEEK] = {
+            getStart: function (around, size, focus) {
+                return around.start().startOfWeek().relativeWeeks(-Math.floor(size * focus));
+            },
+            getEnd: function (start, size, focus) {
+                return start.relativeWeeks(size - 1).endOfWeek();
+            },
+            moveStart: function (day, amount) {
+                return day.relativeWeeks(amount);
+            },
+            moveEnd: function (day, amount) {
+                return day.relativeWeeks(amount);
+            },
+            defaultInput: undefined
+        },
+        Calendar__a[Units.MONTH] = {
+            getStart: function (around, size, focus) {
+                return around.start().startOfMonth().relativeMonths(-Math.floor(size * focus));
+            },
+            getEnd: function (start, size, focus) {
+                return start.relativeMonths(size - 1).endOfMonth();
+            },
+            moveStart: function (day, amount) {
+                return day.relativeMonths(amount);
+            },
+            moveEnd: function (day, amount) {
+                return day.startOfMonth().relativeMonths(amount).endOfMonth();
+            },
+            defaultInput: { fill: true }
+        },
+        Calendar__a[Units.YEAR] = {
+            getStart: function (around, size, focus) {
+                return around.start().startOfYear().relativeYears(-Math.floor(size * focus));
+            },
+            getEnd: function (start, size, focus) {
+                return start.relativeYears(size - 1).endOfYear();
+            },
+            moveStart: function (day, amount) {
+                return day.relativeYears(amount);
+            },
+            moveEnd: function (day, amount) {
+                return day.relativeYears(amount);
+            },
+            defaultInput: { fill: true }
+        },
+        Calendar__a);
     return Calendar;
 }());
 
+var Calendar__a;
 
 // CONCATENATED MODULE: ./src/Month.ts
 
@@ -4000,10 +5413,13 @@ var Sorts = (function () {
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Calendar", function() { return Calendar_Calendar; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "CalendarDay", function() { return CalendarDay_CalendarDay; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "CalendarEvent", function() { return CalendarEvent_CalendarEvent; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Event", function() { return Event; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Constants", function() { return Constants; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Day", function() { return Day_Day; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "DaySpan", function() { return DaySpan_DaySpan; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Functions", function() { return Functions; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Identifier", function() { return Identifier_Identifier; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Iterator", function() { return Iterator_Iterator; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Month", function() { return Month; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Op", function() { return Op; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "operate", function() { return operate; });
@@ -4012,11 +5428,16 @@ var Sorts = (function () {
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Patterns", function() { return Patterns; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "PatternMap", function() { return PatternMap; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Schedule", function() { return Schedule_Schedule; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "ScheduleModifier", function() { return ScheduleModifier_ScheduleModifier; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Sorts", function() { return Sorts; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Suffix", function() { return Suffix; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Time", function() { return Time_Time; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Units", function() { return Units; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Weekday", function() { return Weekday; });
+
+
+
+
 
 
 

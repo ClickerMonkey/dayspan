@@ -12,6 +12,12 @@
   </head>
   <body>
 
+    <!-- TODO
+    - [ ] handling changing of times or allDay flag with include, exclude, cancel, and meta
+    - [ ] dragging existing events
+    - [ ] dragging to create events
+    -->
+
     <v-app id="dayspan" v-cloak>
       <v-navigation-drawer :clipped="$vuetify.breakpoint.lgAndUp" v-model="drawer" fixed app>
         <div class="pa-3" v-if="calendar">
@@ -129,7 +135,9 @@
           <ds-scheduler ref="scheduler"
             @save="eventSave"
             @remove="eventRemove"
-            @exclude="eventRemoveOccurrence"></ds-scheduler>
+            @exclude="eventRemoveOccurrence"
+            @cancel="eventCancel"
+            @move="eventMove"></ds-scheduler>
 
         </v-container>
       </v-content>
@@ -142,7 +150,7 @@
             <v-layout row>
               <v-flex xs1>
                 <v-tooltip bottom>
-                  <v-btn slot="activator" icon color="grey lighten-4" @click="cancel">
+                  <v-btn slot="activator" icon color="grey lighten-4" @click="discard">
                     <v-icon dark>clear</v-icon>
                   </v-btn>
                   <span>Cancel event changes</span>
@@ -157,7 +165,7 @@
               </v-flex>
               <v-flex xs5>
                 <v-btn :disabled="!canSave" color="primary" class="btn--flat" dark @click.stop="save">Save</v-btn>
-                <v-menu bottom left v-if="canRemove || canExclude">
+                <v-menu bottom left v-if="canRemove || canExclude || canCancel || canUncancel">
                   <v-btn slot="activator" color="grey lighten-4">
                     More actions...
                   </v-btn>
@@ -167,6 +175,12 @@
                     </v-list-tile>
                     <v-list-tile @click="exclude" v-if="canExclude">
                       <v-list-tile-title>Remove this occurrence</v-list-tile-title>
+                    </v-list-tile>
+                    <v-list-tile @click="cancel" v-if="canCancel">
+                      <v-list-tile-title>Cancel this occurrence</v-list-tile-title>
+                    </v-list-tile>
+                    <v-list-tile @click="uncancel" v-if="canUncancel">
+                      <v-list-tile-title>Undo cancellation</v-list-tile-title>
                     </v-list-tile>
                   </v-list>
                 </v-menu>
@@ -335,9 +349,9 @@
                         </div>
                         <v-chip label close
                           v-for="d in input.exclude"
-                          :key="d.time"
+                          :key="d"
                           @input="removeExclusion( d )">
-                          {{ d.format('ddd MMM Do YYYY') }}
+                          {{ describeExclusion( d ) }}
                         </v-chip>
                       </v-card-text>
                     </v-card>
@@ -459,10 +473,10 @@
         </div>
         <template v-for="(event, i) in day.events">
           <ds-event
-            :event="event"
             :key="event.id"
-            :index="i"
+            :calendar-event="event"
             :calendar="calendar"
+            :index="i"
             @edit="edit"
           ></ds-event>
         </template>
@@ -480,11 +494,11 @@
     <script type="text/template" id="template_event">
       <div class="ds-event" :style="style" @click.stop="edit">
         <span v-if="showName">
-          <span v-if="hasStartTime">
-            {{ getStartTime }}
+          <span v-if="hasPrefix">
+            {{ getPrefix }}
           </span>
           <strong>
-            {{ event.event.name }}
+            {{ calendarEvent.event.data.name }}
           </strong>
         </span>
         <div v-else>
@@ -496,7 +510,7 @@
     <script type="text/template" id="template_event_time">
       <div class="ds-event" :style="style" @click.stop="edit">
         <strong v-if="showName">
-          {{ event.event.name }}
+          {{ calendarEvent.event.data.name }}
         </strong>
       </div>
     </script>
@@ -552,7 +566,7 @@
         <div class="ds-all-events">
           <template v-for="(event, i) in day.events">
             <ds-event
-              :event="event"
+              :calendar-event="event"
               :key="event.id"
               :index="i"
               :calendar="calendar"
@@ -583,7 +597,7 @@
         <div class="ds-hour" v-for="h in 24" @click.stop="addAt( h )"></div>
         <template v-for="(event, i) in day.events">
           <ds-event-time
-            :event="event"
+            :calendar-event="event"
             :key="event.id"
             :calendar="calendar"
             v-if="!event.fullDay"
@@ -896,6 +910,12 @@
           canExclude: function() {
             return !!this.event && this.repeats;
           },
+          canCancel: function() {
+            return this.event && !this.event.cancelled;
+          },
+          canUncancel: function() {
+            return this.event && this.event.cancelled;
+          },
           types: function() {
             if (!this.day) {
               return [];
@@ -969,12 +989,12 @@
             };
             this.finishOpen('none');
           },
-          edit: function(onDay, event) {
+          edit: function(onDay, calendarEvent) {
             this.day = onDay;
-            this.event = event;
-            this.title = event.event.name;
-            this.color = event.event.color;
-            this.input = this.readInput( event.schedule );
+            this.event = calendarEvent;
+            this.title = calendarEvent.event.data.name;
+            this.color = calendarEvent.event.data.color;
+            this.input = this.readInput( calendarEvent.event.schedule );
             this.finishOpen(this.determineType());
           },
           readInput: function(schedule) {
@@ -995,31 +1015,47 @@
             this.editCustom = true;
           },
           remove: function() {
-            this.$emit('remove', this.event);
             this.open = false;
+            this.$emit('remove', this.event);
           },
           exclude: function() {
+            this.open = false;
             this.$emit('exclude', {
               event: this.event,
               day: this.day
             });
+          },
+          discard: function() {
             this.open = false;
+            this.$emit('discard');
           },
           cancel: function() {
-            this.$emit('cancel');
             this.open = false;
+            this.$emit('cancel', {
+              event: this.event,
+              cancel: true,
+              day: this.day
+            });
+          },
+          uncancel: function() {
+            this.open = false;
+            this.$emit('cancel', {
+              event: this.event,
+              cancel: false,
+              day: this.day
+            });
           },
           writeInput: function() {
             return this.copyShallow(this.input);
           },
           save: function() {
+            this.open = false;
             this.$emit('save', {
               name: this.title,
               color: this.color,
               schedule: this.writeInput(),
               event: this.event
             });
-            this.open = false;
           },
           addExclusion: function(day) {
             if (day) {
@@ -1027,16 +1063,23 @@
                 this.input.exclude = [];
                 this.updateInput();
               }
-              this.input.exclude.push( day );
+              if (this.allDay) {
+                this.input.exclude.push( ds.Identifier.Day.get( day ) );
+              } else {
+                this.input.exclude.push( ds.Identifier.Time.get( day ) );
+              }
             }
           },
-          removeExclusion: function(day) {
-            if (day) {
+          describeExclusion: function(identifier) {
+            var type = ds.Identifier.find(identifier);
+            return type ? type.describe(identifier) : identifier;
+          },
+          removeExclusion: function(identifier) {
+            if (identifier) {
               var exclude = this.input.exclude;
-              for (var i = exclude.length - 1; i >= 0; i--) {
-                if (day.sameDay( exclude[ i ] )) {
-                  exclude.splice( i, 1 );
-                }
+              var i = exclude.indexOf(identifier);
+              if (i !== -1) {
+                exclude.splice(i, 1);
               }
             }
           },
@@ -1178,86 +1221,93 @@
       });
 
       Vue.component('dsEvent', {
-        props: ['event', 'index', 'calendar'],
+        props: ['calendarEvent', 'index', 'calendar'],
         template: '#template_event',
         computed: {
           style: function() {
+
+            var calendarEvent = this.calendarEvent;
             var now = this.$root.today;
-            var past = this.event.time.start.isBefore(now);
-            var color = this.event.event.color;
-            if (past) {
+            var past = calendarEvent.time.start.isBefore(now);
+            var cancelled = calendarEvent.cancelled;
+            var originalColor = calendarEvent.event.data.color;
+            var color = originalColor;
+            if (past || cancelled) {
               color = brighten(color);
             }
 
             return {
               position: 'relative',
-              top: ((this.event.row - (this.index || 0)) * 19) + 'px',
+              top: ((calendarEvent.row - (this.index || 0)) * 19) + 'px',
               backgroundColor: color,
-              marginLeft: this.event.starting ? 0 : '-5px',
-              marginRight: this.event.ending ? 0 : '-5px'
+              marginLeft: calendarEvent.starting ? 0 : '-5px',
+              marginRight: calendarEvent.ending ? 0 : '-5px',
+              textDecoration: cancelled ? 'line-through' : 'inherit',
+              textDecorationColor: cancelled ? originalColor : 'inherit'
             };
           },
-          hasStartTime: function() {
-            return this.event.schedule.times.length === 1;
+          sameDayEvents: function() {
+            return this.calendarEvent.event.schedule.iterateSpans(this.calendarEvent.day, true).list();
           },
-          getStartTime: function() {
-            return this.event.schedule.times[0].format('ha');
+          hasPrefix: function() {
+            return !this.calendarEvent.event.schedule.isFullDay() && this.sameDayEvents.length > 0;
+          },
+          getPrefix: function() {
+            var same = this.sameDayEvents;
+            return same.length === 1 ?
+              same[0].start.format('ha') :
+              '(' + same.length + ')';
           },
           showName: function() {
-            return this.event.starting || (this.calendar && !this.calendar.filled.contains( this.event.time.start ));
+            return this.calendarEvent.starting || (this.calendar && !this.calendar.filled.contains( this.calendarEvent.time.start ));
           }
         },
         methods: {
           edit: function() {
-            this.$emit('edit', this.event);
+            this.$emit('edit', this.calendarEvent);
           }
         }
       });
 
       Vue.component('dsEventTime', {
-        props: ['event', 'calendar'],
+        props: ['calendarEvent', 'calendar'],
         template: '#template_event_time',
         computed: {
           style: function() {
             var HEIGHT = 960;
-            var MILLIS_IN_DAY = ds.Constants.MILLIS_IN_DAY;
-            var SCALE = HEIGHT / MILLIS_IN_DAY;
             var COLUMN_OFFSET = 14;
 
+            var calendarEvent = this.calendarEvent;
+            var bounds = calendarEvent.getTimeBounds(HEIGHT, 1, COLUMN_OFFSET);
             var now = this.$root.now;
-            var start = Math.max(0, this.event.time.start.asTime().toMilliseconds());
-            var end = Math.min(MILLIS_IN_DAY, this.event.time.end.asTime().toMilliseconds());
-            var past = this.event.time.end.isBefore(now);
-            var color = this.event.event.color;
-            if (past) {
+            var past = calendarEvent.time.end.isBefore(now);
+            var cancelled = calendarEvent.cancelled;
+            var originalColor = calendarEvent.event.data.color;
+            var color = originalColor;
+            if (past || cancelled) {
               color = brighten(color);
             }
 
             return {
               position: 'absolute',
-              top: (start * SCALE) + 'px',
-              height: ((end - start) * SCALE) + 'px',
-              left: (COLUMN_OFFSET * this.event.col) + 'px',
-              zIndex: this.event.col + 1,
+              top: bounds.top + 'px',
+              height: bounds.height + 'px',
+              left: bounds.left + 'px',
               right: '0px',
               backgroundColor: color,
-              marginLeft: this.event.starting ? 0 : '-5px',
-              marginRight: this.event.ending ? 0 : '-5px'
+              marginLeft: calendarEvent.starting ? 0 : '-5px',
+              marginRight: calendarEvent.ending ? 0 : '-5px',
+              textDecoration: cancelled ? 'line-through' : 'inherit',
+              textDecorationColor: cancelled ? originalColor : 'inherit'
             };
           },
-          hasStartTime: function() {
-            return this.event.schedule.times.length === 1;
-          },
-          getStartTime: function() {
-            return this.event.schedule.times[0].format('ha');
-          },
           showName: function() {
-            return this.event.starting || (this.calendar && !this.calendar.span.contains( this.event.time.start ));
+            return this.calendarEvent.starting || (this.calendar && !this.calendar.span.contains( this.calendarEvent.time.start ));
           }
         },
         methods: {
           edit: function() {
-            this.$emit('edit', this.event);
+            this.$emit('edit', this.calendarEvent);
           }
         }
       });
@@ -1271,9 +1321,6 @@
           },
           add: function(day) {
             this.$emit('add', day);
-          },
-          isValidEvent: function(e) {
-            return true;
           }
         }
       });
@@ -1287,9 +1334,6 @@
           },
           edit: function(eventDay) {
             this.$emit('edit', eventDay);
-          },
-          isValidEvent: function(e) {
-            return e.fullDay;
           }
         }
       });
@@ -1314,14 +1358,14 @@
         props: ['day', 'calendar'],
         template: '#template_day',
         methods: {
+          add: function() {
+            this.$emit('add', this.day);
+          },
           edit: function(event) {
             this.$emit('edit', {
               event: event,
               day: this.day
             });
-          },
-          add: function() {
-            this.$emit('add', this.day);
           }
         }
       });
@@ -1451,9 +1495,9 @@
           },
           weekdays: moment.weekdays(),
           weekdayCodes: moment.weekdaysShort(),
-          schedules: [
+          defaultEvents: [
             {
-              event: {name: 'Weekly Meeting', color: '#3F51B5'},
+              data: {name: 'Weekly Meeting', color: '#3F51B5'},
               schedule: {
                 dayOfWeek: [ds.Weekday.MONDAY],
                 times: [9],
@@ -1462,7 +1506,7 @@
               }
             },
             {
-              event: {name: 'Mother\'s Day', color: '#2196F3'},
+              data: {name: 'Mother\'s Day', color: '#2196F3'},
               schedule: {
                 month: [ds.Month.MAY],
                 dayOfWeek: [ds.Weekday.SUNDAY],
@@ -1470,7 +1514,7 @@
               }
             },
             {
-              event: {name: 'First Weekend', color: '#4CAF50'},
+              data: {name: 'First Weekend', color: '#4CAF50'},
               schedule: {
                 weekspanOfMonth: [0],
                 dayOfWeek: [ds.Weekday.FRIDAY],
@@ -1526,99 +1570,64 @@
           window.app = this;
 
           // Update Times
-          setTimeout(this.updateTimes, ds.Constants.MILLIS_IN_MINUTE);
+          setInterval(this.updateTimes, ds.Constants.MILLIS_IN_MINUTE);
         },
         mounted: function() {
           this.loadState();
         },
         methods: {
           saveState: function() {
-            localStorage.setItem('dayspan', JSON.stringify({
-              type: this.currentType.id,
-              around: this.calendar.span.start.dayIdentifier,
-              schedules: this.schedules
-            }));
+            localStorage.setItem('dayspanState', JSON.stringify(
+              this.calendar.toInput(true)
+            ));
           },
           loadState: function() {
-            var state = JSON.parse(localStorage.getItem('dayspan'));
+            var state = JSON.parse(localStorage.getItem('dayspanState'));
+            this.loading = true;
             if (state) {
-              this.loading = true;
-              this.schedules = state.schedules;
               this.currentType = this.types.find(function(type) {
-                return type.id === state.type;
+                return type.type === state.type && type.size === state.size;
               });
-              this.rebuild(ds.Day.fromDayIdentifier(state.around));
-              this.loading = false;
+              state.eventSorter = state.listTimes ? ds.Sorts.List([ds.Sorts.FullDay, ds.Sorts.Start]) : ds.Sorts.Start;
+              this.calendar = ds.Calendar.fromInput(state);
+            } else {
+              this.rebuild(ds.Day.today(), this.defaultEvents);
             }
+            this.loading = false;
           },
           updateTimes: function() {
             this.today = ds.Day.today();
             this.now = ds.Day.now();
             this.tomorrow = ds.Day.tomorrow();
           },
-          getAround: function() {
-            var today = this.today;
+          rebuild: function(aroundDay, events) {
             var cal = this.calendar;
-            if (!cal) {
-              return today;
-            }
-            if (cal.span.matchesDay(today)) {
-              return today;
-            }
-            return cal.start;
-          },
-          rebuild: function(aroundDay) {
             var type = this.currentType || this.types[ 2 ];
-            var around = aroundDay || this.getAround();
 
-            if (this.calendar &&
-                this.calendar.type === type.type &&
-                this.calendar.size === type.size &&
-                (!around || this.calendar.span.matchesDay( around ))) {
+            if (cal &&
+                cal.type === type.type &&
+                cal.size === type.size) {
               return;
             }
 
-            switch (type.type) {
-              case ds.Units.DAY:
-                this.calendar = ds.Calendar.days(type.size, around, 0, {
-                  eventsOutside: true,
-                  listTimes: true,
-                  updateRows: true,
-                  updateColumns: true,
-                  eventSorter: ds.Sorts.List([ds.Sorts.FullDay, ds.Sorts.Desc(ds.Sorts.Start)]),
-                  schedules: this.schedules
-                });
-                break;
-              case ds.Units.WEEK:
-                this.calendar = ds.Calendar.weeks(type.size, around, 0, {
-                  eventsOutside: true,
-                  listTimes: true,
-                  updateRows: true,
-                  updateColumns: true,
-                  eventSorter: ds.Sorts.List([ds.Sorts.FullDay, ds.Sorts.Desc(ds.Sorts.Start)]),
-                  schedules: this.schedules
-                });
-                break;
-              case ds.Units.MONTH:
-                this.calendar = ds.Calendar.months(type.size, around, 0, {
-                  eventsOutside: true,
-                  fill: true,
-                  updateRows: true,
-                  updateColumns: false,
-                  eventSorter: ds.Sorts.Start,
-                  schedules: this.schedules
-                });
-                break;
-              case ds.Units.YEAR:
-                this.calendar = ds.Calendar.years(type.size, around, 0, {
-                  eventsOutside: true,
-                  fill: true,
-                  updateRows: true,
-                  updateColumns: false,
-                  eventSorter: ds.Sorts.Start,
-                  schedules: this.schedules
-                });
-                break;
+            var listTimes = type.type === ds.Units.DAY || type.type === ds.Units.WEEK;
+            var input = {
+              type: type.type,
+              size: type.size,
+              around: aroundDay,
+              eventsOutside: true,
+              listTimes: listTimes,
+              updateRows: true,
+              updateColumns: listTimes,
+              fill: !listTimes,
+              eventSorter: listTimes ? ds.Sorts.List([ds.Sorts.FullDay, ds.Sorts.Start]) : ds.Sorts.Start,
+              events: events
+            };
+
+            if (cal) {
+              cal.set(input);
+            } else {
+              this.calendar = ds.Calendar.fromInput(input);
             }
 
             this.saveState();
@@ -1670,47 +1679,52 @@
           addAt: function(dayHour) {
             this.$refs.scheduler.addAt(dayHour.day, dayHour.hour);
           },
-          scheduleIndex: function(event) {
-            var schedules = this.schedules;
-            for (var i = schedules.length - 1; i >= 0; i--) {
-              if (schedules[ i ].event === event) {
+          eventsIndex: function(data) {
+            var events = this.events;
+            for (var i = events.length - 1; i >= 0; i--) {
+              if (events[ i ].data === data) {
                 return i;
               }
             }
             return -1;
           },
           eventSave: function(data) {
-            if (data.event) {
-              data.event.event.name = data.name;
-              data.event.event.color = data.color;
-              data.event.schedule.set( data.schedule );
+            var calendarEvent = data.event;
+            if (calendarEvent) {
+              var event = calendarEvent.event;
+              event.data.name = data.name;
+              event.data.color = data.color;
+              event.schedule.set( data.schedule );
+
               this.calendar.refreshEvents();
-              var i = this.scheduleIndex(data.event.event);
-              if (i !== -1) {
-                this.schedules[ i ].schedule = data.schedule;
-              }
             } else {
-              var entry = {
-                event: { name: data.name, color: data.color },
+              this.calendar.addEvent({
+                data: { name: data.name, color: data.color },
                 schedule: data.schedule
-              };
-              this.schedules.push( entry );
-              this.calendar.addSchedule( entry );
+              });
             }
+
             this.saveState();
             this.$forceUpdate();
           },
           eventRemove: function(calendarEvent) {
-            this.calendar.removeSchedule( calendarEvent.event );
-            var i = this.scheduleIndex( calendarEvent.event );
-            if (i !== -1) {
-              this.schedules.splice( i, 1 );
-            }
+            this.calendar.removeEvent( calendarEvent );
             this.saveState();
             this.$forceUpdate();
           },
           eventRemoveOccurrence: function(data) {
-            data.event.schedule.exclude[ data.day.dayIdentifier ] = true;
+            data.event.exclude();
+            this.eventsRefresh();
+          },
+          eventCancel: function(data) {
+            data.event.cancel(data.cancel);
+            this.eventsRefresh();
+          },
+          eventMove: function(data) {
+            data.event.move(data.moveTo);
+            this.eventsRefresh();
+          },
+          eventsRefresh: function() {
             this.calendar.refreshEvents();
             this.saveState();
             this.$forceUpdate();
@@ -1779,11 +1793,19 @@
         border-bottom: #e0e0e0 1px solid;
       }
       .ds-day .ds-today-dom {
-        margin: -10px;
+        margin: -7px;
         padding: 10px;
         border-radius: 20px;
         background-color: #4285f4;
         color: white;
+        width: 36px;
+        height: 36px;
+        display: block;
+        text-align: center;
+        line-height: 16px;
+        position: relative;
+        z-index: 1;
+        top: -4px;
       }
       .ds-event {
         margin: 1px;
