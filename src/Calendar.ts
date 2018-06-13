@@ -24,6 +24,23 @@ import { Iterator } from './Iterator';
  */
 export type CalendarMover = (day: Day, amount: number) => Day;
 
+/**
+ * A definition for a given [[Units]] which informs a calendar how to setup the
+ * [[Calendar.span]] and how to move with [[Calendar.move]].
+ */
+export interface CalendarTypeDefinition
+{
+  getStart(around: Day, size: number, focus: number): Day;
+  getEnd(start: Day, size: number, focus: number): Day;
+  moveStart(day: Day, amount: number): Day;
+  moveEnd(day: Day, amount: number): Day;
+  defaultInput: any
+}
+
+/**
+ * A map of [[CalendarTypeDefinition]] keyed by the [[Units]].
+ */
+export type CalendarTypeDefinitionMap = { [unit: number]: CalendarTypeDefinition };
 
 /**
  * Input used to initialize or mass change the properties of a [[Calendar]].
@@ -294,26 +311,28 @@ export class Calendar<T, M>
    */
   public set(input: CalendarInput<T, M>): this
   {
+    type CTD = CalendarTypeDefinition;
+
     let typeChange: boolean = fn.isDefined(input.type) && input.type !== this.type;
     let sizeChange: boolean = fn.isDefined(input.size) && input.size !== this.size;
 
     if (typeChange || sizeChange)
     {
-      let focus: number     = fn.coalesce( input.otherwiseFocus, 0.4999 );
-      let prefer: boolean   = fn.coalesce( input.preferToday, true );
-      let size: number      = fn.coalesce( input.size, this.size );
-      let type: Units       = fn.coalesce( input.type, this.type );
-      let around: Day       = fn.coalesce( input.around, this.days[ Math.floor( (this.days.length - 1) * focus ) ] );
-      let today: Day        = Day.today();
+      let focus: number    = fn.coalesce( input.otherwiseFocus, 0.4999 );
+      let prefer: boolean  = fn.coalesce( input.preferToday, true );
+      let size: number     = fn.coalesce( input.size, this.size );
+      let type: Units      = fn.coalesce( input.type, this.type );
+      let around: DayInput = fn.coalesce( input.around, this.days[ Math.floor( (this.days.length - 1) * focus ) ] );
+      let today: Day       = Day.today();
 
       if (!around || (prefer && this.span.matchesDay(today)))
       {
         around = today;
       }
 
-      let meta              = Calendar.TYPES[ type ];
-      let start: Day        = meta.getStart( Day.parse( around ), size, focus );
-      let end: Day          = meta.getEnd( start, size, focus );
+      let meta: CTD        = Calendar.TYPES[ type ];
+      let start: Day       = meta.getStart( Day.parse( around ), size, focus );
+      let end: Day         = meta.getEnd( start, size, focus );
 
       this.span.start = start;
       this.span.end = end;
@@ -321,6 +340,19 @@ export class Calendar<T, M>
       this.size = size;
       this.moveStart = meta.moveStart;
       this.moveEnd = meta.moveEnd;
+    }
+    else if (input.around)
+    {
+      let focus: number    = fn.coalesce( input.otherwiseFocus, 0.4999 );
+      let around: Day      = Day.parse( input.around );
+      let type: Units      = this.type;
+      let size: number     = this.size;
+      let meta: CTD        = Calendar.TYPES[ type ];
+      let start: Day       = meta.getStart( around, size, focus );
+      let end: Day         = meta.getEnd( start, size, focus );
+
+      this.span.start = start;
+      this.span.end = end;
     }
 
     this.fill           = fn.coalesce( input.fill, this.fill );
@@ -1168,7 +1200,7 @@ export class Calendar<T, M>
    */
   public static forType<T, M>(type: Units, size: number = 1, around: Day = Day.today(), focus: number = 0.49999, input?: CalendarInput<T, M>): Calendar<T, M>
   {
-    let meta = this.TYPES[ type ];
+    let meta: CalendarTypeDefinition = this.TYPES[ type ];
     let start: Day = meta.getStart( around, size, focus );
     let end: Day = meta.getEnd( start, size, focus );
 
@@ -1252,7 +1284,7 @@ export class Calendar<T, M>
    * A map of functions and properties by [[Units]] used to create or morph
    * Calendars.
    */
-  public static TYPES =
+  public static TYPES: CalendarTypeDefinitionMap =
   {
     [Units.DAY]:
     {

@@ -4131,6 +4131,17 @@ var Calendar_Calendar = (function () {
             this.moveStart = meta.moveStart;
             this.moveEnd = meta.moveEnd;
         }
+        else if (input.around) {
+            var focus_2 = Functions.coalesce(input.otherwiseFocus, 0.4999);
+            var around = Day_Day.parse(input.around);
+            var type = this.type;
+            var size = this.size;
+            var meta = Calendar.TYPES[type];
+            var start = meta.getStart(around, size, focus_2);
+            var end = meta.getEnd(start, size, focus_2);
+            this.span.start = start;
+            this.span.end = end;
+        }
         this.fill = Functions.coalesce(input.fill, this.fill);
         this.minimumSize = Functions.coalesce(input.minimumSize, this.minimumSize);
         this.repeatCovers = Functions.coalesce(input.repeatCovers, this.repeatCovers);
