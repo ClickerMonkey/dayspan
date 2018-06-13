@@ -1708,7 +1708,7 @@
             this.$forceUpdate();
           },
           eventRemove: function(calendarEvent) {
-            this.calendar.removeEvent( calendarEvent );
+            this.calendar.removeEvent( calendarEvent.event );
             this.saveState();
             this.$forceUpdate();
           },
