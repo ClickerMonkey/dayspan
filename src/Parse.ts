@@ -193,10 +193,14 @@ export class Parse
    * ```
    *
    * @param input The input to parse.
+   * @param value The default value if the input given is an array of identifiers.
+   * @param parseMeta A function to use to parse a modifier.
+   * @param out The modifier to set the identifiers and values of and return.
    * @returns The object with identifier keys and `true` values.
    * @see [[Day.dayIdentifier]]
    */
   public static modifier<T>(input: any, value: T,
+    parseMeta: (input: any) => T = (x => <T>x),
     out: ScheduleModifier<T> = new ScheduleModifier<T>()): ScheduleModifier<T>
   {
     let map = {};
@@ -224,7 +228,7 @@ export class Parse
     {
       for (let identifier in input)
       {
-        map[ identifier ] = input[ identifier ];
+        map[ identifier ] = parseMeta( input[ identifier ] );
       }
     }
 
@@ -238,10 +242,12 @@ export class Parse
    * repeat and they may be all day events or at specific times.
    *
    * @param input The input to parse into a schedule.
+   * @param parseMeta A function to use when parsing meta input into the desired type.
    * @param out The schedule to set the values of and return.
    * @returns An instance of the parsed [[Schedule]].
    */
   public static schedule<M>(input: ScheduleInput<M> | Schedule<M>,
+    parseMeta: (input: any) => M = (x => <M>x),
     out: Schedule<M> = new Schedule<M>()): Schedule<M>
   {
     if (input instanceof Schedule)
@@ -267,10 +273,10 @@ export class Parse
     out.durationUnit = <DurationInput>fn.coalesce( input.durationUnit, Constants.DURATION_DEFAULT_UNIT( fullDay ) );
     out.start = this.day( input.start );
     out.end = this.day( input.end );
-    out.exclude = this.modifier( input.exclude, true, out.exclude );
-    out.include = this.modifier( input.include, true, out.include );
-    out.cancel = this.modifier( input.cancel, true, out.cancel );
-    out.meta = this.modifier( input.meta, null, out.meta );
+    out.exclude = this.modifier( input.exclude, true, undefined, out.exclude );
+    out.include = this.modifier( input.include, true, undefined, out.include );
+    out.cancel = this.modifier( input.cancel, true, undefined, out.cancel );
+    out.meta = this.modifier( input.meta, null, parseMeta, out.meta );
     out.year = this.frequency( input.year, 'year' );
     out.month = this.frequency( input.month, 'month' );
     out.week = this.frequency( input.week, 'week' );
@@ -320,9 +326,13 @@ export class Parse
    * Parses [[EventInput]] and returns an [[Event]].
    *
    * @param input The input to parse.
+   * @param parseData A function to use when parsing data input into the desired type.
+   * @param parseMeta A function to use when parsing meta input into the desired type.
    * @returns The parsed value.
    */
-  public static event<T, M>(input: any): Event<T, M>
+  public static event<T, M>(input: any,
+    parseData: (input: any) => T = (x => <T>x),
+    parseMeta: (input: any) => M = (x => <M>x)): Event<T, M>
   {
     if (input instanceof Event)
     {
@@ -334,9 +344,9 @@ export class Parse
       return null;
     }
 
-    let schedule: Schedule<M> = this.schedule<M>( input.schedule );
+    let schedule: Schedule<M> = this.schedule<M>( input.schedule, parseMeta );
 
-    return new Event( schedule, input.data, input.id, input.visible );
+    return new Event( schedule, parseData( input.data ), input.id, input.visible );
   }
 
   /**

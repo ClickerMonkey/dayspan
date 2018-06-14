@@ -96,6 +96,14 @@ export interface CalendarInput<T, M>
    */
   size?: number; // 1
   /**
+   * @see [[Calendar.parseMeta]]
+   */
+  parseMeta?: (input: any) => M;
+  /**
+   * @see [[Calendar.parseData]]
+   */
+  parseData?: (input: any) => T;
+  /**
    * When morphing a calendar to a fewer number of days, do we want to keep
    * today in the calendar if it is already in the calendar?
    */
@@ -227,6 +235,22 @@ export class Calendar<T, M>
    * The function (if any) which sorts the events on a calendar day.
    */
   public eventSorter: SortEvent<T, M> = null;
+
+  /**
+   * A function to use when parsing meta input into the desired type.
+   *
+   * @param input The input to parse.
+   * @returns The meta parsed from the given input, if any.
+   */
+  public parseMeta: (input: any) => M = (x => <M>x);
+
+  /**
+   * A function to use when parsing meta input into the desired type.
+   *
+   * @param input The input to parse.
+   * @returns The meta parsed from the given input, if any.
+   */
+  public parseData: (input: any) => T = (x => <T>x);
 
   /**
    * A selection of days on the calendar. If no days are selected this is `null`.
@@ -363,6 +387,8 @@ export class Calendar<T, M>
     this.updateRows     = fn.coalesce( input.updateRows, this.updateRows );
     this.updateColumns  = fn.coalesce( input.updateColumns, this.updateColumns );
     this.eventSorter    = fn.coalesce( input.eventSorter, this.eventSorter );
+    this.parseMeta      = fn.coalesce( input.parseMeta, this.parseMeta );
+    this.parseData      = fn.coalesce( input.parseData, this.parseData );
 
     if (fn.isArray(input.events))
     {
@@ -974,7 +1000,7 @@ export class Calendar<T, M>
    */
   public addEvent(event: EventInput<T, M>, allowDuplicates: boolean = false, delayRefresh: boolean = false): this
   {
-    let parsed: Event<T, M> = Parse.event<T, M>(event);
+    let parsed: Event<T, M> = Parse.event<T, M>(event, this.parseData, this.parseMeta);
 
     if (!allowDuplicates)
     {

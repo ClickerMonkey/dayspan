@@ -1,50 +1,11 @@
 
 import { Constants } from './Constants';
 import { Day } from './Day';
-import { DaySpan } from './DaySpan';
+import { DaySpan, DaySpanBounds } from './DaySpan';
 import { Event } from './Event';
 import { Identifier, IdentifierInput } from './Identifier';
 import { Schedule } from './Schedule';
 
-
-/**
- * The calculated bounds of a calendar event on a calendar.
- */
-export interface CalendarEventBounds
-{
-
-  /**
-   * The top of the event within the rectangle of the day.
-   */
-  top: number;
-
-  /**
-   * The bottom of the event within the rectangle of the day.
-   */
-  bottom: number;
-
-  /**
-   * The height of the event within the rectangle of the day. This is equivalent
-   * by `bottom - top`.
-   */
-  height: number;
-
-  /**
-   * The left of the event within the rectangle of the day.
-   */
-  left: number;
-
-  /**
-   * The right of the event within the rectangle of the day.
-   */
-  right: number;
-
-  /**
-   * The width of the event within the rectangle of the day. This is equivalent
-   * by `right - left`.
-   */
-  width: number;
-}
 
 /**
  * An event on a given day and the schedule that generated the event.
@@ -222,7 +183,7 @@ export class CalendarEvent<T, M>
    */
   public get startDelta(): number
   {
-    return (this.start.time - this.day.time) / Constants.MILLIS_IN_DAY;
+    return this.time.startDelta( this.day );
   }
 
   /**
@@ -232,7 +193,7 @@ export class CalendarEvent<T, M>
    */
   public get endDelta(): number
   {
-    return (this.end.time - this.day.time) / Constants.MILLIS_IN_DAY;
+    return this.time.endDelta( this.day );
   }
 
   /**
@@ -254,28 +215,9 @@ export class CalendarEvent<T, M>
    * @param offsetY How much to translate the top & bottom properties by.
    * @returns The calculated bounds for this event.
    */
-  public getTimeBounds(dayHeight: number = 1, dayWidth: number = 1, columnOffset: number = 0.1, clip: boolean = true, offsetX: number = 0, offsetY: number = 0): CalendarEventBounds
+  public getTimeBounds(dayHeight: number = 1, dayWidth: number = 1, columnOffset: number = 0.1, clip: boolean = true, offsetX: number = 0, offsetY: number = 0): DaySpanBounds
   {
-    let startRaw: number = this.startDelta;
-    let endRaw: number = this.endDelta;
-
-    let start: number = clip ? Math.max(0, startRaw) : startRaw;
-    let end: number = clip ? Math.min(1, endRaw) : endRaw;
-
-    let left: number = this.col * columnOffset;
-    let right: number = dayWidth - left;
-
-    let top: number = start * dayHeight;
-    let bottom: number = end * dayHeight;
-
-    return {
-      top: top + offsetY,
-      bottom: bottom + offsetY,
-      height: bottom - top,
-      left: left + offsetX,
-      right: right + offsetX,
-      width: right
-    };
+    return this.time.getBounds( this.day, dayHeight, dayWidth, this.col * columnOffset, clip, offsetX, offsetY );
   }
 
   /**

@@ -165,6 +165,11 @@ export interface ScheduleInput<M>
    * @see [[Schedule.lastFullWeekOfMonth]]
    */
   lastFullWeekOfMonth?: FrequencyValue;
+
+  /**
+   * The function to parse metadata with.
+   */
+  parseMeta?: (input: any) => M;
 }
 
 
@@ -358,11 +363,13 @@ export class Schedule<M>
    * Sets the schedule with the given input.
    *
    * @param input The input which describes the schedule of events.
+   * @param parseMeta A function to use when parsing meta input into the desired type.
    * @see [[Parse.schedule]]
    */
-  public set(input: ScheduleInput<M>): this
+  public set(input: ScheduleInput<M>,
+    parseMeta: (input: any) => M = (x => <M>x)): this
   {
-    Parse.schedule<M>(input, this);
+    Parse.schedule<M>(input, fn.coalesce( input.parseMeta, parseMeta ), this);
 
     return this;
   }

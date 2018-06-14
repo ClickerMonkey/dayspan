@@ -2,7 +2,48 @@
 import { Day } from './Day';
 import { Op } from './Operation';
 import { Units } from './Units';
+import { Constants } from './Constants';
 
+
+
+/**
+ * The calculated bounds of a DaySpan relative to a given day.
+ */
+export interface DaySpanBounds
+{
+
+  /**
+   * The top of the span within the rectangle of the given day.
+   */
+  top: number;
+
+  /**
+   * The bottom of the span within the rectangle of the givne day.
+   */
+  bottom: number;
+
+  /**
+   * The height of the span within the rectangle of the given day. This is
+   * equivalent by `bottom - top`.
+   */
+  height: number;
+
+  /**
+   * The left of the span within the rectangle of the given day.
+   */
+  left: number;
+
+  /**
+   * The right of the span within the rectangle of the given day.
+   */
+  right: number;
+
+  /**
+   * The width of the span within the rectangle of the given day. This is
+   * equivalent by `right - left`.
+   */
+  width: number;
+}
 
 /**
  * A class for a range of time between two [[Day]] timestamps.
@@ -219,6 +260,80 @@ export class DaySpan
   public years(op: Op = Op.DOWN, absolute: boolean = true): number
   {
     return this.start.yearsBetween(this.end, op, absolute);
+  }
+
+  /**
+   * Returns a delta value between 0 and 1 which represents where the
+   * [[DaySpan.start]] is relative to the given day. The delta value would
+   * be less than 0 if the start of the event is before the given day.
+   *
+   * @param relativeTo The day to find the start delta relative to.
+   * @return A number between 0 and 1 if the start of this span is in the
+   *    24-hour period starting at the given timestamp, otherwise the value
+   *    returned may be less than 0 or greater than 1.
+   */
+  public startDelta(relativeTo: Day): number
+  {
+    return (this.start.time - relativeTo.time) / Constants.MILLIS_IN_DAY;
+  }
+
+  /**
+   * Returns a delta value between 0 and 1 which represents where the
+   * [[DaySpan.end]] is relative to the given day. The delta value would
+   * be greater than 1 if the end of the event is after the given day.
+   *
+   * @param relativeTo The day to find the end delta relative to.
+   * @return A number between 0 and 1 if the end of this span is in the
+   *    24-hour period starting at the given timestamp, otherwise the value
+   *    returned may be less than 0 or greater than 1.
+   */
+  public endDelta(relativeTo: Day): number
+  {
+    return (this.end.time - relativeTo.time) / Constants.MILLIS_IN_DAY;
+  }
+
+  /**
+   * Calculates the bounds for span event if it were placed in a rectangle which
+   * represents a day (24 hour period). By default the returned values are
+   * between 0 and 1 and can be scaled by the proper rectangle dimensions or the
+   * rectangle dimensions can be passed to this function.
+   *
+   * @param relativeTo The day to find the bounds relative to. If this is not the
+   *    start of the day the returned bounds is relative to the given time.
+   * @param dayHeight The height of the rectangle of the day.
+   * @param dayWidth The width of the rectangle of the day.
+   * @param columnOffset The offset in the rectangle of the day to adjust this
+   *    span by. This also reduces the width of the returned bounds to keep the
+   *    bounds in the rectangle of the day.
+   * @param clip `true` if the bounds should stay in the day rectangle, `false`
+   *    and the bounds may go outside the rectangle of the day for multi-day
+   *    spans.
+   * @param offsetX How much to translate the left & right properties by.
+   * @param offsetY How much to translate the top & bottom properties by.
+   * @returns The calculated bounds for this span.
+   */
+  public getBounds(relativeTo: Day, dayHeight: number = 1, dayWidth: number = 1, columnOffset: number = 0, clip: boolean = true, offsetX: number = 0, offsetY: number = 0): DaySpanBounds
+  {
+    let startRaw: number = this.startDelta( relativeTo );
+    let endRaw: number = this.endDelta( relativeTo );
+
+    let start: number = clip ? Math.max(0, startRaw) : startRaw;
+    let end: number = clip ? Math.min(1, endRaw) : endRaw;
+
+    let left: number = columnOffset;
+    let right: number = dayWidth - left;
+
+    let top: number = start * dayHeight;
+    let bottom: number = end * dayHeight;
+
+    return {
+      top: top + offsetY,
+      bottom: bottom + offsetY,
+      height: bottom - top,
+      left: left + offsetX,
+      right: right + offsetX,
+      width: right
+    };
   }
 
   /**
