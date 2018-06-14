@@ -993,7 +993,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/e469b1f/src/Parse.ts#L345">Parse.ts:345</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/d54f858/src/Parse.ts#L355">Parse.ts:355</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1030,7 +1030,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/e469b1f/src/Parse.ts#L80">Parse.ts:80</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/d54f858/src/Parse.ts#L80">Parse.ts:80</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1063,13 +1063,13 @@ Parse.day( <span class="hljs-literal">true</span> );                   <span cla
 				<a name="event" class="tsd-anchor"></a>
 				<h3><span class="tsd-flag ts-flagStatic">Static</span> event</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-static">
-					<li class="tsd-signature tsd-kind-icon">event&lt;T, M&gt;<span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">M</span><span class="tsd-signature-symbol">&gt;</span></li>
+					<li class="tsd-signature tsd-kind-icon">event&lt;T, M&gt;<span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, parseData<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">function</span>, parseMeta<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">M</span><span class="tsd-signature-symbol">&gt;</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/e469b1f/src/Parse.ts#L325">Parse.ts:325</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/d54f858/src/Parse.ts#L333">Parse.ts:333</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1094,6 +1094,54 @@ Parse.day( <span class="hljs-literal">true</span> );                   <span cla
 									<p>The input to parse.</p>
 								</div>
 							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> parseData: <span class="tsd-signature-type">function</span><span class="tsd-signature-symbol"> =&nbsp;(x &#x3D;&gt; &lt;T&gt;x)</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>A function to use when parsing data input into the desired type.</p>
+								</div>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter-siganture">
+										<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+										</ul>
+										<ul class="tsd-descriptions">
+											<li class="tsd-description">
+												<h4 class="tsd-parameters-title">Parameters</h4>
+												<ul class="tsd-parameters">
+													<li>
+														<h5>input: <span class="tsd-signature-type">any</span></h5>
+													</li>
+												</ul>
+												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> parseMeta: <span class="tsd-signature-type">function</span><span class="tsd-signature-symbol"> =&nbsp;(x &#x3D;&gt; &lt;M&gt;x)</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>A function to use when parsing meta input into the desired type.</p>
+								</div>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter-siganture">
+										<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">M</span></li>
+										</ul>
+										<ul class="tsd-descriptions">
+											<li class="tsd-description">
+												<h4 class="tsd-parameters-title">Parameters</h4>
+												<ul class="tsd-parameters">
+													<li>
+														<h5>input: <span class="tsd-signature-type">any</span></h5>
+													</li>
+												</ul>
+												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">M</span></h4>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">M</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						<p>The parsed value.</p>
@@ -1110,7 +1158,7 @@ Parse.day( <span class="hljs-literal">true</span> );                   <span cla
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/e469b1f/src/Parse.ts#L26">Parse.ts:26</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/d54f858/src/Parse.ts#L26">Parse.ts:26</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1153,7 +1201,7 @@ Parse.day( <span class="hljs-literal">true</span> );                   <span cla
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/e469b1f/src/Parse.ts#L304">Parse.ts:304</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/d54f858/src/Parse.ts#L310">Parse.ts:310</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1180,13 +1228,13 @@ Parse.day( <span class="hljs-literal">true</span> );                   <span cla
 				<a name="modifier" class="tsd-anchor"></a>
 				<h3><span class="tsd-flag ts-flagStatic">Static</span> modifier</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-static">
-					<li class="tsd-signature tsd-kind-icon">modifier&lt;T&gt;<span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, out<span class="tsd-signature-symbol">?: </span><a href="schedulemodifier.html" class="tsd-signature-type">ScheduleModifier</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="schedulemodifier.html" class="tsd-signature-type">ScheduleModifier</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+					<li class="tsd-signature tsd-kind-icon">modifier&lt;T&gt;<span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, parseMeta<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">function</span>, out<span class="tsd-signature-symbol">?: </span><a href="schedulemodifier.html" class="tsd-signature-type">ScheduleModifier</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="schedulemodifier.html" class="tsd-signature-type">ScheduleModifier</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/e469b1f/src/Parse.ts#L199">Parse.ts:199</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/d54f858/src/Parse.ts#L202">Parse.ts:202</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1219,9 +1267,39 @@ Parse.modifier( [ <span class="hljs-number">20180101</span>, Day.build(<span cla
 							</li>
 							<li>
 								<h5>value: <span class="tsd-signature-type">T</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The default value if the input given is an array of identifiers.</p>
+								</div>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> parseMeta: <span class="tsd-signature-type">function</span><span class="tsd-signature-symbol"> =&nbsp;(x &#x3D;&gt; &lt;T&gt;x)</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>A function to use to parse a modifier.</p>
+								</div>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter-siganture">
+										<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+										</ul>
+										<ul class="tsd-descriptions">
+											<li class="tsd-description">
+												<h4 class="tsd-parameters-title">Parameters</h4>
+												<ul class="tsd-parameters">
+													<li>
+														<h5>input: <span class="tsd-signature-type">any</span></h5>
+													</li>
+												</ul>
+												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+											</li>
+										</ul>
+									</li>
+								</ul>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> out: <a href="schedulemodifier.html" class="tsd-signature-type">ScheduleModifier</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;new ScheduleModifier&lt;T&gt;()</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The modifier to set the identifiers and values of and return.</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="schedulemodifier.html" class="tsd-signature-type">ScheduleModifier</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -1233,13 +1311,13 @@ Parse.modifier( [ <span class="hljs-number">20180101</span>, Day.build(<span cla
 				<a name="schedule" class="tsd-anchor"></a>
 				<h3><span class="tsd-flag ts-flagStatic">Static</span> schedule</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-static">
-					<li class="tsd-signature tsd-kind-icon">schedule&lt;M&gt;<span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><a href="../interfaces/scheduleinput.html" class="tsd-signature-type">ScheduleInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">M</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><a href="schedule.html" class="tsd-signature-type">Schedule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">M</span><span class="tsd-signature-symbol">&gt;</span>, out<span class="tsd-signature-symbol">?: </span><a href="schedule.html" class="tsd-signature-type">Schedule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">M</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="schedule.html" class="tsd-signature-type">Schedule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">M</span><span class="tsd-signature-symbol">&gt;</span></li>
+					<li class="tsd-signature tsd-kind-icon">schedule&lt;M&gt;<span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><a href="../interfaces/scheduleinput.html" class="tsd-signature-type">ScheduleInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">M</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><a href="schedule.html" class="tsd-signature-type">Schedule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">M</span><span class="tsd-signature-symbol">&gt;</span>, parseMeta<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">function</span>, out<span class="tsd-signature-symbol">?: </span><a href="schedule.html" class="tsd-signature-type">Schedule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">M</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="schedule.html" class="tsd-signature-type">Schedule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">M</span><span class="tsd-signature-symbol">&gt;</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/e469b1f/src/Parse.ts#L244">Parse.ts:244</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/d54f858/src/Parse.ts#L249">Parse.ts:249</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1263,6 +1341,30 @@ Parse.modifier( [ <span class="hljs-number">20180101</span>, Day.build(<span cla
 								</div>
 							</li>
 							<li>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> parseMeta: <span class="tsd-signature-type">function</span><span class="tsd-signature-symbol"> =&nbsp;(x &#x3D;&gt; &lt;M&gt;x)</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>A function to use when parsing meta input into the desired type.</p>
+								</div>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter-siganture">
+										<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">M</span></li>
+										</ul>
+										<ul class="tsd-descriptions">
+											<li class="tsd-description">
+												<h4 class="tsd-parameters-title">Parameters</h4>
+												<ul class="tsd-parameters">
+													<li>
+														<h5>input: <span class="tsd-signature-type">any</span></h5>
+													</li>
+												</ul>
+												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">M</span></h4>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li>
 								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> out: <a href="schedule.html" class="tsd-signature-type">Schedule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">M</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;new Schedule&lt;M&gt;()</span></h5>
 								<div class="tsd-comment tsd-typography">
 									<p>The schedule to set the values of and return.</p>
@@ -1284,7 +1386,7 @@ Parse.modifier( [ <span class="hljs-number">20180101</span>, Day.build(<span cla
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/e469b1f/src/Parse.ts#L129">Parse.ts:129</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/d54f858/src/Parse.ts#L129">Parse.ts:129</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1333,7 +1435,7 @@ Parse.time( {hour: <span class="hljs-number">2</span>} ); <span class="hljs-comm
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/e469b1f/src/Parse.ts#L160">Parse.ts:160</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/d54f858/src/Parse.ts#L160">Parse.ts:160</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">

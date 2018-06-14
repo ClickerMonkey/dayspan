@@ -360,7 +360,155 @@ var Units;
     Units[Units["YEAR"] = 3] = "YEAR";
 })(Units = Units || (Units = {}));
 
+// CONCATENATED MODULE: ./src/Constants.ts
+
+/**
+ * A class that stores commonly used values.
+ */
+var Constants = (function () {
+    function Constants() {
+    }
+    /**
+     * The number of milliseconds in a second.
+     */
+    Constants.MILLIS_IN_SECOND = 1000;
+    /**
+     * The number of milliseconds in a minute.
+     */
+    Constants.MILLIS_IN_MINUTE = Constants.MILLIS_IN_SECOND * 60;
+    /**
+     * The number of milliseconds in an hour.
+     */
+    Constants.MILLIS_IN_HOUR = Constants.MILLIS_IN_MINUTE * 60;
+    /**
+     * The number of milliseconds in a day (not including DST days).
+     */
+    Constants.MILLIS_IN_DAY = Constants.MILLIS_IN_HOUR * 24;
+    /**
+     * The number of milliseconds in a week (not including ones that include DST).
+     */
+    Constants.MILLIS_IN_WEEK = Constants.MILLIS_IN_DAY * 7;
+    /**
+     * The number of days in a week.
+     */
+    Constants.DAYS_IN_WEEK = 7;
+    /**
+     * The number of months in a year.
+     */
+    Constants.MONTHS_IN_YEAR = 12;
+    /**
+     * The number of hours in a day (not including DST days).
+     */
+    Constants.HOURS_IN_DAY = 24;
+    /**
+     * The first month of the year.
+     */
+    Constants.MONTH_MIN = 0;
+    /**
+     * The last month of the year.
+     */
+    Constants.MONTH_MAX = 11;
+    /**
+     * The first day of a month.
+     */
+    Constants.DAY_MIN = 1;
+    /**
+     * The last day of the longest month.
+     */
+    Constants.DAY_MAX = 31;
+    /**
+     * The first hour of the day.
+     */
+    Constants.HOUR_MIN = 0;
+    /**
+     * The last hour of the day.
+     */
+    Constants.HOUR_MAX = 23;
+    /**
+     * The first minute of the hour.
+     */
+    Constants.MINUTE_MIN = 0;
+    /**
+     * The last minute of the hour.
+     */
+    Constants.MINUTE_MAX = 59;
+    /**
+     * The first second of the minute.
+     */
+    Constants.SECOND_MIN = 0;
+    /**
+     * The last second of the minute.
+     */
+    Constants.SECOND_MAX = 59;
+    /**
+     * The first millisecond of the second.
+     */
+    Constants.MILLIS_MIN = 0;
+    /**
+     * The last millisecond of the second.
+     */
+    Constants.MILLIS_MAX = 999;
+    /**
+     * The first day of the week.
+     */
+    Constants.WEEKDAY_MIN = 0;
+    /**
+     * The last day of the week.
+     */
+    Constants.WEEKDAY_MAX = 6;
+    /**
+     * The default duration for an event.
+     */
+    Constants.DURATION_DEFAULT = 1;
+    /**
+     * The default duration unit for an all day event.
+     */
+    Constants.DURATION_DEFAULT_UNIT_ALL = 'days';
+    /**
+     * The default duration unit for an event at a given time.
+     */
+    Constants.DURATION_DEFAULT_UNIT_TIMES = 'hours';
+    /**
+     * Computes the duration unit given its for an all day event.
+     *
+     * @param all If the event is all day.
+     * @return The default unit for the event.
+     */
+    Constants.DURATION_DEFAULT_UNIT = function (all) { return all ? Constants.DURATION_DEFAULT_UNIT_ALL :
+        Constants.DURATION_DEFAULT_UNIT_TIMES; };
+    /**
+     * The number of milliseconds for various duration units. These are worse case
+     * scenario and do not include DST changes.
+     */
+    Constants.DURATION_TO_MILLIS = {
+        minute: Constants.MILLIS_IN_MINUTE,
+        minutes: Constants.MILLIS_IN_MINUTE,
+        hour: Constants.MILLIS_IN_HOUR,
+        hours: Constants.MILLIS_IN_HOUR,
+        day: Constants.MILLIS_IN_DAY,
+        days: Constants.MILLIS_IN_DAY,
+        week: Constants.MILLIS_IN_WEEK,
+        weeks: Constants.MILLIS_IN_WEEK,
+        month: Constants.MILLIS_IN_DAY * Constants.DAY_MAX,
+        months: Constants.MILLIS_IN_DAY * Constants.DAY_MAX
+    };
+    /**
+     * The maximum estimated number of events per day. This is used to calculate
+     * [[CalendarEvent.id]] to give each event a unique ID. If you think you will
+     * have more events than this per day, you can enlarge the value.
+     */
+    Constants.MAX_EVENTS_PER_DAY = 24;
+    /**
+     * The day of the week which determines the first week of the year or month.
+     * By default this day is Thursday.
+     */
+    Constants.WEEK_OF_MONTH_MINIMUM_WEEKDAY = 4;
+    return Constants;
+}());
+
+
 // CONCATENATED MODULE: ./src/DaySpan.ts
+
 
 
 
@@ -554,6 +702,76 @@ var DaySpan_DaySpan = (function () {
         if (op === void 0) { op = Op.DOWN; }
         if (absolute === void 0) { absolute = true; }
         return this.start.yearsBetween(this.end, op, absolute);
+    };
+    /**
+     * Returns a delta value between 0 and 1 which represents where the
+     * [[DaySpan.start]] is relative to the given day. The delta value would
+     * be less than 0 if the start of the event is before the given day.
+     *
+     * @param relativeTo The day to find the start delta relative to.
+     * @return A number between 0 and 1 if the start of this span is in the
+     *    24-hour period starting at the given timestamp, otherwise the value
+     *    returned may be less than 0 or greater than 1.
+     */
+    DaySpan.prototype.startDelta = function (relativeTo) {
+        return (this.start.time - relativeTo.time) / Constants.MILLIS_IN_DAY;
+    };
+    /**
+     * Returns a delta value between 0 and 1 which represents where the
+     * [[DaySpan.end]] is relative to the given day. The delta value would
+     * be greater than 1 if the end of the event is after the given day.
+     *
+     * @param relativeTo The day to find the end delta relative to.
+     * @return A number between 0 and 1 if the end of this span is in the
+     *    24-hour period starting at the given timestamp, otherwise the value
+     *    returned may be less than 0 or greater than 1.
+     */
+    DaySpan.prototype.endDelta = function (relativeTo) {
+        return (this.end.time - relativeTo.time) / Constants.MILLIS_IN_DAY;
+    };
+    /**
+     * Calculates the bounds for span event if it were placed in a rectangle which
+     * represents a day (24 hour period). By default the returned values are
+     * between 0 and 1 and can be scaled by the proper rectangle dimensions or the
+     * rectangle dimensions can be passed to this function.
+     *
+     * @param relativeTo The day to find the bounds relative to. If this is not the
+     *    start of the day the returned bounds is relative to the given time.
+     * @param dayHeight The height of the rectangle of the day.
+     * @param dayWidth The width of the rectangle of the day.
+     * @param columnOffset The offset in the rectangle of the day to adjust this
+     *    span by. This also reduces the width of the returned bounds to keep the
+     *    bounds in the rectangle of the day.
+     * @param clip `true` if the bounds should stay in the day rectangle, `false`
+     *    and the bounds may go outside the rectangle of the day for multi-day
+     *    spans.
+     * @param offsetX How much to translate the left & right properties by.
+     * @param offsetY How much to translate the top & bottom properties by.
+     * @returns The calculated bounds for this span.
+     */
+    DaySpan.prototype.getBounds = function (relativeTo, dayHeight, dayWidth, columnOffset, clip, offsetX, offsetY) {
+        if (dayHeight === void 0) { dayHeight = 1; }
+        if (dayWidth === void 0) { dayWidth = 1; }
+        if (columnOffset === void 0) { columnOffset = 0; }
+        if (clip === void 0) { clip = true; }
+        if (offsetX === void 0) { offsetX = 0; }
+        if (offsetY === void 0) { offsetY = 0; }
+        var startRaw = this.startDelta(relativeTo);
+        var endRaw = this.endDelta(relativeTo);
+        var start = clip ? Math.max(0, startRaw) : startRaw;
+        var end = clip ? Math.min(1, endRaw) : endRaw;
+        var left = columnOffset;
+        var right = dayWidth - left;
+        var top = start * dayHeight;
+        var bottom = end * dayHeight;
+        return {
+            top: top + offsetY,
+            bottom: bottom + offsetY,
+            height: bottom - top,
+            left: left + offsetX,
+            right: right + offsetX,
+            width: right
+        };
     };
     /**
      * Summarizes this span given an approximate unit of time and a few other
@@ -1173,153 +1391,6 @@ Identifier_Identifier.Month = new Identifier_IdentifierMonth();
 Identifier_Identifier.Quarter = new Identifier_IdentifierQuarter();
 Identifier_Identifier.Year = new Identifier_IdentifierYear();
 
-// CONCATENATED MODULE: ./src/Constants.ts
-
-/**
- * A class that stores commonly used values.
- */
-var Constants = (function () {
-    function Constants() {
-    }
-    /**
-     * The number of milliseconds in a second.
-     */
-    Constants.MILLIS_IN_SECOND = 1000;
-    /**
-     * The number of milliseconds in a minute.
-     */
-    Constants.MILLIS_IN_MINUTE = Constants.MILLIS_IN_SECOND * 60;
-    /**
-     * The number of milliseconds in an hour.
-     */
-    Constants.MILLIS_IN_HOUR = Constants.MILLIS_IN_MINUTE * 60;
-    /**
-     * The number of milliseconds in a day (not including DST days).
-     */
-    Constants.MILLIS_IN_DAY = Constants.MILLIS_IN_HOUR * 24;
-    /**
-     * The number of milliseconds in a week (not including ones that include DST).
-     */
-    Constants.MILLIS_IN_WEEK = Constants.MILLIS_IN_DAY * 7;
-    /**
-     * The number of days in a week.
-     */
-    Constants.DAYS_IN_WEEK = 7;
-    /**
-     * The number of months in a year.
-     */
-    Constants.MONTHS_IN_YEAR = 12;
-    /**
-     * The number of hours in a day (not including DST days).
-     */
-    Constants.HOURS_IN_DAY = 24;
-    /**
-     * The first month of the year.
-     */
-    Constants.MONTH_MIN = 0;
-    /**
-     * The last month of the year.
-     */
-    Constants.MONTH_MAX = 11;
-    /**
-     * The first day of a month.
-     */
-    Constants.DAY_MIN = 1;
-    /**
-     * The last day of the longest month.
-     */
-    Constants.DAY_MAX = 31;
-    /**
-     * The first hour of the day.
-     */
-    Constants.HOUR_MIN = 0;
-    /**
-     * The last hour of the day.
-     */
-    Constants.HOUR_MAX = 23;
-    /**
-     * The first minute of the hour.
-     */
-    Constants.MINUTE_MIN = 0;
-    /**
-     * The last minute of the hour.
-     */
-    Constants.MINUTE_MAX = 59;
-    /**
-     * The first second of the minute.
-     */
-    Constants.SECOND_MIN = 0;
-    /**
-     * The last second of the minute.
-     */
-    Constants.SECOND_MAX = 59;
-    /**
-     * The first millisecond of the second.
-     */
-    Constants.MILLIS_MIN = 0;
-    /**
-     * The last millisecond of the second.
-     */
-    Constants.MILLIS_MAX = 999;
-    /**
-     * The first day of the week.
-     */
-    Constants.WEEKDAY_MIN = 0;
-    /**
-     * The last day of the week.
-     */
-    Constants.WEEKDAY_MAX = 6;
-    /**
-     * The default duration for an event.
-     */
-    Constants.DURATION_DEFAULT = 1;
-    /**
-     * The default duration unit for an all day event.
-     */
-    Constants.DURATION_DEFAULT_UNIT_ALL = 'days';
-    /**
-     * The default duration unit for an event at a given time.
-     */
-    Constants.DURATION_DEFAULT_UNIT_TIMES = 'hours';
-    /**
-     * Computes the duration unit given its for an all day event.
-     *
-     * @param all If the event is all day.
-     * @return The default unit for the event.
-     */
-    Constants.DURATION_DEFAULT_UNIT = function (all) { return all ? Constants.DURATION_DEFAULT_UNIT_ALL :
-        Constants.DURATION_DEFAULT_UNIT_TIMES; };
-    /**
-     * The number of milliseconds for various duration units. These are worse case
-     * scenario and do not include DST changes.
-     */
-    Constants.DURATION_TO_MILLIS = {
-        minute: Constants.MILLIS_IN_MINUTE,
-        minutes: Constants.MILLIS_IN_MINUTE,
-        hour: Constants.MILLIS_IN_HOUR,
-        hours: Constants.MILLIS_IN_HOUR,
-        day: Constants.MILLIS_IN_DAY,
-        days: Constants.MILLIS_IN_DAY,
-        week: Constants.MILLIS_IN_WEEK,
-        weeks: Constants.MILLIS_IN_WEEK,
-        month: Constants.MILLIS_IN_DAY * Constants.DAY_MAX,
-        months: Constants.MILLIS_IN_DAY * Constants.DAY_MAX
-    };
-    /**
-     * The maximum estimated number of events per day. This is used to calculate
-     * [[CalendarEvent.id]] to give each event a unique ID. If you think you will
-     * have more events than this per day, you can enlarge the value.
-     */
-    Constants.MAX_EVENTS_PER_DAY = 24;
-    /**
-     * The day of the week which determines the first week of the year or month.
-     * By default this day is Thursday.
-     */
-    Constants.WEEK_OF_MONTH_MINIMUM_WEEKDAY = 4;
-    return Constants;
-}());
-
-
 // CONCATENATED MODULE: ./src/Suffix.ts
 
 /**
@@ -1814,10 +1885,12 @@ var Schedule_Schedule = (function () {
      * Sets the schedule with the given input.
      *
      * @param input The input which describes the schedule of events.
+     * @param parseMeta A function to use when parsing meta input into the desired type.
      * @see [[Parse.schedule]]
      */
-    Schedule.prototype.set = function (input) {
-        Parse_Parse.schedule(input, this);
+    Schedule.prototype.set = function (input, parseMeta) {
+        if (parseMeta === void 0) { parseMeta = (function (x) { return x; }); }
+        Parse_Parse.schedule(input, Functions.coalesce(input.parseMeta, parseMeta), this);
         return this;
     };
     Object.defineProperty(Schedule.prototype, "lastTime", {
@@ -2956,10 +3029,14 @@ var Parse_Parse = (function () {
      * ```
      *
      * @param input The input to parse.
+     * @param value The default value if the input given is an array of identifiers.
+     * @param parseMeta A function to use to parse a modifier.
+     * @param out The modifier to set the identifiers and values of and return.
      * @returns The object with identifier keys and `true` values.
      * @see [[Day.dayIdentifier]]
      */
-    Parse.modifier = function (input, value, out) {
+    Parse.modifier = function (input, value, parseMeta, out) {
+        if (parseMeta === void 0) { parseMeta = (function (x) { return x; }); }
         if (out === void 0) { out = new ScheduleModifier_ScheduleModifier(); }
         var map = {};
         if (Functions.isArray(input)) {
@@ -2978,7 +3055,7 @@ var Parse_Parse = (function () {
         }
         if (Functions.isObject(input)) {
             for (var identifier in input) {
-                map[identifier] = input[identifier];
+                map[identifier] = parseMeta(input[identifier]);
             }
         }
         out.map = map;
@@ -2989,10 +3066,12 @@ var Parse_Parse = (function () {
      * repeat and they may be all day events or at specific times.
      *
      * @param input The input to parse into a schedule.
+     * @param parseMeta A function to use when parsing meta input into the desired type.
      * @param out The schedule to set the values of and return.
      * @returns An instance of the parsed [[Schedule]].
      */
-    Parse.schedule = function (input, out) {
+    Parse.schedule = function (input, parseMeta, out) {
+        if (parseMeta === void 0) { parseMeta = (function (x) { return x; }); }
         if (out === void 0) { out = new Schedule_Schedule(); }
         if (input instanceof Schedule_Schedule) {
             return input;
@@ -3012,10 +3091,10 @@ var Parse_Parse = (function () {
         out.durationUnit = Functions.coalesce(input.durationUnit, Constants.DURATION_DEFAULT_UNIT(fullDay));
         out.start = this.day(input.start);
         out.end = this.day(input.end);
-        out.exclude = this.modifier(input.exclude, true, out.exclude);
-        out.include = this.modifier(input.include, true, out.include);
-        out.cancel = this.modifier(input.cancel, true, out.cancel);
-        out.meta = this.modifier(input.meta, null, out.meta);
+        out.exclude = this.modifier(input.exclude, true, undefined, out.exclude);
+        out.include = this.modifier(input.include, true, undefined, out.include);
+        out.cancel = this.modifier(input.cancel, true, undefined, out.cancel);
+        out.meta = this.modifier(input.meta, null, parseMeta, out.meta);
         out.year = this.frequency(input.year, 'year');
         out.month = this.frequency(input.month, 'month');
         out.week = this.frequency(input.week, 'week');
@@ -3058,17 +3137,21 @@ var Parse_Parse = (function () {
      * Parses [[EventInput]] and returns an [[Event]].
      *
      * @param input The input to parse.
+     * @param parseData A function to use when parsing data input into the desired type.
+     * @param parseMeta A function to use when parsing meta input into the desired type.
      * @returns The parsed value.
      */
-    Parse.event = function (input) {
+    Parse.event = function (input, parseData, parseMeta) {
+        if (parseData === void 0) { parseData = (function (x) { return x; }); }
+        if (parseMeta === void 0) { parseMeta = (function (x) { return x; }); }
         if (input instanceof Event) {
             return input;
         }
         if (!input.schedule) {
             return null;
         }
-        var schedule = this.schedule(input.schedule);
-        return new Event(schedule, input.data, input.id, input.visible);
+        var schedule = this.schedule(input.schedule, parseMeta);
+        return new Event(schedule, parseData(input.data), input.id, input.visible);
     };
     /**
      * Parses a schedule from a CRON pattern. TODO
@@ -3865,7 +3948,7 @@ var CalendarEvent_CalendarEvent = (function () {
          * be less than 0 if the start of the event is before [[Calendar.day]].
          */
         get: function () {
-            return (this.start.time - this.day.time) / Constants.MILLIS_IN_DAY;
+            return this.time.startDelta(this.day);
         },
         enumerable: true,
         configurable: true
@@ -3877,7 +3960,7 @@ var CalendarEvent_CalendarEvent = (function () {
          * be greater than 1 if the end of the event is after [[Calendar.day]].
          */
         get: function () {
-            return (this.end.time - this.day.time) / Constants.MILLIS_IN_DAY;
+            return this.time.endDelta(this.day);
         },
         enumerable: true,
         configurable: true
@@ -3908,22 +3991,7 @@ var CalendarEvent_CalendarEvent = (function () {
         if (clip === void 0) { clip = true; }
         if (offsetX === void 0) { offsetX = 0; }
         if (offsetY === void 0) { offsetY = 0; }
-        var startRaw = this.startDelta;
-        var endRaw = this.endDelta;
-        var start = clip ? Math.max(0, startRaw) : startRaw;
-        var end = clip ? Math.min(1, endRaw) : endRaw;
-        var left = this.col * columnOffset;
-        var right = dayWidth - left;
-        var top = start * dayHeight;
-        var bottom = end * dayHeight;
-        return {
-            top: top + offsetY,
-            bottom: bottom + offsetY,
-            height: bottom - top,
-            left: left + offsetX,
-            right: right + offsetX,
-            width: right
-        };
+        return this.time.getBounds(this.day, dayHeight, dayWidth, this.col * columnOffset, clip, offsetX, offsetY);
     };
     /**
      * Changes the cancellation status of this event. By default this cancels
@@ -4057,6 +4125,20 @@ var Calendar_Calendar = (function () {
          */
         this.eventSorter = null;
         /**
+         * A function to use when parsing meta input into the desired type.
+         *
+         * @param input The input to parse.
+         * @returns The meta parsed from the given input, if any.
+         */
+        this.parseMeta = (function (x) { return x; });
+        /**
+         * A function to use when parsing meta input into the desired type.
+         *
+         * @param input The input to parse.
+         * @returns The meta parsed from the given input, if any.
+         */
+        this.parseData = (function (x) { return x; });
+        /**
          * A selection of days on the calendar. If no days are selected this is `null`.
          * This is merely used to keep the selection flags in [[CalendarDay]] updated
          * via [[Calendar.refreshSelection]].
@@ -4150,6 +4232,8 @@ var Calendar_Calendar = (function () {
         this.updateRows = Functions.coalesce(input.updateRows, this.updateRows);
         this.updateColumns = Functions.coalesce(input.updateColumns, this.updateColumns);
         this.eventSorter = Functions.coalesce(input.eventSorter, this.eventSorter);
+        this.parseMeta = Functions.coalesce(input.parseMeta, this.parseMeta);
+        this.parseData = Functions.coalesce(input.parseData, this.parseData);
         if (Functions.isArray(input.events)) {
             this.removeEvents();
             this.addEvents(input.events, false, true);
@@ -4627,7 +4711,7 @@ var Calendar_Calendar = (function () {
     Calendar.prototype.addEvent = function (event, allowDuplicates, delayRefresh) {
         if (allowDuplicates === void 0) { allowDuplicates = false; }
         if (delayRefresh === void 0) { delayRefresh = false; }
-        var parsed = Parse_Parse.event(event);
+        var parsed = Parse_Parse.event(event, this.parseData, this.parseMeta);
         if (!allowDuplicates) {
             var existing = this.findEvent(parsed);
             if (existing) {
