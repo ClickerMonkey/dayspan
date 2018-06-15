@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>FrequencyValueEvery | dayspan</title>
+	<title>IteratorAction | dayspan</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style type="text/css">/*! normalize.css v1.1.3 | MIT License | git.io/normalize */
@@ -909,14 +909,17 @@ img { max-width: 100%; }
 </header>
 <nav class="tsd-navigation secondary">
 	<ul>
-		<li class="current tsd-kind-interface">
-			<a href="frequencyvalueevery.html" class="tsd-kind-icon">Frequency<wbr>Value<wbr>Every</a>
+		<li class="current tsd-kind-enum">
+			<a href="iteratoraction.html" class="tsd-kind-icon">Iterator<wbr>Action</a>
 			<ul>
-				<li class=" tsd-kind-property tsd-parent-kind-interface">
-					<a href="frequencyvalueevery.html#every" class="tsd-kind-icon">every</a>
+				<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+					<a href="iteratoraction.html#continue" class="tsd-kind-icon">Continue</a>
 				</li>
-				<li class=" tsd-kind-property tsd-parent-kind-interface">
-					<a href="frequencyvalueevery.html#offset" class="tsd-kind-icon">offset</a>
+				<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+					<a href="iteratoraction.html#remove" class="tsd-kind-icon">Remove</a>
+				</li>
+				<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+					<a href="iteratoraction.html#stop" class="tsd-kind-icon">Stop</a>
 				</li>
 			</ul>
 		</li>
@@ -927,65 +930,69 @@ img { max-width: 100%; }
 		<section class="tsd-panel tsd-comment">
 			<div class="tsd-comment tsd-typography">
 				<div class="lead">
-					<p>A frequency that occurs at a constant rate with an optional offset.</p>
+					<p>An action to perform on the source as instructed by the iterator.</p>
 				</div>
 			</div>
-		</section>
-		<section class="tsd-panel tsd-hierarchy">
-			<h3>Hierarchy</h3>
-			<ul class="tsd-hierarchy">
-				<li>
-					<span class="target">FrequencyValueEvery</span>
-				</li>
-			</ul>
 		</section>
 		<section class="tsd-panel-group tsd-index-group">
 			<h2>Index</h2>
 			<section class="tsd-panel tsd-index-panel">
 				<div class="tsd-index-content">
 					<section class="tsd-index-section ">
-						<h3>Properties</h3>
+						<h3>Enumeration members</h3>
 						<ul class="tsd-index-list">
-							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="frequencyvalueevery.html#every" class="tsd-kind-icon">every</a></li>
-							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="frequencyvalueevery.html#offset" class="tsd-kind-icon">offset</a></li>
+							<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="iteratoraction.html#continue" class="tsd-kind-icon">Continue</a></li>
+							<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="iteratoraction.html#remove" class="tsd-kind-icon">Remove</a></li>
+							<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="iteratoraction.html#stop" class="tsd-kind-icon">Stop</a></li>
 						</ul>
 					</section>
 				</div>
 			</section>
 		</section>
 		<section class="tsd-panel-group tsd-member-group ">
-			<h2>Properties</h2>
-			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-				<a name="every" class="tsd-anchor"></a>
-				<h3>every</h3>
-				<div class="tsd-signature tsd-kind-icon">every<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+			<h2>Enumeration members</h2>
+			<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+				<a name="continue" class="tsd-anchor"></a>
+				<h3>Continue</h3>
+				<div class="tsd-signature tsd-kind-icon">Continue<span class="tsd-signature-symbol">:</span> </div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bcb57bb/src/Frequency.ts#L14">Frequency.ts:14</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bcb57bb/src/Iterator.ts#L42">Iterator.ts:42</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>How often the value occurs. For example, if this value is <code>2</code> the event will
-						occur on every other unit of time.</p>
+						<p>Continue iteration.</p>
 					</div>
 				</div>
 			</section>
-			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-				<a name="offset" class="tsd-anchor"></a>
-				<h3><span class="tsd-flag ts-flagOptional">Optional</span> offset</h3>
-				<div class="tsd-signature tsd-kind-icon">offset<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+			<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+				<a name="remove" class="tsd-anchor"></a>
+				<h3>Remove</h3>
+				<div class="tsd-signature tsd-kind-icon">Remove<span class="tsd-signature-symbol">:</span> </div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bcb57bb/src/Frequency.ts#L22">Frequency.ts:22</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bcb57bb/src/Iterator.ts#L52">Iterator.ts:52</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>The offset of the frequency which is between <code>0</code> and less than <code>every</code>.
-							This is <code>0</code> by default which means the frequency starts on <code>0</code> and occurs
-							on <code>every</code>, <code>every * 2</code>, <code>every * 3</code>, etc. For example if this value is <code>1</code>
-						and <code>every</code> is 3 the sequence will be: 1, 4, 7, 11, ...</p>
+						<p>Remove the current item if possible, and continue iteration.</p>
+					</div>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+				<a name="stop" class="tsd-anchor"></a>
+				<h3>Stop</h3>
+				<div class="tsd-signature tsd-kind-icon">Stop<span class="tsd-signature-symbol">:</span> </div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/bcb57bb/src/Iterator.ts#L47">Iterator.ts:47</a></li>
+					</ul>
+				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Stop iteration.</p>
 					</div>
 				</div>
 			</section>
