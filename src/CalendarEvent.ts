@@ -242,7 +242,12 @@ export class CalendarEvent<T, M>
    */
   public exclude(excluded: boolean = true): this
   {
-    this.schedule.exclude.set( this.start, excluded, this.identifierType );
+    let schedule: Schedule<M> = this.schedule;
+    let type: Identifier = this.identifierType;
+    let time: Day = this.start;
+
+    schedule.exclude.set( time, excluded, type );
+    schedule.include.set( time, !excluded, type );
 
     return this;
   }
@@ -262,7 +267,10 @@ export class CalendarEvent<T, M>
     let fromTime: Day = this.start;
 
     schedule.exclude.set( fromTime, true, type );
+    schedule.exclude.set( toTime, false, type );
+
     schedule.include.set( toTime, true, type );
+    schedule.include.set( fromTime, false, type );
 
     if (this.meta !== null)
     {
