@@ -4240,7 +4240,11 @@ var CalendarEvent_CalendarEvent = (function () {
      */
     CalendarEvent.prototype.exclude = function (excluded) {
         if (excluded === void 0) { excluded = true; }
-        this.schedule.exclude.set(this.start, excluded, this.identifierType);
+        var schedule = this.schedule;
+        var type = this.identifierType;
+        var time = this.start;
+        schedule.exclude.set(time, excluded, type);
+        schedule.include.set(time, !excluded, type);
         return this;
     };
     /**
@@ -4256,7 +4260,9 @@ var CalendarEvent_CalendarEvent = (function () {
         var type = this.identifierType;
         var fromTime = this.start;
         schedule.exclude.set(fromTime, true, type);
+        schedule.exclude.set(toTime, false, type);
         schedule.include.set(toTime, true, type);
+        schedule.include.set(fromTime, false, type);
         if (this.meta !== null) {
             schedule.meta.unset(fromTime, type);
             schedule.meta.set(toTime, this.meta, type);
