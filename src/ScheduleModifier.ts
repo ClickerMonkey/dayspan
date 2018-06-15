@@ -2,7 +2,7 @@
 import { Identifier, IdentifierInput } from './Identifier';
 import { Day } from './Day';
 import { DaySpan } from './DaySpan';
-import { Iterator } from './Iterator';
+import { Iterator, IteratorAction } from './Iterator';
 
 
 /**
@@ -37,6 +37,25 @@ export class ScheduleModifier<T>
    * The map of values mapped by their [[Identifier]]s.
    */
   public map: { [id: string]: T };
+
+
+  /**
+   * Creates a new schedule modifier.
+   */
+  public constructor()
+  {
+    this.map = {};
+  }
+
+  /**
+   * Clears the modifier of all modifications.
+   */
+  public clear(): this
+  {
+    this.map = {};
+
+    return this;
+  }
 
   /**
    * Returns `true` if this modifier lacks any modifications, otherwise `false`.
@@ -106,7 +125,7 @@ export class ScheduleModifier<T>
    */
   public query(query: IdentifierInput): Iterator<[IdentifierInput, T]>
   {
-    return new Iterator<[IdentifierInput, T]>((callback, iterator) =>
+    return new Iterator<[IdentifierInput, T]>(iterator =>
     {
       let map = this.map;
 
@@ -116,11 +135,13 @@ export class ScheduleModifier<T>
         {
           let value: T = map[ id ];
 
-          callback([id, value], iterator);
-
-          if (!iterator.iterating)
+          switch (iterator.act([id, value]))
           {
-            break;
+            case IteratorAction.Stop:
+              return;
+            case IteratorAction.Remove:
+              delete map[ id ];
+              break;
           }
         }
       }
@@ -138,9 +159,9 @@ export class ScheduleModifier<T>
   public move(from: Day, fromType: Identifier, to: Day, toType: Identifier): this
   {
     let fromIdentifier = fromType.get( from );
-    let toIdentifer = toType.get( to );
+    let toIdentifier = toType.get( to );
 
-    this.map[ toIdentifer ] = this.map[ fromIdentifier ];
+    this.map[ toIdentifier ] = this.map[ fromIdentifier ];
 
     delete this.map[ fromIdentifier ];
 

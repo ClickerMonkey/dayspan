@@ -11,7 +11,7 @@ import { SortEvent } from './Sort';
 import { Constants } from './Constants';
 import { CalendarDay } from './CalendarDay';
 import { CalendarEvent } from './CalendarEvent';
-import { Iterator } from './Iterator';
+import { Iterator, IteratorAction } from './Iterator';
 
 
 /**
@@ -847,17 +847,16 @@ export class Calendar<T, M>
    */
   public iterateDays(): Iterator<CalendarDay<T, M>>
   {
-    return new Iterator<CalendarDay<T, M>>((callback, iterator) =>
+    return new Iterator<CalendarDay<T, M>>(iterator =>
     {
       let days: CalendarDay<T, M>[] = this.days;
 
       for (let i = 0; i < days.length; i++)
       {
-        callback( days[ i ], iterator );
-
-        if (!iterator.iterating)
+        switch (iterator.act(days[ i ]))
         {
-          break;
+          case IteratorAction.Stop:
+            return;
         }
       }
     });

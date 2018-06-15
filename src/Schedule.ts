@@ -10,7 +10,7 @@ import { Time, TimeInput } from './Time';
 import { Suffix } from './Suffix';
 import { ScheduleModifier, ScheduleModifierSpan } from './ScheduleModifier';
 import { Units } from './Units';
-import { Iterator } from './Iterator';
+import { Iterator, IteratorAction } from './Iterator';
 
 // @ts-ignore
 import * as moment from 'moment';
@@ -737,7 +737,7 @@ export class Schedule<M>
    */
   public iterateDaycast(day: Day, max: number, next: boolean, includeDay: boolean = false, lookup: number = 366): Iterator<Day>
   {
-    return new Iterator<Day>((callback, iterator) =>
+    return new Iterator<Day>(iterator =>
     {
       let iterated: number = 0;
 
@@ -750,9 +750,9 @@ export class Schedule<M>
 
         if (!this.iterateSpans( day, false ).isEmpty())
         {
-          callback( day, iterator );
+          let action: IteratorAction = iterator.act( day );
 
-          if (!iterator.iterating || ++iterated >= max)
+          if (action === IteratorAction.Stop || ++iterated >= max)
           {
             return;
           }
@@ -773,7 +773,7 @@ export class Schedule<M>
    */
   public iterateSpans(day: Day, covers: boolean = false): Iterator<DaySpan>
   {
-    return new Iterator<DaySpan>((callback, iterator) =>
+    return new Iterator<DaySpan>(iterator =>
     {
       let current: Day = day;
       let lookBehind: number = covers ? this.durationInDays : 0;
@@ -794,11 +794,10 @@ export class Schedule<M>
             // If that dayspan intersects with the given day, it's a winner!
             if (span.matchesDay( day ))
             {
-              callback( span, iterator );
-
-              if (!iterator.iterating)
+              switch (iterator.act( span ))
               {
-                return;
+                case IteratorAction.Stop:
+                  return;
               }
             }
           }
@@ -826,11 +825,10 @@ export class Schedule<M>
               // has not specifically been excluded...
               if (span.matchesDay( day ) && !this.isExcluded( span.start, true ))
               {
-                callback( span, iterator );
-
-                if (!iterator.iterating)
+                switch (iterator.act( span ))
                 {
-                  return;
+                  case IteratorAction.Stop:
+                    return;
                 }
               }
             }
@@ -842,15 +840,15 @@ export class Schedule<M>
             // We only want the ones that overlap with the given day.
             this.iterateIncludeTimes(current, day).iterate((span, timeIterator) =>
             {
-              callback( span, iterator );
-
-              if (!iterator.iterating)
+              switch (iterator.act( span ))
               {
-                timeIterator.stop();
+                case IteratorAction.Stop:
+                  timeIterator.stop();
+                  break;
               }
             })
 
-            if (!iterator.iterating)
+            if (iterator.action === IteratorAction.Stop)
             {
               return;
             }

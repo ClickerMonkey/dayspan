@@ -157,7 +157,7 @@ export class Time
    * @returns A unique identifier for this time. The number returned is in the
    *  following format: SSSssmmHH
    */
-  public toIdentifer(): number
+  public toIdentifier(): number
   {
     return this.hour +
       this.minute * 100 +

@@ -1461,6 +1461,24 @@ var Suffix = (function () {
 
 
 /**
+ * An action to perform on the source as instructed by the iterator.
+ */
+var IteratorAction;
+(function (IteratorAction) {
+    /**
+     * Continue iteration.
+     */
+    IteratorAction[IteratorAction["Continue"] = 0] = "Continue";
+    /**
+     * Stop iteration.
+     */
+    IteratorAction[IteratorAction["Stop"] = 1] = "Stop";
+    /**
+     * Remove the current item if possible, and continue iteration.
+     */
+    IteratorAction[IteratorAction["Remove"] = 2] = "Remove";
+})(IteratorAction = IteratorAction || (IteratorAction = {}));
+/**
  * A class that allows an iteratable source to be iterated any number of times
  * by providing the following functionality:
  *
@@ -1468,9 +1486,20 @@ var Suffix = (function () {
  * - [[Iterator.first]]: Gets the first item in the source.
  * - [[Iterator.count]]: Counds the number of items in the source.
  * - [[Iterator.list]]: Builds a list of the items in the source.
+ * - [[Iterator.object]]: Builds an object of the items in the source.
+ * - [[Iterator.reduce]]: Reduces the items in the source down to a single value.
+ * - [[Iterator.purge]]: Removes items from the source which meet some criteria.
+ * - [[Iterator.filter]]: Returns a subset of items that meet some criteria by
+ *    returning a new Iterator.
  * - [[Iterator.map]]: Maps each item in the source to another item by returning
  *    a new Iterator.
  * - [[Iterator.iterate]]: Invokes a function for each item in the source.
+ *
+ * The following static functions exist to help iterate simple sources:
+ *
+ * - [[Iterator.forArray]]: Iterates an array, optionally reverse
+ * - [[Iterator.forObject]]: Iterates the properties of an object, optionally
+ *    just the properties explicitly set on the object.
  *
  * ```typescript
  * let iter = object.iterateThings();
@@ -1483,11 +1512,21 @@ var Suffix = (function () {
  * iter.list();                 // get all items as array
  * iter.list(myArray);          // add all items to given array
  * iter.list([], d => d.flag);  // get all items as array that meet some criteria
+ * iter.object(d => d.id);      // get all items as an object keyed by a value (ex: id)
+ * iter.object(d => d.id, {},
+ *    d => d.flag);             // get all items as an object keyed by a value where the item meets some criteria (ex: key id if flag is truthy)
+ * iter.purge(d => d.flag);     // remove all items from source that meet some criteria
+ * iter.filter(d => d.flag);    // returns an iterator which iterates a subset of items which meet some criteria
+ * iter.reduce<number>(0,
+ *   (d, t) => t + d.size);     // reduces all items to a single value (ex: sums all size)
+ * iter.reduce<number>(0,
+ *   (d, t) => t + d.size,
+ *   d => d.flag);              // reduces all items to a single value (ex: sums all size) where the item meets some criteria
  * iter.map<S>(d => d.subitem); // return an iterator for subitems if they exist
  * iter.iterate(d => log(d));   // do something for each item
  * ```
  *
- * @typeparam The type of item being iterated.
+ * @typeparam T The type of item being iterated.
  */
 var Iterator_Iterator = (function () {
     /**
@@ -1500,12 +1539,27 @@ var Iterator_Iterator = (function () {
          * A result of the iteration passed to [[Iterator.stop]].
          */
         this.result = undefined;
-        /**
-         * Whether or not this iterator is currently iterating over the source.
-         */
-        this.iterating = false;
         this.source = source;
     }
+    /**
+     * Returns a clone of this iterator with the same source. This is necessary
+     * if you want to iterate all or a portion of the source while already
+     * iterating it (like a nested loop).
+     */
+    Iterator.prototype.clone = function () {
+        return new Iterator(this.source);
+    };
+    /**
+     * Passes the given item to the iterator callback and returns the action
+     * requested at this point in iteration.
+     *
+     * @param item The current item being iterated.
+     */
+    Iterator.prototype.act = function (item) {
+        this.action = IteratorAction.Continue;
+        this.callback(item, this);
+        return this.action;
+    };
     /**
      * Stops iteration and optionally sets the result of the iteration.
      *
@@ -1513,7 +1567,14 @@ var Iterator_Iterator = (function () {
      */
     Iterator.prototype.stop = function (result) {
         this.result = result;
-        this.iterating = false;
+        this.action = IteratorAction.Stop;
+        return this;
+    };
+    /**
+     * Signals to the iterator source that the current item wants to be removed.
+     */
+    Iterator.prototype.remove = function () {
+        this.action = IteratorAction.Remove;
         return this;
     };
     /**
@@ -1594,6 +1655,80 @@ var Iterator_Iterator = (function () {
         return out;
     };
     /**
+     * Builds an object of items from the source keyed by a result returned by
+     * a `getKey` function.
+     *
+     * @param getKey The function which returns the key of the object.
+     * @param out The object to place the items in.
+     * @param filter The function which determines which items are set on the object.
+     * @returns The reference to `out` which has had items set to it which
+     *    optionally match the given criteria.
+     */
+    Iterator.prototype.object = function (getKey, out, filter) {
+        if (out === void 0) { out = {}; }
+        if (filter === void 0) { filter = null; }
+        this.iterate(function (item, iterator) {
+            if (filter && !filter(item)) {
+                return;
+            }
+            var key = getKey(item);
+            out[key] = item;
+        });
+        return out;
+    };
+    /**
+     * Removes items from the source that match certain criteria.
+     *
+     * @param filter The function which determines which items to remove.
+     */
+    Iterator.prototype.purge = function (filter) {
+        this.iterate(function (item, iterator) {
+            if (filter(item)) {
+                iterator.remove();
+            }
+        });
+        return this;
+    };
+    /**
+     * Reduces all the items in the source to a single value given the initial
+     * value and a function to convert an item and the current reduced value
+     */
+    Iterator.prototype.reduce = function (initial, reducer, filter) {
+        if (filter === void 0) { filter = null; }
+        var reduced = initial;
+        this.iterate(function (item, iterator) {
+            if (filter && !filter(item)) {
+                return;
+            }
+            reduced = reducer(item, reduced);
+        });
+        return reduced;
+    };
+    /**
+     * Returns an iterator where this iterator is the source and the returned
+     * iterator is built on a subset of items which pass a `filter` function.
+     *
+     * @param filter The function which determines if an item should be iterated.
+     * @returns A new iterator for the filtered items from this iterator.
+     */
+    Iterator.prototype.filter = function (filter) {
+        var _this = this;
+        return new Iterator(function (next) {
+            _this.iterate(function (prevItem, prev) {
+                if (filter(prevItem)) {
+                    switch (next.act(prevItem)) {
+                        case IteratorAction.Stop:
+                            prev.stop();
+                            break;
+                        case IteratorAction.Remove:
+                            prev.remove();
+                            break;
+                    }
+                }
+            });
+        });
+    };
+    /**
      * Returns an iterator where this iterator is the source and the returned
      * iterator is built from mapped items pulled from items in the source
      * of this iterator. If the given callback `outerCallback` does not return
@@ -1601,24 +1736,28 @@ var Iterator_Iterator = (function () {
      * function can be specified to only look at mapping items which match
      * certain criteria.
      *
-     * @param outerCallback The function which maps an item to another.
+     * @param mapper The function which maps an item to another.
      * @param filter The function which determines if an item should be mapped.
      * @returns A new iterator for the mapped items from this iterator.
      */
-    Iterator.prototype.map = function (outerCallback, filter) {
+    Iterator.prototype.map = function (mapper, filter) {
         var _this = this;
         if (filter === void 0) { filter = null; }
-        return new Iterator(function (innerCallback, inner) {
-            _this.iterate(function (outerItem, outer) {
-                if (filter && !filter(outerItem)) {
+        return new Iterator(function (next) {
+            _this.iterate(function (prevItem, prev) {
+                if (filter && !filter(prevItem)) {
                     return;
                 }
-                var innerItem = outerCallback(outerItem, outer);
-                if (Functions.isDefined(innerItem)) {
-                    innerCallback(innerItem, inner);
-                }
-                if (!outer.iterating) {
-                    inner.stop();
+                var nextItem = mapper(prevItem, prev);
+                if (Functions.isDefined(nextItem)) {
+                    switch (next.act(nextItem)) {
+                        case IteratorAction.Stop:
+                            prev.stop();
+                            break;
+                        case IteratorAction.Remove:
+                            prev.remove();
+                            break;
+                    }
                 }
             });
         });
@@ -1632,10 +1771,83 @@ var Iterator_Iterator = (function () {
      */
     Iterator.prototype.iterate = function (callback) {
         this.result = undefined;
-        this.iterating = true;
-        this.source(callback, this);
-        this.iterating = false;
+        this.callback = callback;
+        this.action = IteratorAction.Continue;
+        this.source(this);
+        this.callback = null;
         return this;
+    };
+    /**
+     * Passes the result of the iteration to the given function if a truthy
+     * result was passed to [[Iterator.stop]].
+     *
+     * @param getResult The function to pass the result to if it exists.
+     */
+    Iterator.prototype.withResult = function (getResult) {
+        if (this.result) {
+            getResult(this.result);
+        }
+        return this;
+    };
+    /**
+     * Returns an iterator for the given array optionally iterating it in reverse.
+     *
+     * @param items The array of items to iterate.
+     * @param reverse If the array should be iterated in reverse.
+     * @returns A new iterator for the given array.
+     */
+    Iterator.forArray = function (items, reverse) {
+        if (reverse === void 0) { reverse = false; }
+        return new Iterator(function (iterator) {
+            if (reverse) {
+                for (var i = items.length - 1; i >= 0; i--) {
+                    switch (iterator.act(items[i])) {
+                        case IteratorAction.Stop:
+                            return;
+                        case IteratorAction.Remove:
+                            items.splice(i, 1);
+                            break;
+                    }
+                }
+            }
+            else {
+                for (var i = 0; i < items.length; i++) {
+                    switch (iterator.act(items[i])) {
+                        case IteratorAction.Stop:
+                            return;
+                        case IteratorAction.Remove:
+                            items.splice(i, 1);
+                            i--;
+                            break;
+                    }
+                }
+            }
+        });
+    };
+    /**
+     * Returns an iterator for the given object optionally checking the
+     * `hasOwnProperty` function on the given object.
+     *
+     * @param items The object to iterate.
+     * @param hasOwnProperty If `hasOwnProperty` should be checked.
+     * @returns A new iterator for the given object.
+     */
+    Iterator.forObject = function (items, hasOwnProperty) {
+        if (hasOwnProperty === void 0) { hasOwnProperty = true; }
+        return new Iterator(function (iterator) {
+            for (var key in items) {
+                if (hasOwnProperty && !items.hasOwnProperty(key)) {
+                    continue;
+                }
+                switch (iterator.act(items[key])) {
+                    case IteratorAction.Stop:
+                        return;
+                    case IteratorAction.Remove:
+                        delete items[key];
+                        break;
+                }
+            }
+        });
     };
     return Iterator;
 }());
@@ -1652,8 +1864,19 @@ var Iterator_Iterator = (function () {
  * @typeparam T The type of data that modifies the schedule.
  */
 var ScheduleModifier_ScheduleModifier = (function () {
+    /**
+     * Creates a new schedule modifier.
+     */
     function ScheduleModifier() {
+        this.map = {};
     }
+    /**
+     * Clears the modifier of all modifications.
+     */
+    ScheduleModifier.prototype.clear = function () {
+        this.map = {};
+        return this;
+    };
     /**
      * Returns `true` if this modifier lacks any modifications, otherwise `false`.
      */
@@ -1717,14 +1940,17 @@ var ScheduleModifier_ScheduleModifier = (function () {
      */
     ScheduleModifier.prototype.query = function (query) {
         var _this = this;
-        return new Iterator_Iterator(function (callback, iterator) {
+        return new Iterator_Iterator(function (iterator) {
             var map = _this.map;
             for (var id in map) {
                 if (Identifier_Identifier.contains(query, id)) {
                     var value = map[id];
-                    callback([id, value], iterator);
-                    if (!iterator.iterating) {
-                        break;
+                    switch (iterator.act([id, value])) {
+                        case IteratorAction.Stop:
+                            return;
+                        case IteratorAction.Remove:
+                            delete map[id];
+                            break;
                     }
                 }
             }
@@ -1740,8 +1966,8 @@ var ScheduleModifier_ScheduleModifier = (function () {
      */
     ScheduleModifier.prototype.move = function (from, fromType, to, toType) {
         var fromIdentifier = fromType.get(from);
-        var toIdentifer = toType.get(to);
-        this.map[toIdentifer] = this.map[fromIdentifier];
+        var toIdentifier = toType.get(to);
+        this.map[toIdentifier] = this.map[fromIdentifier];
         delete this.map[fromIdentifier];
         return this;
     };
@@ -2214,15 +2440,15 @@ var Schedule_Schedule = (function () {
         var _this = this;
         if (includeDay === void 0) { includeDay = false; }
         if (lookup === void 0) { lookup = 366; }
-        return new Iterator_Iterator(function (callback, iterator) {
+        return new Iterator_Iterator(function (iterator) {
             var iterated = 0;
             for (var days = 0; days < lookup; days++) {
                 if (!includeDay || days > 0) {
                     day = next ? day.next() : day.prev();
                 }
                 if (!_this.iterateSpans(day, false).isEmpty()) {
-                    callback(day, iterator);
-                    if (!iterator.iterating || ++iterated >= max) {
+                    var action = iterator.act(day);
+                    if (action === IteratorAction.Stop || ++iterated >= max) {
                         return;
                     }
                 }
@@ -2242,7 +2468,7 @@ var Schedule_Schedule = (function () {
     Schedule.prototype.iterateSpans = function (day, covers) {
         var _this = this;
         if (covers === void 0) { covers = false; }
-        return new Iterator_Iterator(function (callback, iterator) {
+        return new Iterator_Iterator(function (iterator) {
             var current = day;
             var lookBehind = covers ? _this.durationInDays : 0;
             // If the events start at the end of the day and may last multiple days....
@@ -2256,9 +2482,9 @@ var Schedule_Schedule = (function () {
                         var span = _this.getFullSpan(current);
                         // If that dayspan intersects with the given day, it's a winner!
                         if (span.matchesDay(day)) {
-                            callback(span, iterator);
-                            if (!iterator.iterating) {
-                                return;
+                            switch (iterator.act(span)) {
+                                case IteratorAction.Stop:
+                                    return;
                             }
                         }
                     }
@@ -2279,9 +2505,9 @@ var Schedule_Schedule = (function () {
                             // If the event intersects with the given day and the occurrence
                             // has not specifically been excluded...
                             if (span.matchesDay(day) && !_this.isExcluded(span.start, true)) {
-                                callback(span, iterator);
-                                if (!iterator.iterating) {
-                                    return;
+                                switch (iterator.act(span)) {
+                                    case IteratorAction.Stop:
+                                        return;
                                 }
                             }
                         }
@@ -2291,12 +2517,13 @@ var Schedule_Schedule = (function () {
                         // might have moved/random event occurrents on the current day.
                         // We only want the ones that overlap with the given day.
                         _this.iterateIncludeTimes(current, day).iterate(function (span, timeIterator) {
-                            callback(span, iterator);
-                            if (!iterator.iterating) {
-                                timeIterator.stop();
+                            switch (iterator.act(span)) {
+                                case IteratorAction.Stop:
+                                    timeIterator.stop();
+                                    break;
                             }
                         });
-                        if (!iterator.iterating) {
+                        if (iterator.action === IteratorAction.Stop) {
                             return;
                         }
                     }
@@ -2744,7 +2971,7 @@ var Time_Time = (function () {
      * @returns A unique identifier for this time. The number returned is in the
      *  following format: SSSssmmHH
      */
-    Time.prototype.toIdentifer = function () {
+    Time.prototype.toIdentifier = function () {
         return this.hour +
             this.minute * 100 +
             this.second * 10000 +
@@ -4585,12 +4812,12 @@ var Calendar_Calendar = (function () {
      */
     Calendar.prototype.iterateDays = function () {
         var _this = this;
-        return new Iterator_Iterator(function (callback, iterator) {
+        return new Iterator_Iterator(function (iterator) {
             var days = _this.days;
             for (var i = 0; i < days.length; i++) {
-                callback(days[i], iterator);
-                if (!iterator.iterating) {
-                    break;
+                switch (iterator.act(days[i])) {
+                    case IteratorAction.Stop:
+                        return;
                 }
             }
         });
@@ -5514,6 +5741,7 @@ var Sorts = (function () {
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "DaySpan", function() { return DaySpan_DaySpan; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Functions", function() { return Functions; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Identifier", function() { return Identifier_Identifier; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "IteratorAction", function() { return IteratorAction; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Iterator", function() { return Iterator_Iterator; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Month", function() { return Month; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Op", function() { return Op; });
