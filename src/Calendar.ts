@@ -327,9 +327,12 @@ export class Calendar<T, M>
    * - [[Calendar.updateColumns]]
    * - [[Calendar.eventSorter]]
    * - [[Calendar.events]]
+   * - [[Calendar.parseData]]
+   * - [[Calendar.parseMeta]]
    *
-   * If `delayRefresh` is not given with `true` then [[Calendar.refresh]] will
-   * be called once the calendar properties have been updated.
+   * If [[CalendarInput.delayRefresh]] is not given with `true` then
+   * [[Calendar.refresh]] will be called once the calendar properties have been
+   * updated.
    *
    * @param input The new properties for this calendar to overwrite with.
    */
@@ -533,26 +536,34 @@ export class Calendar<T, M>
   }
 
   /**
-   * Splits up this calendar into an array of calendars. The resulting array
-   * will return [[Calendar.size]] number of calendars.
+   * Splits up this calendar into an iterable collection of calendars. The
+   * resulting iterator will return `size / by` number of calendars.
    *
-   * @param by The new size of the resulting calendars.
-   * @returns An array of calendars split from this calendar.
+   * @param by The new size of the resulting calendars. If the the size of the
+   *    current calendar is not divisible by this value the resulting calendars
+   *    may cover more or less than this calendar covers.
+   * @returns An iterator for the calendars produced.
    */
-  public split(by: number = 1): Calendar<T, M>[]
+  public split(by: number = 1): Iterator<Calendar<T, M>>
   {
-    let split: Calendar<T, M>[] = [];
-    let start: Day = this.start;
-    let end: Day = this.moveEnd( this.end, by - this.size );
-
-    for (let i = 0; i < this.size; i++)
+    return new Iterator<Calendar<T, M>>(iterator =>
     {
-      split.push(new Calendar(start, end, this.type, by, this.moveStart, this.moveEnd, this));
-      start = this.moveStart( start, by );
-      end = this.moveEnd( end, by );
-    }
+      let start: Day = this.start;
+      let end: Day = this.moveEnd( this.end, by - this.size );
 
-    return split;
+      for (let i = 0; i < this.size; i++)
+      {
+        let calendar = new Calendar(start, end, this.type, by, this.moveStart, this.moveEnd, this);
+
+        if (iterator.act(calendar) === IteratorAction.Stop)
+        {
+          return;
+        }
+
+        start = this.moveStart( start, by );
+        end = this.moveEnd( end, by );
+      }
+    });
   }
 
   /**

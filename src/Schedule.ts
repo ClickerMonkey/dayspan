@@ -684,9 +684,9 @@ export class Schedule<M>
    * @returns An array containing the next days on the schedule that events
    *    start or an empty array if there are none.
    */
-  public nextDays(day: Day, max: number, includeDay: boolean = false, lookAhead: number = 366): Day[]
+  public nextDays(day: Day, max: number, includeDay: boolean = false, lookAhead: number = 366): Iterator<Day>
   {
-    return this.iterateDaycast(day, max, true, includeDay, lookAhead).list();
+    return this.iterateDaycast(day, max, true, includeDay, lookAhead);
   }
 
   /**
@@ -717,9 +717,9 @@ export class Schedule<M>
    * @returns An array containing the previous days on the schedule that events
    *    start or an empty array if there are none.
    */
-  public prevDays(day: Day, max: number, includeDay: boolean = false, lookBack: number = 366): Day[]
+  public prevDays(day: Day, max: number, includeDay: boolean = false, lookBack: number = 366): Iterator<Day>
   {
-    return this.iterateDaycast(day, max, false, includeDay, lookBack).list();
+    return this.iterateDaycast(day, max, false, includeDay, lookBack);
   }
 
   /**
