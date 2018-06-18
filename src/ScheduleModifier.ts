@@ -116,39 +116,6 @@ export class ScheduleModifier<T>
   }
 
   /**
-   * Queries the modifier for all values/modifications which fall in the time
-   * span that the given identifier represents. All identifiers and their value
-   * are passed to the given callback.
-   *
-   * @param prefix The identifier
-   *
-   */
-  public query(query: IdentifierInput): Iterator<[IdentifierInput, T]>
-  {
-    return new Iterator<[IdentifierInput, T]>(iterator =>
-    {
-      let map = this.map;
-
-      for (let id in map)
-      {
-        if (Identifier.contains( query, id ))
-        {
-          let value: T = map[ id ];
-
-          switch (iterator.act([id, value]))
-          {
-            case IteratorAction.Stop:
-              return;
-            case IteratorAction.Remove:
-              delete map[ id ];
-              break;
-          }
-        }
-      }
-    });
-  }
-
-  /**
    * Moves the value/modification from one identifier to another.
    *
    * @param from The day to take the identifier from.
@@ -198,22 +165,58 @@ export class ScheduleModifier<T>
   }
 
   /**
+   * Iterates through the modifiers passing the identifier and the related value.
+   *
+   * @returns A new instance of an [[Iterator]].
+   */
+  public iterate(): Iterator<[IdentifierInput, T]>
+  {
+    return new Iterator<[IdentifierInput, T]>(iterator =>
+    {
+      let map = this.map;
+
+      for (let rawId in map)
+      {
+        let asNumber: number = parseInt( rawId );
+        let validAsNumber: boolean = asNumber + '' === rawId;
+        let id: IdentifierInput = validAsNumber ? asNumber : rawId;
+
+        switch (iterator.act([id, map[ rawId ]]))
+        {
+          case IteratorAction.Stop:
+            return;
+          case IteratorAction.Remove:
+            delete map[ rawId ];
+            break;
+        }
+      }
+    });
+  }
+
+  /**
+   * Queries the modifier for all values/modifications which fall in the time
+   * span that the given identifier represents. All identifiers and their value
+   * are passed to the given callback.
+   *
+   * @param prefix The identifier
+   * @returns A new instance of an [[Iterator]].
+   */
+  public query(query: IdentifierInput): Iterator<[IdentifierInput, T]>
+  {
+    return this.iterate()
+      .filter(([id, value]) => Identifier.contains( query, id ));
+    ;
+  }
+
+  /**
    * Returns all identifiers stored in this modifier.
    */
-  public identifiers(filter?: (value: T, id: IdentifierInput) => boolean): IdentifierInput[]
+  public identifiers(filter?: (value: T, id: IdentifierInput) => boolean): Iterator<IdentifierInput>
   {
-    let map = this.map;
-    let out: IdentifierInput[] = [];
-
-    for (let id in map)
-    {
-      if (!filter || filter( map[ id ], id ))
-      {
-        out.push( id );
-      }
-    }
-
-    return out;
+    return this.iterate()
+      .filter(([id, value]) => !filter || filter( value, id ))
+      .map<IdentifierInput>(([id, ]) => id)
+    ;
   }
 
   /**
@@ -225,25 +228,42 @@ export class ScheduleModifier<T>
    * @returns An array of spans calculated from the identifiers with the
    *    associated values/modifications.
    */
-  public spans(endInclusive: boolean = false): ScheduleModifierSpan<T>[]
+  public spans(endInclusive: boolean = false): Iterator<ScheduleModifierSpan<T>>
   {
-    let map = this.map;
-    let out: ScheduleModifierSpan<T>[] = [];
-
-    for (let id in map)
-    {
-      let type: Identifier = Identifier.find(id);
-
-      if (type)
+    return this.iterate()
+      .map(([id, value]) =>
       {
-        out.push({
-          span: type.span( id, endInclusive ),
-          value: map[ id ]
-        });
-      }
-    }
+        let type: Identifier = Identifier.find(id);
 
-    return out;
+        if (type)
+        {
+          let span = type.span( id, endInclusive);
+
+          return { span, value };
+        }
+      })
+    ;
+  }
+
+  /**
+   * Builds a list of the descriptions of the identifiers in this modifier.
+   *
+   * @param short If the description should use shorter language or longer.
+   * @returns The built list of descriptions.
+   */
+  public describe(short: boolean = false): Iterator<string>
+  {
+    return this.iterate()
+      .map<string>( ([id, ]) =>
+      {
+        let type: Identifier = Identifier.find( id );
+
+        if (type)
+        {
+          return type.describe( id, short );
+        }
+      })
+    ;
   }
 
   /**
@@ -265,30 +285,6 @@ export class ScheduleModifier<T>
       if (type)
       {
         out[ type.describe( id, short ) ] = map[ id ];
-      }
-    }
-
-    return out;
-  }
-
-  /**
-   * Builds a list of the descriptions of the identifiers in this modifier.
-   *
-   * @param short If the description should use shorter language or longer.
-   * @returns The built list of descriptions.
-   */
-  public describeList(short: boolean = false): string[]
-  {
-    let map = this.map;
-    let out: string[] = [];
-
-    for (let id in map)
-    {
-      let type: Identifier = Identifier.find(id);
-
-      if (type)
-      {
-        out.push( type.describe( id, short ) );
       }
     }
 

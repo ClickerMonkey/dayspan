@@ -1,10 +1,12 @@
 
 import { Constants } from './Constants';
-import { Day } from './Day';
+import { Day, DayProperty } from './Day';
 import { DaySpan, DaySpanBounds } from './DaySpan';
 import { Event } from './Event';
 import { Identifier, IdentifierInput } from './Identifier';
 import { Schedule } from './Schedule';
+import { Parse } from './Parse';
+import { FrequencyCheck } from './Frequency';
 
 
 /**
@@ -263,19 +265,36 @@ export class CalendarEvent<T, M>
   public move(toTime: Day): this
   {
     let schedule: Schedule<M> = this.schedule;
-    let type: Identifier = this.identifierType;
-    let fromTime: Day = this.start;
 
-    schedule.exclude.set( fromTime, true, type );
-    schedule.exclude.set( toTime, false, type );
-
-    schedule.include.set( toTime, true, type );
-    schedule.include.set( fromTime, false, type );
-
-    if (this.meta !== null)
+    if (schedule.isSingleEvent())
     {
-      schedule.meta.unset( fromTime, type );
-      schedule.meta.set( toTime, this.meta, type );
+      for (let check of schedule.checks)
+      {
+        let prop: DayProperty  = check.property;
+        let value = toTime[ prop ];
+        let frequency: FrequencyCheck = Parse.frequency( [value], prop );
+
+        schedule[ prop ] = frequency;
+      }
+
+      schedule.updateChecks();
+    }
+    else
+    {
+      let type: Identifier = this.identifierType;
+      let fromTime: Day = this.start;
+
+      schedule.exclude.set( fromTime, true, type );
+      schedule.exclude.set( toTime, false, type );
+
+      schedule.include.set( toTime, true, type );
+      schedule.include.set( fromTime, false, type );
+
+      if (this.meta !== null)
+      {
+        schedule.meta.unset( fromTime, type );
+        schedule.meta.set( toTime, this.meta, type );
+      }
     }
 
     return this;

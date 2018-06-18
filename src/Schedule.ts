@@ -902,6 +902,165 @@ export class Schedule<M>
   }
 
   /**
+   * Determines whether this schedule produces a single event, and no more.
+   * If this schedule has any includes, it's assumed to be a multiple event
+   * schedule. A single event can be detected in the following scenarios where
+   * each frequency has a single occurrence (see [[Schedule.isSingleFrequency]]).
+   *
+   * - year, day of year
+   * - year, month, day of month
+   * - year, month, week of month, day of week
+   * - year, week of year, day of week
+   *
+   * @returns `true` if this schedule produces a single event, otherwise `false`.
+   */
+  public isSingleEvent(): boolean
+  {
+    // 0 = full day, 1 = once a day, 1+ = multiple events a day
+    if (this.times.length > 1)
+    {
+      return false;
+    }
+
+    // Let's assume if there are includes, this is not a single event.
+    if (!this.include.isEmpty())
+    {
+      return false;
+    }
+
+    // If this can occur on multiple years, not a single event.
+    if (!this.isSingleYear())
+    {
+      return false;
+    }
+
+    // If this is a specific year and day of the year: single!
+    if (this.isSingleDayOfYear())
+    {
+      return true;
+    }
+
+    // If this is a specific year, month, and day of month: single!
+    if (this.isSingleMonth() && this.isSingleDayOfMonth())
+    {
+      return true;
+    }
+
+    // If this is a specific year, month, week of the month, day of the week: single!
+    if (this.isSingleMonth() && this.isSingleWeekOfMonth() && this.isSingleDayOfWeek())
+    {
+      return true;
+    }
+
+    // If this is a specific year, week of the year, day of the week: single!
+    if (this.isSingleWeekOfYear() && this.isSingleDayOfWeek())
+    {
+      return true;
+    }
+
+    // Doesn't look like a single event.
+    return false;
+  }
+
+  /**
+   * @returns `true` if this schedule produces events only in a specific year.
+   * @see [[Schedule.year]]
+   */
+  public isSingleYear(): boolean
+  {
+    return this.isSingleFrequency( this.year );
+  }
+
+  /**
+   * @returns `true` if this schedule produces events only in a specific month.
+   * @see [[Schedule.month]]
+   */
+  public isSingleMonth(): boolean
+  {
+    return this.isSingleFrequency( this.month );
+  }
+
+  /**
+   * @returns `true` if this schedule produces events only in a specific day of
+   *    the month.
+   * @see [[Schedule.dayOfMonth]]
+   * @see [[Schedule.lastDayOfMonth]]
+   */
+  public isSingleDayOfMonth(): boolean
+  {
+    return this.isSingleFrequency( this.dayOfMonth ) ||
+      this.isSingleFrequency( this.lastDayOfMonth );
+  }
+
+  /**
+   * @returns `true` if this schedule produces events only in a specific day of
+   *    the week.
+   * @see [[Schedule.dayOfWeek]]
+   */
+  public isSingleDayOfWeek(): boolean
+  {
+    return this.isSingleFrequency( this.dayOfWeek );
+  }
+
+  /**
+   * @returns `true` if this schedule produces events only in a specific day of
+   *    the year.
+   * @see [[Schedule.dayOfYear]]
+   */
+  public isSingleDayOfYear(): boolean
+  {
+    return this.isSingleFrequency( this.dayOfYear );
+  }
+
+  /**
+   * @returns `true` if this schedule produces events only in a specific week of
+   *    the month.
+   * @see [[Schedule.weekspanOfMonth]]
+   * @see [[Schedule.fullWeekOfMonth]]
+   * @see [[Schedule.weekOfMonth]]
+   * @see [[Schedule.lastFullWeekOfMonth]]
+   * @see [[Schedule.lastWeekspanOfMonth]]
+   */
+  public isSingleWeekOfMonth(): boolean
+  {
+    return this.isSingleFrequency( this.weekspanOfMonth ) ||
+      this.isSingleFrequency( this.fullWeekOfMonth ) ||
+      this.isSingleFrequency( this.weekOfMonth ) ||
+      this.isSingleFrequency( this.lastFullWeekOfMonth ) ||
+      this.isSingleFrequency( this.lastWeekspanOfMonth );
+  }
+
+  /**
+   * @returns `true` if this schedule produces events only in a specific week of
+   *    the year.
+   * @see [[Schedule.weekspanOfYear]]
+   * @see [[Schedule.fullWeekOfYear]]
+   * @see [[Schedule.week]]
+   * @see [[Schedule.weekOfYear]]
+   * @see [[Schedule.lastFullWeekOfYear]]
+   * @see [[Schedule.lastWeekspanOfYear]]
+   */
+  public isSingleWeekOfYear(): boolean
+  {
+    return this.isSingleFrequency( this.weekspanOfYear ) ||
+      this.isSingleFrequency( this.fullWeekOfYear ) ||
+      this.isSingleFrequency( this.week ) ||
+      this.isSingleFrequency( this.weekOfYear ) ||
+      this.isSingleFrequency( this.lastFullWeekOfYear ) ||
+      this.isSingleFrequency( this.lastWeekspanOfYear );
+  }
+
+  /**
+   * Determines if the given [[FrequencyCheck]] results in a single occurrence.
+   *
+   * @returns `true` if the frequency results in a single event, otherwise `false`.
+   */
+  public isSingleFrequency(frequency: FrequencyCheck): boolean
+  {
+    return fn.isArray( frequency.input ) && (<number[]>frequency.input).length === 1;
+  }
+
+  /**
    * Iterates timed events that were explicitly specified on the given day.
    * Those events could span multiple days so may be tested against another day.
    *
@@ -952,9 +1111,9 @@ export class Schedule<M>
   public toInput(returnDays: boolean = false, returnTimes: boolean = false, timeFormat: string = '', alwaysDuration: boolean = false): ScheduleInput<M>
   {
     let defaultUnit: string = Constants.DURATION_DEFAULT_UNIT( this.isFullDay() );
-    let exclusions: IdentifierInput[] = this.exclude.identifiers(v => v);
-    let inclusions: IdentifierInput[] = this.include.identifiers(v => v);
-    let cancels: IdentifierInput[] = this.cancel.identifiers(v => v);
+    let exclusions: IdentifierInput[] = this.exclude.identifiers(v => v).list();
+    let inclusions: IdentifierInput[] = this.include.identifiers(v => v).list();
+    let cancels: IdentifierInput[] = this.cancel.identifiers(v => v).list();
     let hasMeta: boolean = !this.meta.isEmpty();
     let out: ScheduleInput<M> = {};
     let times: TimeInput[]  = [];
@@ -1085,7 +1244,7 @@ export class Schedule<M>
 
     if (includeExcludes)
     {
-      let excludes: ScheduleModifierSpan<boolean>[] = this.exclude.spans();
+      let excludes: ScheduleModifierSpan<boolean>[] = this.exclude.spans().list();
 
       if (excludes.length)
       {
@@ -1096,7 +1255,7 @@ export class Schedule<M>
 
     if (includeIncludes)
     {
-      let includes: ScheduleModifierSpan<boolean>[] = this.include.spans();
+      let includes: ScheduleModifierSpan<boolean>[] = this.include.spans().list();
 
       if (includes.length)
       {

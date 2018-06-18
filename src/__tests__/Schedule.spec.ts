@@ -166,4 +166,308 @@ describe('Schedule', () =>
     expect( s.iterateSpans(d4).count() ).toBe( 2 );
   })
 
+  it('is single year', () =>
+  {
+    let s0 = new Schedule({
+      year: [2018]
+    });
+
+    expect( s0.isSingleYear() ).toBeTruthy();
+
+    let s1 = new Schedule({
+      year: {every: 2, offset: 2018}
+    });
+
+    expect( s1.isSingleYear() ).toBeFalsy();
+
+    let s2 = new Schedule({
+      year: [2017, 2018]
+    });
+
+    expect( s2.isSingleYear() ).toBeFalsy();
+
+    let s3 = new Schedule({
+      dayOfMonth: [23]
+    });
+
+    expect( s3.isSingleYear() ).toBeFalsy();
+  })
+
+  it('is single month', () =>
+  {
+    let s0 = new Schedule({
+      month: [5]
+    });
+
+    expect( s0.isSingleMonth() ).toBeTruthy();
+
+    let s1 = new Schedule({
+      month: {every: 2, offset: 1}
+    });
+
+    expect( s1.isSingleMonth() ).toBeFalsy();
+
+    let s2 = new Schedule({
+      month: [4, 5]
+    });
+
+    expect( s2.isSingleMonth() ).toBeFalsy();
+
+    let s3 = new Schedule({
+      dayOfMonth: [23]
+    });
+
+    expect( s3.isSingleMonth() ).toBeFalsy();
+  })
+
+  it('is single day of week', () =>
+  {
+    let s0 = new Schedule({
+      dayOfWeek: [5]
+    });
+
+    expect( s0.isSingleDayOfWeek() ).toBeTruthy();
+
+    let s1 = new Schedule({
+      dayOfWeek: {every: 2, offset: 1}
+    });
+
+    expect( s1.isSingleDayOfWeek() ).toBeFalsy();
+
+    let s2 = new Schedule({
+      dayOfWeek: [4, 5]
+    });
+
+    expect( s2.isSingleDayOfWeek() ).toBeFalsy();
+
+    let s3 = new Schedule({
+      month: [23]
+    });
+
+    expect( s3.isSingleDayOfWeek() ).toBeFalsy();
+  })
+
+  it('is single day of year', () =>
+  {
+    let s0 = new Schedule({
+      dayOfYear: [5]
+    });
+
+    expect( s0.isSingleDayOfYear() ).toBeTruthy();
+
+    let s1 = new Schedule({
+      dayOfYear: {every: 2, offset: 1}
+    });
+
+    expect( s1.isSingleDayOfYear() ).toBeFalsy();
+
+    let s2 = new Schedule({
+      dayOfYear: [4, 5]
+    });
+
+    expect( s2.isSingleDayOfYear() ).toBeFalsy();
+
+    let s3 = new Schedule({
+      month: [23]
+    });
+
+    expect( s3.isSingleDayOfYear() ).toBeFalsy();
+  })
+
+  it('is single week of month', () =>
+  {
+    let s0 = new Schedule({
+      weekspanOfMonth: [5]
+    });
+
+    expect( s0.isSingleWeekOfMonth() ).toBeTruthy();
+
+    let s1 = new Schedule({
+      weekspanOfMonth: {every: 2, offset: 1}
+    });
+
+    expect( s1.isSingleWeekOfMonth() ).toBeFalsy();
+
+    let s2 = new Schedule({
+      weekspanOfMonth: [4, 5]
+    });
+
+    expect( s2.isSingleWeekOfMonth() ).toBeFalsy();
+
+    let s3 = new Schedule({
+      month: [23]
+    });
+
+    expect( s3.isSingleWeekOfMonth() ).toBeFalsy();
+
+    let s4 = new Schedule({
+      fullWeekOfMonth: [5]
+    });
+
+    expect( s4.isSingleWeekOfMonth() ).toBeTruthy();
+
+    let s5 = new Schedule({
+      weekOfMonth: [5]
+    });
+
+    expect( s5.isSingleWeekOfMonth() ).toBeTruthy();
+
+    let s6 = new Schedule({
+      lastFullWeekOfMonth: [5]
+    });
+
+    expect( s6.isSingleWeekOfMonth() ).toBeTruthy();
+
+    let s7 = new Schedule({
+      lastWeekspanOfMonth: [5]
+    });
+
+    expect( s7.isSingleWeekOfMonth() ).toBeTruthy();
+
+    let s8 = new Schedule({
+      lastWeekspanOfMonth: [5],
+      fullWeekOfMonth: [1, 2],
+      month: [2, 3]
+    });
+
+    expect( s8.isSingleWeekOfMonth() ).toBeTruthy();
+  })
+
+  it('is single week of year', () =>
+  {
+    let s0 = new Schedule({
+      weekspanOfYear: [5]
+    });
+
+    expect( s0.isSingleWeekOfYear() ).toBeTruthy();
+
+    let s1 = new Schedule({
+      weekspanOfYear: {every: 2, offset: 1}
+    });
+
+    expect( s1.isSingleWeekOfYear() ).toBeFalsy();
+
+    let s2 = new Schedule({
+      weekspanOfYear: [4, 5]
+    });
+
+    expect( s2.isSingleWeekOfYear() ).toBeFalsy();
+
+    let s3 = new Schedule({
+      month: [23]
+    });
+
+    expect( s3.isSingleWeekOfYear() ).toBeFalsy();
+
+    let s4 = new Schedule({
+      fullWeekOfYear: [5]
+    });
+
+    expect( s4.isSingleWeekOfYear() ).toBeTruthy();
+
+    let s5 = new Schedule({
+      week: [5]
+    });
+
+    expect( s5.isSingleWeekOfYear() ).toBeTruthy();
+
+    let s6 = new Schedule({
+      weekOfYear: [5]
+    });
+
+    expect( s6.isSingleWeekOfYear() ).toBeTruthy();
+
+    let s7 = new Schedule({
+      lastFullWeekOfYear: [5]
+    });
+
+    expect( s7.isSingleWeekOfYear() ).toBeTruthy();
+
+    let s8 = new Schedule({
+      weekOfYear: [5],
+      fullWeekOfYear: [1, 2],
+      month: [2, 3]
+    });
+
+    expect( s8.isSingleWeekOfYear() ).toBeTruthy();
+
+    let s9 = new Schedule({
+      lastWeekspanOfYear: [5]
+    });
+
+    expect( s9.isSingleWeekOfYear() ).toBeTruthy();
+  })
+
+  it('is single event', () =>
+  {
+    var s0 = new Schedule({
+      year: [2018],
+      month: [4],
+      dayOfMonth: [23]
+    });
+
+    expect( s0.isSingleEvent() ).toBeTruthy();
+
+    var s1 = new Schedule({
+      year: [2018],
+      dayOfYear: [100]
+    });
+
+    expect( s1.isSingleEvent() ).toBeTruthy();
+
+    var s2 = new Schedule({
+      year: [2018],
+      month: [4],
+      fullWeekOfMonth: [2],
+      dayOfWeek: [3],
+      times: [23]
+    });
+
+    expect( s2.isSingleEvent() ).toBeTruthy();
+
+    var s3 = new Schedule({
+      year: [2018],
+      weekOfYear: [26],
+      dayOfWeek: [1]
+    });
+
+    expect( s3.isSingleEvent() ).toBeTruthy();
+  });
+
+  it('is not single event', () =>
+  {
+    var s0 = new Schedule({
+      year: [2018, 2017],
+      month: [4],
+      dayOfMonth: [23]
+    });
+
+    expect( s0.isSingleEvent() ).toBeFalsy();
+
+    var s1 = new Schedule({
+      year: [2018],
+      dayOfYear: [100],
+      times: [11, 22]
+    });
+
+    expect( s1.isSingleEvent() ).toBeFalsy();
+
+    var s2 = new Schedule({
+      year: [2018],
+      month: [4],
+      fullWeekOfMonth: [2],
+      dayOfWeek: [3, 4],
+      times: [23]
+    });
+
+    expect( s2.isSingleEvent() ).toBeFalsy();
+
+    var s3 = new Schedule({
+      weekOfYear: [26],
+      dayOfWeek: [1]
+    });
+
+    expect( s3.isSingleEvent() ).toBeFalsy();
+  });
+
 })

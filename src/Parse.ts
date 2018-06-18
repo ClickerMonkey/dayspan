@@ -33,8 +33,8 @@ export class Parse
 
     if (fn.isFrequencyValueEvery(input))
     {
-      let offset: number = input.offset || 0;
       let every: number = input.every;
+      let offset: number = (input.offset || 0) % every;
 
       check = (value: number) => {
         return value % every === offset;

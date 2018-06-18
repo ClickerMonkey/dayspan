@@ -2568,6 +2568,127 @@ var Schedule_Schedule = (function () {
         return !!this.iterateSpans(day, true).first(function (span) { return span.contains(day); });
     };
     /**
+     * Determines whether this schedule produces a single event, and no more.
+     * If this schedule has any includes, it's assumed to be a multiple event
+     * schedule.
+     *
+     * @returns `true` if this schedule produces a single event, otherwise `false`.
+     */
+    Schedule.prototype.isSingleEvent = function () {
+        // 0 = full day, 1 = once a day, 1+ = multiple events a day
+        if (this.times.length > 1) {
+            return false;
+        }
+        // Let's assume if there are includes, this is not a single event.
+        if (!this.include.isEmpty()) {
+            return false;
+        }
+        // If this can occur on multiple years, not a single event.
+        if (!this.isSingleYear()) {
+            return false;
+        }
+        // If this is a specific year and day of the year: single!
+        if (this.isSingleDayOfYear()) {
+            return true;
+        }
+        // If this is a specific year, month, and day of month: single!
+        if (this.isSingleMonth() && this.isSingleDayOfMonth()) {
+            return true;
+        }
+        // If this is a specific year, month, week of the month, day of the week: single!
+        if (this.isSingleMonth() && this.isSingleWeekOfMonth() && this.isSingleDayOfWeek()) {
+            return true;
+        }
+        // If this is a specific year, week of the year, day of the week: single!
+        if (this.isSingleWeekOfYear() && this.isSingleDayOfWeek()) {
+            return true;
+        }
+        // Doesn't look like a single event.
+        return false;
+    };
+    /**
+     * @returns `true` if this schedule produces events only in a specific year.
+     * @see [[Schedule.year]]
+     */
+    Schedule.prototype.isSingleYear = function () {
+        return this.isSingleFrequency(this.year);
+    };
+    /**
+     * @returns `true` if this schedule produces events only in a specific month.
+     * @see [[Schedule.month]]
+     */
+    Schedule.prototype.isSingleMonth = function () {
+        return this.isSingleFrequency(this.month);
+    };
+    /**
+     * @returns `true` if this schedule produces events only in a specific day of
+     *    the month.
+     * @see [[Schedule.dayOfMonth]]
+     * @see [[Schedule.lastDayOfMonth]]
+     */
+    Schedule.prototype.isSingleDayOfMonth = function () {
+        return this.isSingleFrequency(this.dayOfMonth) ||
+            this.isSingleFrequency(this.lastDayOfMonth);
+    };
+    /**
+     * @returns `true` if this schedule produces events only in a specific day of
+     *    the week.
+     * @see [[Schedule.dayOfWeek]]
+     */
+    Schedule.prototype.isSingleDayOfWeek = function () {
+        return this.isSingleFrequency(this.dayOfWeek);
+    };
+    /**
+     * @returns `true` if this schedule produces events only in a specific day of
+     *    the year.
+     * @see [[Schedule.dayOfYear]]
+     */
+    Schedule.prototype.isSingleDayOfYear = function () {
+        return this.isSingleFrequency(this.dayOfYear);
+    };
+    /**
+     * @returns `true` if this schedule produces events only in a specific week of
+     *    the month.
+     * @see [[Schedule.weekspanOfMonth]]
+     * @see [[Schedule.fullWeekOfMonth]]
+     * @see [[Schedule.weekOfMonth]]
+     * @see [[Schedule.lastFullWeekOfMonth]]
+     * @see [[Schedule.lastWeekspanOfMonth]]
+     */
+    Schedule.prototype.isSingleWeekOfMonth = function () {
+        return this.isSingleFrequency(this.weekspanOfMonth) ||
+            this.isSingleFrequency(this.fullWeekOfMonth) ||
+            this.isSingleFrequency(this.weekOfMonth) ||
+            this.isSingleFrequency(this.lastFullWeekOfMonth) ||
+            this.isSingleFrequency(this.lastWeekspanOfMonth);
+    };
+    /**
+     * @returns `true` if this schedule produces events only in a specific week of
+     *    the year.
+     * @see [[Schedule.weekspanOfYear]]
+     * @see [[Schedule.fullWeekOfYear]]
+     * @see [[Schedule.week]]
+     * @see [[Schedule.weekOfYear]]
+     * @see [[Schedule.lastFullWeekOfYear]]
+     * @see [[Schedule.lastWeekspanOfYear]]
+     */
+    Schedule.prototype.isSingleWeekOfYear = function () {
+        return this.isSingleFrequency(this.weekspanOfYear) ||
+            this.isSingleFrequency(this.fullWeekOfYear) ||
+            this.isSingleFrequency(this.week) ||
+            this.isSingleFrequency(this.weekOfYear) ||
+            this.isSingleFrequency(this.lastFullWeekOfYear) ||
+            this.isSingleFrequency(this.lastWeekspanOfYear);
+    };
+    /**
+     * Determines if the given [[FrequencyCheck]] results in a single occurrence.
+     *
+     * @returns `true` if the frequency results in a single event, otherwise `false`.
+     */
+    Schedule.prototype.isSingleFrequency = function (frequency) {
+        return Functions.isArray(frequency.input) && frequency.input.length === 1;
+    };
+    /**
      * Iterates timed events that were explicitly specified on the given day.
      * Those events could span multiple days so may be tested against another day.
      *
@@ -4053,6 +4174,7 @@ var CalendarDay_CalendarDay = (function (_super) {
 
 
 
+
 /**
  * An event on a given day and the schedule that generated the event.
  *
@@ -4257,15 +4379,27 @@ var CalendarEvent_CalendarEvent = (function () {
      */
     CalendarEvent.prototype.move = function (toTime) {
         var schedule = this.schedule;
-        var type = this.identifierType;
-        var fromTime = this.start;
-        schedule.exclude.set(fromTime, true, type);
-        schedule.exclude.set(toTime, false, type);
-        schedule.include.set(toTime, true, type);
-        schedule.include.set(fromTime, false, type);
-        if (this.meta !== null) {
-            schedule.meta.unset(fromTime, type);
-            schedule.meta.set(toTime, this.meta, type);
+        if (schedule.isSingleEvent()) {
+            for (var _i = 0, _a = schedule.checks; _i < _a.length; _i++) {
+                var check = _a[_i];
+                var prop = check.property;
+                var value = toTime[prop];
+                var frequency = Parse_Parse.frequency([value], prop);
+                schedule[prop] = frequency;
+            }
+            schedule.updateChecks();
+        }
+        else {
+            var type = this.identifierType;
+            var fromTime = this.start;
+            schedule.exclude.set(fromTime, true, type);
+            schedule.exclude.set(toTime, false, type);
+            schedule.include.set(toTime, true, type);
+            schedule.include.set(fromTime, false, type);
+            if (this.meta !== null) {
+                schedule.meta.unset(fromTime, type);
+                schedule.meta.set(toTime, this.meta, type);
+            }
         }
         return this;
     };
