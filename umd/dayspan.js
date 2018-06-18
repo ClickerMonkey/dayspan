@@ -1931,32 +1931,6 @@ var ScheduleModifier_ScheduleModifier = (function () {
         return all;
     };
     /**
-     * Queries the modifier for all values/modifications which fall in the time
-     * span that the given identifier represents. All identifiers and their value
-     * are passed to the given callback.
-     *
-     * @param prefix The identifier
-     *
-     */
-    ScheduleModifier.prototype.query = function (query) {
-        var _this = this;
-        return new Iterator_Iterator(function (iterator) {
-            var map = _this.map;
-            for (var id in map) {
-                if (Identifier_Identifier.contains(query, id)) {
-                    var value = map[id];
-                    switch (iterator.act([id, value])) {
-                        case IteratorAction.Stop:
-                            return;
-                        case IteratorAction.Remove:
-                            delete map[id];
-                            break;
-                    }
-                }
-            }
-        });
-    };
-    /**
      * Moves the value/modification from one identifier to another.
      *
      * @param from The day to take the identifier from.
@@ -1995,17 +1969,57 @@ var ScheduleModifier_ScheduleModifier = (function () {
         return this;
     };
     /**
+     * Iterates through the modifiers passing the identifier and the related value.
+     *
+     * @returns A new instance of an [[Iterator]].
+     */
+    ScheduleModifier.prototype.iterate = function () {
+        var _this = this;
+        return new Iterator_Iterator(function (iterator) {
+            var map = _this.map;
+            for (var rawId in map) {
+                var asNumber = parseInt(rawId);
+                var validAsNumber = asNumber + '' === rawId;
+                var id = validAsNumber ? asNumber : rawId;
+                switch (iterator.act([id, map[rawId]])) {
+                    case IteratorAction.Stop:
+                        return;
+                    case IteratorAction.Remove:
+                        delete map[rawId];
+                        break;
+                }
+            }
+        });
+    };
+    /**
+     * Queries the modifier for all values/modifications which fall in the time
+     * span that the given identifier represents. All identifiers and their value
+     * are passed to the given callback.
+     *
+     * @param prefix The identifier
+     * @returns A new instance of an [[Iterator]].
+     */
+    ScheduleModifier.prototype.query = function (query) {
+        return this.iterate()
+            .filter(function (_a) {
+            var id = _a[0], value = _a[1];
+            return Identifier_Identifier.contains(query, id);
+        });
+        ;
+    };
+    /**
      * Returns all identifiers stored in this modifier.
      */
     ScheduleModifier.prototype.identifiers = function (filter) {
-        var map = this.map;
-        var out = [];
-        for (var id in map) {
-            if (!filter || filter(map[id], id)) {
-                out.push(id);
-            }
-        }
-        return out;
+        return this.iterate()
+            .filter(function (_a) {
+            var id = _a[0], value = _a[1];
+            return !filter || filter(value, id);
+        })
+            .map(function (_a) {
+            var id = _a[0];
+            return id;
+        });
     };
     /**
      * Builds a list of spans and the associated values. The spans are calculated
@@ -2018,18 +2032,32 @@ var ScheduleModifier_ScheduleModifier = (function () {
      */
     ScheduleModifier.prototype.spans = function (endInclusive) {
         if (endInclusive === void 0) { endInclusive = false; }
-        var map = this.map;
-        var out = [];
-        for (var id in map) {
+        return this.iterate()
+            .map(function (_a) {
+            var id = _a[0], value = _a[1];
             var type = Identifier_Identifier.find(id);
             if (type) {
-                out.push({
-                    span: type.span(id, endInclusive),
-                    value: map[id]
-                });
+                var span = type.span(id, endInclusive);
+                return { span: span, value: value };
             }
-        }
-        return out;
+        });
+    };
+    /**
+     * Builds a list of the descriptions of the identifiers in this modifier.
+     *
+     * @param short If the description should use shorter language or longer.
+     * @returns The built list of descriptions.
+     */
+    ScheduleModifier.prototype.describe = function (short) {
+        if (short === void 0) { short = false; }
+        return this.iterate()
+            .map(function (_a) {
+            var id = _a[0];
+            var type = Identifier_Identifier.find(id);
+            if (type) {
+                return type.describe(id, short);
+            }
+        });
     };
     /**
      * Builds a map of the values/modifications keyed by the descripton of the
@@ -2046,24 +2074,6 @@ var ScheduleModifier_ScheduleModifier = (function () {
             var type = Identifier_Identifier.find(id);
             if (type) {
                 out[type.describe(id, short)] = map[id];
-            }
-        }
-        return out;
-    };
-    /**
-     * Builds a list of the descriptions of the identifiers in this modifier.
-     *
-     * @param short If the description should use shorter language or longer.
-     * @returns The built list of descriptions.
-     */
-    ScheduleModifier.prototype.describeList = function (short) {
-        if (short === void 0) { short = false; }
-        var map = this.map;
-        var out = [];
-        for (var id in map) {
-            var type = Identifier_Identifier.find(id);
-            if (type) {
-                out.push(type.describe(id, short));
             }
         }
         return out;
@@ -2570,7 +2580,13 @@ var Schedule_Schedule = (function () {
     /**
      * Determines whether this schedule produces a single event, and no more.
      * If this schedule has any includes, it's assumed to be a multiple event
-     * schedule.
+     * schedule. A single event can be detected in the following scenarios where
+     * each frequency has a single occurrence (see [[Schedule.isSingleFrequency]]).
+     *
+     * - year, day of year
+     * - year, month, day of month
+     * - year, month, week of month, day of week
+     * - year, week of year, day of week
      *
      * @returns `true` if this schedule produces a single event, otherwise `false`.
      */
@@ -2735,9 +2751,9 @@ var Schedule_Schedule = (function () {
         if (timeFormat === void 0) { timeFormat = ''; }
         if (alwaysDuration === void 0) { alwaysDuration = false; }
         var defaultUnit = Constants.DURATION_DEFAULT_UNIT(this.isFullDay());
-        var exclusions = this.exclude.identifiers(function (v) { return v; });
-        var inclusions = this.include.identifiers(function (v) { return v; });
-        var cancels = this.cancel.identifiers(function (v) { return v; });
+        var exclusions = this.exclude.identifiers(function (v) { return v; }).list();
+        var inclusions = this.include.identifiers(function (v) { return v; }).list();
+        var cancels = this.cancel.identifiers(function (v) { return v; }).list();
         var hasMeta = !this.meta.isEmpty();
         var out = {};
         var times = [];
@@ -2872,21 +2888,21 @@ var Schedule_Schedule = (function () {
             }
         }
         if (includeExcludes) {
-            var excludes = this.exclude.spans();
+            var excludes = this.exclude.spans().list();
             if (excludes.length) {
                 out += ' excluding ';
                 out += this.describeArray(excludes, function (x) { return x.span.summary(Units.DAY); });
             }
         }
         if (includeIncludes) {
-            var includes = this.include.spans();
+            var includes = this.include.spans().list();
             if (includes.length) {
                 out += ' including ';
                 out += this.describeArray(includes, function (x) { return x.span.summary(Units.DAY); });
             }
         }
         if (includeCancels) {
-            var cancels = this.cancel.spans();
+            var cancels = this.cancel.spans().list();
             if (cancels.length) {
                 out += ' with cancellations on ';
                 out += this.describeArray(cancels, function (x) { return x.span.summary(Units.DAY); });
@@ -3250,8 +3266,8 @@ var Parse_Parse = (function () {
         };
         check.given = false;
         if (Functions.isFrequencyValueEvery(input)) {
-            var offset_1 = input.offset || 0;
             var every_1 = input.every;
+            var offset_1 = (input.offset || 0) % every_1;
             check = function (value) {
                 return value % every_1 === offset_1;
             };

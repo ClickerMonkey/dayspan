@@ -1266,7 +1266,7 @@ export class Schedule<M>
 
     if (includeCancels)
     {
-      let cancels: ScheduleModifierSpan<boolean>[] = this.cancel.spans();
+      let cancels: ScheduleModifierSpan<boolean>[] = this.cancel.spans().list();
 
       if (cancels.length)
       {
