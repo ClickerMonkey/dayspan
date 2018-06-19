@@ -90,6 +90,17 @@ export class Functions
   }
 
   /**
+   * Determines whether the given input is defined and not null.
+   *
+   * @param input The variable to test.
+   * @return `true` if the variable is defined and not null, otherwise `false`.
+   */
+  public static isValue(input: any): boolean
+  {
+    return input !== null && typeof(input) !== 'undefined';
+  }
+
+  /**
    * Determines whether the given input appears to be a valid
    * [[FrequencyValueEvery]].
    *

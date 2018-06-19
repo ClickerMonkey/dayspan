@@ -1,7 +1,7 @@
 
 import { Functions as fn } from './Functions';
 import { FrequencyValue, FrequencyCheck, FrequencyValueEvery, FrequencyValueOneOf } from './Frequency';
-import { Day, DayInput, DurationInput } from './Day';
+import { Day, DayInput, DurationInput, DayProperty } from './Day';
 import { Identifier, IdentifierInput } from './Identifier';
 import { DaySpan } from './DaySpan';
 import { Constants } from './Constants';
@@ -15,6 +15,14 @@ import { Iterator, IteratorAction } from './Iterator';
 // @ts-ignore
 import * as moment from 'moment';
 
+
+/**
+ * A tuple which identifies an event on the schedule. The tuple contains the
+ * total span of the event occurrence, the day of the event (could be the start
+ * day, end day, or any days in between for multi-day events) as well as the
+ * identifier for the event.
+ */
+export type ScheduleEventTuple = [DaySpan, Day, IdentifierInput];
 
 /**
  * Input given by a user which describes an event schedule.
@@ -381,6 +389,15 @@ export class Schedule<M>
   public get lastTime(): Time
   {
     return this.times[ this.times.length - 1 ];
+  }
+
+  /**
+   * The [[Identifier]] for this schedule. Either [[Identifier.Day]] or
+   * [[Identifier.Time]].
+   */
+  public get identifierType(): Identifier
+  {
+    return this.isFullDay() ? Identifier.Day : Identifier.Time;
   }
 
   /**
@@ -902,6 +919,168 @@ export class Schedule<M>
   }
 
   /**
+   * Changes the exclusion status of the event at the given time. By default
+   * this excludes this event - but `false`  may be passed to undo an exclusion.
+   *
+   * @param time The start time of the event occurrence to exclude or include.
+   * @param excluded Whether the event should be excluded.
+   */
+  public setExcluded(time: Day, excluded: boolean = true): this
+  {
+    let type: Identifier = this.identifierType;
+
+    this.exclude.set( time, excluded, type );
+    this.include.set( time, !excluded, type );
+
+    return this;
+  }
+
+  /**
+   * Changes the cancellation status of the event at the given start time. By
+   * default this cancels the event occurrence - but `false` may be passed to
+   * undo a cancellation.
+   *
+   * @param time The start time of the event occurrence to cancel or uncancel.
+   * @param cancelled Whether the event should be cancelled.
+   */
+  public setCancelled(time: Day, cancelled: boolean = true): this
+  {
+    this.cancel.set( time, cancelled, this.identifierType );
+
+    return this;
+  }
+
+  /**
+   * Moves the event instance starting at `fromTime` to `toTime` optionally
+   * placing `meta` in the schedules metadata for the new time `toTime`.
+   * If this schedule has a single event ([[Schedule.isSingleEvent]]) then the
+   * only value needed is `toTime` and not `fromTime`.
+   *
+   * @param toTime The timestamp of the new event.
+   * @param fromTime The timestamp of the event on the schedule to move if this
+   *    schedule generates multiple events.
+   * @param meta The metadata to place in the schedule for the given `toTime`.
+   * @returns `true` if the schedule had the event moved, otherwise `false`.
+   */
+  public move(toTime: Day, fromTime?: Day, meta?: M): boolean
+  {
+    if (!this.moveSingleEvent( toTime ) && fromTime)
+    {
+      return this.moveInstance( fromTime, toTime, meta );
+    }
+
+    return false;
+  }
+
+  /**
+   * Moves the event instance starting at `fromTime` to `toTime` optionally
+   * placing `meta` in the schedules metadata for the new time `toTime`. A move
+   * is accomplished by excluding the current event and adding an inclusion of
+   * the new day & time.
+   *
+   * @param fromTime The timestamp of the event on the schedule to move.
+   * @param toTime The timestamp of the new event.
+   * @param meta The metadata to place in the schedule for the given `toTime`.
+   * @returns `true`.
+   * @see [[Schedule.move]]
+   */
+  public moveInstance(fromTime: Day, toTime: Day, meta?: M): boolean
+  {
+    let type: Identifier = this.identifierType;
+
+    this.exclude.set( fromTime, true, type );
+    this.exclude.set( toTime, false, type );
+
+    this.include.set( toTime, true, type );
+    this.include.set( fromTime, false, type );
+
+    if (fn.isValue( meta ))
+    {
+      this.meta.unset( fromTime, type );
+      this.meta.set( toTime, meta, type );
+    }
+
+    return true;
+  }
+
+  /**
+   * Moves the single event in this schedule to the given day/time if applicable.
+   * If this schedule is not a single event schedule then `false` is returned.
+   * If this schedule is a timed event the time will take the time of the given
+   * `toTime` of `takeTime` is `true`.
+   *
+   * @param toTime The time to move the single event to.
+   * @param takeTime If this schedule has a single timed event, should the time
+   *    of the event be changed to the time of the given `toTime`?
+   * @returns `true` if the schedule was adjusted, otherwise `false`.
+   * @see [[Schedule.move]]
+   */
+  public moveSingleEvent(toTime: Day, takeTime: boolean = true): boolean
+  {
+    if (!this.isSingleEvent())
+    {
+      return false;
+    }
+
+    for (let check of this.checks)
+    {
+      let prop: DayProperty  = check.property;
+      let value = toTime[ prop ];
+      let frequency: FrequencyCheck = Parse.frequency( [value], prop );
+
+      this[ prop ] = frequency;
+    }
+
+    if (this.times.length === 1 && takeTime)
+    {
+      this.times[ 0 ] = toTime.asTime();
+    }
+
+    this.updateChecks();
+
+    let span: DaySpan = this.getSingleEventSpan();
+
+    if (this.start)
+    {
+      this.start = span.start.start();
+    }
+
+    if (this.end)
+    {
+      this.end = span.end.end();
+    }
+
+    return true;
+  }
+
+  /**
+   * Returns the span of the single event in this schedule if it's that type of
+   * schedule, otherwise `null` is returned.
+   *
+   * @returns A span of the single event, otherwise `null`.
+   * @see [[Schedule.isSingleEvent]]
+   */
+  public getSingleEventSpan(): DaySpan
+  {
+    if (!this.isSingleEvent())
+    {
+      return null;
+    }
+
+    let startOfYear: Day = Day.build( this.year.input[0], 0, 1 );
+    let start: Day = this.iterateDaycast( startOfYear, 1, true, true, 366 ).first();
+
+    if (!start)
+    {
+      return null;
+    }
+
+    return this.isFullDay() ?
+      this.getFullSpan( start ) :
+      this.getTimeSpan( start, this.times[ 0 ] );
+  }
+
+  /**
    * Determines whether this schedule produces a single event, and no more.
    * If this schedule has any includes, it's assumed to be a multiple event
    * schedule. A single event can be detected in the following scenarios where
@@ -1058,6 +1237,86 @@ export class Schedule<M>
   public isSingleFrequency(frequency: FrequencyCheck): boolean
   {
     return fn.isArray( frequency.input ) && (<number[]>frequency.input).length === 1;
+  }
+
+  /**
+   * Creates a forecast for this schedule which returns a number of event
+   * occurrences around a given day. A single item could be returned per day, or
+   * you could get an item for each timed event occurrence.
+   *
+   * @param around The day to find a forecast around.
+   * @param covers If `true` spans which span multiple days will be looked at
+   *    to see if they intersect with the given day, otherwise `false` will
+   *    only look at the given day for the start of events.
+   * @param daysAfter The number of events to return before the given day.
+   * @param daysBefore The number of events to return after the given day.
+   * @param times If timed events should be returned, or only one for each day.
+   * @param lookAround How many days to look before and after the given day for
+   *    event occurrences.
+   * @returns A new iterator which provides the event occurence span, the day it
+   *    starts (or is covered if `covers` is `true`), and the identifier for the
+   *    event.
+   */
+  public forecast(around: Day,
+    covers: boolean = true,
+    daysAfter: number,
+    daysBefore: number = daysAfter,
+    times: boolean = false,
+    lookAround: number = 366): Iterator<ScheduleEventTuple>
+  {
+    let type: Identifier = this.identifierType;
+
+    let tuplesForDay = (day: Day, tuples: Iterator<ScheduleEventTuple>): boolean =>
+    {
+      let spans: DaySpan[] = this.iterateSpans( day, covers ).list();
+      let last: number = times ? spans.length : Math.min( 1, spans.length );
+      let offset: number = times ? 0 : spans.length - 1;
+
+      for (let i = 0; i < last; i++)
+      {
+        let span: DaySpan = spans[ i + offset ];
+        let id: IdentifierInput = type.get( span.start );
+
+        if (tuples.act( [ span, day, id ] ) === IteratorAction.Stop)
+        {
+          return false;
+        }
+      }
+
+      return true;
+    };
+
+    let prev = new Iterator<ScheduleEventTuple>(iterator =>
+    {
+      let curr: Day = around;
+
+      for (let i = 0; i < lookAround; i++)
+      {
+        if (!tuplesForDay( curr, iterator ))
+        {
+          break;
+        }
+
+        curr = curr.prev();
+      }
+    });
+
+    let next = new Iterator<ScheduleEventTuple>(iterator =>
+    {
+      let curr: Day = around;
+
+      for (let i = 0; i < lookAround; i++)
+      {
+        curr = curr.next();
+
+        if (!tuplesForDay( curr, iterator ))
+        {
+          break;
+        }
+      }
+    });
+
+    return prev.take( daysBefore + 1 ).reverse().append( next.take( daysAfter ) );
   }
 
   /**

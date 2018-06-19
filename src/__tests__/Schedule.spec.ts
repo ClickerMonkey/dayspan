@@ -3,7 +3,7 @@ import { Schedule } from '../Schedule';
 import { Weekday } from '../Weekday';
 import { Month } from '../Month';
 import { Day } from '../Day';
-import { Identifier } from '../Identifier';
+import { Identifier, IdentifierInput } from '../Identifier';
 
 
 describe('Schedule', () =>
@@ -468,6 +468,31 @@ describe('Schedule', () =>
     });
 
     expect( s3.isSingleEvent() ).toBeFalsy();
+  });
+
+  it('forecast', () =>
+  {
+    let s1 = new Schedule({
+      dayOfMonth: [1, 15]
+    });
+
+    let forecast: IdentifierInput[] =
+      s1.forecast(Day.build(2018, 5, 1), true, 4)
+        .map<IdentifierInput>(([span, day, id]) => id)
+        .list()
+    ;
+
+    expect( forecast ).toEqual([
+      20180401,
+      20180415,
+      20180501,
+      20180515,
+      20180601,
+      20180615,
+      20180701,
+      20180715,
+      20180801
+    ]);
   });
 
 })

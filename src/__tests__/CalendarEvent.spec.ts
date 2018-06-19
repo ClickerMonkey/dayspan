@@ -45,7 +45,7 @@ describe('CalendarEvent', () =>
     expect( s.isSingleEvent() ).toBeTruthy();
     expect( s.checks.length ).toBe( 3 );
 
-    ce.move(Day.fromArray([2017, 2, 11]));
+    ce.move(Day.fromArray([2017, 2, 11, 3, 45]));
 
     expect( s.include.isEmpty() ).toBeTruthy();
     expect( s.exclude.isEmpty() ).toBeTruthy();

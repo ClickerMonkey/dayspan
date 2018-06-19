@@ -313,6 +313,93 @@ export class Iterator<T>
   }
 
   /**
+   * Returns a new iterator that only returns a maximum number of items.
+   *
+   * @param amount The maximum number of items to return.
+   * @returns A new iterator which returns a maximum number of items.
+   */
+  public take(amount: number): Iterator<T>
+  {
+    return new Iterator<T>(next =>
+    {
+      this.iterate((item, prev) =>
+      {
+        switch (next.act( item ))
+        {
+          case IteratorAction.Stop:
+            prev.stop();
+            break;
+          case IteratorAction.Remove:
+            prev.remove();
+            break;
+        }
+
+        if (--amount <= 0)
+        {
+          prev.stop();
+        }
+      });
+    });
+  }
+
+  /**
+   * Returns a new iterator that skips the given number of items from the items
+   * in this iterator.
+   *
+   * @param amount The number of items to skip.
+   * @returns A new iterator which skipped the given number of items.
+   */
+  public skip(amount: number): Iterator<T>
+  {
+    return new Iterator<T>(next =>
+    {
+      let skipped: number = 0;
+
+      this.iterate((item, prev) =>
+      {
+        if (skipped >= amount)
+        {
+          switch (next.act( item ))
+          {
+            case IteratorAction.Stop:
+              prev.stop();
+              break;
+            case IteratorAction.Remove:
+              prev.remove();
+              break;
+          }
+        }
+
+        skipped++;
+      });
+    });
+  }
+
+  /**
+   * Returns a new iterator thats items are the items in this iterator followed
+   * by the items in the given iterators.
+   *
+   * @param iterators The iterators to append after this one.
+   * @returns A new iterator based on this iterator followed by the given.
+   */
+  public append(...iterators: Iterator<T>[]): Iterator<T>
+  {
+    return Iterator.join<T>( this, ...iterators );
+  }
+
+  /**
+   * Returns a new iterator thats items are the items in the given iterators
+   * followed by the items in this iterator.
+   *
+   * @param iterators The iterators to prepend before this one.
+   * @returns A new iterator based on the given iterators followed by this.
+   */
+  public prepend(...iterators: Iterator<T>[]): Iterator<T>
+  {
+    return Iterator.join<T>( ...iterators, this );
+  }
+
+  /**
    * Removes items from the source that match certain criteria.
    *
    * @param filter The function which determines which items to remove.
@@ -328,6 +415,42 @@ export class Iterator<T>
     });
 
     return this;
+  }
+
+  /**
+   * Returns an iterator which takes items from this iterator and presents them
+   * in reverse.
+   *
+   * @returns A new iterator with the items in this iterator in reverse.
+   */
+  public reverse(): Iterator<T>
+  {
+    return new Iterator<T>(iterator =>
+    {
+      let items: T[] = this.list();
+      let removed: T[] = [];
+
+      for (let i = items.length - 1; i >= 0; i--)
+      {
+        let item: T = items[ i ];
+        let action: IteratorAction = iterator.act( item );
+
+        if (action === IteratorAction.Stop)
+        {
+          break;
+        }
+
+        if (action === IteratorAction.Remove)
+        {
+          removed.push( item );
+        }
+      }
+
+      if (removed.length > 0)
+      {
+        this.purge(item => removed.indexOf( item ) !== -1);
+      }
+    });
   }
 
   /**
@@ -531,5 +654,50 @@ export class Iterator<T>
     });
   }
 
+  /**
+   * Joins all the given iterators into a single iterator where the items
+   * returned are in the same order as passed to this function. If any items
+   * are removed from the returned iterator they will be removed from the given
+   * iterator if it supports removal.
+   *
+   * @param iterators The array of iterators to join as one.
+   * @returns A new iterator for the given iterators.
+   */
+  public static join<T>(...iterators: Iterator<T>[]): Iterator<T>
+  {
+    return new Iterator<T>(parent =>
+    {
+      for (let child of iterators)
+      {
+        child.iterate((item, childIterator) =>
+        {
+          switch (parent.act( item ))
+          {
+            case IteratorAction.Remove:
+              childIterator.remove();
+              break;
+            case IteratorAction.Stop:
+              childIterator.stop();
+              break;
+          }
+        });
+
+        if (child.action === IteratorAction.Stop)
+        {
+          return;
+        }
+      }
+    });
+  }
+
+  /**
+   * Returns a new iterator with no items.
+   *
+   * @returns A new iterator with no items.
+   */
+  public static empty<T>(): Iterator<T>
+  {
+    return new Iterator<T>(parent => {});
+  }
 
 }

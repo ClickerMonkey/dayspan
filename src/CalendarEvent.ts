@@ -1,12 +1,10 @@
 
 import { Constants } from './Constants';
-import { Day, DayProperty } from './Day';
+import { Day } from './Day';
 import { DaySpan, DaySpanBounds } from './DaySpan';
 import { Event } from './Event';
 import { Identifier, IdentifierInput } from './Identifier';
 import { Schedule } from './Schedule';
-import { Parse } from './Parse';
-import { FrequencyCheck } from './Frequency';
 
 
 /**
@@ -176,7 +174,7 @@ export class CalendarEvent<T, M>
    */
   public get identifierType(): Identifier
   {
-    return this.fullDay ? Identifier.Day : Identifier.Time;
+    return this.schedule.identifierType;
   }
 
   /**
@@ -233,7 +231,7 @@ export class CalendarEvent<T, M>
    */
   public cancel(cancelled: boolean = true): this
   {
-    this.schedule.cancel.set( this.start, cancelled, this.identifierType );
+    this.schedule.setCancelled( this.start, cancelled );
     this.cancelled = cancelled;
 
     return this;
@@ -247,12 +245,7 @@ export class CalendarEvent<T, M>
    */
   public exclude(excluded: boolean = true): this
   {
-    let schedule: Schedule<M> = this.schedule;
-    let type: Identifier = this.identifierType;
-    let time: Day = this.start;
-
-    schedule.exclude.set( time, excluded, type );
-    schedule.include.set( time, !excluded, type );
+    this.schedule.setExcluded( this.start, excluded );
 
     return this;
   }
@@ -266,43 +259,11 @@ export class CalendarEvent<T, M>
    * to match the timestamp provided.
    *
    * @param toTime The timestamp to move this event to.
+   * @returns Whether the event was moved to the given time.
    */
-  public move(toTime: Day): this
+  public move(toTime: Day): boolean
   {
-    let schedule: Schedule<M> = this.schedule;
-
-    if (schedule.isSingleEvent())
-    {
-      for (let check of schedule.checks)
-      {
-        let prop: DayProperty  = check.property;
-        let value = toTime[ prop ];
-        let frequency: FrequencyCheck = Parse.frequency( [value], prop );
-
-        schedule[ prop ] = frequency;
-      }
-
-      schedule.updateChecks();
-    }
-    else
-    {
-      let type: Identifier = this.identifierType;
-      let fromTime: Day = this.start;
-
-      schedule.exclude.set( fromTime, true, type );
-      schedule.exclude.set( toTime, false, type );
-
-      schedule.include.set( toTime, true, type );
-      schedule.include.set( fromTime, false, type );
-
-      if (this.meta !== null)
-      {
-        schedule.meta.unset( fromTime, type );
-        schedule.meta.set( toTime, this.meta, type );
-      }
-    }
-
-    return this;
+    return this.schedule.move( toTime, this.start, this.meta );
   }
 
 }

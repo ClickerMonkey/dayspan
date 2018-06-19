@@ -171,6 +171,15 @@ var Functions = (function () {
         return typeof (input) !== 'undefined';
     };
     /**
+     * Determines whether the given input is defined and not null.
+     *
+     * @param input The variable to test.
+     * @return `true` if the variable is defined and not null, otherwise `false`.
+     */
+    Functions.isValue = function (input) {
+        return input !== null && typeof (input) !== 'undefined';
+    };
+    /**
      * Determines whether the given input appears to be a valid
      * [[FrequencyValueEvery]].
      *
@@ -1677,6 +1686,84 @@ var Iterator_Iterator = (function () {
         return out;
     };
     /**
+     * Returns a new iterator that only returns a maximum number of items.
+     *
+     * @param amount The maximum number of items to return.
+     * @returns A new iterator which returns a maximum number of items.
+     */
+    Iterator.prototype.take = function (amount) {
+        var _this = this;
+        return new Iterator(function (next) {
+            _this.iterate(function (item, prev) {
+                switch (next.act(item)) {
+                    case IteratorAction.Stop:
+                        prev.stop();
+                        break;
+                    case IteratorAction.Remove:
+                        prev.remove();
+                        break;
+                }
+                if (--amount <= 0) {
+                    prev.stop();
+                }
+            });
+        });
+    };
+    /**
+     * Returns a new iterator that skips the given number of items from the items
+     * in this iterator.
+     *
+     * @param amount The number of items to skip.
+     * @returns A new iterator which skipped the given number of items.
+     */
+    Iterator.prototype.skip = function (amount) {
+        var _this = this;
+        return new Iterator(function (next) {
+            var skipped = 0;
+            _this.iterate(function (item, prev) {
+                if (skipped >= amount) {
+                    switch (next.act(item)) {
+                        case IteratorAction.Stop:
+                            prev.stop();
+                            break;
+                        case IteratorAction.Remove:
+                            prev.remove();
+                            break;
+                    }
+                }
+                skipped++;
+            });
+        });
+    };
+    /**
+     * Returns a new iterator thats items are the items in this iterator followed
+     * by the items in the given iterators.
+     *
+     * @param iterators The iterators to append after this one.
+     * @returns A new iterator based on this iterator followed by the given.
+     */
+    Iterator.prototype.append = function () {
+        var iterators = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            iterators[_i] = arguments[_i];
+        }
+        return Iterator.join.apply(Iterator, [this].concat(iterators));
+    };
+    /**
+     * Returns a new iterator thats items are the items in the given iterators
+     * followed by the items in this iterator.
+     *
+     * @param iterators The iterators to prepend before this one.
+     * @returns A new iterator based on the given iterators followed by this.
+     */
+    Iterator.prototype.prepend = function () {
+        var iterators = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            iterators[_i] = arguments[_i];
+        }
+        return Iterator.join.apply(Iterator, iterators.concat([this]));
+    };
+    /**
      * Removes items from the source that match certain criteria.
      *
      * @param filter The function which determines which items to remove.
@@ -1688,6 +1775,32 @@ var Iterator_Iterator = (function () {
             }
         });
         return this;
+    };
+    /**
+     * Returns an iterator which takes items from this iterator and presents them
+     * in reverse.
+     *
+     * @returns A new iterator with the items in this iterator in reverse.
+     */
+    Iterator.prototype.reverse = function () {
+        var _this = this;
+        return new Iterator(function (iterator) {
+            var items = _this.list();
+            var removed = [];
+            for (var i = items.length - 1; i >= 0; i--) {
+                var item = items[i];
+                var action = iterator.act(item);
+                if (action === IteratorAction.Stop) {
+                    break;
+                }
+                if (action === IteratorAction.Remove) {
+                    removed.push(item);
+                }
+            }
+            if (removed.length > 0) {
+                _this.purge(function (item) { return removed.indexOf(item) !== -1; });
+            }
+        });
     };
     /**
      * Reduces all the items in the source to a single value given the initial
@@ -1848,6 +1961,47 @@ var Iterator_Iterator = (function () {
                 }
             }
         });
+    };
+    /**
+     * Joins all the given iterators into a single iterator where the items
+     * returned are in the same order as passed to this function. If any items
+     * are removed from the returned iterator they will be removed from the given
+     * iterator if it supports removal.
+     *
+     * @param iterators The array of iterators to join as one.
+     * @returns A new iterator for the given iterators.
+     */
+    Iterator.join = function () {
+        var iterators = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            iterators[_i] = arguments[_i];
+        }
+        return new Iterator(function (parent) {
+            for (var _i = 0, iterators_1 = iterators; _i < iterators_1.length; _i++) {
+                var child = iterators_1[_i];
+                child.iterate(function (item, childIterator) {
+                    switch (parent.act(item)) {
+                        case IteratorAction.Remove:
+                            childIterator.remove();
+                            break;
+                        case IteratorAction.Stop:
+                            childIterator.stop();
+                            break;
+                    }
+                });
+                if (child.action === IteratorAction.Stop) {
+                    return;
+                }
+            }
+        });
+    };
+    /**
+     * Returns a new iterator with no items.
+     *
+     * @returns A new iterator with no items.
+     */
+    Iterator.empty = function () {
+        return new Iterator(function (parent) { });
     };
     return Iterator;
 }());
@@ -2083,8 +2237,9 @@ var ScheduleModifier_ScheduleModifier = (function () {
 
 
 // CONCATENATED MODULE: ./src/Schedule.ts
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_moment__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_9_moment__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_moment__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10_moment__);
+
 
 
 
@@ -2136,6 +2291,17 @@ var Schedule_Schedule = (function () {
          */
         get: function () {
             return this.times[this.times.length - 1];
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Schedule.prototype, "identifierType", {
+        /**
+         * The [[Identifier]] for this schedule. Either [[Identifier.Day]] or
+         * [[Identifier.Time]].
+         */
+        get: function () {
+            return this.isFullDay() ? Identifier_Identifier.Day : Identifier_Identifier.Time;
         },
         enumerable: true,
         configurable: true
@@ -2578,6 +2744,132 @@ var Schedule_Schedule = (function () {
         return !!this.iterateSpans(day, true).first(function (span) { return span.contains(day); });
     };
     /**
+     * Changes the exclusion status of the event at the given time. By default
+     * this excludes this event - but `false`  may be passed to undo an exclusion.
+     *
+     * @param time The start time of the event occurrence to exclude or include.
+     * @param excluded Whether the event should be excluded.
+     */
+    Schedule.prototype.setExcluded = function (time, excluded) {
+        if (excluded === void 0) { excluded = true; }
+        var type = this.identifierType;
+        this.exclude.set(time, excluded, type);
+        this.include.set(time, !excluded, type);
+        return this;
+    };
+    /**
+     * Changes the cancellation status of the event at the given start time. By
+     * default this cancels the event occurrence - but `false` may be passed to
+     * undo a cancellation.
+     *
+     * @param time The start time of the event occurrence to cancel or uncancel.
+     * @param cancelled Whether the event should be cancelled.
+     */
+    Schedule.prototype.setCancelled = function (time, cancelled) {
+        if (cancelled === void 0) { cancelled = true; }
+        this.cancel.set(time, cancelled, this.identifierType);
+        return this;
+    };
+    /**
+     * Moves the event instance starting at `fromTime` to `toTime` optionally
+     * placing `meta` in the schedules metadata for the new time `toTime`.
+     * If this schedule has a single event ([[Schedule.isSingleEvent]]) then the
+     * only value needed is `toTime` and not `fromTime`.
+     *
+     * @param toTime The timestamp of the new event.
+     * @param fromTime The timestamp of the event on the schedule to move if this
+     *    schedule generates multiple events.
+     * @param meta The metadata to place in the schedule for the given `toTime`.
+     * @returns `true` if the schedule had the event moved, otherwise `false`.
+     */
+    Schedule.prototype.move = function (toTime, fromTime, meta) {
+        if (!this.moveSingleEvent(toTime) && fromTime) {
+            return this.moveInstance(fromTime, toTime, meta);
+        }
+        return false;
+    };
+    /**
+     * Moves the event instance starting at `fromTime` to `toTime` optionally
+     * placing `meta` in the schedules metadata for the new time `toTime`. A move
+     * is accomplished by excluding the current event and adding an inclusion of
+     * the new day & time.
+     *
+     * @param fromTime The timestamp of the event on the schedule to move.
+     * @param toTime The timestamp of the new event.
+     * @param meta The metadata to place in the schedule for the given `toTime`.
+     * @returns `true`.
+     * @see [[Schedule.move]]
+     */
+    Schedule.prototype.moveInstance = function (fromTime, toTime, meta) {
+        var type = this.identifierType;
+        this.exclude.set(fromTime, true, type);
+        this.exclude.set(toTime, false, type);
+        this.include.set(toTime, true, type);
+        this.include.set(fromTime, false, type);
+        if (Functions.isValue(meta)) {
+            this.meta.unset(fromTime, type);
+            this.meta.set(toTime, meta, type);
+        }
+        return true;
+    };
+    /**
+     * Moves the single event in this schedule to the given day/time if applicable.
+     * If this schedule is not a single event schedule then `false` is returned.
+     * If this schedule is a timed event the time will take the time of the given
+     * `toTime` of `takeTime` is `true`.
+     *
+     * @param toTime The time to move the single event to.
+     * @param takeTime If this schedule has a single timed event, should the time
+     *    of the event be changed to the time of the given `toTime`?
+     * @returns `true` if the schedule was adjusted, otherwise `false`.
+     * @see [[Schedule.move]]
+     */
+    Schedule.prototype.moveSingleEvent = function (toTime, takeTime) {
+        if (takeTime === void 0) { takeTime = true; }
+        if (!this.isSingleEvent()) {
+            return false;
+        }
+        for (var _i = 0, _a = this.checks; _i < _a.length; _i++) {
+            var check = _a[_i];
+            var prop = check.property;
+            var value = toTime[prop];
+            var frequency = Parse_Parse.frequency([value], prop);
+            this[prop] = frequency;
+        }
+        if (this.times.length === 1 && takeTime) {
+            this.times[0] = toTime.asTime();
+        }
+        this.updateChecks();
+        var span = this.getSingleEventSpan();
+        if (this.start) {
+            this.start = span.start.start();
+        }
+        if (this.end) {
+            this.end = span.end.end();
+        }
+        return true;
+    };
+    /**
+     * Returns the span of the single event in this schedule if it's that type of
+     * schedule, otherwise `null` is returned.
+     *
+     * @returns A span of the single event, otherwise `null`.
+     * @see [[Schedule.isSingleEvent]]
+     */
+    Schedule.prototype.getSingleEventSpan = function () {
+        if (!this.isSingleEvent()) {
+            return null;
+        }
+        var startOfYear = Day_Day.build(this.year.input[0], 0, 1);
+        var start = this.iterateDaycast(startOfYear, 1, true, true, 366).first();
+        if (!start) {
+            return null;
+        }
+        return this.isFullDay() ?
+            this.getFullSpan(start) :
+            this.getTimeSpan(start, this.times[0]);
+    };
+    /**
      * Determines whether this schedule produces a single event, and no more.
      * If this schedule has any includes, it's assumed to be a multiple event
      * schedule. A single event can be detected in the following scenarios where
@@ -2703,6 +2995,64 @@ var Schedule_Schedule = (function () {
      */
     Schedule.prototype.isSingleFrequency = function (frequency) {
         return Functions.isArray(frequency.input) && frequency.input.length === 1;
+    };
+    /**
+     * Creates a forecast for this schedule which returns a number of event
+     * occurrences around a given day. A single item could be returned per day, or
+     * you could get an item for each timed event occurrence.
+     *
+     * @param around The day to find a forecast around.
+     * @param covers If `true` spans which span multiple days will be looked at
+     *    to see if they intersect with the given day, otherwise `false` will
+     *    only look at the given day for the start of events.
+     * @param daysAfter The number of events to return before the given day.
+     * @param daysBefore The number of events to return after the given day.
+     * @param times If timed events should be returned, or only one for each day.
+     * @param lookAround How many days to look before and after the given day for
+     *    event occurrences.
+     * @returns A new iterator which provides the event occurence span, the day it
+     *    starts (or is covered if `covers` is `true`), and the identifier for the
+     *    event.
+     */
+    Schedule.prototype.forecast = function (around, covers, daysAfter, daysBefore, times, lookAround) {
+        var _this = this;
+        if (covers === void 0) { covers = true; }
+        if (daysBefore === void 0) { daysBefore = daysAfter; }
+        if (times === void 0) { times = false; }
+        if (lookAround === void 0) { lookAround = 366; }
+        var type = this.identifierType;
+        var tuplesForDay = function (day, tuples) {
+            var spans = _this.iterateSpans(day, covers).list();
+            var last = times ? spans.length : Math.min(1, spans.length);
+            var offset = times ? 0 : spans.length - 1;
+            for (var i = 0; i < last; i++) {
+                var span = spans[i + offset];
+                var id = type.get(span.start);
+                if (tuples.act([span, day, id]) === IteratorAction.Stop) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        var prev = new Iterator_Iterator(function (iterator) {
+            var curr = around;
+            for (var i = 0; i < lookAround; i++) {
+                if (!tuplesForDay(curr, iterator)) {
+                    break;
+                }
+                curr = curr.prev();
+            }
+        });
+        var next = new Iterator_Iterator(function (iterator) {
+            var curr = around;
+            for (var i = 0; i < lookAround; i++) {
+                curr = curr.next();
+                if (!tuplesForDay(curr, iterator)) {
+                    break;
+                }
+            }
+        });
+        return prev.take(daysBefore + 1).reverse().append(next.take(daysAfter));
     };
     /**
      * Iterates timed events that were explicitly specified on the given day.
@@ -2861,12 +3211,12 @@ var Schedule_Schedule = (function () {
         else {
             out += 'The ' + thing + ' will occur';
         }
-        out += this.describeRule(this.dayOfWeek.input, 'day of the week', function (x) { return __WEBPACK_IMPORTED_MODULE_9_moment__["weekdays"]()[x]; }, 1, false);
+        out += this.describeRule(this.dayOfWeek.input, 'day of the week', function (x) { return __WEBPACK_IMPORTED_MODULE_10_moment__["weekdays"]()[x]; }, 1, false);
         out += this.describeRule(this.lastDayOfMonth.input, 'last day of the month', function (x) { return Suffix.CACHE[x]; });
         out += this.describeRule(this.dayOfMonth.input, 'day of the month', function (x) { return Suffix.CACHE[x]; });
         out += this.describeRule(this.dayOfYear.input, 'day of the year', function (x) { return Suffix.CACHE[x]; }, 1);
         out += this.describeRule(this.year.input, 'year', function (x) { return x; }, 0, false, ' in ');
-        out += this.describeRule(this.month.input, 'month', function (x) { return __WEBPACK_IMPORTED_MODULE_9_moment__["months"]()[x]; }, 0, false, ' in ');
+        out += this.describeRule(this.month.input, 'month', function (x) { return __WEBPACK_IMPORTED_MODULE_10_moment__["months"]()[x]; }, 0, false, ' in ');
         out += this.describeRule(this.weekOfYear.input, 'week of the year', function (x) { return Suffix.CACHE[x]; });
         out += this.describeRule(this.weekspanOfYear.input, 'weekspan of the year', function (x) { return Suffix.CACHE[x + 1]; }, 1);
         out += this.describeRule(this.fullWeekOfYear.input, 'full week of the year', function (x) { return Suffix.CACHE[x]; });
@@ -4189,8 +4539,6 @@ var CalendarDay_CalendarDay = (function (_super) {
 // CONCATENATED MODULE: ./src/CalendarEvent.ts
 
 
-
-
 /**
  * An instance of an [[Event]] on a given day of a [[Calendar]] generated by
  * the event's [[Schedule]].
@@ -4302,7 +4650,7 @@ var CalendarEvent_CalendarEvent = (function () {
          * [[Identifier.Time]].
          */
         get: function () {
-            return this.fullDay ? Identifier_Identifier.Day : Identifier_Identifier.Time;
+            return this.schedule.identifierType;
         },
         enumerable: true,
         configurable: true
@@ -4369,7 +4717,7 @@ var CalendarEvent_CalendarEvent = (function () {
      */
     CalendarEvent.prototype.cancel = function (cancelled) {
         if (cancelled === void 0) { cancelled = true; }
-        this.schedule.cancel.set(this.start, cancelled, this.identifierType);
+        this.schedule.setCancelled(this.start, cancelled);
         this.cancelled = cancelled;
         return this;
     };
@@ -4381,11 +4729,7 @@ var CalendarEvent_CalendarEvent = (function () {
      */
     CalendarEvent.prototype.exclude = function (excluded) {
         if (excluded === void 0) { excluded = true; }
-        var schedule = this.schedule;
-        var type = this.identifierType;
-        var time = this.start;
-        schedule.exclude.set(time, excluded, type);
-        schedule.include.set(time, !excluded, type);
+        this.schedule.setExcluded(this.start, excluded);
         return this;
     };
     /**
@@ -4397,32 +4741,10 @@ var CalendarEvent_CalendarEvent = (function () {
      * to match the timestamp provided.
      *
      * @param toTime The timestamp to move this event to.
+     * @returns Whether the event was moved to the given time.
      */
     CalendarEvent.prototype.move = function (toTime) {
-        var schedule = this.schedule;
-        if (schedule.isSingleEvent()) {
-            for (var _i = 0, _a = schedule.checks; _i < _a.length; _i++) {
-                var check = _a[_i];
-                var prop = check.property;
-                var value = toTime[prop];
-                var frequency = Parse_Parse.frequency([value], prop);
-                schedule[prop] = frequency;
-            }
-            schedule.updateChecks();
-        }
-        else {
-            var type = this.identifierType;
-            var fromTime = this.start;
-            schedule.exclude.set(fromTime, true, type);
-            schedule.exclude.set(toTime, false, type);
-            schedule.include.set(toTime, true, type);
-            schedule.include.set(fromTime, false, type);
-            if (this.meta !== null) {
-                schedule.meta.unset(fromTime, type);
-                schedule.meta.set(toTime, this.meta, type);
-            }
-        }
-        return this;
+        return this.schedule.move(toTime, this.start, this.meta);
     };
     return CalendarEvent;
 }());
