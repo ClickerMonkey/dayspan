@@ -1006,6 +1006,9 @@ img { max-width: 100%; }
 					<a href="schedule.html#lasttime" class="tsd-kind-icon">last<wbr>Time</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
+					<a href="schedule.html#adjustdefinedspan" class="tsd-kind-icon">adjust<wbr>Defined<wbr>Span</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class">
 					<a href="schedule.html#coversday" class="tsd-kind-icon">covers<wbr>Day</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -1108,6 +1111,9 @@ img { max-width: 100%; }
 					<a href="schedule.html#movesingleevent" class="tsd-kind-icon">move<wbr>Single<wbr>Event</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
+					<a href="schedule.html#movetime" class="tsd-kind-icon">move<wbr>Time</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class">
 					<a href="schedule.html#nextday" class="tsd-kind-icon">next<wbr>Day</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -1127,6 +1133,12 @@ img { max-width: 100%; }
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
 					<a href="schedule.html#setexcluded" class="tsd-kind-icon">set<wbr>Excluded</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class">
+					<a href="schedule.html#setfrequency" class="tsd-kind-icon">set<wbr>Frequency</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class">
+					<a href="schedule.html#setfullday" class="tsd-kind-icon">set<wbr>Full<wbr>Day</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
 					<a href="schedule.html#toinput" class="tsd-kind-icon">to<wbr>Input</a>
@@ -1224,6 +1236,7 @@ img { max-width: 100%; }
 					<section class="tsd-index-section ">
 						<h3>Methods</h3>
 						<ul class="tsd-index-list">
+							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#adjustdefinedspan" class="tsd-kind-icon">adjust<wbr>Defined<wbr>Span</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#coversday" class="tsd-kind-icon">covers<wbr>Day</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#coverstime" class="tsd-kind-icon">covers<wbr>Time</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#describe" class="tsd-kind-icon">describe</a></li>
@@ -1258,6 +1271,7 @@ img { max-width: 100%; }
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#move" class="tsd-kind-icon">move</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#moveinstance" class="tsd-kind-icon">move<wbr>Instance</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#movesingleevent" class="tsd-kind-icon">move<wbr>Single<wbr>Event</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#movetime" class="tsd-kind-icon">move<wbr>Time</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#nextday" class="tsd-kind-icon">next<wbr>Day</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#nextdays" class="tsd-kind-icon">next<wbr>Days</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#prevday" class="tsd-kind-icon">prev<wbr>Day</a></li>
@@ -1265,6 +1279,8 @@ img { max-width: 100%; }
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#set" class="tsd-kind-icon">set</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#setcancelled" class="tsd-kind-icon">set<wbr>Cancelled</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#setexcluded" class="tsd-kind-icon">set<wbr>Excluded</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#setfrequency" class="tsd-kind-icon">set<wbr>Frequency</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#setfullday" class="tsd-kind-icon">set<wbr>Full<wbr>Day</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#toinput" class="tsd-kind-icon">to<wbr>Input</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#updatechecks" class="tsd-kind-icon">update<wbr>Checks</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="schedule.html#updatedurationindays" class="tsd-kind-icon">update<wbr>Duration<wbr>InDays</a></li>
@@ -1792,6 +1808,40 @@ img { max-width: 100%; }
 		<section class="tsd-panel-group tsd-member-group ">
 			<h2>Methods</h2>
 			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<a name="adjustdefinedspan" class="tsd-anchor"></a>
+				<h3>adjust<wbr>Defined<wbr>Span</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<li class="tsd-signature tsd-kind-icon">adjust<wbr>Defined<wbr>Span<span class="tsd-signature-symbol">(</span>addSpan<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L616">Schedule.ts:616</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Adjusts the <a href="schedule.html#start">Schedule.start</a> and <a href="schedule.html#end">Schedule.end</a> dates specified on this
+									schedule if this schedule represents a single event and the <code>start</code> and
+								<code>end</code> are already set or <code>addSpan</code> is <code>true</code>.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> addSpan: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>If <code>true</code>, the <code>start</code> and <code>end</code> dates will always be
+									adjusted if this schedule is a single event.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 				<a name="coversday" class="tsd-anchor"></a>
 				<h3>covers<wbr>Day</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -1801,7 +1851,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L903">Schedule.ts:903</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L967">Schedule.ts:967</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1837,7 +1887,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L916">Schedule.ts:916</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L980">Schedule.ts:980</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1871,7 +1921,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1435">Schedule.ts:1435</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1547">Schedule.ts:1547</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1947,7 +1997,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1260">Schedule.ts:1260</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1373">Schedule.ts:1373</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2016,7 +2066,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L572">Schedule.ts:572</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L636">Schedule.ts:636</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2126,7 +2176,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1063">Schedule.ts:1063</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1176">Schedule.ts:1176</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2155,7 +2205,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L588">Schedule.ts:588</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L652">Schedule.ts:652</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2194,7 +2244,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L639">Schedule.ts:639</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L703">Schedule.ts:703</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2332,7 +2382,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L653">Schedule.ts:653</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L717">Schedule.ts:717</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2406,7 +2456,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1168">Schedule.ts:1168</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1281">Schedule.ts:1281</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2435,7 +2485,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1179">Schedule.ts:1179</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1292">Schedule.ts:1292</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2461,7 +2511,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1189">Schedule.ts:1189</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1302">Schedule.ts:1302</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2487,7 +2537,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1096">Schedule.ts:1096</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1209">Schedule.ts:1209</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2519,7 +2569,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1237">Schedule.ts:1237</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1350">Schedule.ts:1350</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2548,7 +2598,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1157">Schedule.ts:1157</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1270">Schedule.ts:1270</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2573,7 +2623,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1203">Schedule.ts:1203</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1316">Schedule.ts:1316</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2611,7 +2661,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1222">Schedule.ts:1222</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1335">Schedule.ts:1335</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2652,7 +2702,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1148">Schedule.ts:1148</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1261">Schedule.ts:1261</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2677,7 +2727,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L755">Schedule.ts:755</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L819">Schedule.ts:819</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2740,7 +2790,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1330">Schedule.ts:1330</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1443">Schedule.ts:1443</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2779,7 +2829,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L791">Schedule.ts:791</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L855">Schedule.ts:855</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2820,7 +2870,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L608">Schedule.ts:608</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L672">Schedule.ts:672</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2954,7 +3004,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L888">Schedule.ts:888</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L952">Schedule.ts:952</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2987,7 +3037,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L965">Schedule.ts:965</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1044">Schedule.ts:1044</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -3035,7 +3085,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L987">Schedule.ts:987</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1100">Schedule.ts:1100</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -3087,7 +3137,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1018">Schedule.ts:1018</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1131">Schedule.ts:1131</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -3125,6 +3175,46 @@ img { max-width: 100%; }
 				</ul>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<a name="movetime" class="tsd-anchor"></a>
+				<h3>move<wbr>Time</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<li class="tsd-signature tsd-kind-icon">move<wbr>Time<span class="tsd-signature-symbol">(</span>fromTime<span class="tsd-signature-symbol">: </span><a href="time.html" class="tsd-signature-type">Time</a>, toTime<span class="tsd-signature-symbol">: </span><a href="time.html" class="tsd-signature-type">Time</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1063">Schedule.ts:1063</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Moves a time specified in this schedule to the given time, adjusting
+									any cancelled event instances, metadata, and any excluded and included
+								event instances.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>fromTime: <a href="time.html" class="tsd-signature-type">Time</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The time to move.</p>
+								</div>
+							</li>
+							<li>
+								<h5>toTime: <a href="time.html" class="tsd-signature-type">Time</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The new time in the schedule.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if time was moved, otherwise <code>false</code>.</p>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 				<a name="nextday" class="tsd-anchor"></a>
 				<h3>next<wbr>Day</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -3134,7 +3224,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L686">Schedule.ts:686</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L750">Schedule.ts:750</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -3180,7 +3270,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L704">Schedule.ts:704</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L768">Schedule.ts:768</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -3234,7 +3324,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L719">Schedule.ts:719</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L783">Schedule.ts:783</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -3280,7 +3370,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L737">Schedule.ts:737</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L801">Schedule.ts:801</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -3390,7 +3480,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L946">Schedule.ts:946</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1025">Schedule.ts:1025</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -3429,7 +3519,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L928">Schedule.ts:928</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1007">Schedule.ts:1007</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -3458,6 +3548,90 @@ img { max-width: 100%; }
 				</ul>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<a name="setfrequency" class="tsd-anchor"></a>
+				<h3>set<wbr>Frequency</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<li class="tsd-signature tsd-kind-icon">set<wbr>Frequency<span class="tsd-signature-symbol">(</span>property<span class="tsd-signature-symbol">: </span><a href="../globals.html#dayproperty" class="tsd-signature-type">DayProperty</a>, frequency<span class="tsd-signature-symbol">?: </span><a href="../globals.html#frequencyvalue" class="tsd-signature-type">FrequencyValue</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L993">Schedule.ts:993</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Sets the frequency for the given property. This does not update the
+									<a href="schedule.html#checks">Schedule.checks</a> array, the <a href="schedule.html#updatechecks">Schedule.updateChecks</a> function needs
+								to be called.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>property: <a href="../globals.html#dayproperty" class="tsd-signature-type">DayProperty</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The frequency to update.</p>
+								</div>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> frequency: <a href="../globals.html#frequencyvalue" class="tsd-signature-type">FrequencyValue</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The new frequency.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<a name="setfullday" class="tsd-anchor"></a>
+				<h3>set<wbr>Full<wbr>Day</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<li class="tsd-signature tsd-kind-icon">set<wbr>Full<wbr>Day<span class="tsd-signature-symbol">(</span>fullDay<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span>, defaultTime<span class="tsd-signature-symbol">?: </span><a href="../globals.html#timeinput" class="tsd-signature-type">TimeInput</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L579">Schedule.ts:579</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Sets whether this schedule is a full day event if it is not already. If
+									this schedule is a full day event and <code>false</code> is passed to this function
+									a single timed event will be added based on <code>defaultTime</code>. If this schedule
+									has timed events and <code>true</code> is passed to make the schedule full day, the
+									timed events are removed from this schedule. If the durationUnit is not the
+									expected unit based on the new full day flag - the duration is reset to 1
+								and the duration unit is set to the expected unit.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> fullDay: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>Whether this schedule should represent a full day event or
+									timed events.</p>
+								</div>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> defaultTime: <a href="../globals.html#timeinput" class="tsd-signature-type">TimeInput</a><span class="tsd-signature-symbol"> =&nbsp;&quot;08:00&quot;</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>If <code>fullDay</code> is <code>false</code> and this schedule is currently
+									a full day event - this time will be used as the time of the first event.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 				<a name="toinput" class="tsd-anchor"></a>
 				<h3>to<wbr>Input</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -3467,7 +3641,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1370">Schedule.ts:1370</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Schedule.ts#L1482">Schedule.ts:1482</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -3475,9 +3649,6 @@ img { max-width: 100%; }
 								<p>Converts the schedule instance back into input.</p>
 							</div>
 							<dl class="tsd-comment-tags">
-								<dt>see</dt>
-								<dd><p>[[Schedule.getExclusions]]</p>
-								</dd>
 								<dt>see</dt>
 								<dd><p><a href="time.html#format">Time.format</a></p>
 								</dd>

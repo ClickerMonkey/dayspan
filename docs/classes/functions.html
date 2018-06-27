@@ -916,6 +916,9 @@ img { max-width: 100%; }
 					<a href="functions.html#coalesce" class="tsd-kind-icon">coalesce</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a href="functions.html#extend" class="tsd-kind-icon">extend</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
 					<a href="functions.html#isarray" class="tsd-kind-icon">is<wbr>Array</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
@@ -979,6 +982,7 @@ img { max-width: 100%; }
 						<h3>Methods</h3>
 						<ul class="tsd-index-list">
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="functions.html#coalesce" class="tsd-kind-icon">coalesce</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="functions.html#extend" class="tsd-kind-icon">extend</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="functions.html#isarray" class="tsd-kind-icon">is<wbr>Array</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="functions.html#isarrayequals" class="tsd-kind-icon">is<wbr>Array<wbr>Equals</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="functions.html#isdefined" class="tsd-kind-icon">is<wbr>Defined</a></li>
@@ -1045,6 +1049,44 @@ Functions.coalesce(<span class="hljs-built_in">void</span> <span class="hljs-num
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
 						<p>The first defined argument.</p>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+				<a name="extend" class="tsd-anchor"></a>
+				<h3><span class="tsd-flag ts-flagStatic">Static</span> extend</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<li class="tsd-signature tsd-kind-icon">extend<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, from<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Functions.ts#L173">Functions.ts:173</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Copies values from <code>from</code> object and sets them to the <code>target</code> object.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>target: <span class="tsd-signature-type">any</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The object to set values to.</p>
+								</div>
+							</li>
+							<li>
+								<h5>from: <span class="tsd-signature-type">any</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The object to copy value references from.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
+						<p>The reference to <code>target</code>.</p>
 					</li>
 				</ul>
 			</section>
@@ -1372,7 +1414,7 @@ Functions.isFrequencyValueOneOf(<span class="hljs-literal">null</span>);  <span 
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Functions.ts#L182">Functions.ts:182</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Functions.ts#L199">Functions.ts:199</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1427,7 +1469,7 @@ Functions.pad(<span class="hljs-string">'heyman'</span>, <span class="hljs-numbe
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Functions.ts#L209">Functions.ts:209</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Functions.ts#L226">Functions.ts:226</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">

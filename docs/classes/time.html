@@ -937,6 +937,18 @@ img { max-width: 100%; }
 					<a href="time.html#format" class="tsd-kind-icon">format</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
+					<a href="time.html#matches" class="tsd-kind-icon">matches</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class">
+					<a href="time.html#matcheshour" class="tsd-kind-icon">matches<wbr>Hour</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class">
+					<a href="time.html#matchesminute" class="tsd-kind-icon">matches<wbr>Minute</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class">
+					<a href="time.html#matchessecond" class="tsd-kind-icon">matches<wbr>Second</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class">
 					<a href="time.html#toidentifier" class="tsd-kind-icon">to<wbr>Identifier</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -1006,6 +1018,10 @@ img { max-width: 100%; }
 						<h3>Methods</h3>
 						<ul class="tsd-index-list">
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="time.html#format" class="tsd-kind-icon">format</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class"><a href="time.html#matches" class="tsd-kind-icon">matches</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class"><a href="time.html#matcheshour" class="tsd-kind-icon">matches<wbr>Hour</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class"><a href="time.html#matchesminute" class="tsd-kind-icon">matches<wbr>Minute</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class"><a href="time.html#matchessecond" class="tsd-kind-icon">matches<wbr>Second</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="time.html#toidentifier" class="tsd-kind-icon">to<wbr>Identifier</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="time.html#tomilliseconds" class="tsd-kind-icon">to<wbr>Milliseconds</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="time.html#toobject" class="tsd-kind-icon">to<wbr>Object</a></li>
@@ -1148,7 +1164,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">FORMATTERS<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[{size: 3,formats: {SSS: (t: Time) &#x3D;&gt; fn.padNumber(t.millisecond, 3)}},{size: 2,formats: {HH: (t: Time) &#x3D;&gt; fn.padNumber(t.hour, 2),hh: (t: Time) &#x3D;&gt; fn.padNumber((t.hour % 12) || 12, 2),kk: (t: Time) &#x3D;&gt; fn.padNumber(t.hour + 1, 2),mm: (t: Time) &#x3D;&gt; fn.padNumber(t.minute, 2),ss: (t: Time) &#x3D;&gt; fn.padNumber(t.second, 2),SS: (t: Time) &#x3D;&gt; fn.padNumber(t.millisecond, 3, 2)}},{size: 1,formats: {A: (t: Time) &#x3D;&gt; t.hour &lt; 12 ? &#x27;AM&#x27; : &#x27;PM&#x27;,a: (t: Time) &#x3D;&gt; t.hour &lt; 12 ? &#x27;am&#x27; : &#x27;pm&#x27;,H: (t: Time) &#x3D;&gt; t.hour + &#x27;&#x27;,h: (t: Time) &#x3D;&gt; ((t.hour % 12) || 12) + &#x27;&#x27;,k: (t: Time) &#x3D;&gt; (t.hour + 1) + &#x27;&#x27;,m: (t: Time) &#x3D;&gt; t.minute + &#x27;&#x27;,s: (t: Time) &#x3D;&gt; t.second + &#x27;&#x27;,S: (t: Time) &#x3D;&gt; fn.padNumber(t.millisecond, 3, 1)}}]</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L257">Time.ts:257</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L309">Time.ts:309</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -1237,6 +1253,136 @@ img { max-width: 100%; }
 				</ul>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<a name="matches" class="tsd-anchor"></a>
+				<h3>matches</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<li class="tsd-signature tsd-kind-icon">matches<span class="tsd-signature-symbol">(</span>time<span class="tsd-signature-symbol">: </span><a href="time.html" class="tsd-signature-type">Time</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L137">Time.ts:137</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether this time is an exact match for the given time.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>time: <a href="time.html" class="tsd-signature-type">Time</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The given time to test against.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the time matches this time, otherwise <code>false</code>.</p>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<a name="matcheshour" class="tsd-anchor"></a>
+				<h3>matches<wbr>Hour</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<li class="tsd-signature tsd-kind-icon">matches<wbr>Hour<span class="tsd-signature-symbol">(</span>time<span class="tsd-signature-symbol">: </span><a href="time.html" class="tsd-signature-type">Time</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L151">Time.ts:151</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether this time has the same hour as the given time.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>time: <a href="time.html" class="tsd-signature-type">Time</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The given time to test against.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the given hour matches this hour, otherwise <code>false</code>.</p>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<a name="matchesminute" class="tsd-anchor"></a>
+				<h3>matches<wbr>Minute</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<li class="tsd-signature tsd-kind-icon">matches<wbr>Minute<span class="tsd-signature-symbol">(</span>time<span class="tsd-signature-symbol">: </span><a href="time.html" class="tsd-signature-type">Time</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L162">Time.ts:162</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether this time has the same hour and minute as the given time.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>time: <a href="time.html" class="tsd-signature-type">Time</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The given time to test against.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the given hour and minute matches, otherwise <code>false</code>.</p>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<a name="matchessecond" class="tsd-anchor"></a>
+				<h3>matches<wbr>Second</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<li class="tsd-signature tsd-kind-icon">matches<wbr>Second<span class="tsd-signature-symbol">(</span>time<span class="tsd-signature-symbol">: </span><a href="time.html" class="tsd-signature-type">Time</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L176">Time.ts:176</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Determines whether this time has the same hour, minute, and second as the
+								given time.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>time: <a href="time.html" class="tsd-signature-type">Time</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The given time to test against.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if the given hour, minute, and second matches, otherwise
+						<code>false</code>.</p>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 				<a name="toidentifier" class="tsd-anchor"></a>
 				<h3>to<wbr>Identifier</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -1246,7 +1392,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L160">Time.ts:160</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L212">Time.ts:212</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1267,7 +1413,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L135">Time.ts:135</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L187">Time.ts:187</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1288,7 +1434,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L172">Time.ts:172</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L224">Time.ts:224</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1309,7 +1455,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L147">Time.ts:147</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L199">Time.ts:199</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1330,7 +1476,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L249">Time.ts:249</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L301">Time.ts:301</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1381,7 +1527,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L229">Time.ts:229</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L281">Time.ts:281</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1414,7 +1560,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L205">Time.ts:205</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L257">Time.ts:257</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1452,7 +1598,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L192">Time.ts:192</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Time.ts#L244">Time.ts:244</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">

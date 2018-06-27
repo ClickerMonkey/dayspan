@@ -237,6 +237,19 @@ var Functions = (function () {
         return this.isDefined(a) ? a : (this.isDefined(b) ? b : c);
     };
     /**
+     * Copies values from `from` object and sets them to the `target` object.
+     *
+     * @param target The object to set values to.
+     * @param from The object to copy value references from.
+     * @returns The reference to `target`.
+     */
+    Functions.extend = function (target, from) {
+        for (var prop in from) {
+            target[prop] = from[prop];
+        }
+        return target;
+    };
+    /**
      * Pads the string `x` up to `length` characters with the given `padding`
      * optionally placing the `padding` `before` `x`.
      *
@@ -1547,7 +1560,7 @@ var Iterator_Iterator = (function () {
         /**
          * A result of the iteration passed to [[Iterator.stop]].
          */
-        this.result = undefined;
+        this.result = null;
         this.source = source;
     }
     /**
@@ -2100,6 +2113,41 @@ var ScheduleModifier_ScheduleModifier = (function () {
         return this;
     };
     /**
+     * Moves any identifiers with the matching time `fromTime` to `toTime` and
+     * returns the number of moves.
+     *
+     * @param fromTime The time to move from.
+     * @param toTime The time to move to.
+     * @returns The number of modifiers moved.
+     */
+    ScheduleModifier.prototype.moveTime = function (fromTime, toTime) {
+        var type = Identifier_Identifier.Time;
+        var moveIds = [];
+        this.iterate().iterate(function (_a) {
+            var id = _a[0], value = _a[1];
+            if (type.is(id)) {
+                var start = type.start(id);
+                if (start.sameTime(fromTime)) {
+                    moveIds.push(id);
+                }
+            }
+        });
+        var moved = 0;
+        for (var _i = 0, moveIds_1 = moveIds; _i < moveIds_1.length; _i++) {
+            var id = moveIds_1[_i];
+            var value = this.map[id];
+            var start = type.start(id);
+            var newStart = start.withTime(toTime);
+            var newId = type.get(newStart);
+            if (!this.map[newId]) {
+                this.map[newId] = value;
+                delete this.map[id];
+                moved++;
+            }
+        }
+        return moved;
+    };
+    /**
      * Sets the value/modification in this map given a day, the value, and the
      * identifier type.
      *
@@ -2447,6 +2495,58 @@ var Schedule_Schedule = (function () {
         return this.times.length === 0;
     };
     /**
+     * Sets whether this schedule is a full day event if it is not already. If
+     * this schedule is a full day event and `false` is passed to this function
+     * a single timed event will be added based on `defaultTime`. If this schedule
+     * has timed events and `true` is passed to make the schedule full day, the
+     * timed events are removed from this schedule. If the durationUnit is not the
+     * expected unit based on the new full day flag - the duration is reset to 1
+     * and the duration unit is set to the expected unit.
+     *
+     * @param fullDay Whether this schedule should represent a full day event or
+     *    timed events.
+     * @param defaultTime If `fullDay` is `false` and this schedule is currently
+     *    a full day event - this time will be used as the time of the first event.
+     */
+    Schedule.prototype.setFullDay = function (fullDay, defaultTime) {
+        if (fullDay === void 0) { fullDay = true; }
+        if (defaultTime === void 0) { defaultTime = '08:00'; }
+        if (fullDay !== this.isFullDay()) {
+            if (fullDay) {
+                this.times = [];
+                if (this.durationUnit !== 'days' && this.durationUnit !== 'day') {
+                    this.duration = 1;
+                    this.durationUnit = 'days';
+                }
+            }
+            else {
+                this.times = [Parse_Parse.time(defaultTime)];
+                if (this.durationUnit !== 'hours' && this.durationUnit !== 'hour') {
+                    this.duration = 1;
+                    this.durationUnit = 'hours';
+                }
+            }
+        }
+        return this;
+    };
+    /**
+     * Adjusts the [[Schedule.start]] and [[Schedule.end]] dates specified on this
+     * schedule if this schedule represents a single event and the `start` and
+     * `end` are already set or `addSpan` is `true`.
+     *
+     * @param addSpan If `true`, the `start` and `end` dates will always be
+     *    adjusted if this schedule is a single event.
+     */
+    Schedule.prototype.adjustDefinedSpan = function (addSpan) {
+        if (addSpan === void 0) { addSpan = false; }
+        var single = this.getSingleEventSpan();
+        if (single && (addSpan || (this.start && this.end))) {
+            this.start = single.start.start();
+            this.end = single.end.end();
+        }
+        return this;
+    };
+    /**
      * Returns a span of time for a schedule with full day events starting on the
      * start of the given day with the desired duration in days or weeks.
      *
@@ -2744,6 +2844,18 @@ var Schedule_Schedule = (function () {
         return !!this.iterateSpans(day, true).first(function (span) { return span.contains(day); });
     };
     /**
+     * Sets the frequency for the given property. This does not update the
+     * [[Schedule.checks]] array, the [[Schedule.updateChecks]] function needs
+     * to be called.
+     *
+     * @param property The frequency to update.
+     * @param frequency The new frequency.
+     */
+    Schedule.prototype.setFrequency = function (property, frequency) {
+        this[property] = Parse_Parse.frequency(frequency, property);
+        return this;
+    };
+    /**
      * Changes the exclusion status of the event at the given time. By default
      * this excludes this event - but `false`  may be passed to undo an exclusion.
      *
@@ -2787,6 +2899,31 @@ var Schedule_Schedule = (function () {
             return this.moveInstance(fromTime, toTime, meta);
         }
         return false;
+    };
+    /**
+     * Moves a time specified in this schedule to the given time, adjusting
+     * any cancelled event instances, metadata, and any excluded and included
+     * event instances.
+     *
+     * @param fromTime The time to move.
+     * @param toTime The new time in the schedule.
+     * @returns `true` if time was moved, otherwise `false`.
+     */
+    Schedule.prototype.moveTime = function (fromTime, toTime) {
+        var found = false;
+        for (var i = 0; i < this.times.length && !found; i++) {
+            if (found = fromTime.matches(this.times[i])) {
+                this.times.splice(i, 1, toTime);
+            }
+        }
+        if (found) {
+            this.include.moveTime(fromTime, toTime);
+            this.exclude.moveTime(fromTime, toTime);
+            this.cancel.moveTime(fromTime, toTime);
+            this.meta.moveTime(fromTime, toTime);
+            this.adjustDefinedSpan(false);
+        }
+        return found;
     };
     /**
      * Moves the event instance starting at `fromTime` to `toTime` optionally
@@ -2837,7 +2974,7 @@ var Schedule_Schedule = (function () {
             this[prop] = frequency;
         }
         if (this.times.length === 1 && takeTime) {
-            this.times[0] = toTime.asTime();
+            this.times = [toTime.asTime()];
         }
         this.updateChecks();
         var span = this.getSingleEventSpan();
@@ -3092,7 +3229,6 @@ var Schedule_Schedule = (function () {
      * @param alwaysDuration If the duration values (`duration` and
      *    `durationUnit`) should always be returned in the input.
      * @returns The input that describes this schedule.
-     * @see [[Schedule.getExclusions]]
      * @see [[Time.format]]
      */
     Schedule.prototype.toInput = function (returnDays, returnTimes, timeFormat, alwaysDuration) {
@@ -3128,7 +3264,7 @@ var Schedule_Schedule = (function () {
         if (cancels.length)
             out.cancel = cancels;
         if (hasMeta)
-            out.meta = this.meta.map;
+            out.meta = Functions.extend({}, this.meta.map);
         if (this.dayOfWeek.input)
             out.dayOfWeek = this.dayOfWeek.input;
         if (this.dayOfMonth.input)
@@ -3432,6 +3568,50 @@ var Time_Time = (function () {
         return out;
     };
     /**
+     * Determines whether this time is an exact match for the given time.
+     *
+     * @param time The given time to test against.
+     * @returns `true` if the time matches this time, otherwise `false`.
+     */
+    Time.prototype.matches = function (time) {
+        return this.hour === time.hour &&
+            this.minute === time.minute &&
+            this.second === time.second &&
+            this.millisecond === time.millisecond;
+    };
+    /**
+     * Determines whether this time has the same hour as the given time.
+     *
+     * @param time The given time to test against.
+     * @returns `true` if the given hour matches this hour, otherwise `false`.
+     */
+    Time.prototype.matchesHour = function (time) {
+        return this.hour === time.hour;
+    };
+    /**
+     * Determines whether this time has the same hour and minute as the given time.
+     *
+     * @param time The given time to test against.
+     * @returns `true` if the given hour and minute matches, otherwise `false`.
+     */
+    Time.prototype.matchesMinute = function (time) {
+        return this.hour === time.hour &&
+            this.minute === time.minute;
+    };
+    /**
+     * Determines whether this time has the same hour, minute, and second as the
+     * given time.
+     *
+     * @param time The given time to test against.
+     * @returns `true` if the given hour, minute, and second matches, otherwise
+     *    `false`.
+     */
+    Time.prototype.matchesSecond = function (time) {
+        return this.hour === time.hour &&
+            this.minute === time.minute &&
+            this.second === time.second;
+    };
+    /**
      * @returns The number of milliseconds from the start of the day until this
      *  time.
      */
@@ -3633,7 +3813,7 @@ var Parse_Parse = (function () {
             };
             check.given = true;
         }
-        check.input = input;
+        check.input = Functions.coalesce(input, null);
         check.property = property;
         return check;
     };
@@ -5862,6 +6042,7 @@ var Weekday = (function () {
 
 
 
+
 /**
  * A class which helps describe [[ScheduleInput]] if it matches a pattern.
  */
@@ -5882,32 +6063,67 @@ var Pattern_Pattern = (function () {
         this.rules = rules;
     }
     /**
-     * Applies this pattern to schedule input removing and adding any necessary
-     * properties from the input to match this pattern - based around the day
-     * provided.
+     * Applies this pattern to a [[Schedule]] or [[ScheduleInput]] removing and
+     * adding any necessary properties from the input to match this pattern -
+     * based around the day provided.
      *
-     * @param input The input to update to match this pattern.
+     * @param schedule The schedule to update to match this pattern.
      * @param day The day to base the schedule on.
      * @returns The reference to the input passed in.
      */
-    Pattern.prototype.apply = function (input, day) {
+    Pattern.prototype.apply = function (schedule, day) {
+        if (schedule instanceof Schedule_Schedule) {
+            this.applyGeneric(day, function (prop, frequency) { return schedule.setFrequency(prop, frequency); }, function (prop) { return schedule.setFrequency(prop); });
+            schedule.updateChecks();
+        }
+        else {
+            this.applyGeneric(day, function (prop, frequency) { return schedule[prop] = frequency; }, function (prop) { return delete schedule[prop]; });
+        }
+        return schedule;
+    };
+    /**
+     * Applies this pattern to any object provided they implement the
+     * `setFrequency` and `removeFrequency` functions.
+     *
+     * @param day The day to base the schedule on.
+     * @param setFrequency The function which sets the frequency on the object.
+     * @param removeFrequency The function to remove a frequency from the object.
+     */
+    Pattern.prototype.applyGeneric = function (day, setFrequency, removeFrequency) {
         for (var _i = 0, _a = Pattern.PROPS; _i < _a.length; _i++) {
             var prop = _a[_i];
             var rule = this.rules[prop];
             // Should have one value
             if (rule === 1) {
-                input[prop] = [day[prop]];
+                setFrequency(prop, [day[prop]]);
             }
             // Can be any of the values in the array
             if (Functions.isArray(rule)) {
-                input[prop] = rule;
+                setFrequency(prop, rule);
             }
             // Must not be present
             if (!Functions.isDefined(rule)) {
-                delete input[prop];
+                removeFrequency(prop);
             }
         }
-        return input;
+    };
+    /**
+     * Determines whether the given [[Schedule]] or [[ScheduleInput]] matches this
+     * pattern. Optionally a day can be provided to make sure the day matches the
+     * schedule and pattern together.
+     *
+     * @param schedule The schedule input to test.
+     * @param exactlyWith A day to further validate against for matching.
+     * @returns `true` if the schedule was a match to this pattern with the
+     *    day if one was provided, otherwise `false`.
+     */
+    Pattern.prototype.isMatch = function (schedule, exactlyWith) {
+        if (schedule instanceof Schedule_Schedule) {
+            return this.isMatchGeneric(function (prop) { return schedule[prop].input; }, exactlyWith);
+        }
+        else {
+            return this.isMatchGeneric(function (prop) { return schedule[prop]; }, exactlyWith);
+        }
     };
     /**
      * Determines whether the given input matches this pattern. Optionally a day
@@ -5919,12 +6135,12 @@ var Pattern_Pattern = (function () {
      * @returns `true` if the schedule input was a match to this pattern with the
      *    day if one was provided, otherwise `false`.
      */
-    Pattern.prototype.isMatch = function (input, exactlyWith) {
+    Pattern.prototype.isMatchGeneric = function (getFrequency, exactlyWith) {
         var exactly = Functions.isDefined(exactlyWith);
         for (var _i = 0, _a = Pattern.PROPS; _i < _a.length; _i++) {
             var prop = _a[_i];
             var rule = this.rules[prop];
-            var curr = input[prop];
+            var curr = getFrequency(prop);
             // Optional, skip it
             if (rule === false) {
                 continue;
