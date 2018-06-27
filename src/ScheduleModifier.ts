@@ -1,6 +1,7 @@
 
 import { Identifier, IdentifierInput } from './Identifier';
 import { Day } from './Day';
+import { Time } from './Time';
 import { DaySpan } from './DaySpan';
 import { Iterator, IteratorAction } from './Iterator';
 
@@ -136,6 +137,52 @@ export class ScheduleModifier<T>
   }
 
   /**
+   * Moves any identifiers with the matching time `fromTime` to `toTime` and
+   * returns the number of moves.
+   *
+   * @param fromTime The time to move from.
+   * @param toTime The time to move to.
+   * @returns The number of modifiers moved.
+   */
+  public moveTime(fromTime: Time, toTime: Time): number
+  {
+    let type: Identifier = Identifier.Time;
+    let moveIds: IdentifierInput[] = [];
+
+    this.iterate().iterate(([id, value]) =>
+    {
+      if (type.is( id ))
+      {
+        let start: Day = type.start( id );
+
+        if (start.sameTime( fromTime ))
+        {
+          moveIds.push( id );
+        }
+      }
+    });
+
+    let moved: number = 0;
+
+    for (let id of moveIds)
+    {
+      let value: T = this.map[ id ];
+      let start: Day = type.start( id );
+      let newStart: Day = start.withTime( toTime );
+      let newId: IdentifierInput = type.get( newStart );
+
+      if (!this.map[ newId ])
+      {
+        this.map[ newId ] = value;
+        delete this.map[ id ];
+        moved++;
+      }
+    }
+
+    return moved;
+  }
+
+  /**
    * Sets the value/modification in this map given a day, the value, and the
    * identifier type.
    *
@@ -237,7 +284,7 @@ export class ScheduleModifier<T>
 
         if (type)
         {
-          let span = type.span( id, endInclusive);
+          let span = type.span( id, endInclusive );
 
           return { span, value };
         }

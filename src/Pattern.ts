@@ -3,8 +3,8 @@ import { Functions as fn } from './Functions';
 import { Day, DayProperty } from './Day';
 import { Suffix } from './Suffix';
 import { Weekday } from './Weekday';
-import { FrequencyValueEvery } from './Frequency';
-import { ScheduleInput } from './Schedule';
+import { FrequencyValueEvery, FrequencyValue } from './Frequency';
+import { Schedule, ScheduleInput } from './Schedule';
 
 
 /**
@@ -120,15 +120,47 @@ export class Pattern
   }
 
   /**
-   * Applies this pattern to schedule input removing and adding any necessary
-   * properties from the input to match this pattern - based around the day
-   * provided.
+   * Applies this pattern to a [[Schedule]] or [[ScheduleInput]] removing and
+   * adding any necessary properties from the input to match this pattern -
+   * based around the day provided.
    *
-   * @param input The input to update to match this pattern.
+   * @param schedule The schedule to update to match this pattern.
    * @param day The day to base the schedule on.
    * @returns The reference to the input passed in.
    */
-  public apply<M>(input: ScheduleInput<M>, day: Day): ScheduleInput<M>
+  public apply<M, I extends ScheduleInput<M> | Schedule<M>>(schedule: I, day: Day): I
+  {
+    if (schedule instanceof Schedule)
+    {
+      this.applyGeneric(day,
+        (prop, frequency) => schedule.setFrequency( prop, frequency ),
+        (prop) => schedule.setFrequency( prop )
+      );
+
+      schedule.updateChecks();
+    }
+    else
+    {
+      this.applyGeneric(day,
+        (prop, frequency) => schedule[ prop ] = frequency,
+        (prop) => delete schedule[ prop ]
+      );
+    }
+
+    return schedule;
+  }
+
+  /**
+   * Applies this pattern to any object provided they implement the
+   * `setFrequency` and `removeFrequency` functions.
+   *
+   * @param day The day to base the schedule on.
+   * @param setFrequency The function which sets the frequency on the object.
+   * @param removeFrequency The function to remove a frequency from the object.
+   */
+  public applyGeneric(day: Day,
+    setFrequency: (property: DayProperty, frequency: any) => any,
+    removeFrequency: (property: DayProperty) => any): void
   {
     for (let prop of Pattern.PROPS)
     {
@@ -137,23 +169,43 @@ export class Pattern
       // Should have one value
       if (rule === 1)
       {
-        input[ prop ] = [day[ prop ]];
+        setFrequency( prop, [day[ prop ]] );
       }
 
       // Can be any of the values in the array
       if (fn.isArray(rule))
       {
-        input[ prop ] = rule;
+        setFrequency( prop, rule );
       }
 
       // Must not be present
       if (!fn.isDefined(rule))
       {
-        delete input[ prop ];
+        removeFrequency( prop );
       }
     }
+  }
 
-    return input;
+  /**
+   * Determines whether the given [[Schedule]] or [[ScheduleInput]] matches this
+   * pattern. Optionally a day can be provided to make sure the day matches the
+   * schedule and pattern together.
+   *
+   * @param schedule The schedule input to test.
+   * @param exactlyWith A day to further validate against for matching.
+   * @returns `true` if the schedule was a match to this pattern with the
+   *    day if one was provided, otherwise `false`.
+   */
+  public isMatch<M, I extends ScheduleInput<M> | Schedule<M>>(schedule: I, exactlyWith?: Day): boolean
+  {
+    if (schedule instanceof Schedule)
+    {
+      return this.isMatchGeneric((prop) => schedule[ prop ].input, exactlyWith);
+    }
+    else
+    {
+      return this.isMatchGeneric((prop) => schedule[ prop ], exactlyWith);
+    }
   }
 
   /**
@@ -166,14 +218,14 @@ export class Pattern
    * @returns `true` if the schedule input was a match to this pattern with the
    *    day if one was provided, otherwise `false`.
    */
-  public isMatch<M>(input: ScheduleInput<M>, exactlyWith?: Day): boolean
+  public isMatchGeneric(getFrequency: (property: DayProperty) => FrequencyValue, exactlyWith?: Day): boolean
   {
     let exactly: boolean = fn.isDefined( exactlyWith );
 
     for (let prop of Pattern.PROPS)
     {
       let rule = this.rules[ prop ];
-      let curr = input[ prop ];
+      let curr = getFrequency( prop );
 
       // Optional, skip it
       if (rule === false)
@@ -196,9 +248,9 @@ export class Pattern
       // Must be an array of the same size
       if (fn.isNumber(rule))
       {
-        if (fn.isArray(curr) && curr.length === rule)
+        if (fn.isArray(curr) && (<number[]>curr).length === rule)
         {
-          if (exactly && curr.indexOf( exactlyWith[ prop ] ) === -1)
+          if (exactly && (<number[]>curr).indexOf( <number>exactlyWith[ prop ] ) === -1)
           {
             return false;
           }
@@ -217,7 +269,7 @@ export class Pattern
           return false;
         }
 
-        if (rule.length !== curr.length)
+        if (rule.length !== (<number[]>curr).length)
         {
           return false;
         }
@@ -245,7 +297,7 @@ export class Pattern
         }
 
         var ruleOffset = rule.offset || 0;
-        var currOffset = curr.offset || 0;
+        var currOffset = (<FrequencyValueEvery>curr).offset || 0;
 
         if (currOffset !== ruleOffset || curr.every !== rule.every)
         {
@@ -284,11 +336,11 @@ export class Pattern
    * @param exactlyWith  A day to further validate against for matching.
    * @see [[Pattern.isMatch]]
    */
-  public static findMatch<M>(input: ScheduleInput<M>, listedOnly: boolean = true, exactlyWith?: Day): Pattern
+  public static findMatch<M, I extends ScheduleInput<M> | Schedule<M>>(input: I, listedOnly: boolean = true, exactlyWith?: Day): Pattern
   {
     for (let pattern of Patterns)
     {
-      if ((pattern.listed || !listedOnly) && pattern.isMatch( input, exactlyWith ))
+      if ((pattern.listed || !listedOnly) && pattern.isMatch<M, I>( input, exactlyWith ))
       {
         return pattern;
       }

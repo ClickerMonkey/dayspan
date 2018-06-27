@@ -129,6 +129,58 @@ export class Time
   }
 
   /**
+   * Determines whether this time is an exact match for the given time.
+   *
+   * @param time The given time to test against.
+   * @returns `true` if the time matches this time, otherwise `false`.
+   */
+  public matches(time: Time): boolean
+  {
+    return this.hour === time.hour &&
+      this.minute === time.minute &&
+      this.second === time.second &&
+      this.millisecond === time.millisecond;
+  }
+
+  /**
+   * Determines whether this time has the same hour as the given time.
+   *
+   * @param time The given time to test against.
+   * @returns `true` if the given hour matches this hour, otherwise `false`.
+   */
+  public matchesHour(time: Time): boolean
+  {
+    return this.hour === time.hour;
+  }
+
+  /**
+   * Determines whether this time has the same hour and minute as the given time.
+   *
+   * @param time The given time to test against.
+   * @returns `true` if the given hour and minute matches, otherwise `false`.
+   */
+  public matchesMinute(time: Time): boolean
+  {
+    return this.hour === time.hour &&
+      this.minute === time.minute;
+  }
+
+  /**
+   * Determines whether this time has the same hour, minute, and second as the
+   * given time.
+   *
+   * @param time The given time to test against.
+   * @returns `true` if the given hour, minute, and second matches, otherwise
+   *    `false`.
+   */
+  public matchesSecond(time: Time): boolean
+  {
+    return this.hour === time.hour &&
+      this.minute === time.minute &&
+      this.second === time.second;
+  }
+
+  /**
    * @returns The number of milliseconds from the start of the day until this
    *  time.
    */

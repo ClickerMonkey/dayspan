@@ -164,6 +164,23 @@ export class Functions
   }
 
   /**
+   * Copies values from `from` object and sets them to the `target` object.
+   *
+   * @param target The object to set values to.
+   * @param from The object to copy value references from.
+   * @returns The reference to `target`.
+   */
+  public static extend(target: any, from: any): any
+  {
+    for (let prop in from)
+    {
+      target[ prop ] = from[ prop ];
+    }
+
+    return target;
+  }
+
+  /**
    * Pads the string `x` up to `length` characters with the given `padding`
    * optionally placing the `padding` `before` `x`.
    *

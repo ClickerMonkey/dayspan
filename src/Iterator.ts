@@ -14,8 +14,7 @@ export type IteratorCallback<T, R> = (item: T, iterator: Iterator<T>) => R;
 
 /**
  * An [[Iterator]] source which handles iterating over items and calls
- * `callback` for each item, checking [[Iterator.iterating]] after each
- * invokation to stop iteration as early as possible.
+ * [[Iterator.act]] for each item, taking the requested action when possible.
  *
  * @param callback The function to invoke for each item.
  * @param iterator The iterator to check for early exists.
@@ -108,7 +107,7 @@ export class Iterator<T>
   /**
    * A result of the iteration passed to [[Iterator.stop]].
    */
-  public result: any = undefined;
+  public result: any = null;
 
   /**
    * The last action (if any) called on this iterator.

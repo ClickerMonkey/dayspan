@@ -3,6 +3,7 @@ import { Schedule } from '../Schedule';
 import { Weekday } from '../Weekday';
 import { Month } from '../Month';
 import { Day } from '../Day';
+import { Time } from '../Time';
 import { Identifier, IdentifierInput } from '../Identifier';
 
 
@@ -493,6 +494,43 @@ describe('Schedule', () =>
       20180715,
       20180801
     ]);
+  });
+
+  it('moveTime', () =>
+  {
+    let s1 = new Schedule({
+      dayOfWeek: [1],
+      times: [
+        '09:30',
+        '15:00'
+      ]
+    });
+
+    let c0 = Day.build(2018, 5, 18, 9, 30);
+    let c1 = Day.build(2018, 5, 18, 9, 0);
+
+    s1.move(
+      Day.build(2018, 5, 25, 9, 15),
+      Day.build(2018, 5, 25, 9, 30)
+    );
+
+    expect( s1.isCancelled(c0) ).toBe( false );
+
+    s1.setCancelled(c0);
+
+    expect( s1.isCancelled(c0) ).toBe( true );
+
+    s1.moveTime(
+      Time.parse('09:30'),
+      Time.parse('09:00')
+    );
+
+    expect( s1.isCancelled(c0) ).toBe( false );
+    expect( s1.isCancelled(c1) ).toBe( true );
+
+    expect( s1.times.length ).toBe( 2 );
+    expect( s1.times[0].format('HH:mm') ).toBe( '09:00' );
+    expect( s1.times[1].format('HH:mm') ).toBe( '15:00' );
   });
 
 })

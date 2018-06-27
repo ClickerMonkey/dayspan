@@ -56,7 +56,7 @@ export class Parse
       check.given = true;
     }
 
-    check.input = input;
+    check.input = fn.coalesce( input, null );
     check.property = property;
 
     return check;

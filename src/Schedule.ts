@@ -563,6 +563,70 @@ export class Schedule<M>
   }
 
   /**
+   * Sets whether this schedule is a full day event if it is not already. If
+   * this schedule is a full day event and `false` is passed to this function
+   * a single timed event will be added based on `defaultTime`. If this schedule
+   * has timed events and `true` is passed to make the schedule full day, the
+   * timed events are removed from this schedule. If the durationUnit is not the
+   * expected unit based on the new full day flag - the duration is reset to 1
+   * and the duration unit is set to the expected unit.
+   *
+   * @param fullDay Whether this schedule should represent a full day event or
+   *    timed events.
+   * @param defaultTime If `fullDay` is `false` and this schedule is currently
+   *    a full day event - this time will be used as the time of the first event.
+   */
+  public setFullDay(fullDay: boolean = true, defaultTime: TimeInput = '08:00'): this
+  {
+    if (fullDay !== this.isFullDay())
+    {
+      if (fullDay)
+      {
+        this.times = [];
+
+        if (this.durationUnit !== 'days' && this.durationUnit !== 'day')
+        {
+          this.duration = 1;
+          this.durationUnit = 'days';
+        }
+      }
+      else
+      {
+        this.times = [Parse.time( defaultTime )];
+
+        if (this.durationUnit !== 'hours' && this.durationUnit !== 'hour')
+        {
+          this.duration = 1;
+          this.durationUnit = 'hours';
+        }
+      }
+    }
+
+    return this;
+  }
+
+  /**
+   * Adjusts the [[Schedule.start]] and [[Schedule.end]] dates specified on this
+   * schedule if this schedule represents a single event and the `start` and
+   * `end` are already set or `addSpan` is `true`.
+   *
+   * @param addSpan If `true`, the `start` and `end` dates will always be
+   *    adjusted if this schedule is a single event.
+   */
+  public adjustDefinedSpan(addSpan: boolean = false): this
+  {
+    let single: DaySpan = this.getSingleEventSpan();
+
+    if (single && (addSpan || (this.start && this.end)))
+    {
+      this.start = single.start.start();
+      this.end = single.end.end();
+    }
+
+    return this;
+  }
+
+  /**
    * Returns a span of time for a schedule with full day events starting on the
    * start of the given day with the desired duration in days or weeks.
    *
@@ -919,6 +983,21 @@ export class Schedule<M>
   }
 
   /**
+   * Sets the frequency for the given property. This does not update the
+   * [[Schedule.checks]] array, the [[Schedule.updateChecks]] function needs
+   * to be called.
+   *
+   * @param property The frequency to update.
+   * @param frequency The new frequency.
+   */
+  public setFrequency(property: DayProperty, frequency?: FrequencyValue): this
+  {
+    this[ property ] = Parse.frequency( frequency, property );
+
+    return this;
+  }
+
+  /**
    * Changes the exclusion status of the event at the given time. By default
    * this excludes this event - but `false`  may be passed to undo an exclusion.
    *
@@ -970,6 +1049,40 @@ export class Schedule<M>
     }
 
     return false;
+  }
+
+  /**
+   * Moves a time specified in this schedule to the given time, adjusting
+   * any cancelled event instances, metadata, and any excluded and included
+   * event instances.
+   *
+   * @param fromTime The time to move.
+   * @param toTime The new time in the schedule.
+   * @returns `true` if time was moved, otherwise `false`.
+   */
+  public moveTime(fromTime: Time, toTime: Time): boolean
+  {
+    let found: boolean = false;
+
+    for (let i = 0; i < this.times.length && !found; i++)
+    {
+      if (found = fromTime.matches( this.times[ i ] ))
+      {
+        this.times.splice( i, 1, toTime );
+      }
+    }
+
+    if (found)
+    {
+      this.include.moveTime( fromTime, toTime );
+      this.exclude.moveTime( fromTime, toTime );
+      this.cancel.moveTime( fromTime, toTime );
+      this.meta.moveTime( fromTime, toTime );
+
+      this.adjustDefinedSpan( false );
+    }
+
+    return found;
   }
 
   /**
@@ -1033,7 +1146,7 @@ export class Schedule<M>
 
     if (this.times.length === 1 && takeTime)
     {
-      this.times[ 0 ] = toTime.asTime();
+      this.times = [toTime.asTime()];
     }
 
     this.updateChecks();
@@ -1364,7 +1477,6 @@ export class Schedule<M>
    * @param alwaysDuration If the duration values (`duration` and
    *    `durationUnit`) should always be returned in the input.
    * @returns The input that describes this schedule.
-   * @see [[Schedule.getExclusions]]
    * @see [[Time.format]]
    */
   public toInput(returnDays: boolean = false, returnTimes: boolean = false, timeFormat: string = '', alwaysDuration: boolean = false): ScheduleInput<M>
@@ -1390,7 +1502,7 @@ export class Schedule<M>
     if (exclusions.length) out.exclude = exclusions;
     if (inclusions.length) out.include = inclusions;
     if (cancels.length) out.cancel = cancels;
-    if (hasMeta) out.meta = this.meta.map;
+    if (hasMeta) out.meta = fn.extend( {}, this.meta.map );
     if (this.dayOfWeek.input) out.dayOfWeek = this.dayOfWeek.input;
     if (this.dayOfMonth.input) out.dayOfMonth = this.dayOfMonth.input;
     if (this.lastDayOfMonth.input) out.lastDayOfMonth = this.lastDayOfMonth.input;
