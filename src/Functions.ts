@@ -75,7 +75,7 @@ export class Functions
    */
   public static isObject(input: any): boolean
   {
-    return !this.isArray(input) && typeof(input) === 'object';
+    return input !== null && !this.isArray(input) && typeof(input) === 'object';
   }
 
   /**

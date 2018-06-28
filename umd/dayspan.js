@@ -159,7 +159,7 @@ var Functions = (function () {
      * @returns `true` if the variable is a plain object, otherwise `false`.
      */
     Functions.isObject = function (input) {
-        return !this.isArray(input) && typeof (input) === 'object';
+        return input !== null && !this.isArray(input) && typeof (input) === 'object';
     };
     /**
      * Determines whether the given input is defined.
