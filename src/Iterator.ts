@@ -48,7 +48,12 @@ export enum IteratorAction
   /**
    * Remove the current item if possible, and continue iteration.
    */
-  Remove
+  Remove,
+
+  /**
+   * Replace the current item with the provided value.
+   */
+  Replace
 }
 
 /**
@@ -115,6 +120,11 @@ export class Iterator<T>
   public action: IteratorAction;
 
   /**
+   * The value to replace with the current item.
+   */
+  public replaceWith: T;
+
+  /**
    * The current callback passed to the iterator.
    */
   public callback: IteratorCallback<T, any>;
@@ -156,6 +166,7 @@ export class Iterator<T>
   public act(item: T): IteratorAction
   {
     this.action = IteratorAction.Continue;
+    this.replaceWith = null;
 
     this.callback( item, this );
 
@@ -171,6 +182,19 @@ export class Iterator<T>
   {
     this.result = result;
     this.action = IteratorAction.Stop;
+
+    return this;
+  }
+
+  /**
+   * Stops iteration and optionally sets the result of the iteration.
+   *
+   * @param result The result of the iteration.
+   */
+  public replace(replaceWith: T): this
+  {
+    this.replaceWith = replaceWith;
+    this.action = IteratorAction.Replace;
 
     return this;
   }
@@ -331,6 +355,9 @@ export class Iterator<T>
           case IteratorAction.Remove:
             prev.remove();
             break;
+          case IteratorAction.Replace:
+            prev.replace( next.replaceWith );
+            break;
         }
 
         if (--amount <= 0)
@@ -365,6 +392,9 @@ export class Iterator<T>
               break;
             case IteratorAction.Remove:
               prev.remove();
+              break;
+            case IteratorAction.Replace:
+              prev.replace( next.replaceWith );
               break;
           }
         }
@@ -427,7 +457,9 @@ export class Iterator<T>
     return new Iterator<T>(iterator =>
     {
       let items: T[] = this.list();
-      let removed: T[] = [];
+      let modifies: boolean = false;
+      let actions: IteratorAction[] = [];
+      let replaces: T[] = [];
 
       for (let i = items.length - 1; i >= 0; i--)
       {
@@ -439,15 +471,33 @@ export class Iterator<T>
           break;
         }
 
-        if (action === IteratorAction.Remove)
+        if (action !== IteratorAction.Continue)
         {
-          removed.push( item );
+          modifies = true;
+
+          actions[ i ] = action;
+          replaces[ i ] = iterator.replaceWith;
         }
       }
 
-      if (removed.length > 0)
+      if (modifies)
       {
-        this.purge(item => removed.indexOf( item ) !== -1);
+        let index: number = 0;
+
+        this.iterate((item, iterator) =>
+        {
+          switch (actions[ index ])
+          {
+            case IteratorAction.Remove:
+              iterator.remove();
+              break;
+            case IteratorAction.Replace:
+              iterator.replace( replaces[ index ] );
+              break;
+          }
+
+          index++;
+        });
       }
     });
   }
@@ -493,9 +543,11 @@ export class Iterator<T>
             case IteratorAction.Stop:
               prev.stop();
               break;
-
             case IteratorAction.Remove:
               prev.remove();
+              break;
+            case IteratorAction.Replace:
+              prev.replace( next.replaceWith );
               break;
           }
         }
@@ -513,9 +565,12 @@ export class Iterator<T>
    *
    * @param mapper The function which maps an item to another.
    * @param filter The function which determines if an item should be mapped.
+   * @param unmapper The function which unmaps a value when replace is called.
    * @returns A new iterator for the mapped items from this iterator.
    */
-  public map<W>(mapper: IteratorCallback<T, W>, filter: IteratorFilter<T> = null): Iterator<W>
+  public map<W>(mapper: IteratorCallback<T, W>,
+    filter: IteratorFilter<T> = null,
+    unmapper: (replaceWith: W, current: W, item: T) => T = null): Iterator<W>
   {
     return new Iterator<W>(next =>
     {
@@ -535,9 +590,13 @@ export class Iterator<T>
             case IteratorAction.Stop:
               prev.stop();
               break;
-
             case IteratorAction.Remove:
               prev.remove();
+              break;
+            case IteratorAction.Replace:
+              if (unmapper) {
+                prev.replace( unmapper( next.replaceWith, nextItem, prevItem ) );
+              }
               break;
           }
         }
@@ -601,6 +660,9 @@ export class Iterator<T>
             case IteratorAction.Remove:
               items.splice(i, 1);
               break;
+            case IteratorAction.Replace:
+              items.splice(i, 1, iterator.replaceWith);
+              break;
           }
         }
       }
@@ -615,6 +677,9 @@ export class Iterator<T>
             case IteratorAction.Remove:
               items.splice(i, 1);
               i--;
+              break;
+            case IteratorAction.Replace:
+              items.splice(i, 1, iterator.replaceWith);
               break;
           }
         }
@@ -648,6 +713,9 @@ export class Iterator<T>
           case IteratorAction.Remove:
             delete items[ key ];
             break;
+          case IteratorAction.Replace:
+            items[ key ] = iterator.replaceWith;
+            break;
         }
       }
     });
@@ -677,6 +745,9 @@ export class Iterator<T>
               break;
             case IteratorAction.Stop:
               childIterator.stop();
+              break;
+            case IteratorAction.Replace:
+              childIterator.replace( parent.replaceWith );
               break;
           }
         });

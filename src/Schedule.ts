@@ -1038,14 +1038,13 @@ export class Schedule<M>
    * @param toTime The timestamp of the new event.
    * @param fromTime The timestamp of the event on the schedule to move if this
    *    schedule generates multiple events.
-   * @param meta The metadata to place in the schedule for the given `toTime`.
    * @returns `true` if the schedule had the event moved, otherwise `false`.
    */
   public move(toTime: Day, fromTime?: Day, meta?: M): boolean
   {
     if (!this.moveSingleEvent( toTime ) && fromTime)
     {
-      return this.moveInstance( fromTime, toTime, meta );
+      return this.moveInstance( fromTime, toTime );
     }
 
     return false;
@@ -1093,11 +1092,10 @@ export class Schedule<M>
    *
    * @param fromTime The timestamp of the event on the schedule to move.
    * @param toTime The timestamp of the new event.
-   * @param meta The metadata to place in the schedule for the given `toTime`.
    * @returns `true`.
    * @see [[Schedule.move]]
    */
-  public moveInstance(fromTime: Day, toTime: Day, meta?: M): boolean
+  public moveInstance(fromTime: Day, toTime: Day): boolean
   {
     let type: Identifier = this.identifierType;
 
@@ -1107,10 +1105,26 @@ export class Schedule<M>
     this.include.set( toTime, true, type );
     this.include.set( fromTime, false, type );
 
-    if (fn.isValue( meta ))
+    if (this.cancel.get( fromTime, false ) && !this.cancel.get( toTime, false ))
     {
-      this.meta.unset( fromTime, type );
+      this.cancel.set( toTime, true, type );
+
+      if (this.cancel.getIdentifier( fromTime ) === type)
+      {
+        this.cancel.unset( fromTime, type );
+      }
+    }
+
+    let meta: M = this.meta.get( fromTime, null );
+
+    if (meta && meta !== this.meta.get( toTime, null ))
+    {
       this.meta.set( toTime, meta, type );
+
+      if (this.meta.getIdentifier( fromTime ) === type)
+      {
+        this.meta.unset( fromTime, type );
+      }
     }
 
     return true;

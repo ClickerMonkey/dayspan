@@ -1,4 +1,5 @@
 
+import { Functions as fn } from './Functions';
 import { Identifier, IdentifierInput } from './Identifier';
 import { Day } from './Day';
 import { Time } from './Time';
@@ -92,6 +93,28 @@ export class ScheduleModifier<T>
       map[ day.weekIdentifier ] ||
       map[ day.quarterIdentifier ] ||
       otherwise;
+  }
+
+  /**
+   * Gets the most specific identifier type for the span over the given day.
+   * If the day does not have a modification, `null` is returned.
+   *
+   * @param day The day to get the type for.
+   * @param lookAtTime If the specific time of the given day should be looked at.
+   * @returns The most specific identifier for the given day, otherwise `null`.
+   */
+  public getIdentifier(day: Day, lookAtTime: boolean = true): Identifier
+  {
+    let map = this.map;
+
+    if (lookAtTime && fn.isDefined( map[ day.timeIdentifier ] )) return Identifier.Time;
+    if (fn.isDefined( map[ day.dayIdentifier ] )) return Identifier.Day;
+    if (fn.isDefined( map[ day.monthIdentifier ] )) return Identifier.Month;
+    if (fn.isDefined( map[ day.weekIdentifier ] )) return Identifier.Week;
+    if (fn.isDefined( map[ day.quarterIdentifier ] )) return Identifier.Quarter;
+    if (fn.isDefined( map[ day.year ] )) return Identifier.Year;
+
+    return null;
   }
 
   /**

@@ -263,7 +263,7 @@ export class CalendarEvent<T, M>
    */
   public move(toTime: Day): boolean
   {
-    return this.schedule.move( toTime, this.start, this.meta );
+    return this.schedule.move( toTime, this.start );
   }
 
 }

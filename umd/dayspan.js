@@ -1499,6 +1499,10 @@ var IteratorAction;
      * Remove the current item if possible, and continue iteration.
      */
     IteratorAction[IteratorAction["Remove"] = 2] = "Remove";
+    /**
+     * Replace the current item with the provided value.
+     */
+    IteratorAction[IteratorAction["Replace"] = 3] = "Replace";
 })(IteratorAction = IteratorAction || (IteratorAction = {}));
 /**
  * A class that allows an iteratable source to be iterated any number of times
@@ -1579,6 +1583,7 @@ var Iterator_Iterator = (function () {
      */
     Iterator.prototype.act = function (item) {
         this.action = IteratorAction.Continue;
+        this.replaceWith = null;
         this.callback(item, this);
         return this.action;
     };
@@ -1590,6 +1595,16 @@ var Iterator_Iterator = (function () {
     Iterator.prototype.stop = function (result) {
         this.result = result;
         this.action = IteratorAction.Stop;
+        return this;
+    };
+    /**
+     * Stops iteration and optionally sets the result of the iteration.
+     *
+     * @param result The result of the iteration.
+     */
+    Iterator.prototype.replace = function (replaceWith) {
+        this.replaceWith = replaceWith;
+        this.action = IteratorAction.Replace;
         return this;
     };
     /**
@@ -1715,6 +1730,9 @@ var Iterator_Iterator = (function () {
                     case IteratorAction.Remove:
                         prev.remove();
                         break;
+                    case IteratorAction.Replace:
+                        prev.replace(next.replaceWith);
+                        break;
                 }
                 if (--amount <= 0) {
                     prev.stop();
@@ -1741,6 +1759,9 @@ var Iterator_Iterator = (function () {
                             break;
                         case IteratorAction.Remove:
                             prev.remove();
+                            break;
+                        case IteratorAction.Replace:
+                            prev.replace(next.replaceWith);
                             break;
                     }
                 }
@@ -1799,19 +1820,34 @@ var Iterator_Iterator = (function () {
         var _this = this;
         return new Iterator(function (iterator) {
             var items = _this.list();
-            var removed = [];
+            var modifies = false;
+            var actions = [];
+            var replaces = [];
             for (var i = items.length - 1; i >= 0; i--) {
                 var item = items[i];
                 var action = iterator.act(item);
                 if (action === IteratorAction.Stop) {
                     break;
                 }
-                if (action === IteratorAction.Remove) {
-                    removed.push(item);
+                if (action !== IteratorAction.Continue) {
+                    modifies = true;
+                    actions[i] = action;
+                    replaces[i] = iterator.replaceWith;
                 }
             }
-            if (removed.length > 0) {
-                _this.purge(function (item) { return removed.indexOf(item) !== -1; });
+            if (modifies) {
+                var index_1 = 0;
+                _this.iterate(function (item, iterator) {
+                    switch (actions[index_1]) {
+                        case IteratorAction.Remove:
+                            iterator.remove();
+                            break;
+                        case IteratorAction.Replace:
+                            iterator.replace(replaces[index_1]);
+                            break;
+                    }
+                    index_1++;
+                });
             }
         });
     };
@@ -1849,6 +1885,9 @@ var Iterator_Iterator = (function () {
                         case IteratorAction.Remove:
                             prev.remove();
                             break;
+                        case IteratorAction.Replace:
+                            prev.replace(next.replaceWith);
+                            break;
                     }
                 }
             });
@@ -1864,11 +1903,13 @@ var Iterator_Iterator = (function () {
      *
      * @param mapper The function which maps an item to another.
      * @param filter The function which determines if an item should be mapped.
+     * @param unmapper The function which unmaps a value when replace is called.
      * @returns A new iterator for the mapped items from this iterator.
      */
-    Iterator.prototype.map = function (mapper, filter) {
+    Iterator.prototype.map = function (mapper, filter, unmapper) {
         var _this = this;
         if (filter === void 0) { filter = null; }
+        if (unmapper === void 0) { unmapper = null; }
         return new Iterator(function (next) {
             _this.iterate(function (prevItem, prev) {
                 if (filter && !filter(prevItem)) {
@@ -1882,6 +1923,11 @@ var Iterator_Iterator = (function () {
                             break;
                         case IteratorAction.Remove:
                             prev.remove();
+                            break;
+                        case IteratorAction.Replace:
+                            if (unmapper) {
+                                prev.replace(unmapper(next.replaceWith, nextItem, prevItem));
+                            }
                             break;
                     }
                 }
@@ -1933,6 +1979,9 @@ var Iterator_Iterator = (function () {
                         case IteratorAction.Remove:
                             items.splice(i, 1);
                             break;
+                        case IteratorAction.Replace:
+                            items.splice(i, 1, iterator.replaceWith);
+                            break;
                     }
                 }
             }
@@ -1944,6 +1993,9 @@ var Iterator_Iterator = (function () {
                         case IteratorAction.Remove:
                             items.splice(i, 1);
                             i--;
+                            break;
+                        case IteratorAction.Replace:
+                            items.splice(i, 1, iterator.replaceWith);
                             break;
                     }
                 }
@@ -1970,6 +2022,9 @@ var Iterator_Iterator = (function () {
                         return;
                     case IteratorAction.Remove:
                         delete items[key];
+                        break;
+                    case IteratorAction.Replace:
+                        items[key] = iterator.replaceWith;
                         break;
                 }
             }
@@ -2000,6 +2055,9 @@ var Iterator_Iterator = (function () {
                         case IteratorAction.Stop:
                             childIterator.stop();
                             break;
+                        case IteratorAction.Replace:
+                            childIterator.replace(parent.replaceWith);
+                            break;
                     }
                 });
                 if (child.action === IteratorAction.Stop) {
@@ -2021,6 +2079,7 @@ var Iterator_Iterator = (function () {
 
 
 // CONCATENATED MODULE: ./src/ScheduleModifier.ts
+
 
 
 
@@ -2073,6 +2132,31 @@ var ScheduleModifier_ScheduleModifier = (function () {
             map[day.weekIdentifier] ||
             map[day.quarterIdentifier] ||
             otherwise;
+    };
+    /**
+     * Gets the most specific identifier type for the span over the given day.
+     * If the day does not have a modification, `null` is returned.
+     *
+     * @param day The day to get the type for.
+     * @param lookAtTime If the specific time of the given day should be looked at.
+     * @returns The most specific identifier for the given day, otherwise `null`.
+     */
+    ScheduleModifier.prototype.getIdentifier = function (day, lookAtTime) {
+        if (lookAtTime === void 0) { lookAtTime = true; }
+        var map = this.map;
+        if (lookAtTime && Functions.isDefined(map[day.timeIdentifier]))
+            return Identifier_Identifier.Time;
+        if (Functions.isDefined(map[day.dayIdentifier]))
+            return Identifier_Identifier.Day;
+        if (Functions.isDefined(map[day.monthIdentifier]))
+            return Identifier_Identifier.Month;
+        if (Functions.isDefined(map[day.weekIdentifier]))
+            return Identifier_Identifier.Week;
+        if (Functions.isDefined(map[day.quarterIdentifier]))
+            return Identifier_Identifier.Quarter;
+        if (Functions.isDefined(map[day.year]))
+            return Identifier_Identifier.Year;
+        return null;
     };
     /**
      * Gets all values in this modifier for the given day. If none exist, an empty
@@ -2891,12 +2975,11 @@ var Schedule_Schedule = (function () {
      * @param toTime The timestamp of the new event.
      * @param fromTime The timestamp of the event on the schedule to move if this
      *    schedule generates multiple events.
-     * @param meta The metadata to place in the schedule for the given `toTime`.
      * @returns `true` if the schedule had the event moved, otherwise `false`.
      */
     Schedule.prototype.move = function (toTime, fromTime, meta) {
         if (!this.moveSingleEvent(toTime) && fromTime) {
-            return this.moveInstance(fromTime, toTime, meta);
+            return this.moveInstance(fromTime, toTime);
         }
         return false;
     };
@@ -2933,19 +3016,27 @@ var Schedule_Schedule = (function () {
      *
      * @param fromTime The timestamp of the event on the schedule to move.
      * @param toTime The timestamp of the new event.
-     * @param meta The metadata to place in the schedule for the given `toTime`.
      * @returns `true`.
      * @see [[Schedule.move]]
      */
-    Schedule.prototype.moveInstance = function (fromTime, toTime, meta) {
+    Schedule.prototype.moveInstance = function (fromTime, toTime) {
         var type = this.identifierType;
         this.exclude.set(fromTime, true, type);
         this.exclude.set(toTime, false, type);
         this.include.set(toTime, true, type);
         this.include.set(fromTime, false, type);
-        if (Functions.isValue(meta)) {
-            this.meta.unset(fromTime, type);
+        if (this.cancel.get(fromTime, false) && !this.cancel.get(toTime, false)) {
+            this.cancel.set(toTime, true, type);
+            if (this.cancel.getIdentifier(fromTime) === type) {
+                this.cancel.unset(fromTime, type);
+            }
+        }
+        var meta = this.meta.get(fromTime, null);
+        if (meta && meta !== this.meta.get(toTime, null)) {
             this.meta.set(toTime, meta, type);
+            if (this.meta.getIdentifier(fromTime) === type) {
+                this.meta.unset(fromTime, type);
+            }
         }
         return true;
     };
@@ -4924,7 +5015,7 @@ var CalendarEvent_CalendarEvent = (function () {
      * @returns Whether the event was moved to the given time.
      */
     CalendarEvent.prototype.move = function (toTime) {
-        return this.schedule.move(toTime, this.start, this.meta);
+        return this.schedule.move(toTime, this.start);
     };
     return CalendarEvent;
 }());
