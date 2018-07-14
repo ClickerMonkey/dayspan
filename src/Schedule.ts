@@ -1479,6 +1479,16 @@ export class Schedule<M>
   }
 
   /**
+   * Clones this schedule.
+   *
+   * @returns A new schedule which matches this schedule.
+   */
+  public clone(): Schedule<M>
+  {
+    return new Schedule<M>( this.toInput() );
+  }
+
+  /**
    * Converts the schedule instance back into input.
    *
    * @param returnDays When `true` the start, end, and array of exclusions will
@@ -1739,6 +1749,79 @@ export class Schedule<M>
     }
 
     return out;
+  }
+
+  /**
+   * Generates a schedule for an event which occurs once all day for a given day
+   * optionally spanning multiple days starting on the given day.
+   *
+   * @param input The day the event starts.
+   * @param days The number of days the event lasts.
+   * @returns A new schedule that starts on the given day.
+   */
+  public static forDay<M>(input: DayInput, days: number = 1): Schedule<M>
+  {
+    let day: Day = Day.parse( input );
+
+    if (!day)
+    {
+      return null;
+    }
+
+    return new Schedule<M>({
+      year: [ day.year ],
+      month: [ day.month ],
+      dayOfMonth: [ day.dayOfMonth ],
+      duration: days,
+      durationUnit: 'days'
+    });
+  }
+
+  /**
+   * Generates a schedule for an event which occurs once at a given time on a
+   * given day optionally spanning any amount of time (default is 1 hour).
+   *
+   * @param input The day the event starts.
+   * @param time The time the event starts.
+   * @param duration The duration of the event.
+   * @param durationUnit The unit for the duration of the event.
+   * @returns A new schedule that starts on the given day and time.
+   */
+  public static forTime<M>(input: DayInput, time: TimeInput, duration: number = 1, durationUnit: DurationInput = 'hours'): Schedule<M>
+  {
+    let day: Day = Day.parse( input );
+
+    if (!day)
+    {
+      return null;
+    }
+
+    return new Schedule<M>({
+      year: [ day.year ],
+      month: [ day.month ],
+      dayOfMonth: [ day.dayOfMonth ],
+      times: [ time ],
+      duration: duration,
+      durationUnit: durationUnit
+    });
+  }
+
+  /**
+   * Generates a schedule for an event which occurs once over a given span.
+   *
+   * @param span The span of the event.
+   * @returns A new schedule that starts and ends at the given timestamps.
+   */
+  public static forSpan<M>(span: DaySpan): Schedule<M>
+  {
+    let start = span.start;
+    let minutes = span.minutes();
+    let isDay = minutes % Constants.MINUTES_IN_DAY === 0;
+    let isHour = minutes % Constants.MINUTES_IN_HOUR === 0;
+    let duration = isDay ? minutes / Constants.MINUTES_IN_DAY : (isHour ? minutes / Constants.MINUTES_IN_HOUR : minutes);
+    let durationUnit: DurationInput = isDay ? 'days' : (isHour ? 'hours' : 'minutes');
+
+    return this.forTime( start, start.asTime(), duration, durationUnit );
   }
 
 }

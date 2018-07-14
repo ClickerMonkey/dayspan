@@ -31,6 +31,15 @@ export class Constants
    */
   public static MILLIS_IN_WEEK: number = Constants.MILLIS_IN_DAY * 7;
 
+  /**
+   * The number of minutes in an hour.
+   */
+  public static MINUTES_IN_HOUR = 60;
+
+  /**
+   * The number of minutes in a day (not including DST days).
+   */
+  public static MINUTES_IN_DAY = 60 * 24;
 
   /**
    * The number of days in a week.

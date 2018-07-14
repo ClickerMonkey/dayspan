@@ -411,6 +411,14 @@ var Constants = (function () {
      */
     Constants.MILLIS_IN_WEEK = Constants.MILLIS_IN_DAY * 7;
     /**
+     * The number of minutes in an hour.
+     */
+    Constants.MINUTES_IN_HOUR = 60;
+    /**
+     * The number of minutes in a day (not including DST days).
+     */
+    Constants.MINUTES_IN_DAY = 60 * 24;
+    /**
      * The number of days in a week.
      */
     Constants.DAYS_IN_WEEK = 7;
@@ -3308,6 +3316,14 @@ var Schedule_Schedule = (function () {
         return this.include.query(day.dayIdentifier).map(getSpan, isIncludedTime);
     };
     /**
+     * Clones this schedule.
+     *
+     * @returns A new schedule which matches this schedule.
+     */
+    Schedule.prototype.clone = function () {
+        return new Schedule(this.toInput());
+    };
+    /**
      * Converts the schedule instance back into input.
      *
      * @param returnDays When `true` the start, end, and array of exclusions will
@@ -3548,6 +3564,69 @@ var Schedule_Schedule = (function () {
             out += ' and ' + map(array[last]);
         }
         return out;
+    };
+    /**
+     * Generates a schedule for an event which occurs once all day for a given day
+     * optionally spanning multiple days starting on the given day.
+     *
+     * @param input The day the event starts.
+     * @param days The number of days the event lasts.
+     * @returns A new schedule that starts on the given day.
+     */
+    Schedule.forDay = function (input, days) {
+        if (days === void 0) { days = 1; }
+        var day = Day_Day.parse(input);
+        if (!day) {
+            return null;
+        }
+        return new Schedule({
+            year: [day.year],
+            month: [day.month],
+            dayOfMonth: [day.dayOfMonth],
+            duration: days,
+            durationUnit: 'days'
+        });
+    };
+    /**
+     * Generates a schedule for an event which occurs once at a given time on a
+     * given day optionally spanning any amount of time (default is 1 hour).
+     *
+     * @param input The day the event starts.
+     * @param time The time the event starts.
+     * @param duration The duration of the event.
+     * @param durationUnit The unit for the duration of the event.
+     * @returns A new schedule that starts on the given day and time.
+     */
+    Schedule.forTime = function (input, time, duration, durationUnit) {
+        if (duration === void 0) { duration = 1; }
+        if (durationUnit === void 0) { durationUnit = 'hours'; }
+        var day = Day_Day.parse(input);
+        if (!day) {
+            return null;
+        }
+        return new Schedule({
+            year: [day.year],
+            month: [day.month],
+            dayOfMonth: [day.dayOfMonth],
+            times: [time],
+            duration: duration,
+            durationUnit: durationUnit
+        });
+    };
+    /**
+     * Generates a schedule for an event which occurs once over a given span.
+     *
+     * @param span The span of the event.
+     * @returns A new schedule that starts and ends at the given timestamps.
+     */
+    Schedule.forSpan = function (span) {
+        var start = span.start;
+        var minutes = span.minutes();
+        var isDay = minutes % Constants.MINUTES_IN_DAY === 0;
+        var isHour = minutes % Constants.MINUTES_IN_HOUR === 0;
+        var duration = isDay ? minutes / Constants.MINUTES_IN_DAY : (isHour ? minutes / Constants.MINUTES_IN_HOUR : minutes);
+        var durationUnit = isDay ? 'days' : (isHour ? 'hours' : 'minutes');
+        return this.forTime(start, start.asTime(), duration, durationUnit);
     };
     return Schedule;
 }());
