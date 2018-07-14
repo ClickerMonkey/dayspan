@@ -56,6 +56,16 @@ describe('Calendar', () => {
     expect( c.days[2].dayOfMonth ).toBe( 15 );
   })
 
+  it('days 3 getDay', () => {
+
+    let d = Day.build(2018, Month.APRIL, 11);
+    let c = Calendar.days<string, any>(3, d);
+    let cd = c.getDay([2018, Month.APRIL, 11]);
+
+    expect( cd ).toBeDefined();
+    expect( cd.dayIdentifier ).toBe( 20180411 );
+  })
+
   it('schedule', () =>
   {
     let d = Day.build(2018, Month.MAY, 11);

@@ -4706,6 +4706,7 @@ var CalendarDay___extends = (this && this.__extends) || (function () {
 })();
 
 
+
 /**
  * A day in a [[Calendar]] with extra information relative to any selection on
  * the calendar, the current date, or events on the day.
@@ -4769,6 +4770,14 @@ var CalendarDay_CalendarDay = (function (_super) {
         _this.events = [];
         return _this;
     }
+    /**
+     * Creates an iterator for the events on this day.
+     *
+     * @returns The new iterator for the events on this day.
+     */
+    CalendarDay.prototype.iterateEvents = function () {
+        return Iterator_Iterator.forArray(this.events);
+    };
     /**
      * Updates the current flags on this day given the current day (ex: today).
      *
@@ -5567,6 +5576,21 @@ var Calendar_Calendar = (function () {
             }
         });
         return this;
+    };
+    /**
+     * Gets the calendar day for the given day.
+     *
+     * @param input The day to get the calendar day for.
+     * @returns The reference to the calendar day, or null if the given input
+     *    is not on this calendar.
+     */
+    Calendar.prototype.getDay = function (input) {
+        var parsed = Day_Day.parse(input);
+        if (parsed) {
+            var dayCount = parsed.start().daysBetween(this.days[0], Op.DOWN, false);
+            return this.days[dayCount];
+        }
+        return null;
     };
     /**
      * Iterates over all days in this calendar and passes each day to `iterator`.

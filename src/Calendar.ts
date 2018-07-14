@@ -852,6 +852,27 @@ export class Calendar<T, M>
   }
 
   /**
+   * Gets the calendar day for the given day.
+   *
+   * @param input The day to get the calendar day for.
+   * @returns The reference to the calendar day, or null if the given input
+   *    is not on this calendar.
+   */
+  public getDay(input: DayInput): CalendarDay<T, M>
+  {
+    let parsed: Day = Day.parse( input );
+
+    if (parsed)
+    {
+      let dayCount: number = parsed.start().daysBetween( this.days[ 0 ], Op.DOWN, false );
+
+      return this.days[ dayCount ];
+    }
+
+    return null;
+  }
+
+  /**
    * Iterates over all days in this calendar and passes each day to `iterator`.
    *
    * @param iterator The function to pass [[CalendarDay]]s to.
