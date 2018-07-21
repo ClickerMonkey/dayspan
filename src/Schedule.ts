@@ -370,14 +370,21 @@ export class Schedule<M>
   /**
    * Sets the schedule with the given input.
    *
-   * @param input The input which describes the schedule of events.
+   * @param input The input or schedule which describes the schedule of events.
    * @param parseMeta A function to use when parsing meta input into the desired type.
    * @see [[Parse.schedule]]
    */
-  public set(input: ScheduleInput<M>,
+  public set(input: ScheduleInput<M> | Schedule<M>,
     parseMeta: (input: any) => M = (x => <M>x)): this
   {
-    Parse.schedule<M>(input, fn.coalesce( input.parseMeta, parseMeta ), this);
+    if (input instanceof Schedule)
+    {
+      Parse.schedule<M>( input.toInput(), undefined, this);
+    }
+    else
+    {
+      Parse.schedule<M>(input, fn.coalesce( input.parseMeta, parseMeta ), this);
+    }
 
     return this;
   }
@@ -1027,6 +1034,41 @@ export class Schedule<M>
     this.cancel.set( time, cancelled, this.identifierType );
 
     return this;
+  }
+
+  /**
+   * Removes the time from this schedule and all related included, excluded,
+   * cancelled instances as well as metadata.
+   *
+   * @param time The time to remove from the schedule.
+   * @param removeInclude If any included instances should be removed as well.
+   * @returns `true` if the time was removed, otherwise `false`.
+   */
+  public removeTime(time: Time, removeInclude: boolean = true): boolean
+  {
+    let found: boolean = false;
+
+    for (let i = 0; i < this.times.length && !found; i++)
+    {
+      if (found = time.matches( this.times[ i ] ))
+      {
+        this.times.splice( i, 1 );
+      }
+    }
+
+    if (found)
+    {
+      if (removeInclude)
+      {
+        this.include.removeTime( time );
+      }
+
+      this.exclude.removeTime( time );
+      this.cancel.removeTime( time );
+      this.meta.removeTime( time );
+    }
+
+    return found;
   }
 
   /**

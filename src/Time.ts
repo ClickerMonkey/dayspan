@@ -181,6 +181,28 @@ export class Time
   }
 
   /**
+   * Sets the time of this instance to the same time of the given input.
+   *
+   * @param input The time to set this to.
+   * @returns `true` if this time was set, otherwise `false` (invalid input).
+   */
+  public set(input: TimeInput): boolean
+  {
+    let parsed: Time = Time.parse( input );
+    let valid: boolean = !!parsed;
+
+    if (valid)
+    {
+      this.hour = parsed.hour;
+      this.minute = parsed.minute;
+      this.second = parsed.second;
+      this.millisecond = parsed.millisecond;
+    }
+
+    return valid;
+  }
+
+  /**
    * @returns The number of milliseconds from the start of the day until this
    *  time.
    */

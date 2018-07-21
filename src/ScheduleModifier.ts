@@ -206,6 +206,34 @@ export class ScheduleModifier<T>
   }
 
   /**
+   * Removes any identifiers and modifications that are at the given time.
+   *
+   * @param time The time to remove.
+   * @returns The number of modifiers removed.
+   */
+  public removeTime(time: Time): number
+  {
+    let type: Identifier = Identifier.Time;
+    let removed: number = 0;
+
+    this.iterate().iterate(([id,], iterator) =>
+    {
+      if (type.is( id ))
+      {
+        let start: Day = type.start( id );
+
+        if (start.sameTime( time ))
+        {
+          iterator.remove();
+          removed++;
+        }
+      }
+    });
+
+    return removed;
+  }
+
+  /**
    * Sets the value/modification in this map given a day, the value, and the
    * identifier type.
    *

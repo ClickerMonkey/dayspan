@@ -2240,6 +2240,27 @@ var ScheduleModifier_ScheduleModifier = (function () {
         return moved;
     };
     /**
+     * Removes any identifiers and modifications that are at the given time.
+     *
+     * @param time The time to remove.
+     * @returns The number of modifiers removed.
+     */
+    ScheduleModifier.prototype.removeTime = function (time) {
+        var type = Identifier_Identifier.Time;
+        var removed = 0;
+        this.iterate().iterate(function (_a, iterator) {
+            var id = _a[0];
+            if (type.is(id)) {
+                var start = type.start(id);
+                if (start.sameTime(time)) {
+                    iterator.remove();
+                    removed++;
+                }
+            }
+        });
+        return removed;
+    };
+    /**
      * Sets the value/modification in this map given a day, the value, and the
      * identifier type.
      *
@@ -2415,13 +2436,18 @@ var Schedule_Schedule = (function () {
     /**
      * Sets the schedule with the given input.
      *
-     * @param input The input which describes the schedule of events.
+     * @param input The input or schedule which describes the schedule of events.
      * @param parseMeta A function to use when parsing meta input into the desired type.
      * @see [[Parse.schedule]]
      */
     Schedule.prototype.set = function (input, parseMeta) {
         if (parseMeta === void 0) { parseMeta = (function (x) { return x; }); }
-        Parse_Parse.schedule(input, Functions.coalesce(input.parseMeta, parseMeta), this);
+        if (input instanceof Schedule) {
+            Parse_Parse.schedule(input.toInput(), undefined, this);
+        }
+        else {
+            Parse_Parse.schedule(input, Functions.coalesce(input.parseMeta, parseMeta), this);
+        }
         return this;
     };
     Object.defineProperty(Schedule.prototype, "lastTime", {
@@ -2973,6 +2999,32 @@ var Schedule_Schedule = (function () {
         if (cancelled === void 0) { cancelled = true; }
         this.cancel.set(time, cancelled, this.identifierType);
         return this;
+    };
+    /**
+     * Removes the time from this schedule and all related included, excluded,
+     * cancelled instances as well as metadata.
+     *
+     * @param time The time to remove from the schedule.
+     * @param removeInclude If any included instances should be removed as well.
+     * @returns `true` if the time was removed, otherwise `false`.
+     */
+    Schedule.prototype.removeTime = function (time, removeInclude) {
+        if (removeInclude === void 0) { removeInclude = true; }
+        var found = false;
+        for (var i = 0; i < this.times.length && !found; i++) {
+            if (found = time.matches(this.times[i])) {
+                this.times.splice(i, 1);
+            }
+        }
+        if (found) {
+            if (removeInclude) {
+                this.include.removeTime(time);
+            }
+            this.exclude.removeTime(time);
+            this.cancel.removeTime(time);
+            this.meta.removeTime(time);
+        }
+        return found;
     };
     /**
      * Moves the event instance starting at `fromTime` to `toTime` optionally
@@ -3780,6 +3832,23 @@ var Time_Time = (function () {
         return this.hour === time.hour &&
             this.minute === time.minute &&
             this.second === time.second;
+    };
+    /**
+     * Sets the time of this instance to the same time of the given input.
+     *
+     * @param input The time to set this to.
+     * @returns `true` if this time was set, otherwise `false` (invalid input).
+     */
+    Time.prototype.set = function (input) {
+        var parsed = Time.parse(input);
+        var valid = !!parsed;
+        if (valid) {
+            this.hour = parsed.hour;
+            this.minute = parsed.minute;
+            this.second = parsed.second;
+            this.millisecond = parsed.millisecond;
+        }
+        return valid;
     };
     /**
      * @returns The number of milliseconds from the start of the day until this
