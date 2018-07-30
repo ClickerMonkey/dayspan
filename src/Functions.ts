@@ -64,7 +64,7 @@ export class Functions
    */
   public static isNumber(input: any): boolean
   {
-    return isFinite(input);
+    return isFinite(input) && typeof input === 'number';
   }
 
   /**

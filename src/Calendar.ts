@@ -1181,7 +1181,7 @@ export class Calendar<T, M>
     out.eventsOutside = this.eventsOutside;
     out.updateRows = this.updateRows;
     out.updateColumns = this.updateColumns;
-    out.around = plain ? this.span.start.dayIdentifier : this.span.start;
+    out.around = plain ? this.span.start.time : this.span.start;
     out.events = [];
 
     for (let event of this.events)

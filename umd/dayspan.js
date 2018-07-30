@@ -150,7 +150,7 @@ var Functions = (function () {
      * @returns `true` if the variable is a finite number, otherwise `false`.
      */
     Functions.isNumber = function (input) {
-        return isFinite(input);
+        return isFinite(input) && typeof input === 'number';
     };
     /**
      * Determines whether the given input is an object and NOT an array.
@@ -6001,7 +6001,7 @@ var Calendar_Calendar = (function () {
         out.eventsOutside = this.eventsOutside;
         out.updateRows = this.updateRows;
         out.updateColumns = this.updateColumns;
-        out.around = plain ? this.span.start.dayIdentifier : this.span.start;
+        out.around = plain ? this.span.start.time : this.span.start;
         out.events = [];
         for (var _i = 0, _a = this.events; _i < _a.length; _i++) {
             var event_7 = _a[_i];
