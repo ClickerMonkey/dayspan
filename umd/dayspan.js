@@ -5376,8 +5376,7 @@ var Calendar_Calendar = (function () {
         this.parseMeta = Functions.coalesce(input.parseMeta, this.parseMeta);
         this.parseData = Functions.coalesce(input.parseData, this.parseData);
         if (Functions.isArray(input.events)) {
-            this.removeEvents();
-            this.addEvents(input.events, false, true);
+            this.setEvents(input.events, true);
         }
         if (!input.delayRefresh) {
             this.refresh();

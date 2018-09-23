@@ -395,8 +395,7 @@ export class Calendar<T, M>
 
     if (fn.isArray(input.events))
     {
-      this.removeEvents();
-      this.addEvents(input.events, false, true);
+      this.setEvents(input.events, true);
     }
 
     if (!input.delayRefresh)
