@@ -1081,6 +1081,41 @@ export class Calendar<T, M>
   }
 
   /**
+   * Sets the given events to this calendar replacing the current list of
+   * events.
+   *
+   * @param events The events to set to the calendar.
+   * @param delayRefresh When `true` the [[Calendar.refreshEvents]] will not be
+   *    called after the events are added.
+   * @see [[Calendar.refreshEvents]]
+   */
+  public setEvents(events: EventInput<T, M>[], delayRefresh: boolean = false): this
+  {
+    const parsedEvents = [];
+
+    for (let i = 0; i < events.length; i++)
+    {
+      let parsed: Event<T, M> = Parse.event<T, M>(events[i], this.parseData, this.parseMeta);
+
+      if (parsed)
+      {
+        parsedEvents.push(parsed);
+      }
+    }
+
+    this.events = parsedEvents;
+
+    this.refreshVisible();
+
+    if (!delayRefresh)
+    {
+      this.refreshEvents();
+    }
+
+    return this;
+  }
+
+  /**
    * Sets the selection point or range of the calendar and updates the flags
    * in the days.
    *

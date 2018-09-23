@@ -5910,6 +5910,31 @@ var Calendar_Calendar = (function () {
         return this;
     };
     /**
+     * Sets the given events to this calendar replacing the current list of
+     * events.
+     *
+     * @param events The events to set to the calendar.
+     * @param delayRefresh When `true` the [[Calendar.refreshEvents]] will not be
+     *    called after the events are added.
+     * @see [[Calendar.refreshEvents]]
+     */
+    Calendar.prototype.setEvents = function (events, delayRefresh) {
+        if (delayRefresh === void 0) { delayRefresh = false; }
+        var parsedEvents = [];
+        for (var i = 0; i < events.length; i++) {
+            var parsed = Parse_Parse.event(events[i], this.parseData, this.parseMeta);
+            if (parsed) {
+                parsedEvents.push(parsed);
+            }
+        }
+        this.events = parsedEvents;
+        this.refreshVisible();
+        if (!delayRefresh) {
+            this.refreshEvents();
+        }
+        return this;
+    };
+    /**
      * Sets the selection point or range of the calendar and updates the flags
      * in the days.
      *
