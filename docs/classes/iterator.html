@@ -922,6 +922,9 @@ img { max-width: 100%; }
 					<a href="iterator.html#callback" class="tsd-kind-icon">callback</a>
 				</li>
 				<li class=" tsd-kind-property tsd-parent-kind-class">
+					<a href="iterator.html#replacewith" class="tsd-kind-icon">replace<wbr>With</a>
+				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-class">
 					<a href="iterator.html#result" class="tsd-kind-icon">result</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -968,6 +971,9 @@ img { max-width: 100%; }
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
 					<a href="iterator.html#remove" class="tsd-kind-icon">remove</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-class">
+					<a href="iterator.html#replace" class="tsd-kind-icon">replace</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
 					<a href="iterator.html#reverse" class="tsd-kind-icon">reverse</a>
@@ -1089,6 +1095,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 						<ul class="tsd-index-list">
 							<li class="tsd-kind-property tsd-parent-kind-class"><a href="iterator.html#action" class="tsd-kind-icon">action</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-class"><a href="iterator.html#callback" class="tsd-kind-icon">callback</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-class"><a href="iterator.html#replacewith" class="tsd-kind-icon">replace<wbr>With</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-class"><a href="iterator.html#result" class="tsd-kind-icon">result</a></li>
 						</ul>
 					</section>
@@ -1110,6 +1117,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="iterator.html#purge" class="tsd-kind-icon">purge</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="iterator.html#reduce" class="tsd-kind-icon">reduce</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="iterator.html#remove" class="tsd-kind-icon">remove</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-class"><a href="iterator.html#replace" class="tsd-kind-icon">replace</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="iterator.html#reverse" class="tsd-kind-icon">reverse</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="iterator.html#skip" class="tsd-kind-icon">skip</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="iterator.html#stop" class="tsd-kind-icon">stop</a></li>
@@ -1136,7 +1144,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L128">Iterator.ts:128</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L138">Iterator.ts:138</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1168,7 +1176,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 				<div class="tsd-signature tsd-kind-icon">action<span class="tsd-signature-symbol">:</span> <a href="../enums/iteratoraction.html" class="tsd-signature-type">IteratorAction</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L115">Iterator.ts:115</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L120">Iterator.ts:120</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -1183,7 +1191,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 				<div class="tsd-signature tsd-kind-icon">callback<span class="tsd-signature-symbol">:</span> <a href="../globals.html#iteratorcallback" class="tsd-signature-type">IteratorCallback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L120">Iterator.ts:120</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L130">Iterator.ts:130</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -1193,12 +1201,27 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+				<a name="replacewith" class="tsd-anchor"></a>
+				<h3>replace<wbr>With</h3>
+				<div class="tsd-signature tsd-kind-icon">replace<wbr>With<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L125">Iterator.ts:125</a></li>
+					</ul>
+				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The value to replace with the current item.</p>
+					</div>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="result" class="tsd-anchor"></a>
 				<h3>result</h3>
 				<div class="tsd-signature tsd-kind-icon">result<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;null</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L110">Iterator.ts:110</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L115">Iterator.ts:115</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -1220,7 +1243,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L156">Iterator.ts:156</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L166">Iterator.ts:166</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1252,7 +1275,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L384">Iterator.ts:384</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L414">Iterator.ts:414</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1285,7 +1308,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L145">Iterator.ts:145</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L155">Iterator.ts:155</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1309,7 +1332,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L221">Iterator.ts:221</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L245">Iterator.ts:245</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1343,7 +1366,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L483">Iterator.ts:483</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L533">Iterator.ts:533</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1376,7 +1399,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L245">Iterator.ts:245</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L269">Iterator.ts:269</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1409,7 +1432,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L195">Iterator.ts:195</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L219">Iterator.ts:219</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1442,7 +1465,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L555">Iterator.ts:555</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L614">Iterator.ts:614</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1475,7 +1498,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L272">Iterator.ts:272</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L296">Iterator.ts:296</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1509,13 +1532,13 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 				<a name="map" class="tsd-anchor"></a>
 				<h3>map</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
-					<li class="tsd-signature tsd-kind-icon">map&lt;W&gt;<span class="tsd-signature-symbol">(</span>mapper<span class="tsd-signature-symbol">: </span><a href="../globals.html#iteratorcallback" class="tsd-signature-type">IteratorCallback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">W</span><span class="tsd-signature-symbol">&gt;</span>, filter<span class="tsd-signature-symbol">?: </span><a href="../globals.html#iteratorfilter" class="tsd-signature-type">IteratorFilter</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="iterator.html" class="tsd-signature-type">Iterator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">W</span><span class="tsd-signature-symbol">&gt;</span></li>
+					<li class="tsd-signature tsd-kind-icon">map&lt;W&gt;<span class="tsd-signature-symbol">(</span>mapper<span class="tsd-signature-symbol">: </span><a href="../globals.html#iteratorcallback" class="tsd-signature-type">IteratorCallback</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">W</span><span class="tsd-signature-symbol">&gt;</span>, filter<span class="tsd-signature-symbol">?: </span><a href="../globals.html#iteratorfilter" class="tsd-signature-type">IteratorFilter</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>, unmapper<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="iterator.html" class="tsd-signature-type">Iterator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">W</span><span class="tsd-signature-symbol">&gt;</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L518">Iterator.ts:518</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L571">Iterator.ts:571</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1548,6 +1571,36 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 									<p>The function which determines if an item should be mapped.</p>
 								</div>
 							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> unmapper: <span class="tsd-signature-type">function</span><span class="tsd-signature-symbol"> =&nbsp;null</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The function which unmaps a value when replace is called.</p>
+								</div>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter-siganture">
+										<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>replaceWith<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">W</span>, current<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">W</span>, item<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+										</ul>
+										<ul class="tsd-descriptions">
+											<li class="tsd-description">
+												<h4 class="tsd-parameters-title">Parameters</h4>
+												<ul class="tsd-parameters">
+													<li>
+														<h5>replaceWith: <span class="tsd-signature-type">W</span></h5>
+													</li>
+													<li>
+														<h5>current: <span class="tsd-signature-type">W</span></h5>
+													</li>
+													<li>
+														<h5>item: <span class="tsd-signature-type">T</span></h5>
+													</li>
+												</ul>
+												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="iterator.html" class="tsd-signature-type">Iterator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">W</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						<p>A new iterator for the mapped items from this iterator.</p>
@@ -1564,7 +1617,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L297">Iterator.ts:297</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L321">Iterator.ts:321</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1628,7 +1681,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L396">Iterator.ts:396</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L426">Iterator.ts:426</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1661,7 +1714,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L406">Iterator.ts:406</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L436">Iterator.ts:436</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1692,7 +1745,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L459">Iterator.ts:459</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L509">Iterator.ts:509</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1754,7 +1807,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L181">Iterator.ts:181</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L205">Iterator.ts:205</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1762,6 +1815,34 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 								<p>Signals to the iterator source that the current item wants to be removed.</p>
 							</div>
 						</div>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<a name="replace" class="tsd-anchor"></a>
+				<h3>replace</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<li class="tsd-signature tsd-kind-icon">replace<span class="tsd-signature-symbol">(</span>replaceWith<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L194">Iterator.ts:194</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Stops iteration and optionally sets the result of the iteration.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>replaceWith: <span class="tsd-signature-type">T</span></h5>
+							</li>
+						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
 					</li>
 				</ul>
@@ -1776,7 +1857,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L425">Iterator.ts:425</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L455">Iterator.ts:455</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1800,7 +1881,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L351">Iterator.ts:351</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L378">Iterator.ts:378</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1833,7 +1914,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L170">Iterator.ts:170</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L181">Iterator.ts:181</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1864,7 +1945,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L320">Iterator.ts:320</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L344">Iterator.ts:344</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1896,7 +1977,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L572">Iterator.ts:572</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L631">Iterator.ts:631</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1946,7 +2027,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L697">Iterator.ts:697</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L768">Iterator.ts:768</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1975,7 +2056,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L589">Iterator.ts:589</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L648">Iterator.ts:648</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2019,7 +2100,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L633">Iterator.ts:633</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L698">Iterator.ts:698</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2069,7 +2150,7 @@ iter.iterate(<span class="hljs-function"><span class="hljs-params">d</span> =&gt
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/941b2e1/src/Iterator.ts#L665">Iterator.ts:665</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Iterator.ts#L733">Iterator.ts:733</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
