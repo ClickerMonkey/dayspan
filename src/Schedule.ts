@@ -1863,7 +1863,7 @@ export class Schedule<M>
     let duration = isDay ? minutes / Constants.MINUTES_IN_DAY : (isHour ? minutes / Constants.MINUTES_IN_HOUR : minutes);
     let durationUnit: DurationInput = isDay ? 'days' : (isHour ? 'hours' : 'minutes');
 
-    return this.forTime( start, start.asTime(), duration, durationUnit );
+    return this.forTime<M>( start, start.asTime(), duration, durationUnit );
   }
 
 }
