@@ -64,7 +64,6 @@
       "tsx",
       "js"
     ],
-    "mapCoverage": true,
     "coveragePathIgnorePatterns": [
       "<rootDir>/node_modules/",
       "<rootDir>/lib/",
@@ -84,7 +83,8 @@
         "lines": 80,
         "statements": 85
       }
-    }
+    },
+    "testURL": "http:/localhost/"
   },
   "dependencies": {
     "jest-cli": "22.4.3",
@@ -99,7 +99,7 @@
     "cz-conventional-changelog": "2.0.0",
     "gzip-size-cli": "2.0.0",
     "irish-pub": "0.2.0",
-    "jest": "20.0.4",
+    "jest": "23.6.0",
     "lint-staged": "4.0.0",
     "prettier": "1.5.2",
     "shx": "0.2.2",
