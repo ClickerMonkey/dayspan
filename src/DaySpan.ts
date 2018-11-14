@@ -303,8 +303,8 @@ export class DaySpan
    * @param dayHeight The height of the rectangle of the day.
    * @param dayWidth The width of the rectangle of the day.
    * @param columnOffset The offset in the rectangle of the day to adjust this
-   *    span by. This also reduces the width of the returned bounds to keep the
-   *    bounds in the rectangle of the day.
+   *    span by.
+   * @param columnWidth The width of event span
    * @param clip `true` if the bounds should stay in the day rectangle, `false`
    *    and the bounds may go outside the rectangle of the day for multi-day
    *    spans.
@@ -312,19 +312,21 @@ export class DaySpan
    * @param offsetY How much to translate the top & bottom properties by.
    * @returns The calculated bounds for this span.
    */
-  public getBounds(relativeTo: Day, dayHeight: number = 1, dayWidth: number = 1, columnOffset: number = 0, clip: boolean = true, offsetX: number = 0, offsetY: number = 0): DaySpanBounds
+  public getBounds(relativeTo: Day, dayHeight: number = 1, dayWidth: number = 1, columnOffset: number = 0, columnWidth: number = 1, clip: boolean = true, offsetX: number = 0, offsetY: number = 0): DaySpanBounds
   {
-    let startRaw: number = this.startDelta( relativeTo );
-    let endRaw: number = this.endDelta( relativeTo );
+    const startRaw: number = this.startDelta( relativeTo );
+    const endRaw: number = this.endDelta( relativeTo );
 
-    let start: number = clip ? Math.max(0, startRaw) : startRaw;
-    let end: number = clip ? Math.min(1, endRaw) : endRaw;
+    const start: number = clip ? Math.max(0, startRaw) : startRaw;
+    const end: number = clip ? Math.min(1, endRaw) : endRaw;
 
-    let left: number = columnOffset;
-    let right: number = dayWidth - left;
+    const left: number = columnOffset;
+    const right: number = dayWidth - left;
 
-    let top: number = start * dayHeight;
-    let bottom: number = end * dayHeight;
+    const width: number = columnWidth || 1;
+
+    const top: number = start * dayHeight;
+    const bottom: number = end * dayHeight;
 
     return {
       top: top + offsetY,
@@ -332,7 +334,7 @@ export class DaySpan
       height: bottom - top,
       left: left + offsetX,
       right: right + offsetX,
-      width: right
+      width: width
     };
   }
 

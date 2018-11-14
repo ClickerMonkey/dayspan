@@ -96,6 +96,11 @@ export class CalendarEvent<T, M>
    */
   public col: number = 0;
 
+  /**
+   * Define width of event column in visual calendar.
+   * Don't mix it up with day or week column width.
+   */
+  public colWidth: number = 0;
 
   /**
    * Creates a new event instance given the id, the event paired with the
@@ -220,7 +225,7 @@ export class CalendarEvent<T, M>
    */
   public getTimeBounds(dayHeight: number = 1, dayWidth: number = 1, columnOffset: number = 0.1, clip: boolean = true, offsetX: number = 0, offsetY: number = 0): DaySpanBounds
   {
-    return this.time.getBounds( this.day, dayHeight, dayWidth, this.col * columnOffset, clip, offsetX, offsetY );
+    return this.time.getBounds( this.day, dayHeight, dayWidth, this.col, this.colWidth, clip, offsetX, offsetY );
   }
 
   /**

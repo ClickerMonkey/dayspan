@@ -59,7 +59,7 @@
       true
     ],
     "unified-signatures": true,
-    "prefer-for-of": true,
+    "prefer-for-of": false,
     "match-default-export-name": true,
     "prefer-const": true,
     "prefer-method-signature": true,
