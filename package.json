@@ -88,7 +88,7 @@
   },
   "dependencies": {
     "jest-cli": "22.4.3",
-    "moment": "2.22.1"
+    "moment": "^2.24.0"
   },
   "devDependencies": {
     "@types/jest": "20.0.2",
