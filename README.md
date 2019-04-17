@@ -5,7 +5,7 @@ A date & schedule library to use for advanced calendars in TypeScript and JS.
 - [Google Calendar Clone](https://clickermonkey.github.io/dayspan-vuetify/example/) checkout [dayspan-vuetify](https://github.com/ClickerMonkey/dayspan-vuetify)
 - [Documentation](https://clickermonkey.github.io/dayspan/docs/)
 - [Download JS](umd/dayspan.js)
-- Install via `bower install dayspan` or `npm install dayspan`
+- Install via `bower install dayspan` or `npm install dayspan` Moment library is added as a peer dependency to prevent duplication, so you should also explicitly add it in your application via `npm install moment` 
 
 ### Features
 
