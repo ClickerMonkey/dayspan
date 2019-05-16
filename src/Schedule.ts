@@ -723,6 +723,11 @@ export class Schedule<M>
    */
   public isFullyExcluded(day: Day): boolean
   {
+    // If exclude object is empty, bail early.
+    if (this.exclude.isEmpty()) {
+      return false
+    }
+
     if (this.isExcluded(day, false))
     {
       return true;
@@ -942,8 +947,12 @@ export class Schedule<M>
             }
           }
 
-          current = current.prev();
           lookBehind--;
+          // Generating current.prev() is costly.
+          // Avoid generating it if looping condition is no longer satisfied.
+          if (lookBehind >= 0) {
+            current = current.prev()
+          }
         }
       }
     });
