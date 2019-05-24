@@ -1,3 +1,4 @@
+import { FrequencyValueEvery } from "./Frequency";
 
 
 /**
@@ -14,7 +15,7 @@ export class Functions
    * @param input The variable to test.
    * @returns `true` if the variable is an array, otherwise `false`.
    */
-  public static isArray(input: any): boolean
+  public static isArray<T>(input: any): input is Array<T>
   {
     return input instanceof Array;
   }
@@ -50,7 +51,7 @@ export class Functions
    * @param input The variable to test.
    * @returns `true` if the variable is a string, otherwise `false`.
    */
-  public static isString(input: any): boolean
+  public static isString(input: any): input is string
   {
     return typeof(input) === 'string';
   }
@@ -62,7 +63,7 @@ export class Functions
    * @param input The variable to test.
    * @returns `true` if the variable is a finite number, otherwise `false`.
    */
-  public static isNumber(input: any): boolean
+  public static isNumber(input: any): input is number
   {
     return isFinite(input) && typeof input === 'number';
   }
@@ -73,7 +74,7 @@ export class Functions
    * @param input The variable to test.
    * @returns `true` if the variable is a plain object, otherwise `false`.
    */
-  public static isObject(input: any): boolean
+  public static isObject<T extends object>(input: any): input is T
   {
     return input !== null && !this.isArray(input) && typeof(input) === 'object';
   }
@@ -84,7 +85,7 @@ export class Functions
    * @param input The variable to test.
    * @return `true` if the variable is defined, otherwise `false`.
    */
-  public static isDefined(input: any): boolean
+  public static isDefined<T>(input: T | undefined): input is T
   {
     return typeof(input) !== 'undefined';
   }
@@ -95,7 +96,7 @@ export class Functions
    * @param input The variable to test.
    * @return `true` if the variable is defined and not null, otherwise `false`.
    */
-  public static isValue(input: any): boolean
+  public static isValue<T>(input: T | undefined | null): input is T
   {
     return input !== null && typeof(input) !== 'undefined';
   }
@@ -118,9 +119,9 @@ export class Functions
    * @returns `true` if the variable appears to be a [[FrequencyValueEvery]],
    *    otherwise false.
    */
-  public static isFrequencyValueEvery(input: any): boolean
+  public static isFrequencyValueEvery(input: any): input is FrequencyValueEvery
   {
-    return this.isObject( input ) && this.isNumber( input.every );
+    return this.isObject<FrequencyValueEvery>( input ) && this.isNumber( input.every );
   }
 
   /**
@@ -138,7 +139,7 @@ export class Functions
    * @returns `true` if the variable appears to be a [[FrequencyValueOneOf]],
    *    otherwise false.
    */
-  public static isFrequencyValueOneOf(input: any): boolean
+  public static isFrequencyValueOneOf(input: any): input is number[]
   {
     return this.isArray( input ) && input.length > 0;
   }
@@ -170,9 +171,9 @@ export class Functions
    * @param from The object to copy value references from.
    * @returns The reference to `target`.
    */
-  public static extend(target: any, from: any): any
+  public static extend<T = { [prop: string]: any }>(target: T, from: T): T
   {
-    for (let prop in from)
+    for (const prop in from)
     {
       target[ prop ] = from[ prop ];
     }

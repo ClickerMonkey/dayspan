@@ -68,8 +68,8 @@ export class Sorts
    */
   public static FullDay<T, M>(a: CalendarEvent<T, M>, b: CalendarEvent<T, M>): number
   {
-    let af: number = a.fullDay ? 0 : 1;
-    let bf: number = b.fullDay ? 0 : 1;
+    const af: number = a.fullDay ? 0 : 1;
+    const bf: number = b.fullDay ? 0 : 1;
 
     return af - bf;
   }
@@ -117,8 +117,8 @@ export class Sorts
   {
     return (a, b) =>
     {
-      let as: string = getString( a.event ) || '';
-      let bs: string = getString( b.event ) || '';
+      const as: string = getString( a.event ) || '';
+      const bs: string = getString( b.event ) || '';
 
       return as.localeCompare( bs );
     };
@@ -136,8 +136,8 @@ export class Sorts
   {
     return (a, b) =>
     {
-      let ao: number = getOrder( a.event );
-      let bo: number = getOrder( b.event );
+      const ao: number = getOrder( a.event );
+      const bo: number = getOrder( b.event );
 
       return ao - bo;
     };
@@ -154,9 +154,9 @@ export class Sorts
   {
     return (a, b) =>
     {
-      for (let sorter of sorters)
+      for (const sorter of sorters)
       {
-        let compare: number = sorter(a, b);
+        const compare: number = sorter(a, b);
 
         if (compare !== 0)
         {

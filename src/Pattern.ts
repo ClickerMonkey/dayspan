@@ -1,10 +1,10 @@
 
-import { Functions as fn } from './Functions';
 import { Day, DayProperty } from './Day';
-import { Suffix } from './Suffix';
-import { Weekday } from './Weekday';
-import { FrequencyValueEvery, FrequencyValue } from './Frequency';
+import { FrequencyValue, FrequencyValueEvery } from './Frequency';
+import { Functions as fn } from './Functions';
+import { Locales } from './Locale';
 import { Schedule, ScheduleInput } from './Schedule';
+import { Weekday } from './Weekday';
 
 
 /**
@@ -162,9 +162,9 @@ export class Pattern
     setFrequency: (property: DayProperty, frequency: any) => any,
     removeFrequency: (property: DayProperty) => any): void
   {
-    for (let prop of Pattern.PROPS)
+    for (const prop of Pattern.PROPS)
     {
-      let rule = this.rules[ prop ];
+      const rule = this.rules[ prop ];
 
       // Should have one value
       if (rule === 1)
@@ -220,12 +220,12 @@ export class Pattern
    */
   public isMatchGeneric(getFrequency: (property: DayProperty) => FrequencyValue, exactlyWith?: Day): boolean
   {
-    let exactly: boolean = fn.isDefined( exactlyWith );
+    const exactly: boolean = fn.isDefined( exactlyWith );
 
-    for (let prop of Pattern.PROPS)
+    for (const prop of Pattern.PROPS)
     {
-      let rule = this.rules[ prop ];
-      let curr = getFrequency( prop );
+      const rule = this.rules[ prop ];
+      const curr = getFrequency( prop );
 
       // Optional, skip it
       if (rule === false)
@@ -248,9 +248,9 @@ export class Pattern
       // Must be an array of the same size
       if (fn.isNumber(rule))
       {
-        if (fn.isArray(curr) && (<number[]>curr).length === rule)
+        if (fn.isArray(curr) && (curr as number[]).length === rule)
         {
-          if (exactly && (<number[]>curr).indexOf( <number>exactlyWith[ prop ] ) === -1)
+          if (exactly && (curr as number[]).indexOf( exactlyWith[ prop ] as number ) === -1)
           {
             return false;
           }
@@ -269,12 +269,12 @@ export class Pattern
           return false;
         }
 
-        if (rule.length !== (<number[]>curr).length)
+        if (rule.length !== (curr as number[]).length)
         {
           return false;
         }
 
-        for (var i = 0; i < rule.length; i++)
+        for (let i = 0; i < rule.length; i++)
         {
           if (rule[ i ] !== curr[ i ])
           {
@@ -289,22 +289,22 @@ export class Pattern
       }
 
       // Must be an object with same over & offset.
-      if (fn.isObject(rule))
+      if (fn.isFrequencyValueEvery(rule))
       {
-        if (!fn.isObject(curr))
+        if (!fn.isFrequencyValueEvery(curr))
         {
           return false;
         }
 
-        var ruleOffset = rule.offset || 0;
-        var currOffset = (<FrequencyValueEvery>curr).offset || 0;
+        const ruleOffset = rule.offset || 0;
+        const currOffset = curr.offset || 0;
 
         if (currOffset !== ruleOffset || curr.every !== rule.every)
         {
           return false;
         }
 
-        if (exactly && (<number>exactlyWith[ prop ] % rule.every) !== ruleOffset)
+        if (exactly && ((exactlyWith[ prop ] as number) % rule.every) !== ruleOffset)
         {
           return false;
         }
@@ -338,7 +338,7 @@ export class Pattern
    */
   public static findMatch<M, I extends ScheduleInput<M> | Schedule<M>>(input: I, listedOnly: boolean = true, exactlyWith?: Day): Pattern
   {
-    for (let pattern of Patterns)
+    for (const pattern of Patterns)
     {
       if ((pattern.listed || !listedOnly) && pattern.isMatch<M, I>( input, exactlyWith ))
       {
@@ -361,7 +361,7 @@ export class Pattern
 export let Patterns: Pattern[] = [
   new Pattern(
     'none', true,
-    (day: Day) => 'Does not repeat',
+    (day) => Locales.current.patternNone(day),
     {
       year: 1,
       month: 1,
@@ -370,21 +370,21 @@ export let Patterns: Pattern[] = [
   ),
   new Pattern(
     'daily', true,
-    (day: Day) => 'Daily',
+    (day) => Locales.current.patternDaily(day),
     {
 
     }
   ),
   new Pattern(
     'weekly', true,
-    (day: Day) =>  'Weekly on ' + day.format('dddd'),
+    (day) => Locales.current.patternWeekly(day),
     {
       dayOfWeek: 1
     }
   ),
   new Pattern(
     'monthlyWeek', true,
-    (day: Day) => 'Monthly on the ' + Suffix.CACHE[day.weekspanOfMonth + 1] + ' ' + day.format('dddd'),
+    (day) => Locales.current.patternMonthlyWeek(day),
     {
       dayOfWeek: 1,
       weekspanOfMonth: 1
@@ -392,7 +392,7 @@ export let Patterns: Pattern[] = [
   ),
   new Pattern(
     'annually', true,
-    (day: Day) => 'Annually on ' + day.format('MMMM Do'),
+    (day) => Locales.current.patternAnnually(day),
     {
       month: 1,
       dayOfMonth: 1
@@ -400,7 +400,7 @@ export let Patterns: Pattern[] = [
   ),
   new Pattern(
     'annuallyMonthWeek', true,
-    (day: Day) => 'Annually on the ' + Suffix.CACHE[day.weekspanOfMonth + 1] + ' ' + day.format('dddd') + ' of ' + day.format('MMMM'),
+    (day) => Locales.current.patternAnnuallyMonthWeek(day),
     {
       month: 1,
       dayOfWeek: 1,
@@ -409,21 +409,45 @@ export let Patterns: Pattern[] = [
   ),
   new Pattern(
     'weekday', true,
-    (day: Day) => 'Every weekday (Monday to Friday)',
+    (day) => Locales.current.patternWeekday(day),
     {
       dayOfWeek: [Weekday.MONDAY, Weekday.TUESDAY, Weekday.WEDNESDAY, Weekday.THURSDAY, Weekday.FRIDAY]
     }
   ),
   new Pattern(
     'monthly', true,
-    (day: Day) => 'Monthly on the ' + day.format('Do') + ' day',
+    (day) => Locales.current.patternMonthly(day),
     {
       dayOfMonth: 1
     }
   ),
   new Pattern(
+    'lastDay', false,
+    (day) => Locales.current.patternLastDay(day),
+    {
+      lastDayOfMonth: [1]
+    }
+  ),
+  new Pattern(
+    'lastDayOfMonth', false,
+    (day) => Locales.current.patternLastDayOfMonth(day),
+    {
+      month: 1,
+      lastDayOfMonth: [1]
+    }
+  ),
+  new Pattern(
+    'lastWeekday', false,
+    (day) => Locales.current.patternLastWeekday(day),
+    {
+      lastWeekspanOfMonth: [0],
+      dayOfWeek: 1,
+      month: 1
+    }
+  ),
+  new Pattern(
     'custom', true,
-    (day: Day) => 'Custom...',
+    (day) => Locales.current.patternCustom(day),
     {
       dayOfWeek: false,
       dayOfMonth: false,
@@ -453,7 +477,7 @@ export let Patterns: Pattern[] = [
  */
 export let PatternMap: { [name: string]: Pattern } = {};
 
-for (let pattern of Patterns)
+for (const pattern of Patterns)
 {
   PatternMap[ pattern.name ] = pattern;
 }

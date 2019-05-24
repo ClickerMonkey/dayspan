@@ -1,8 +1,9 @@
 
-import { Functions as fn } from './Functions';
 import { Constants } from './Constants';
+import { Functions as fn } from './Functions';
 import { Parse } from './Parse';
 
+// tslint:disable: no-magic-numbers
 
 /**
  * A value that can possibly be parsed into a Time instance.
@@ -94,7 +95,7 @@ export class Time
    */
   public format(format: string): string
   {
-    let formatterEntries = Time.FORMATTERS;
+    const formatterEntries = Time.FORMATTERS;
     let out: string = '';
 
     for (let i = 0; i < format.length; i++)
@@ -103,12 +104,12 @@ export class Time
 
       for (let k = 0; k < formatterEntries.length && !handled; k++)
       {
-        let entry = formatterEntries[ k ];
-        let part: string = format.substring( i, i + entry.size );
+        const entry = formatterEntries[ k ];
+        const part: string = format.substring( i, i + entry.size );
 
         if (part.length === entry.size)
         {
-          let formatter = entry.formats[ part ];
+          const formatter = entry.formats[ part ];
 
           if (formatter)
           {
@@ -188,8 +189,8 @@ export class Time
    */
   public set(input: TimeInput): boolean
   {
-    let parsed: Time = Time.parse( input );
-    let valid: boolean = !!parsed;
+    const parsed: Time = Time.parse( input );
+    const valid: boolean = !!parsed;
 
     if (valid)
     {
@@ -245,7 +246,7 @@ export class Time
    */
   public toObject(): TimeInput
   {
-    let out: TimeInput = {
+    const out: TimeInput = {
       hour: this.hour
     };
 
@@ -278,17 +279,17 @@ export class Time
    */
   public static fromString(time: string): Time
   {
-    let matches: string[] = this.REGEX.exec( time );
+    const matches: string[] = this.REGEX.exec( time );
 
     if (!matches)
     {
       return null;
     }
 
-    let h: number = parseInt(matches[1]) || 0;
-    let m: number = parseInt(matches[2]) || 0;
-    let s: number = parseInt(matches[3]) || 0;
-    let l: number = parseInt(matches[4]) || 0;
+    const h: number = parseInt(matches[1]) || 0;
+    const m: number = parseInt(matches[2]) || 0;
+    const s: number = parseInt(matches[3]) || 0;
+    const l: number = parseInt(matches[4]) || 0;
 
     return this.build(h, m, s, l);
   }
@@ -302,10 +303,10 @@ export class Time
    */
   public static fromIdentifier(time: number): Time
   {
-    let h: number = time % 100;
-    let m: number = Math.floor(time / 100) % 100;
-    let s: number = Math.floor(time / 10000) % 100;
-    let l: number = Math.floor(time / 10000000) % 1000;
+    const h: number = time % 100;
+    const m: number = Math.floor(time / 100) % 100;
+    const s: number = Math.floor(time / 10000) % 100;
+    const l: number = Math.floor(time / 10000000) % 1000;
 
     return this.build(h, m, s, l);
   }

@@ -1,8 +1,9 @@
 
+import { Constants } from './Constants';
 import { Day } from './Day';
+import { Locales } from './Locale';
 import { Op } from './Operation';
 import { Units } from './Units';
-import { Constants } from './Constants';
 
 
 
@@ -314,17 +315,17 @@ export class DaySpan
    */
   public getBounds(relativeTo: Day, dayHeight: number = 1, dayWidth: number = 1, columnOffset: number = 0, clip: boolean = true, offsetX: number = 0, offsetY: number = 0): DaySpanBounds
   {
-    let startRaw: number = this.startDelta( relativeTo );
-    let endRaw: number = this.endDelta( relativeTo );
+    const startRaw: number = this.startDelta( relativeTo );
+    const endRaw: number = this.endDelta( relativeTo );
 
-    let start: number = clip ? Math.max(0, startRaw) : startRaw;
-    let end: number = clip ? Math.min(1, endRaw) : endRaw;
+    const start: number = clip ? Math.max(0, startRaw) : startRaw;
+    const end: number = clip ? Math.min(1, endRaw) : endRaw;
 
-    let left: number = columnOffset;
-    let right: number = dayWidth - left;
+    const left: number = columnOffset;
+    const right: number = dayWidth - left;
 
-    let top: number = start * dayHeight;
-    let bottom: number = end * dayHeight;
+    const top: number = start * dayHeight;
+    const bottom: number = end * dayHeight;
 
     return {
       top: top + offsetY,
@@ -353,19 +354,20 @@ export class DaySpan
    */
   public summary(type: Units, dayOfWeek: boolean = true, short: boolean = false, repeat: boolean = false, contextual: boolean = true, delimiter: string = ' - '): string
   {
-    let formats = DaySpan.SUMMARY_FORMATS[ type ];
-    let today: Day = Day.today();
-    let showStartYear: boolean = !contextual || !this.start.sameYear( today );
-    let showEndYear: boolean = !contextual || !this.end.sameYear( today );
-    let start: string = this.start.format( formats(short, dayOfWeek, showStartYear) );
-    let end: string = this.end.format( formats(short, dayOfWeek, showEndYear) );
+    const formats = [Locales.current.summaryDay, Locales.current.summaryWeek, Locales.current.summaryMonth, Locales.current.summaryYear];
+    const formatter = formats[ type ];
+    const today: Day = Day.today();
+    const showStartYear: boolean = !contextual || !this.start.sameYear( today );
+    const showEndYear: boolean = !contextual || !this.end.sameYear( today );
+    const start: string = this.start.format( formatter(short, dayOfWeek, showStartYear) );
+    const end: string = this.end.format( formatter(short, dayOfWeek, showEndYear) );
     let summary: string = start;
 
     if (start !== end)
     {
       if (!repeat)
       {
-        summary = this.start.format( formats(short, dayOfWeek, !this.start.sameYear(this.end)) );
+        summary = this.start.format( formatter(short, dayOfWeek, !this.start.sameYear(this.end)) );
       }
 
       summary += delimiter;
@@ -402,8 +404,8 @@ export class DaySpan
    */
   public intersection(span: DaySpan): DaySpan
   {
-    let start: Day = this.start.max( span.start );
-    let end: Day = this.end.min( span.end );
+    const start: Day = this.start.max( span.start );
+    const end: Day = this.end.min( span.end );
 
     return start.isAfter( end ) ? null : new DaySpan(start, end);
   }
@@ -416,8 +418,8 @@ export class DaySpan
    */
   public union(span: DaySpan): DaySpan
   {
-    let start: Day = this.start.min( span.start );
-    let end: Day = this.end.max( span.end );
+    const start: Day = this.start.min( span.start );
+    const end: Day = this.end.max( span.end );
 
     return new DaySpan(start, end);
   }
@@ -433,25 +435,5 @@ export class DaySpan
   {
     return new DaySpan( day, day );
   }
-
-
-  /**
-   * Formatting functions which assist the [[DaySpan.summary]] function.
-   */
-  public static SUMMARY_FORMATS =
-  {
-    [Units.DAY]: (short: boolean, dayOfWeek: boolean, year: boolean) => {
-      return (dayOfWeek ? (short ? 'ddd, ' : 'dddd, ') : '') + (short ? 'MMM ' : 'MMMM ') + 'Do' + (year ? ' YYYY' : '');
-    },
-    [Units.WEEK]: (short: boolean, dayOfWeek: boolean, year: boolean) => {
-      return (dayOfWeek ? (short ? 'ddd, ' : 'dddd, ') : '') + (short ? 'MMM ' : 'MMMM ') + 'Do' + (year ? ' YYYY' : '');
-    },
-    [Units.MONTH]: (short: boolean, dayOfWeek: boolean, year: boolean) => {
-      return (short ? 'MMM' : 'MMMM') + (year ? ' YYYY' : '');
-    },
-    [Units.YEAR]: (short: boolean, dayOfWeek: boolean, year: boolean) => {
-      return (year ? 'YYYY' : '');
-    }
-  };
 
 }

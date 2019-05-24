@@ -1,11 +1,12 @@
 
-import { Functions as fn } from './Functions';
+import { Constants } from './Constants';
+import { Unit } from './DateFunctions';
+import { Day, DayInput, DayProperty } from './Day';
+import { Event } from './Event';
 import { FrequencyCheck } from './Frequency';
+import { Functions as fn } from './Functions';
 import { Schedule, ScheduleInput } from './Schedule';
 import { ScheduleModifier } from './ScheduleModifier';
-import { Constants } from './Constants';
-import { Day, DayProperty, DayInput, DurationInput } from './Day';
-import { Event } from './Event';
 import { Time } from './Time';
 
 
@@ -33,8 +34,8 @@ export class Parse
 
     if (fn.isFrequencyValueEvery(input))
     {
-      let every: number = input.every;
-      let offset: number = (input.offset || 0) % every;
+      const every: number = input.every;
+      const offset: number = (input.offset || 0) % every;
 
       check = (value: number) => {
         return value % every === offset;
@@ -44,10 +45,10 @@ export class Parse
 
     if (fn.isFrequencyValueOneOf(input))
     {
-      let map: object = {};
+      const map: { [value: number]: true | undefined } = {};
 
-      for (let i = 0; i < input.length; i++) {
-        map[ input[ i ] ] = true;
+      for (const i of input) {
+        map[ i ] = true;
       }
 
       check = (value: number) => {
@@ -81,23 +82,23 @@ export class Parse
   {
     if (fn.isNumber(input))
     {
-      return Day.unix( <number>input );
+      return Day.unix( input );
     }
     else if (fn.isString(input))
     {
-      return Day.fromString( <string>input );
+      return Day.fromString( input );
     }
     else if (input instanceof Day)
     {
       return input;
     }
-    else if (fn.isArray( input ))
+    else if (fn.isArray<number>( input ))
     {
-      return Day.fromArray( <number[]>input );
+      return Day.fromArray( input );
     }
-    else if (fn.isObject( input ))
+    else if (fn.isObject<object>( input ))
     {
-      return Day.fromObject( <object>input );
+      return Day.fromObject( input );
     }
     else if (input === true)
     {
@@ -134,13 +135,13 @@ export class Parse
     }
     if (fn.isNumber(input))
     {
-      return Time.fromIdentifier( <number>input );
+      return Time.fromIdentifier( input );
     }
     if (fn.isString(input))
     {
-      return Time.fromString( <string>input );
+      return Time.fromString( input );
     }
-    if (fn.isObject(input) && fn.isNumber(input.hour))
+    if (fn.isObject<any>(input) && fn.isNumber(input.hour))
     {
       return new Time(input.hour, input.minute, input.second, input.millisecond);
     }
@@ -159,13 +160,13 @@ export class Parse
    */
   public static times(input: any): Time[]
   {
-    let times: Time[] = [];
+    const times: Time[] = [];
 
     if (fn.isArray(input))
     {
-      for (let timeInput of input)
+      for (const timeInput of input)
       {
-        let time = this.time( timeInput );
+        const time = this.time( timeInput );
 
         if (time)
         {
@@ -200,14 +201,14 @@ export class Parse
    * @see [[Day.dayIdentifier]]
    */
   public static modifier<T>(input: any, value: T,
-    parseMeta: (input: any) => T = (x => <T>x),
+    parseMeta: (input: any) => T = (x => x),
     out: ScheduleModifier<T> = new ScheduleModifier<T>()): ScheduleModifier<T>
   {
-    let map = {};
+    const map = {};
 
     if (fn.isArray(input))
     {
-      for (let identifier of input)
+      for (const identifier of input)
       {
         if (identifier instanceof Day)
         {
@@ -215,18 +216,18 @@ export class Parse
         }
         else if (fn.isNumber(identifier))
         {
-          map[ <number>identifier ] = value;
+          map[ identifier ] = value;
         }
         else if (fn.isString(identifier))
         {
-          map[ <string>identifier ] = value;
+          map[ identifier ] = value;
         }
       }
     }
 
     if (fn.isObject(input))
     {
-      for (let identifier in input)
+      for (const identifier in input)
       {
         map[ identifier ] = parseMeta( input[ identifier ] );
       }
@@ -235,6 +236,68 @@ export class Parse
     out.map = map;
 
     return out;
+  }
+
+  /**
+   * 
+   */
+  public static unit (input: string, all: boolean = false): Unit
+  {
+    if (typeof input !== 'string') 
+    {
+      return Constants.DURATION_DEFAULT_UNIT(all);
+    }
+
+    switch (input.toLowerCase()) {
+      case 'ms':
+      case 'milli':
+      case 'millis':
+      case 'millisecond':
+      case 'milliseconds':
+        return 'millis';
+      case 's':
+      case 'sec':
+      case 'secs':
+      case 'second':
+      case 'seconds':
+        return 'second';
+      case 'm':
+      case 'min':
+      case 'mins':
+      case 'minute':
+      case 'minutes':
+        return 'minute';
+      case 'h':
+      case 'hr':
+      case 'hour':
+      case 'hours':
+        return 'hour';
+      case 'd':
+      case 'day':
+      case 'days':
+        return 'day';
+      case 'w':
+      case 'wk':
+      case 'week':
+      case 'weeks':
+        return 'week';
+      case 'mon':
+      case 'month':
+      case 'months':
+        return 'month';
+      case 'q':
+      case 'quarter':
+      case 'quarters':
+        return 'quarter';
+      case 'y':
+      case 'yr':
+      case 'yrs':
+      case 'year':
+      case 'years':
+        return 'year';
+    }
+
+    return Constants.DURATION_DEFAULT_UNIT(all);
   }
 
   /**
@@ -247,7 +310,7 @@ export class Parse
    * @returns An instance of the parsed [[Schedule]].
    */
   public static schedule<M>(input: ScheduleInput<M> | Schedule<M>,
-    parseMeta: (input: any) => M = (x => <M>x),
+    parseMeta: (input: any) => M = (x => x),
     out: Schedule<M> = new Schedule<M>()): Schedule<M>
   {
     if (input instanceof Schedule)
@@ -255,9 +318,9 @@ export class Parse
       return input;
     }
 
-    let on: Day = this.day( input.on );
-    let times: Time[] = this.times( input.times );
-    let fullDay: boolean = times.length === 0;
+    const on: Day = this.day( input.on );
+    const times: Time[] = this.times( input.times );
+    const fullDay: boolean = times.length === 0;
 
     if (on)
     {
@@ -270,16 +333,18 @@ export class Parse
 
     out.times = times;
     out.duration = fn.coalesce( input.duration, Constants.DURATION_DEFAULT );
-    out.durationUnit = <DurationInput>fn.coalesce( input.durationUnit, Constants.DURATION_DEFAULT_UNIT( fullDay ) );
+    out.durationUnit = this.unit( input.durationUnit, fullDay );
     out.start = this.day( input.start );
     out.end = this.day( input.end );
+    out.maxOccurrences = fn.coalesce( input.maxOccurrences, 0 );
     out.exclude = this.modifier( input.exclude, true, undefined, out.exclude );
     out.include = this.modifier( input.include, true, undefined, out.include );
     out.cancel = this.modifier( input.cancel, true, undefined, out.cancel );
     out.meta = this.modifier( input.meta, null, parseMeta, out.meta );
     out.year = this.frequency( input.year, 'year' );
     out.month = this.frequency( input.month, 'month' );
-    out.week = this.frequency( input.week, 'week' );
+    out.day = this.frequency( input.day, 'day' );
+    out.quarter = this.frequency( input.quarter, 'quarter' );
     out.weekOfYear = this.frequency( input.weekOfYear, 'weekOfYear' );
     out.weekspanOfYear = this.frequency( input.weekspanOfYear, 'weekspanOfYear' );
     out.fullWeekOfYear = this.frequency( input.fullWeekOfYear, 'fullWeekOfYear' );
@@ -296,6 +361,7 @@ export class Parse
     out.dayOfYear = this.frequency( input.dayOfYear, 'dayOfYear' );
     out.updateDurationInDays();
     out.updateChecks();
+    out.updateEnd();
 
     return out;
   }
@@ -309,9 +375,9 @@ export class Parse
    */
   public static givenFrequency(checks: FrequencyCheck[]): FrequencyCheck[]
   {
-    let out: FrequencyCheck[] = [];
+    const out: FrequencyCheck[] = [];
 
-    for (let check of checks)
+    for (const check of checks)
     {
       if (check.given)
       {
@@ -331,8 +397,8 @@ export class Parse
    * @returns The parsed value.
    */
   public static event<T, M>(input: any,
-    parseData: (input: any) => T = (x => <T>x),
-    parseMeta: (input: any) => M = (x => <M>x)): Event<T, M>
+    parseData: (input: any) => T = (x => x),
+    parseMeta: (input: any) => M = (x => x)): Event<T, M>
   {
     if (input instanceof Event)
     {
@@ -344,7 +410,7 @@ export class Parse
       return null;
     }
 
-    let schedule: Schedule<M> = this.schedule<M>( input.schedule, parseMeta );
+    const schedule: Schedule<M> = this.schedule<M>( input.schedule, parseMeta );
 
     return new Event( schedule, parseData( input.data ), input.id, input.visible );
   }

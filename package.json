@@ -52,6 +52,7 @@
     ]
   },
   "jest": {
+    "testURL": "http://localhost/",
     "roots": [
       "<rootDir>/src"
     ],
@@ -86,9 +87,6 @@
       }
     }
   },
-  "peerDependencies": {
-    "moment": "^2.24.0"
-  },
   "devDependencies": {
     "@types/jest": "20.0.2",
     "@types/node": "7.0.31",
@@ -117,5 +115,8 @@
     "validate-commit-msg": "2.12.2",
     "webpack": "3.0.0",
     "webpack-config-utils": "2.3.0"
+  },
+  "dependencies": {
+    "iteratez": "1.2.1"
   }
 }

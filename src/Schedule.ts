@@ -1,19 +1,18 @@
 
-import { Functions as fn } from './Functions';
-import { FrequencyValue, FrequencyCheck, FrequencyValueEvery, FrequencyValueOneOf } from './Frequency';
-import { Day, DayInput, DurationInput, DayProperty } from './Day';
-import { Identifier, IdentifierInput } from './Identifier';
-import { DaySpan } from './DaySpan';
-import { Constants } from './Constants';
-import { Parse } from './Parse';
-import { Time, TimeInput } from './Time';
-import { Suffix } from './Suffix';
-import { ScheduleModifier, ScheduleModifierSpan } from './ScheduleModifier';
-import { Units } from './Units';
-import { Iterator, IteratorAction } from './Iterator';
+import { Iterate, IterateAction } from 'iteratez';
 
-// @ts-ignore
-import * as moment from 'moment';
+import { Constants } from './Constants';
+import { Unit, durations } from './DateFunctions';
+import { Day, DayInput, DayProperty } from './Day';
+import { DaySpan } from './DaySpan';
+import { FrequencyCheck, FrequencyValue } from './Frequency';
+import { Functions as fn } from './Functions';
+import { Identifier, IdentifierInput } from './Identifier';
+import { LocaleRule, Locales } from './Locale';
+import { Parse } from './Parse';
+import { ScheduleModifier, ScheduleModifierSpan } from './ScheduleModifier';
+import { Time, TimeInput } from './Time';
+import { Units } from './Units';
 
 
 /**
@@ -23,6 +22,10 @@ import * as moment from 'moment';
  * identifier for the event.
  */
 export type ScheduleEventTuple = [DaySpan, Day, IdentifierInput];
+
+
+type Iter<M, T = Day> = Iterate<T, number, Schedule<M>>;
+
 
 /**
  * Input given by a user which describes an event schedule.
@@ -43,6 +46,11 @@ export interface ScheduleInput<M>
   end?: DayInput;
 
   /**
+   * @see [[Schedule.maxOccurrences]]
+   */
+  maxOccurrences?: number;
+
+  /**
    * A shortcut to setting the [[Schedule.start]], [[Schedule.end]],
    * [[Schedule.year]], [[Schedule.month]], and [[Schedule.dayOfMonth]].
    */
@@ -61,7 +69,7 @@ export interface ScheduleInput<M>
   /**
    * @see [[Schedule.durationUnit]]
    */
-  durationUnit?: DurationInput;
+  durationUnit?: string;
 
   /**
    * An array of days or identifiers which should be excluded from the schedule.
@@ -100,9 +108,14 @@ export interface ScheduleInput<M>
   year?: FrequencyValue;
 
   /**
-   * @see [[Schedule.week]]
+   * @see [[Schedule.day]]
    */
-  week?: FrequencyValue;
+  day?: FrequencyValue;
+
+  /**
+   * @see [[Schedule.quarter]]
+   */
+  quarter?: FrequencyValue;
 
   /**
    * @see [[Schedule.dayOfWeek]]
@@ -177,7 +190,7 @@ export interface ScheduleInput<M>
   /**
    * The function to parse metadata with.
    */
-  parseMeta?: (input: any) => M;
+  parseMeta?(input: any): M;
 }
 
 
@@ -202,6 +215,14 @@ export class Schedule<M>
   public end: Day;
 
   /**
+   * The maximum number of occurrences allowed in the Schedule. 
+   * [[Schedule.start]] is required and [[Schedule.end]] is ignored and 
+   * overwritten. This is an expensive check and should be avoided if 
+   * possible. If this value is less than 1 it is ignored.
+   */
+  public maxOccurrences: number;
+
+  /**
    * The length of events in this schedule.
    */
   public duration: number;
@@ -209,7 +230,7 @@ export class Schedule<M>
   /**
    * The unit which describes the duration of the event.
    */
-  public durationUnit: DurationInput;
+  public durationUnit: Unit;
 
   /**
    * The times at which the events occur on the days they should. If there are
@@ -257,6 +278,11 @@ export class Schedule<M>
   public meta: ScheduleModifier<M>;
 
   /**
+   * How frequent the event occurs based on [[Day.day]].
+   */
+  public day: FrequencyCheck;
+
+  /**
    * How frequent the event occurs based on [[Day.dayOfWeek]].
    */
   public dayOfWeek: FrequencyCheck;
@@ -280,11 +306,6 @@ export class Schedule<M>
    * How frequent the event occurs based on [[Day.month]].
    */
   public month: FrequencyCheck;
-
-  /**
-   * How frequent the event occurs based on [[Day.week]].
-   */
-  public week: FrequencyCheck;
 
   /**
    * How frequent the event occurs based on [[Day.weekOfYear]].
@@ -342,6 +363,11 @@ export class Schedule<M>
   public year: FrequencyCheck;
 
   /**
+   * How frequent the event occurs based on [[Day.quarter]].
+   */
+  public quarter: FrequencyCheck;
+
+  /**
    * The array of frequency functions which had valid frequencies.
    *
    * @see [[FrequencyCheck.given]]
@@ -375,7 +401,7 @@ export class Schedule<M>
    * @see [[Parse.schedule]]
    */
   public set(input: ScheduleInput<M> | Schedule<M>,
-    parseMeta: (input: any) => M = (x => <M>x)): this
+    parseMeta: (input: any) => M = (x => x)): this
   {
     if (input instanceof Schedule)
     {
@@ -414,10 +440,10 @@ export class Schedule<M>
    */
   public updateDurationInDays(): this
   {
-    let start: number = this.lastTime ? this.lastTime.toMilliseconds() : 0;
-    let duration: number = this.duration * (Constants.DURATION_TO_MILLIS[ this.durationUnit ] || 0);
-    let exclude: number = Constants.MILLIS_IN_DAY;
-    let day: number = Constants.MILLIS_IN_DAY;
+    const start: number = this.lastTime ? this.lastTime.toMilliseconds() : 0;
+    const duration: number = this.duration * (durations[ this.durationUnit ] || 0);
+    const exclude: number = Constants.MILLIS_IN_DAY;
+    const day: number = Constants.MILLIS_IN_DAY;
 
     this.durationInDays = Math.max(0, Math.ceil((start + duration - exclude) / day));
 
@@ -433,7 +459,8 @@ export class Schedule<M>
     this.checks = Parse.givenFrequency([
       this.year,
       this.month,
-      this.week,
+      this.day,
+      this.quarter,
       this.weekOfYear,
       this.fullWeekOfYear,
       this.weekspanOfYear,
@@ -451,6 +478,156 @@ export class Schedule<M>
     ]);
 
     return this;
+  }
+
+  /**
+   * Updates the [[Schedule.end]] based on [[Schedule.maxOccurrences]]
+   */
+  public updateEnd(): this
+  {
+    if (this.maxOccurrences > 0 && this.start)
+    {
+      // Clear so it's not used in calculating maximum years.
+      this.end = null;
+
+      const maximumYears = this.getMaximumYears();
+      const lookahead = maximumYears * Constants.DAYS_IN_YEAR;
+      const [lastSpan] = this.forecast(this.start, false, this.maxOccurrences, 0, true, lookahead).last();
+
+      this.end = lastSpan.end;
+    }
+
+    return this;
+  }
+
+  /**
+   * Estimates the maximum number of years from the start date that events 
+   * could be happening. If the start date is not specified -1 will be 
+   * returned representing potentially infinite years. If specific years
+   * are specified the difference between the maximum year and the start year
+   * will be returned. After that if [[Schedule.maxOccurrences]] is not 
+   * specified -1 will be returned unless the end date is specified. In that
+   * case the years between the start and end are returned. Otherwise
+   * if events occur every X years then that calculation is used taking into
+   * account [[Schedule.maxOccurrences]]. Finally no year rule is specified
+   * so worst case is assumed, [[Schedule.maxOccurrences]].
+   * 
+   * The returned value is always rounded up, so if the first and last 
+   * occurrence happens the same year 1 will be returned.
+   */
+  public getMaximumYears(): number
+  {
+    if (!this.start)
+    {
+      return -1;
+    }
+
+    let max = 0;
+
+    if (this.end)
+    {
+      max = this.end.year - this.start.year + 1;
+    }
+
+    if (fn.isFrequencyValueOneOf(this.year))
+    {
+      const valueOfMax = this.year.reduce((a, b) => Math.max(a, b));
+
+      
+      return max - this.start.year + 1;
+    }
+
+    if (this.maxOccurrences <= 0)
+    {
+      return -1;
+    }
+
+    if (fn.isFrequencyValueEvery(this.year))
+    {
+      const { every, offset } = this.year;
+
+      return this.start.year + (offset || 0) + every * this.maxOccurrences + 1;
+    }
+
+    return this.maxOccurrences;
+  }
+
+  /**
+   * Gets the start date of the schedule. Even if one is not specified, one
+   * can be calculated if this is a single event schedule.
+   */
+  public getStart(): Day | null
+  {
+    if (this.start)
+    {
+      return this.start;
+    }
+
+    const singleEventSpan = this.getSingleEventSpan();
+
+    if (singleEventSpan)
+    {
+      return singleEventSpan.start;
+    }
+
+    return null;
+  }
+
+  /**
+   * Gets the end date of the schedule. Even if one is not specified, one
+   * can be calculated if this is a single event schedule.
+   */
+  public getEnd(): Day | null
+  {
+    if (this.end)
+    {
+      return this.end;
+    }
+
+    const singleEventSpan = this.getSingleEventSpan();
+
+    if (singleEventSpan)
+    {
+      return singleEventSpan.end;
+    }
+
+    return null;
+  }
+
+  /**
+   * Attempts to calculate the entire range of the schedule taking into account
+   * any start date, end date, the included and excluded dates, and also even 
+   * if the start and end date aren't specified, it checks to see if this is a 
+   * single event schedule. If the start of the result is not defined, that 
+   * means this schedule has occurred since the beginning of time. If the end
+   * of the result is not defined, that means the schedule will occurr until 
+   * the end of time.
+   */
+  public getRange(useInclude: boolean = true): Partial<DaySpan>
+  {
+    const hasTimes = this.times.length > 0;
+    let start = this.getStart();
+    let end = this.getEnd();
+
+    if (useInclude)
+    {
+      this.include.spans().each(({span}) => 
+      {
+        if (!this.isExcluded(span.start, hasTimes))
+        {
+          if (!start || span.start.isBefore(start))
+          {
+            start = span.start;
+          }
+          if (!end || span.end.isAfter(end))
+          {
+            end = span.end;
+          }
+        }
+      });
+    }
+
+    return { start, end }
   }
 
   /**
@@ -591,20 +768,20 @@ export class Schedule<M>
       {
         this.times = [];
 
-        if (this.durationUnit !== 'days' && this.durationUnit !== 'day')
+        if (this.durationUnit !== 'day')
         {
           this.duration = 1;
-          this.durationUnit = 'days';
+          this.durationUnit = 'day';
         }
       }
       else
       {
         this.times = [Parse.time( defaultTime )];
 
-        if (this.durationUnit !== 'hours' && this.durationUnit !== 'hour')
+        if (this.durationUnit !== 'hour')
         {
           this.duration = 1;
-          this.durationUnit = 'hours';
+          this.durationUnit = 'hour';
         }
       }
     }
@@ -622,7 +799,7 @@ export class Schedule<M>
    */
   public adjustDefinedSpan(addSpan: boolean = false): this
   {
-    let single: DaySpan = this.getSingleEventSpan();
+    const single: DaySpan = this.getSingleEventSpan();
 
     if (single && (addSpan || (this.start && this.end)))
     {
@@ -642,8 +819,8 @@ export class Schedule<M>
    */
   public getFullSpan(day: Day): DaySpan
   {
-    let start: Day = day.start();
-    let end: Day = start.add( this.duration, this.durationUnit );
+    const start: Day = day.start();
+    const end: Day = start.add( this.duration, this.durationUnit );
 
     return new DaySpan( start, end );
   }
@@ -658,8 +835,8 @@ export class Schedule<M>
    */
   public getTimeSpan(day: Day, time: Time): DaySpan
   {
-    let start: Day = day.withTime( time );
-    let end: Day = start.add( this.duration, this.durationUnit );
+    const start: Day = day.withTime( time );
+    const end: Day = start.add( this.duration, this.durationUnit );
 
     return new DaySpan( start, end );
   }
@@ -688,9 +865,9 @@ export class Schedule<M>
       return false;
     }
 
-    for (let check of this.checks)
+    for (const check of this.checks)
     {
-      if (!check( <number>day[ check.property ] ))
+      if (!check( day[ check.property ] as number ))
       {
         return false;
       }
@@ -709,7 +886,7 @@ export class Schedule<M>
    */
   public hasIncludedTime(day: Day): boolean
   {
-    return !this.iterateIncludeTimes( day ).isEmpty();
+    return !this.iterateIncludeTimes( day ).empty();
   }
 
   /**
@@ -738,7 +915,7 @@ export class Schedule<M>
       return false;
     }
 
-    for (let time of this.times)
+    for (const time of this.times)
     {
       if (!this.isExcluded( day.withTime( time ) ))
       {
@@ -759,7 +936,7 @@ export class Schedule<M>
    *     day for event occurrences.
    * @returns The next day on the schedule or `null` if none exists.
    */
-  public nextDay(day: Day, includeDay: boolean = false, lookAhead: number = 366): Day
+  public nextDay(day: Day, includeDay: boolean = false, lookAhead: number = Constants.DAYS_IN_YEAR): Day
   {
     return this.iterateDaycast(day, 1, true, includeDay, lookAhead).first();
   }
@@ -777,7 +954,7 @@ export class Schedule<M>
    * @returns An array containing the next days on the schedule that events
    *    start or an empty array if there are none.
    */
-  public nextDays(day: Day, max: number, includeDay: boolean = false, lookAhead: number = 366): Iterator<Day>
+  public nextDays(day: Day, max: number, includeDay: boolean = false, lookAhead: number = Constants.DAYS_IN_YEAR): Iter<M>
   {
     return this.iterateDaycast(day, max, true, includeDay, lookAhead);
   }
@@ -792,7 +969,7 @@ export class Schedule<M>
    *     day for event occurrences.
    * @returns The previous day on the schedule or `null` if none exists.
    */
-  public prevDay(day: Day, includeDay: boolean = false, lookBack: number = 366): Day
+  public prevDay(day: Day, includeDay: boolean = false, lookBack: number = Constants.DAYS_IN_YEAR): Day
   {
     return this.iterateDaycast(day, 1, false, includeDay, lookBack).first();
   }
@@ -810,7 +987,7 @@ export class Schedule<M>
    * @returns An array containing the previous days on the schedule that events
    *    start or an empty array if there are none.
    */
-  public prevDays(day: Day, max: number, includeDay: boolean = false, lookBack: number = 366): Iterator<Day>
+  public prevDays(day: Day, max: number, includeDay: boolean = false, lookBack: number = Constants.DAYS_IN_YEAR): Iter<M>
   {
     return this.iterateDaycast(day, max, false, includeDay, lookBack);
   }
@@ -828,11 +1005,12 @@ export class Schedule<M>
    * @returns A new Iterator for the days found in the cast.
    * @see [[Schedule.iterateSpans]]
    */
-  public iterateDaycast(day: Day, max: number, next: boolean, includeDay: boolean = false, lookup: number = 366): Iterator<Day>
+  public iterateDaycast(day: Day, max: number, next: boolean, includeDay: boolean = false, lookup: number = Constants.DAYS_IN_YEAR): Iter<M>
   {
-    return new Iterator<Day>(iterator =>
+    return new Iterate<Day, number, Schedule<M>>(iterator =>
     {
       let iterated: number = 0;
+      let acted: number = 0;
 
       for (let days = 0; days < lookup; days++)
       {
@@ -841,11 +1019,11 @@ export class Schedule<M>
           day = next ? day.next() : day.prev();
         }
 
-        if (!this.iterateSpans( day, false ).isEmpty())
+        if (!this.iterateSpans( day, false ).empty())
         {
-          let action: IteratorAction = iterator.act( day );
+          const action: IterateAction = iterator.act( day, acted++ );
 
-          if (action === IteratorAction.Stop || ++iterated >= max)
+          if (action === IterateAction.STOP || ++iterated >= max)
           {
             return;
           }
@@ -864,12 +1042,13 @@ export class Schedule<M>
    *    only look at the given day for the start of events.
    * @returns A new Iterator for all the spans found.
    */
-  public iterateSpans(day: Day, covers: boolean = false): Iterator<DaySpan>
+  public iterateSpans(day: Day, covers: boolean = false): Iter<M, DaySpan>
   {
-    return new Iterator<DaySpan>(iterator =>
+    return new Iterate<DaySpan, number, Schedule<M>>(iterator =>
     {
       let current: Day = day;
       let lookBehind: number = covers ? this.durationInDays : 0;
+      let key: number = 0;
 
       // If the events start at the end of the day and may last multiple days....
       if (this.isFullDay())
@@ -882,14 +1061,14 @@ export class Schedule<M>
           if (this.matchesDay( current ))
           {
             // Build a DaySpan with the given start day and the schedules duration.
-            let span: DaySpan = this.getFullSpan( current );
+            const span: DaySpan = this.getFullSpan( current );
 
             // If that dayspan intersects with the given day, it's a winner!
             if (span.matchesDay( day ))
             {
-              switch (iterator.act( span ))
+              switch (iterator.act( span, key++ ))
               {
-                case IteratorAction.Stop:
+                case IterateAction.STOP:
                   return;
               }
             }
@@ -910,17 +1089,17 @@ export class Schedule<M>
           if (this.matchesDay( current ))
           {
             // Iterate through each daily occurrence in the schedule...
-            for (let time of this.times)
+            for (const time of this.times)
             {
-              let span: DaySpan = this.getTimeSpan( current, time );
+              const span: DaySpan = this.getTimeSpan( current, time );
 
               // If the event intersects with the given day and the occurrence
               // has not specifically been excluded...
               if (span.matchesDay( day ) && !this.isExcluded( span.start, true ))
               {
-                switch (iterator.act( span ))
+                switch (iterator.act( span, key++ ))
                 {
-                  case IteratorAction.Stop:
+                  case IterateAction.STOP:
                     return;
                 }
               }
@@ -931,23 +1110,24 @@ export class Schedule<M>
             // The current day does not match the schedule, however the schedule
             // might have moved/random event occurrents on the current day.
             // We only want the ones that overlap with the given day.
-            this.iterateIncludeTimes(current, day).iterate((span, timeIterator) =>
+            this.iterateIncludeTimes(current, day).each((span, i, timeIterator) =>
             {
-              switch (iterator.act( span ))
+              switch (iterator.act( span, key++ ))
               {
-                case IteratorAction.Stop:
+                case IterateAction.STOP:
                   timeIterator.stop();
                   break;
               }
             })
 
-            if (iterator.action === IteratorAction.Stop)
+            if (iterator.action === IterateAction.STOP)
             {
               return;
             }
           }
 
           lookBehind--;
+
           // Generating current.prev() is costly.
           // Avoid generating it if looping condition is no longer satisfied.
           if (lookBehind >= 0) {
@@ -967,7 +1147,7 @@ export class Schedule<M>
    */
   public matchesTime(day: Day): boolean
   {
-    return !!this.iterateSpans( day, true ).first( span => span.start.sameMinute( day ) );
+    return !!this.iterateSpans( day, true ).where( span => span.start.sameMinute( day ) ).first();
   }
 
   /**
@@ -982,7 +1162,7 @@ export class Schedule<M>
    */
   public coversDay(day: Day): boolean
   {
-    return !this.iterateSpans( day, true ).isEmpty();
+    return !this.iterateSpans( day, true ).empty();
   }
 
   /**
@@ -995,7 +1175,7 @@ export class Schedule<M>
    */
   public coversTime(day: Day): boolean
   {
-    return !!this.iterateSpans( day, true ).first( span => span.contains( day ) );
+    return !!this.iterateSpans( day, true ).where( span => span.contains( day ) ).first();
   }
 
   /**
@@ -1022,7 +1202,7 @@ export class Schedule<M>
    */
   public setExcluded(time: Day, excluded: boolean = true): this
   {
-    let type: Identifier = this.identifierType;
+    const type: Identifier = this.identifierType;
 
     this.exclude.set( time, excluded, type );
     this.include.set( time, !excluded, type );
@@ -1059,7 +1239,9 @@ export class Schedule<M>
 
     for (let i = 0; i < this.times.length && !found; i++)
     {
-      if (found = time.matches( this.times[ i ] ))
+      found = time.matches( this.times[ i ] )
+
+      if (found)
       {
         this.times.splice( i, 1 );
       }
@@ -1116,7 +1298,9 @@ export class Schedule<M>
 
     for (let i = 0; i < this.times.length && !found; i++)
     {
-      if (found = fromTime.matches( this.times[ i ] ))
+      found = fromTime.matches( this.times[ i ] )
+      
+      if (found)
       {
         this.times.splice( i, 1, toTime );
       }
@@ -1148,7 +1332,7 @@ export class Schedule<M>
    */
   public moveInstance(fromTime: Day, toTime: Day): boolean
   {
-    let type: Identifier = this.identifierType;
+    const type: Identifier = this.identifierType;
 
     this.exclude.set( fromTime, true, type );
     this.exclude.set( toTime, false, type );
@@ -1166,7 +1350,7 @@ export class Schedule<M>
       }
     }
 
-    let meta: M = this.meta.get( fromTime, null );
+    const meta: M = this.meta.get( fromTime, null );
 
     if (meta && meta !== this.meta.get( toTime, null ))
     {
@@ -1200,11 +1384,11 @@ export class Schedule<M>
       return false;
     }
 
-    for (let check of this.checks)
+    for (const check of this.checks)
     {
-      let prop: DayProperty  = check.property;
-      let value = toTime[ prop ];
-      let frequency: FrequencyCheck = Parse.frequency( [value], prop );
+      const prop: DayProperty  = check.property;
+      const value = toTime[ prop ];
+      const frequency: FrequencyCheck = Parse.frequency( [value], prop );
 
       this[ prop ] = frequency;
     }
@@ -1216,7 +1400,7 @@ export class Schedule<M>
 
     this.updateChecks();
 
-    let span: DaySpan = this.getSingleEventSpan();
+    const span: DaySpan = this.getSingleEventSpan();
 
     if (this.start)
     {
@@ -1227,6 +1411,8 @@ export class Schedule<M>
     {
       this.end = span.end.end();
     }
+
+    this.updateEnd();
 
     return true;
   }
@@ -1245,8 +1431,8 @@ export class Schedule<M>
       return null;
     }
 
-    let startOfYear: Day = Day.build( this.year.input[0], 0, 1 );
-    let start: Day = this.iterateDaycast( startOfYear, 1, true, true, 366 ).first();
+    const startOfYear: Day = Day.build( this.year.input[0], 0, 1 );
+    const start: Day = this.iterateDaycast( startOfYear, 1, true, true, Constants.DAYS_IN_YEAR ).first();
 
     if (!start)
     {
@@ -1401,7 +1587,6 @@ export class Schedule<M>
   {
     return this.isSingleFrequency( this.weekspanOfYear ) ||
       this.isSingleFrequency( this.fullWeekOfYear ) ||
-      this.isSingleFrequency( this.week ) ||
       this.isSingleFrequency( this.weekOfYear ) ||
       this.isSingleFrequency( this.lastFullWeekOfYear ) ||
       this.isSingleFrequency( this.lastWeekspanOfYear );
@@ -1414,7 +1599,7 @@ export class Schedule<M>
    */
   public isSingleFrequency(frequency: FrequencyCheck): boolean
   {
-    return fn.isArray( frequency.input ) && (<number[]>frequency.input).length === 1;
+    return fn.isFrequencyValueOneOf(frequency) && frequency.length === 1;
   }
 
   /**
@@ -1426,8 +1611,8 @@ export class Schedule<M>
    * @param covers If `true` spans which span multiple days will be looked at
    *    to see if they intersect with the given day, otherwise `false` will
    *    only look at the given day for the start of events.
-   * @param daysAfter The number of events to return before the given day.
-   * @param daysBefore The number of events to return after the given day.
+   * @param daysAfter The number of events to return after the given day.
+   * @param daysBefore The number of events to return before the given day.
    * @param times If timed events should be returned, or only one for each day.
    * @param lookAround How many days to look before and after the given day for
    *    event occurrences.
@@ -1440,22 +1625,24 @@ export class Schedule<M>
     daysAfter: number,
     daysBefore: number = daysAfter,
     times: boolean = false,
-    lookAround: number = 366): Iterator<ScheduleEventTuple>
+    lookAround: number = Constants.DAYS_IN_YEAR): Iter<M, ScheduleEventTuple>
   {
-    let type: Identifier = this.identifierType;
+    const type: Identifier = this.identifierType;
 
-    let tuplesForDay = (day: Day, tuples: Iterator<ScheduleEventTuple>): boolean =>
+    let tupleIndex: number = 0;
+
+    const tuplesForDay = (day: Day, tuples: Iter<M, ScheduleEventTuple>): boolean =>
     {
-      let spans: DaySpan[] = this.iterateSpans( day, covers ).list();
-      let last: number = times ? spans.length : Math.min( 1, spans.length );
-      let offset: number = times ? 0 : spans.length - 1;
+      const spans: DaySpan[] = this.iterateSpans( day, covers ).array();
+      const last: number = times ? spans.length : Math.min( 1, spans.length );
+      const offset: number = times ? 0 : spans.length - 1;
 
       for (let i = 0; i < last; i++)
       {
-        let span: DaySpan = spans[ i + offset ];
-        let id: IdentifierInput = type.get( span.start );
+        const span: DaySpan = spans[ i + offset ];
+        const id: IdentifierInput = type.get( span.start );
 
-        if (tuples.act( [ span, day, id ] ) === IteratorAction.Stop)
+        if (tuples.act( [ span, day, id ], tupleIndex++ ) === IterateAction.STOP)
         {
           return false;
         }
@@ -1464,7 +1651,7 @@ export class Schedule<M>
       return true;
     };
 
-    let prev = new Iterator<ScheduleEventTuple>(iterator =>
+    const prev = new Iterate<ScheduleEventTuple, number, Schedule<M>>(iterator =>
     {
       let curr: Day = around;
 
@@ -1479,7 +1666,7 @@ export class Schedule<M>
       }
     });
 
-    let next = new Iterator<ScheduleEventTuple>(iterator =>
+    const next = new Iterate<ScheduleEventTuple, number, Schedule<M>>(iterator =>
     {
       let curr: Day = around;
 
@@ -1505,20 +1692,20 @@ export class Schedule<M>
    * @param matchAgainst The day to test against the timed event.
    * @returns A new Iterator for all the included spans found.
    */
-  public iterateIncludeTimes(day: Day, matchAgainst: Day = day): Iterator<DaySpan>
+  public iterateIncludeTimes(day: Day, matchAgainst: Day = day): Iterate<DaySpan, string, ScheduleModifier<boolean>>
   {
-    let isIncludedTime = (result: [IdentifierInput, boolean]) =>
+    const isIncludedTime = (result: [IdentifierInput, boolean]) =>
     {
-      let [id, included] = result;
+      const [id, included] = result;
 
       return included && Identifier.Time.is( id );
     };
 
-    let getSpan = (result: [IdentifierInput, boolean]) =>
+    const getSpan = (result: [IdentifierInput, boolean]) =>
     {
-      let [id] = result;
-      let time: Day = Identifier.Time.start( id );
-      let span: DaySpan = this.getTimeSpan( time, time.asTime() );
+      const [id] = result;
+      const time: Day = Identifier.Time.start( id );
+      const span: DaySpan = this.getTimeSpan( time, time.asTime() );
 
       if (span.matchesDay( matchAgainst ))
       {
@@ -1526,7 +1713,7 @@ export class Schedule<M>
       }
     };
 
-    return this.include.query( day.dayIdentifier ).map<DaySpan>( getSpan, isIncludedTime );
+    return this.include.query( day.dayIdentifier ).where( isIncludedTime ).transform<DaySpan>( getSpan );
   }
 
   /**
@@ -1551,26 +1738,29 @@ export class Schedule<M>
    * @param timeFormat The time format to use when returning the times as strings.
    * @param alwaysDuration If the duration values (`duration` and
    *    `durationUnit`) should always be returned in the input.
+   * @param alwaysReturnEnd If end should be in the input even if 
+   *    maxOccurrences is specified on the schedule.
    * @returns The input that describes this schedule.
    * @see [[Time.format]]
    */
-  public toInput(returnDays: boolean = false, returnTimes: boolean = false, timeFormat: string = '', alwaysDuration: boolean = false): ScheduleInput<M>
+  public toInput(returnDays: boolean = false, returnTimes: boolean = false, timeFormat: string = '', alwaysDuration: boolean = false, alwaysReturnEnd: boolean = false): ScheduleInput<M>
   {
-    let defaultUnit: string = Constants.DURATION_DEFAULT_UNIT( this.isFullDay() );
-    let exclusions: IdentifierInput[] = this.exclude.identifiers(v => v).list();
-    let inclusions: IdentifierInput[] = this.include.identifiers(v => v).list();
-    let cancels: IdentifierInput[] = this.cancel.identifiers(v => v).list();
-    let hasMeta: boolean = !this.meta.isEmpty();
-    let out: ScheduleInput<M> = {};
-    let times: TimeInput[]  = [];
+    const defaultUnit: string = Constants.DURATION_DEFAULT_UNIT( this.isFullDay() );
+    const exclusions: IdentifierInput[] = this.exclude.identifiers(v => v).array();
+    const inclusions: IdentifierInput[] = this.include.identifiers(v => v).array();
+    const cancels: IdentifierInput[] = this.cancel.identifiers(v => v).array();
+    const hasMeta: boolean = !this.meta.isEmpty();
+    const out: ScheduleInput<M> = {};
+    const times: TimeInput[]  = [];
 
-    for (let time of this.times)
+    for (const time of this.times)
     {
       times.push( returnTimes ? time : (timeFormat ? time.format( timeFormat ) : time.toString()) );
     }
 
     if (this.start) out.start = returnDays ? this.start : this.start.time;
-    if (this.end) out.end = returnDays ? this.end : this.end.time;
+    if (this.end && (alwaysReturnEnd || this.maxOccurrences < 1)) out.end = returnDays ? this.end : this.end.time;
+    if (this.maxOccurrences > 0) out.maxOccurrences = this.maxOccurrences;
     if (times.length) out.times = times;
     if (alwaysDuration || this.duration !== Constants.DURATION_DEFAULT) out.duration = this.duration;
     if (alwaysDuration || this.durationUnit !== defaultUnit) out.durationUnit = this.durationUnit;
@@ -1584,7 +1774,7 @@ export class Schedule<M>
     if (this.dayOfYear.input) out.dayOfYear = this.dayOfYear.input;
     if (this.year.input) out.year = this.year.input;
     if (this.month.input) out.month = this.month.input;
-    if (this.week.input) out.week = this.week.input;
+    if (this.day.input) out.day = this.day.input;
     if (this.weekOfYear.input) out.weekOfYear = this.weekOfYear.input;
     if (this.weekspanOfYear.input) out.weekspanOfYear = this.weekspanOfYear.input;
     if (this.fullWeekOfYear.input) out.fullWeekOfYear = this.fullWeekOfYear.input;
@@ -1627,96 +1817,86 @@ export class Schedule<M>
     includeIncludes: boolean = false,
     includeCancels: boolean = false): string
   {
+    const lang = Locales.current;
     let out: string = '';
 
     if (includeRange)
     {
       if (this.start)
       {
-        out += 'Starting on ' + this.start.format('dddd Do, YYYY');
+        out += lang.scheduleStartingOn(this.start);
 
         if (this.end)
         {
-          out += ' and ending on ' + this.end.format('dddd Do, YYYY');
+          out += lang.scheduleEndingOn(this.end);
         }
       }
       else if (this.end)
       {
-        out += 'Up until ' + this.end.format('dddd Do, YYYY');
+        out += lang.scheduleEndsOn(this.end);
       }
     }
 
-    if (out)
-    {
-      out += ' the ' + thing + ' will occur';
-    }
-    else
-    {
-      out += 'The ' + thing + ' will occur';
-    }
+    out += lang.scheduleThing(thing, !out);
 
-    out += this.describeRule( this.dayOfWeek.input, 'day of the week', x => moment.weekdays()[x], 1, false);
-    out += this.describeRule( this.lastDayOfMonth.input, 'last day of the month', x => Suffix.CACHE[x] );
-    out += this.describeRule( this.dayOfMonth.input, 'day of the month', x => Suffix.CACHE[x] );
-    out += this.describeRule( this.dayOfYear.input, 'day of the year', x => Suffix.CACHE[x], 1 );
-    out += this.describeRule( this.year.input, 'year', x => x, 0, false, ' in ' );
-    out += this.describeRule( this.month.input, 'month', x => moment.months()[x], 0, false, ' in ' );
-    out += this.describeRule( this.weekOfYear.input, 'week of the year', x => Suffix.CACHE[x] );
-    out += this.describeRule( this.weekspanOfYear.input, 'weekspan of the year', x => Suffix.CACHE[x + 1], 1 );
-    out += this.describeRule( this.fullWeekOfYear.input, 'full week of the year', x => Suffix.CACHE[x] );
-    out += this.describeRule( this.lastWeekspanOfYear.input, 'last weekspan of the year', x => Suffix.CACHE[x + 1], 1 );
-    out += this.describeRule( this.lastFullWeekOfYear.input, 'last full week of the year', x => Suffix.CACHE[x] );
-    out += this.describeRule( this.weekOfMonth.input, 'week of the month', x => Suffix.CACHE[x] );
-    out += this.describeRule( this.fullWeekOfMonth.input, 'full week of the month', x => Suffix.CACHE[x] );
-    out += this.describeRule( this.weekspanOfMonth.input, 'weekspan of the month', x => Suffix.CACHE[x + 1], 1 );
-    out += this.describeRule( this.lastFullWeekOfMonth.input, 'last full week of the month', x => Suffix.CACHE[x] );
-    out += this.describeRule( this.lastWeekspanOfMonth.input, 'last weekspan of the month', x => Suffix.CACHE[x + 1], 1 );
+    out += this.describeRule( this.dayOfWeek.input, lang.ruleDayOfWeek );
+    out += this.describeRule( this.day.input, lang.ruleDay );
+    out += this.describeRule( this.lastDayOfMonth.input, lang.ruleLastDayOfMonth );
+    out += this.describeRule( this.dayOfMonth.input, lang.ruleDayOfMonth );
+    out += this.describeRule( this.dayOfYear.input, lang.ruleDayOfYear );
+    out += this.describeRule( this.year.input, lang.ruleYear );
+    out += this.describeRule( this.month.input, lang.ruleMonth );
+    out += this.describeRule( this.weekOfYear.input, lang.ruleWeekOfYear );
+    out += this.describeRule( this.weekspanOfYear.input, lang.ruleWeekspanOfYear );
+    out += this.describeRule( this.fullWeekOfYear.input, lang.ruleFullWeekOfYear );
+    out += this.describeRule( this.lastWeekspanOfYear.input, lang.ruleLastWeekspanOfYear );
+    out += this.describeRule( this.lastFullWeekOfYear.input, lang.ruleLastFullWeekOfYear );
+    out += this.describeRule( this.weekOfMonth.input, lang.ruleWeekOfMonth );
+    out += this.describeRule( this.fullWeekOfMonth.input, lang.ruleFullWeekOfMonth );
+    out += this.describeRule( this.weekspanOfMonth.input, lang.ruleWeekspanOfMonth );
+    out += this.describeRule( this.lastFullWeekOfMonth.input, lang.ruleLastFullWeekOfMonth );
+    out += this.describeRule( this.lastWeekspanOfMonth.input, lang.ruleLastWeekspanOfMonth );
 
     if (includeTimes && this.times.length)
     {
-      out += ' at ';
+      out += lang.scheduleAtTimes;
       out += this.describeArray( this.times, x => x.format('hh:mm a') );
     }
 
     if (includeDuration && this.duration !== Constants.DURATION_DEFAULT)
     {
-      out += ' lasting ' + this.duration + ' ';
-
-      if (this.durationUnit)
-      {
-        out += this.durationUnit + ' ';
-      }
+      out += lang.scheduleDuration(this.duration, this.durationUnit);
     }
 
     if (includeExcludes)
     {
-      let excludes: ScheduleModifierSpan<boolean>[] = this.exclude.spans().list();
+      const excludes: ScheduleModifierSpan<boolean>[] = this.exclude.spans().array();
 
       if (excludes.length)
       {
-        out += ' excluding ';
+        out += lang.scheduleExcludes;
         out += this.describeArray( excludes, x => x.span.summary(Units.DAY) );
       }
     }
 
     if (includeIncludes)
     {
-      let includes: ScheduleModifierSpan<boolean>[] = this.include.spans().list();
+      const includes: ScheduleModifierSpan<boolean>[] = this.include.spans().array();
 
       if (includes.length)
       {
-        out += ' including ';
+        out += lang.scheduleIncludes;
         out += this.describeArray( includes, x => x.span.summary(Units.DAY) );
       }
     }
 
     if (includeCancels)
     {
-      let cancels: ScheduleModifierSpan<boolean>[] = this.cancel.spans().list();
+      const cancels: ScheduleModifierSpan<boolean>[] = this.cancel.spans().array();
 
       if (cancels.length)
       {
-        out += ' with cancellations on ';
+        out += lang.scheduleCancels;
         out += this.describeArray( cancels, x => x.span.summary(Units.DAY) );
       }
     }
@@ -1728,47 +1908,28 @@ export class Schedule<M>
    * Describes the given frequency.
    *
    * @param value The frequency to describe.
-   * @param unit The unit of the frequency.
-   * @param map How the values in the frequency should be described.
-   * @param everyOffset A value to add to a [[FrequencyValueEvery]] offset to
-   *    account for zero-based values that should be shifted for human
-   *    friendliness.
-   * @param the If the word 'the' should be used to describe the unit.
-   * @param on The word which preceeds values of the given unit.
-   * @param required If the description should always return a non-empty string
-   *    even if the frequency was not specified in the original input.
+   * @param localeRule The locale rule used to describe the frequency.
    * @returns A string description of the frequency.
    */
-  private describeRule(value: FrequencyValue, unit: string, map: (x: number) => any, everyOffset: number = 0, the: boolean = true, on: string = ' on ', required: boolean = false): string
+  private describeRule(value: FrequencyValue, localeRule: LocaleRule): string
   {
-    let out: string = '';
-    let suffix: string = the ? ' ' + unit : '';
+    let out = '';
 
     if (fn.isFrequencyValueEvery(value))
     {
-      let valueEvery: FrequencyValueEvery = <FrequencyValueEvery>value;
+      out += ' ' + localeRule.every(value.every);
 
-      out += ' every ' + Suffix.CACHE[ valueEvery.every ] + ' ' + unit;
-
-      if (valueEvery.offset)
+      if (value.offset)
       {
-        out += ' starting at ' + map( valueEvery.offset + everyOffset ) + suffix;
+        out += ' ' + localeRule.offset(value.offset);
       }
     }
     else if (fn.isFrequencyValueOneOf(value))
     {
-      let valueOne: FrequencyValueOneOf = <FrequencyValueOneOf>value;
-
-      if (valueOne.length)
+      if (value.length)
       {
-        out += on + (the ? 'the ' : '');
-        out += this.describeArray( valueOne, map );
-        out += suffix;
+        out += ' ' + localeRule.oneOf(value);
       }
-    }
-    else if (required)
-    {
-      out +=  on + 'any ' + unit;
     }
 
     return out;
@@ -1784,22 +1945,7 @@ export class Schedule<M>
    */
   private describeArray<T>(array: T[], map: (item: T) => string): string
   {
-    let out: string = '';
-    let last: number = array.length - 1;
-
-    out += map( array[ 0 ] );
-
-    for (let i = 1; i < last; i++)
-    {
-      out += ', ' + map( array[ i ] );
-    }
-
-    if (last > 0)
-    {
-      out += ' and ' + map( array[ last ] );
-    }
-
-    return out;
+    return Locales.current.list(array.map(map));
   }
 
   /**
@@ -1812,7 +1958,7 @@ export class Schedule<M>
    */
   public static forDay<M>(input: DayInput, days: number = 1): Schedule<M>
   {
-    let day: Day = Day.parse( input );
+    const day: Day = Day.parse( input );
 
     if (!day)
     {
@@ -1824,7 +1970,7 @@ export class Schedule<M>
       month: [ day.month ],
       dayOfMonth: [ day.dayOfMonth ],
       duration: days,
-      durationUnit: 'days'
+      durationUnit: 'day'
     });
   }
 
@@ -1838,9 +1984,9 @@ export class Schedule<M>
    * @param durationUnit The unit for the duration of the event.
    * @returns A new schedule that starts on the given day and time.
    */
-  public static forTime<M>(input: DayInput, time: TimeInput, duration: number = 1, durationUnit: DurationInput = 'hours'): Schedule<M>
+  public static forTime<M>(input: DayInput, time: TimeInput, duration: number = 1, durationUnit: Unit = 'hour'): Schedule<M>
   {
-    let day: Day = Day.parse( input );
+    const day: Day = Day.parse( input );
 
     if (!day)
     {
@@ -1852,8 +1998,8 @@ export class Schedule<M>
       month: [ day.month ],
       dayOfMonth: [ day.dayOfMonth ],
       times: [ time ],
-      duration: duration,
-      durationUnit: durationUnit
+      duration,
+      durationUnit
     });
   }
 
@@ -1865,12 +2011,12 @@ export class Schedule<M>
    */
   public static forSpan<M>(span: DaySpan): Schedule<M>
   {
-    let start = span.start;
-    let minutes = span.minutes();
-    let isDay = minutes % Constants.MINUTES_IN_DAY === 0;
-    let isHour = minutes % Constants.MINUTES_IN_HOUR === 0;
-    let duration = isDay ? minutes / Constants.MINUTES_IN_DAY : (isHour ? minutes / Constants.MINUTES_IN_HOUR : minutes);
-    let durationUnit: DurationInput = isDay ? 'days' : (isHour ? 'hours' : 'minutes');
+    const start = span.start;
+    const minutes = span.minutes();
+    const isDay = minutes % Constants.MINUTES_IN_DAY === 0;
+    const isHour = minutes % Constants.MINUTES_IN_HOUR === 0;
+    const duration = isDay ? minutes / Constants.MINUTES_IN_DAY : (isHour ? minutes / Constants.MINUTES_IN_HOUR : minutes);
+    const durationUnit: Unit = isDay ? 'day' : (isHour ? 'hour' : 'minute');
 
     return this.forTime<M>( start, start.asTime(), duration, durationUnit );
   }

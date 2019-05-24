@@ -1,18 +1,13 @@
 
-import { Identifier, IdentifierInput } from './Identifier';
 import { Constants } from './Constants';
+import { add, compare, diff, endOf, getDayOfWeek, getDayOfYear, getDaysInMonth, getDaysInYear, getFullWeekOfMonth, getFullWeekOfYear, getLastDayOfMonth, getLastFullWeekOfMonth, getLastFullWeekOfYear, getLastWeekspanOfMonth, getLastWeekspanOfYear, getQuarter, getWeekOfMonth, getWeekOfYear, getWeeksInYear, getWeekspanOfMonth, getWeekspanOfYear, isDaylightSavingTime, isLeapYear, mutate, startOf, Unit } from './DateFunctions';
+import { Identifier, IdentifierInput } from './Identifier';
+import { Locale, LocaleOptions, Locales } from './Locale';
 import { Op, operate } from './Operation';
 import { Parse } from './Parse';
+import { Ref } from './Ref';
 import { Time } from './Time';
 
-// @ts-ignore
-import * as moment from 'moment';
-
-
-/**
- * Valid durations that can be specified.
- */
-export type DurationInput = moment.unitOfTime.DurationConstructor;
 
 /**
  * All valid types which may be converted to a [[Day]] instance.
@@ -29,18 +24,48 @@ export type DayInput = number | string | Day | number[] | object | true;
 /**
  * One of the properties on the [[Day]] object.
  */
-export type DayProperty = keyof Day;
+export type DayProperty = keyof DayFrequency;
+
+/**
+ * 
+ */
+export interface DayFrequency
+{
+  time: number;
+  millis: number;
+  seconds: number;
+  minute: number;
+  hour: number;
+  month: number;
+  year: number;
+  day: number;
+  dayOfMonth: number;
+  quarter: number;
+  dayOfYear: number;
+  dayOfWeek: number;
+  lastDayOfMonth: number;
+  weekOfYear: number;
+  weekspanOfYear: number;
+  fullWeekOfYear: number;
+  lastFullWeekOfYear: number;
+  lastWeekspanOfYear: number;
+  weekOfMonth: number;
+  weekspanOfMonth: number;
+  fullWeekOfMonth: number;
+  lastFullWeekOfMonth: number;
+  lastWeekspanOfMonth: number;
+}
 
 /**
  * A class which represents a point in time as
  */
-export class Day
+export class Day implements DayFrequency
 {
 
   /**
    *
    */
-  public readonly date: moment.Moment;
+  public readonly date: Date;
 
   /**
    *
@@ -77,154 +102,328 @@ export class Day
    */
   public readonly year: number;
 
+
   /**
-   *
+   * The day of the week, starting at 0 for Sunday.
    */
-  public readonly quarter: number;
-
-
-  /**
-   *
-   */
-  public readonly dayOfWeek: number;
+  public readonly day: number;
 
   /**
-   *
+   * The day of the month, starting at 1 for the 1st.
    */
   public readonly dayOfMonth: number;
 
-  /**
-   *
-   */
-  public readonly lastDayOfMonth: number;
 
-  /**
-   *
-   */
-  public readonly dayOfYear: number;
+  private _locale: Ref<Locale>;
 
 
   /**
    *
    */
-  public readonly week: number;
-
-  /**
-   *
-   */
-  public readonly weekOfYear: number;
-
-  /**
-   *
-   */
-  public readonly weekspanOfYear: number;
-
-  /**
-   *
-   */
-  public readonly fullWeekOfYear: number;
-
-  /**
-   *
-   */
-  public readonly lastWeekspanOfYear: number;
-
-  /**
-   *
-   */
-  public readonly lastFullWeekOfYear: number;
-
-
-  /**
-   *
-   */
-  public readonly weekOfMonth: number;
-
-  /**
-   *
-   */
-  public readonly weekspanOfMonth: number;
-
-  /**
-   *
-   */
-  public readonly fullWeekOfMonth: number;
-
-  /**
-   *
-   */
-  public readonly lastWeekspanOfMonth: number;
-
-  /**
-   *
-   */
-  public readonly lastFullWeekOfMonth: number;
-
-
-  /**
-   *
-   */
-  public readonly timeIdentifier: IdentifierInput;
-
-  /**
-   *
-   */
-  public readonly dayIdentifier: IdentifierInput;
-
-  /**
-   *
-   */
-  public readonly weekIdentifier: IdentifierInput;
-
-  /**
-   *
-   */
-  public readonly monthIdentifier: IdentifierInput;
-
-  /**
-   *
-   */
-  public readonly quarterIdentifier: IdentifierInput;
-
-
-
-  /**
-   *
-   */
-  public constructor(date: moment.Moment)
+  public constructor(date: Date)
   {
     this.date                 = date;
     this.time                 = date.valueOf();
-    this.millis               = date.millisecond();
-    this.seconds              = date.second();
-    this.minute               = date.minute();
-    this.hour                 = date.hour();
-    this.month                = date.month();
-    this.year                 = date.year();
-    this.quarter              = date.quarter();
-    this.dayOfWeek            = date.day();
-    this.dayOfMonth           = date.date();
-    this.dayOfYear            = date.dayOfYear();
-    this.week                 = date.week();
+    this.millis               = date.getMilliseconds();
+    this.seconds              = date.getSeconds();
+    this.minute               = date.getMinutes();
+    this.hour                 = date.getHours();
+    this.month                = date.getMonth();
+    this.year                 = date.getFullYear();
+    this.day                  = date.getDay();
+    this.dayOfMonth           = date.getDate();
 
-    this.lastDayOfMonth       = Day.getLastDayOfMonth( date );
-    this.weekOfYear           = Day.getWeekOfYear( date );
-    this.weekspanOfYear       = Day.getWeekspanOfYear( date );
-    this.fullWeekOfYear       = Day.getFullWeekOfYear( date );
-    this.lastWeekspanOfYear   = Day.getLastWeekspanOfYear( date );
-    this.lastFullWeekOfYear   = Day.getLastFullWeekOfYear( date );
+    this._locale = Locales.ref;
+  }
 
-    this.weekOfMonth          = Day.getWeekOfMonth( date );
-    this.weekspanOfMonth      = Day.getWeekspanOfMonth( date );
-    this.fullWeekOfMonth      = Day.getFullWeekOfMonth( date );
-    this.lastWeekspanOfMonth  = Day.getLastWeekspanOfMonth( date );
-    this.lastFullWeekOfMonth  = Day.getLastFullWeekOfMonth( date );
+  /**
+   * The quarter of the year this day is in.
+   */
+  public get quarter(): number 
+  {
+    return this.getValue('_quarter', getQuarter);
+  }
 
-    this.timeIdentifier       = Identifier.Time.get( this );
-    this.dayIdentifier        = Identifier.Day.get( this);
-    this.weekIdentifier       = Identifier.Week.get( this);
-    this.monthIdentifier      = Identifier.Month.get( this);
-    this.quarterIdentifier    = Identifier.Quarter.get( this );
+  public _quarter: number = null;
+
+  /**
+   * The day of the year, starting at 1 for the 1st of January.
+   */
+  public get dayOfYear(): number 
+  {
+    return this.getValue('_dayOfYear', getDayOfYear);
+  }
+
+  public _dayOfYear: number = null;
+
+  /**
+   * The day of the week relative to the first day of the week specified by
+   * [[Locale.weekStartsOn]]. So if the week starts on Monday, then this will
+   * be 0 for Monday, 1 for Tuesday, etc.
+   */
+  public get dayOfWeek(): number
+  {
+    return this.getLocaleValue('_dayOfWeek', getDayOfWeek);
+  }
+
+  public _dayOfWeek: number = null;
+
+  /**
+   * The last day of the month, starting at 1 for the last day, 2 for the 2nd 
+   * to last, etc.
+   */
+  public get lastDayOfMonth(): number
+  {
+    return this.getValue('_lastDayOfMonth', getLastDayOfMonth);
+  }
+
+  public _lastDayOfMonth: number = null;
+
+  /**
+   * The week of the year. The first week of the year (1) is the first week 
+   * which has the date [[Locale.firstWeekContainsDate]]. If there is a week 
+   * before that it will be 0.
+   */
+  public get weekOfYear(): number
+  {
+    return this.getLocaleValue('_weekOfYear', getWeekOfYear);
+  }
+
+  public _weekOfYear: number = null;
+
+  /**
+   * The weekspan of the year, starting at 0 representing January 1st to the 7th.
+   */
+  public get weekspanOfYear(): number
+  {
+    return this.getValue('_weekspanOfYear', getWeekspanOfYear);
+  }
+
+  public _weekspanOfYear: number = null;
+
+  /**
+   * The full week of the year, starting at 0 for a partial week (if one exists) 
+   * and 1 for the first full week.
+   */
+  public get fullWeekOfYear(): number
+  {
+    return this.getLocaleValue('_fullWeekOfYear', getFullWeekOfYear);
+  }
+
+  public _fullWeekOfYear: number = null;
+
+  /**
+   * The last weekspan of the year, starting at 0 representing December 31st to 
+   * December 25th.
+   */
+  public get lastWeekspanOfYear(): number
+  {
+    return this.getValue('_lastWeekspanOfYear', getLastWeekspanOfYear);
+  }
+
+  public _lastWeekspanOfYear: number = null;
+
+  /**
+   * The last full week of the year, starting at 0 for the last week ending 
+   * before Thursday and 1 for the last week with a Thursday.
+   */
+  public get lastFullWeekOfYear(): number
+  {
+    return this.getLocaleValue('_lastFullWeekOfYear', getLastFullWeekOfYear);
+  }
+
+  public _lastFullWeekOfYear: number = null;
+
+
+  /**
+   * The week of the month. The first week of the month (1) is the first week 
+   * which has the date [[Locale.firstWeekContainsDate]]. If there is a week 
+   * before that it will be 0.
+   */
+  public get weekOfMonth(): number
+  {
+    return this.getLocaleValue('_weekOfMonth', getWeekOfMonth);
+  }
+
+  public _weekOfMonth: number = null;
+
+  /**
+   * The weekspan of the month, starting at 0 representing the 1st to the 7th.
+   */
+  public get weekspanOfMonth(): number
+  {
+    return this.getValue('_weekspanOfMonth', getWeekspanOfMonth);
+  }
+
+  public _weekspanOfMonth: number = null;
+
+  /**
+   * The full week of the month, starting at 0 for a partial week (if one exists) 
+   * and 1 for the first full week.
+   */
+  public get fullWeekOfMonth(): number
+  {
+    return this.getLocaleValue('_fullWeekOfMonth', getFullWeekOfMonth);
+  }
+
+  public _fullWeekOfMonth: number = null;
+
+  /**
+   * The last weekspan of the month, starting at 0 representing 31st to 25th 
+   * for a month with 31 days.
+   */
+  public get lastWeekspanOfMonth(): number
+  {
+    return this.getValue('_lastWeekspanOfMonth', getLastWeekspanOfMonth);
+  }
+
+  public _lastWeekspanOfMonth: number = null;
+
+  /**
+   * The last full week of the month, starting at 0 for the last week ending 
+   * before Thursday and 1 for the last week with a Thursday.
+   */
+  public get lastFullWeekOfMonth(): number
+  {
+    return this.getLocaleValue('_lastFullWeekOfMonth', getLastFullWeekOfMonth);
+  }
+
+  public _lastFullWeekOfMonth: number = null;
+
+  /**
+   *
+   */
+  public get timeIdentifier(): IdentifierInput
+  {
+    return this.getValue('_timeIdentifier', () => Identifier.Time.get(this));
+  }
+
+  public _timeIdentifier: IdentifierInput = null;
+
+  /**
+   *
+   */
+  public get dayIdentifier(): IdentifierInput
+  {
+    return this.getValue('_dayIdentifier', () => Identifier.Day.get(this));
+  }
+
+  public _dayIdentifier: IdentifierInput = null;
+
+  /**
+   *
+   */
+  public get weekIdentifier(): IdentifierInput
+  {
+    return this.getValue('_weekIdentifier', () => Identifier.Week.get(this));
+  }
+
+  public _weekIdentifier: IdentifierInput = null;
+
+  /**
+   *
+   */
+  public get monthIdentifier(): IdentifierInput
+  {
+    return this.getValue('_monthIdentifier', () => Identifier.Month.get(this));
+  }
+
+  public _monthIdentifier: IdentifierInput = null;
+
+  /**
+   *
+   */
+  public get quarterIdentifier(): IdentifierInput
+  {
+    return this.getValue('_quarterIdentifier', () => Identifier.Quarter.get(this));
+  }
+
+  public _quarterIdentifier: IdentifierInput = null;
+
+
+  /**
+   * 
+   * @param property 
+   * @param compute 
+   */
+  private getLocaleValue<K extends keyof Day> (property: K, compute: (date: Date, options: LocaleOptions) => Day[K]): Day[K]
+  {
+    this.checkForUpdate();
+
+    if (this[property] === null)
+    {
+      (this as Day)[property] = compute(this.date, this._locale.value);
+    }
+
+    return this[property];
+  }
+
+  /**
+   * 
+   * @param property 
+   * @param compute 
+   */
+  private getValue<K extends keyof Day> (property: K, compute: (date: Date) => Day[K]): Day[K]
+  {
+    if (this[property] === null)
+    {
+      (this as Day)[property] = compute(this.date);
+    }
+
+    return this[property];
+  }
+
+  /**
+   * 
+   */
+  private checkForUpdate (): void
+  {
+    if (this._locale.dirty)
+    {
+      this._locale = Locales.ref;
+
+      this.resetLocaleCache();
+    }
+  }
+
+  /**
+   * 
+   * @param key 
+   */
+  public setLocale (key: string): void
+  {
+    const locale = Locales.get(key);
+
+    if (locale !== this._locale.value)
+    {
+      this._locale = this._locale.getUpdate(locale);
+
+      this.resetLocaleCache();
+    }
+  }
+
+  /**
+   * 
+   */
+  public getLocale (): Locale
+  {
+    this.checkForUpdate();
+
+    return this._locale.value;
+  }
+
+  /**
+   * 
+   */
+  public resetLocaleCache (): void
+  {
+    this._dayOfWeek = null;
+    this._weekOfYear = null;
+    this._fullWeekOfYear = null;
+    this._lastFullWeekOfYear = null;
+    this._weekOfMonth = null;
+    this._fullWeekOfMonth = null;
+    this._lastFullWeekOfMonth = null;
   }
 
   // Same
@@ -232,7 +431,7 @@ export class Day
   /**
    *
    */
-  public sameDay(day: Day): boolean
+  public sameDay (day: Day): boolean
   {
     return this.dayIdentifier === day.dayIdentifier;
   }
@@ -240,7 +439,7 @@ export class Day
   /**
    *
    */
-  public sameMonth(day: Day): boolean
+  public sameMonth (day: Day): boolean
   {
     return this.monthIdentifier === day.monthIdentifier;
   }
@@ -248,7 +447,7 @@ export class Day
   /**
    *
    */
-  public sameWeek(day: Day): boolean
+  public sameWeek (day: Day): boolean
   {
     return this.weekIdentifier === day.weekIdentifier;
   }
@@ -256,7 +455,7 @@ export class Day
   /**
    *
    */
-  public sameYear(day: Day): boolean
+  public sameYear (day: Day): boolean
   {
     return this.year === day.year;
   }
@@ -264,7 +463,7 @@ export class Day
   /**
    *
    */
-  public sameQuarter(day: Day): boolean
+  public sameQuarter (day: Day): boolean
   {
     return this.quarterIdentifier === day.quarterIdentifier;
   }
@@ -272,239 +471,344 @@ export class Day
   /**
    *
    */
-  public sameHour(day: Day): boolean {
-    return this.dayIdentifier === day.dayIdentifier && this.hour === day.hour;
+  public sameHour (day: Day): boolean 
+  {
+    return this.dayIdentifier === day.dayIdentifier && 
+      this.hour === day.hour;
   }
 
   /**
    *
    */
-  public sameMinute(day: Day): boolean {
+  public sameMinute (day: Day): boolean 
+  {
     return this.timeIdentifier === day.timeIdentifier;
   }
 
   /**
    *
    */
-  public sameTime(time: Time): boolean {
-    return this.hour === time.hour && this.minute === time.minute && this.seconds === time.second && this.millis === time.millisecond;
+  public sameTime (time: Time): boolean 
+  {
+    return this.hour === time.hour && 
+      this.minute === time.minute && 
+      this.seconds === time.second && 
+      this.millis === time.millisecond;
   }
 
   // Comparison
 
   /**
-   *
+   * 
+   * @param day 
+   * @param precision 
    */
-  public isBefore(day: Day, precision?: moment.unitOfTime.StartOf): boolean {
-    return this.date.isBefore( day.date, precision );
+  public compare (day: Day, precision?: Unit): number
+  {
+    return compare(this.date, day.date, precision);
   }
 
   /**
    *
    */
-  public isSameOrBefore(day: Day, precision?: moment.unitOfTime.StartOf): boolean {
-    return this.date.isSameOrBefore( day.date, precision );
+  public isBefore (day: Day, precision?: Unit): boolean 
+  {
+    return compare(this.date, day.date, precision) < 0;
   }
 
   /**
    *
    */
-  public isAfter(day: Day, precision?: moment.unitOfTime.StartOf): boolean {
-    return this.date.isAfter( day.date, precision );
+  public isSameOrBefore (day: Day, precision?: Unit): boolean 
+  {
+    return compare(this.date, day.date, precision) <= 0;
   }
 
   /**
    *
    */
-  public isSameOrAfter(day: Day, precision?: moment.unitOfTime.StartOf): boolean {
-    return this.date.isSameOrAfter( day.date, precision );
+  public isAfter(day: Day, precision?: Unit): boolean 
+  {
+    return compare(this.date, day.date, precision) > 0;
   }
 
   /**
    *
    */
-  public max(day: Day): Day {
-    return this.date.isAfter( day.date ) ? this : day;
+  public isSameOrAfter(day: Day, precision?: Unit): boolean 
+  {
+    return compare(this.date, day.date, precision) >= 0;
   }
 
   /**
    *
+   * @param day
+   * @returns
    */
-  public min(day: Day): Day {
-    return this.date.isBefore( day.date ) ? this : day;
+  public max(day: Day): Day 
+  {
+    return compare(this.date, day.date) > 0 ? this : day;
+  }
+
+  /**
+   *
+   * @param day
+   * @returns
+   */
+  public min(day: Day): Day 
+  {
+    return compare(this.date, day.date) < 0 ? this : day;
   }
 
   // Between
 
-  public millisBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number {
-    return operate( this.date.diff( day.date, 'milliseconds', true ), op, absolute );
+  /**
+   * 
+   * @param day
+   * @param unit
+   * @param op
+   * @param absolute
+   * @returns
+   */
+  public between(day: Day, unit: Unit, op: Op = Op.DOWN, absolute: boolean = true): number
+  {
+    return operate( diff[unit](this.date, day.date), op, absolute );
   }
 
-  public secondsBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number {
-    return operate( this.date.diff( day.date, 'seconds', true ), op, absolute );
+  public millisBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number 
+  {
+    return this.between(day, 'millis', op, absolute);
   }
 
-  public minutesBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number {
-    return operate( this.date.diff( day.date, 'minutes', true ), op, absolute );
+  public secondsBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number 
+  {
+    return this.between(day, 'second', op, absolute);
   }
 
-  public hoursBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number {
-    return operate( this.date.diff( day.date, 'hours', true ), op, absolute );
+  public minutesBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number 
+  {
+    return this.between(day, 'minute', op, absolute);
   }
 
-  public daysBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number {
-    return operate( this.date.diff( day.date, 'days', true ), op, absolute );
+  public hoursBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number 
+  {
+    return this.between(day, 'hour', op, absolute);
   }
 
-  public weeksBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number {
-    return operate( this.date.diff( day.date, 'weeks', true ), op, absolute );
+  public daysBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number 
+  {
+    return this.between(day, 'day', op, absolute);
   }
 
-  public monthsBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number {
-    return operate( this.date.diff( day.date, 'months', true ), op, absolute );
+  public weeksBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number 
+  {
+    return this.between(day, 'week', op, absolute);
   }
 
-  public yearsBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number {
-    return operate( this.date.diff( day.date, 'years', true ), op, absolute );
+  public monthsBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number 
+  {
+    return this.between(day, 'month', op, absolute);
   }
 
-  public isBetween(start: Day, end: Day, inclusive: boolean = true): boolean {
-    return this.date.isBetween(start.date, end.date, null, inclusive ? '[]' : '[)');
+  public yearsBetween(day: Day, op: Op = Op.DOWN, absolute: boolean = true): number 
+  {
+    return this.between(day, 'year', op, absolute);
   }
 
-  public mutate(mutator: (date: moment.Moment) => void): Day {
-    var d = this.toMoment();
-    mutator( d );
-    return new Day( d );
+  public isBetween(start: Day, end: Day, inclusive: boolean = true, precision?: Unit): boolean 
+  {
+    const before = this.isBefore(start);
+
+    if (before) 
+    {
+      return false;
+    }
+
+    const after = inclusive
+      ? this.isSameOrAfter(end)
+      : this.isAfter(end);
+
+    if (after) 
+    {
+      return false;
+    }
+
+    return true;
   }
 
-  public add(amount: number, unit: string): Day {
-    return this.mutate(d => d.add(amount, <DurationInput>unit));
+  public mutate(mutator: (date: Date) => any): Day 
+  {
+    const d = this.toDate();
+
+    const result = mutator( d );
+
+    return result instanceof Date
+      ? new Day(result)
+      : new Day(d);
   }
 
-  public relative(millis: number): Day {
-    return this.mutate(d => d.add(millis, 'milliseconds'));
+  public add(amount: number, unit: Unit = 'millis'): Day 
+  {
+    return this.mutate(d => add[unit](d, amount));
+  }
+
+  public relative(millis: number): Day 
+  {
+    return this.add(millis);
   }
 
   // Days
 
-  public relativeDays(days: number): Day {
-    return this.mutate(d => d.add(days, 'days'));
+  public relativeDays(days: number): Day 
+  {
+    return this.add(days, 'day');
   }
 
-  public prev(days: number = 1): Day {
-    return this.relativeDays( -days );
+  public prev(days: number = 1): Day 
+  {
+    return this.relativeDays(days);
   }
 
-  public next(days: number = 1): Day {
-    return this.relativeDays( days );
+  public next(days: number = 1): Day 
+  {
+    return this.relativeDays(-days);
   }
 
-  public withDayOfMonth(day: number): Day {
-    return this.mutate(d => d.date(day));
+  public withDayOfMonth(day: number): Day 
+  {
+    return this.mutate(d => d.setDate(day));
   }
 
-  public withDayOfWeek(dayOfWeek: number): Day {
-    return this.mutate(d => d.day(dayOfWeek));
+  public withDay(day: number): Day 
+  {
+    return this.mutate(d => d.setDate(d.getDate() + (day - this.date.getDay())));
   }
 
-  public withDayOfYear(dayOfYear: number): Day {
-    return this.mutate(d => d.dayOfYear(dayOfYear));
+  public withDayOfWeek(dayOfWeek: number): Day 
+  {
+    return this.mutate(d => d.setDate(d.getDate() + (dayOfWeek - getDayOfWeek(this.date, this.getLocale()))));
+  }
+
+  public withDayOfYear(dayOfYear: number): Day 
+  {
+    return this.mutate(d => d.setDate(d.getDate() + (dayOfYear - getDayOfYear(this.date))));
   }
 
   // Month
 
-  public withMonth(month: number): Day {
-    return this.mutate(d => d.month(month));
+  public withMonth(month: number): Day 
+  {
+    return this.mutate(d => d.setMonth(month));
   }
 
-  public relativeMonths(months: number): Day {
-    return this.mutate(d => d.add(months, 'months'));
+  public relativeMonths(months: number): Day 
+  {
+    return this.add(months, 'month');
   }
 
-  public prevMonth(months: number = 1): Day {
+  public prevMonth(months: number = 1): Day 
+  {
     return this.relativeMonths( -months );
   }
 
-  public nextMonth(months: number = 1): Day {
+  public nextMonth(months: number = 1): Day 
+  {
     return this.relativeMonths( months );
   }
 
   // Week Of Year
 
-  public withWeek(week: number, relativeWeek: number = this.week): Day {
-    return this.mutate(d => d.add((week - relativeWeek) * Constants.DAYS_IN_WEEK, 'days'));
+  protected withWeek(week: number, relativeWeek: number): Day 
+  {
+    return this.add((week - relativeWeek) * Constants.DAYS_IN_WEEK, 'day');
   }
 
-  public withWeekOfYear(week: number): Day {
+  public withWeekOfYear(week: number): Day 
+  {
     return this.withWeek(week, this.weekOfYear);
   }
 
-  public withFullWeekOfYear(week: number): Day {
+  public withFullWeekOfYear(week: number): Day 
+  {
     return this.withWeek(week, this.fullWeekOfYear);
   }
 
-  public withWeekspanOfYear(week: number): Day {
+  public withWeekspanOfYear(week: number): Day 
+  {
     return this.withWeek(week, this.weekspanOfYear);
   }
 
-  public withWeekOfMonth(week: number): Day {
+  public withWeekOfMonth(week: number): Day 
+  {
     return this.withWeek(week, this.weekOfMonth);
   }
 
-  public withWeekspanOfMonth(week: number): Day {
+  public withWeekspanOfMonth(week: number): Day 
+  {
     return this.withWeek(week, this.weekspanOfMonth);
   }
 
-  public withFullWeekOfMonth(week: number): Day {
+  public withFullWeekOfMonth(week: number): Day 
+  {
     return this.withWeek(week, this.fullWeekOfMonth);
   }
 
-  public relativeWeeks(weeks: number): Day {
-    return this.mutate(d => d.add(weeks, 'weeks'));
+  public relativeWeeks(weeks: number): Day 
+  {
+    return this.add(weeks, 'week');
   }
 
-  public prevWeek(weeks: number = 1): Day {
+  public prevWeek(weeks: number = 1): Day 
+  {
     return this.relativeWeeks( -weeks );
   }
 
-  public nextWeek(weeks: number = 1): Day {
+  public nextWeek(weeks: number = 1): Day 
+  {
     return this.relativeWeeks( weeks );
   }
 
   // Year
 
-  public withYear(year: number): Day {
-    return this.mutate(d => d.year(year));
+  public withYear(year: number): Day 
+  {
+    return this.mutate(d => d.setFullYear(year));
   }
 
-  public relativeYears(years: number): Day {
-    return this.mutate(d => d.add(years, 'year'));
+  public relativeYears(years: number): Day 
+  {
+    return this.add(years, 'year');
   }
 
-  public prevYear(years: number = 1): Day {
+  public prevYear(years: number = 1): Day 
+  {
     return this.relativeYears( -years );
   }
 
-  public nextYear(years: number = 1): Day {
+  public nextYear(years: number = 1): Day 
+  {
     return this.relativeYears( years );
   }
 
   // Hour
 
-  public withHour(hour: number): Day {
-    return this.mutate(d => d.hour(hour));
+  public withHour(hour: number): Day 
+  {
+    return this.mutate(d => d.setHours(hour));
   }
 
-  public relativeHours(hours: number): Day {
-    return this.mutate(d => d.add(hours, 'hours'));
+  public relativeHours(hours: number): Day 
+  {
+    return this.add(hours, 'hour');
   }
 
-  public prevHour(hours: number = 1): Day {
+  public prevHour(hours: number = 1): Day 
+  {
     return this.relativeHours( -hours );
   }
 
-  public nextHour(hours: number = 1): Day {
+  public nextHour(hours: number = 1): Day 
+  {
     return this.relativeHours( hours );
   }
 
@@ -514,37 +818,53 @@ export class Day
       hour: number = Constants.HOUR_MIN,
       minute: number = Constants.MINUTE_MIN,
       second: number = Constants.SECOND_MIN,
-      millisecond: number = Constants.MILLIS_MIN): Day {
-    return this.mutate(d => d.set({hour, minute, second, millisecond}));
+      millisecond: number = Constants.MILLIS_MIN): Day 
+  {
+    return this.mutate(d => d.setHours(hour, minute, second, millisecond));
   }
 
-  public withTime(time: Time): Day {
+  public withTime(time: Time): Day 
+  {
     return this.withTimes(time.hour, time.minute, time.second, time.millisecond);
   }
 
-  public asTime(): Time {
+  public asTime(): Time 
+  {
     return new Time(this.hour, this.minute, this.seconds, this.millis);
   }
 
   // Start & End
 
-  // Time
-
-  public start(): Day {
-    return this.mutate(d => d.startOf('day'));
+  public startOf(unit: Unit): Day
+  {
+    return this.mutate(d => startOf[unit](d, this.getLocale()));
   }
 
-  public isStart(): boolean {
+  public endOf(unit: Unit, inclusive: boolean = false): Day
+  {
+    return inclusive
+      ? this.mutate(d => { startOf[unit](d, this.getLocale());  add[unit](d, 1); })
+      : this.mutate(d => endOf[unit](d, this.getLocale()));
+  }
+
+  // Time
+
+  public start(): Day 
+  {
+    return this.startOf('day');
+  }
+
+  public isStart(): boolean 
+  {
     return this.hour === Constants.HOUR_MIN &&
       this.minute === Constants.MINUTE_MIN &&
       this.seconds === Constants.SECOND_MIN &&
       this.millis === Constants.MILLIS_MIN;
   }
 
-  public end(inclusive: boolean = true): Day {
-    return inclusive ?
-      this.mutate(d => d.endOf('day')) :
-      this.mutate(d => d.startOf('day').add(1, 'day'));
+  public end(inclusive: boolean = true): Day 
+  {
+    return this.endOf('day', inclusive);
   }
 
   public isEnd(): boolean {
@@ -556,23 +876,25 @@ export class Day
 
   // Hour
 
-  public startOfHour(): Day {
-    return this.mutate(d => d.startOf('hour'));
+  public startOfHour(): Day 
+  {
+    return this.startOf('hour');
   }
 
-  public isStartOfHour(): boolean {
+  public isStartOfHour(): boolean 
+  {
     return this.minute === Constants.MINUTE_MIN &&
       this.seconds === Constants.SECOND_MIN &&
       this.millis === Constants.MILLIS_MIN;
   }
 
-  public endOfHour(inclusive: boolean = true): Day {
-    return inclusive ?
-      this.mutate(d => d.endOf('hour')) :
-      this.mutate(d => d.startOf('hour').add(1, 'hour'));
+  public endOfHour(inclusive: boolean = true): Day 
+  {
+    return this.endOf('hour', inclusive);
   }
 
-  public isEndOfHour(): boolean {
+  public isEndOfHour(): boolean 
+  {
     return this.minute === Constants.MINUTE_MAX &&
       this.seconds === Constants.SECOND_MAX &&
       this.millis === Constants.MILLIS_MAX;
@@ -580,180 +902,213 @@ export class Day
 
   // Week
 
-  public startOfWeek(): Day {
-    return this.mutate(d => d.startOf('week'));
+  public startOfWeek(): Day 
+  {
+    return this.startOf('week');
   }
 
-  public isStartOfWeek(): boolean {
+  public isStartOfWeek(): boolean 
+  {
     return this.dayOfWeek === Constants.WEEKDAY_MIN;
   }
 
-  public endOfWeek(inclusive: boolean = true): Day {
-    return inclusive ?
-      this.mutate(d => d.endOf('week')) :
-      this.mutate(d => d.startOf('week').add(1, 'week'));
+  public endOfWeek(inclusive: boolean = true): Day 
+  {
+    return this.endOf('week', inclusive);
   }
 
-  public isEndOfWeek(): boolean {
+  public isEndOfWeek(): boolean 
+  {
     return this.dayOfWeek === Constants.WEEKDAY_MAX;
   }
 
   // Month
 
-  public startOfMonth(): Day {
-    return this.mutate(d => d.startOf('month'));
+  public startOfMonth(): Day 
+  {
+    return this.startOf('month');
   }
 
-  public isStartOfMonth(): boolean {
+  public isStartOfMonth(): boolean 
+  {
     return this.dayOfMonth === Constants.DAY_MIN;
   }
 
-  public endOfMonth(inclusive: boolean = true): Day {
-    return inclusive ?
-      this.mutate(d => d.endOf('month')) :
-      this.mutate(d => d.startOf('month').add(1, 'month'));
+  public endOfMonth(inclusive: boolean = true): Day 
+  {
+    return this.endOf('month', inclusive);
   }
 
-  public isEndOfMonth(): boolean {
+  public isEndOfMonth(): boolean 
+  {
     return this.dayOfMonth === this.daysInMonth();
   }
 
   // Year
 
-  public startOfYear(): Day {
-    return this.mutate(d => d.startOf('year'));
+  public startOfYear(): Day 
+  {
+    return this.startOf('year');
   }
 
-  public isStartOfYear(): boolean {
-    return this.month === Constants.MONTH_MIN && this.dayOfMonth === Constants.DAY_MIN;
+  public isStartOfYear(): boolean 
+  {
+    return this.month === Constants.MONTH_MIN && 
+      this.dayOfMonth === Constants.DAY_MIN;
   }
 
-  public endOfYear(inclusive: boolean = true): Day {
-    return inclusive ?
-      this.mutate(d => d.endOf('year')) :
-      this.mutate(d => d.startOf('year').add(1, 'year'));
+  public endOfYear(inclusive: boolean = true): Day 
+  {
+    return this.endOf('year', inclusive);
   }
 
-  public isEndOfYear(): boolean {
-    return this.month === Constants.MONTH_MAX && this.dayOfMonth === Constants.DAY_MAX;
+  public isEndOfYear(): boolean 
+  {
+    return this.month === Constants.MONTH_MAX && 
+      this.dayOfMonth === Constants.DAY_MAX;
   }
 
   // Days In X
 
-  public daysInMonth(): number {
-    return this.date.daysInMonth();
+  public daysInMonth(): number 
+  {
+    return getDaysInMonth(this.date);
   }
 
-  public daysInYear(): number {
-    return this.endOfYear().dayOfYear;
+  public daysInYear(): number 
+  {
+    return getDaysInYear(this.date);
   }
 
-  public weeksInYear(): number {
-    return this.date.weeksInYear();
+  public weeksInYear(): number 
+  {
+    return getWeeksInYear(this.date);
   }
 
   // Display
 
-  public format(format: string): string {
-    return this.date.format( format );
+  public format(format: string): string 
+  {
+    // return this.date.format( format );
+
+    return '';
   }
 
-  public utc(keepLocalTime?: boolean): Day {
-    return this.mutate(d => d.utc(keepLocalTime));
+  public utc(keepLocalTime?: boolean): Day 
+  {
+    // TODO
+    return this;
   }
 
-  public toMoment(): moment.Moment {
-    return this.date.clone();
+  public toDate(): Date 
+  {
+    return new Date(this.date.getTime());
   }
 
-  public toDate(): Date {
-    return this.date.toDate();
+  public toArray(): number[] 
+  {
+    return [this.year, this.month, this.dayOfMonth, this.hour, this.minute, this.seconds, this.millis];
   }
 
-  public toArray(): number[] {
-    return this.date.toArray();
-  }
-
-  public toJSON(): string {
+  public toJSON(): string 
+  {
     return this.date.toJSON();
   }
 
-  public toISOString(keepOffset: boolean = false): string {
-    return this.date.toISOString( keepOffset );
+  public toISOString(keepOffset: boolean = false): string 
+  {
+    return this.date.toISOString(); // TODO
   }
 
-  public toObject(): object {
-    return this.date.toObject();
+  public toObject(): object 
+  {
+    throw new Error('toObject is no longer supported');
   }
 
-  public toString(): string {
+  public toString(): string 
+  {
     return this.date.toString();
   }
 
   // State
 
-  public isDST(): boolean {
-    return this.date.isDST();
+  public isDST(): boolean 
+  {
+    return isDaylightSavingTime(this.date);
   }
 
-  public isLeapYear(): boolean {
-    return this.date.isLeapYear();
+  public isLeapYear(): boolean 
+  {
+    return isLeapYear(this.date);
   }
 
   // Instances
 
-  public static now(): Day {
-    return new Day(moment());
+  public static now(): Day 
+  {
+    return new Day(new Date());
   }
 
-  public static today(): Day {
+  public static today(): Day 
+  {
     return this.now().start();
   }
 
-  public static tomorrow(): Day {
+  public static tomorrow(): Day 
+  {
     return this.today().next();
   }
 
-  public static fromMoment(moment: moment.Moment): Day {
-    return moment && moment.isValid() ? new Day( moment ) : null;
+  public static fromDate(date: Date): Day | null
+  {
+    return isFinite(date.getTime()) ? new Day(date) : null;
   }
 
-  public static unix(millis: number): Day {
-    return this.fromMoment(moment(millis));
+  public static unix(millis: number): Day 
+  {
+    return this.fromDate(new Date(millis));
   }
 
-  public static unixSeconds(millis: number): Day {
-    return this.fromMoment(moment.unix(millis));
+  public static unixSeconds(millis: number): Day 
+  {
+    return this.fromDate(new Date(millis * Constants.MILLIS_IN_SECOND));
   }
 
-  public static parse(input: DayInput): Day {
+  public static parse(input: DayInput): Day 
+  {
     return Parse.day(input);
   }
 
-  public static fromString(input: string): Day {
-    return this.fromMoment(moment(input));
+  public static fromString(input: string): Day 
+  {
+    return this.fromDate(new Date(input));
   }
 
-  public static fromFormat(input: string, formats: string | string[]): Day {
-    return this.fromMoment(moment(input, formats));
+  public static fromFormat(input: string, formats: string | string[]): Day 
+  {
+    throw new Error('fromFormat is no longer supported');
   }
 
-  public static fromObject(input: object): Day {
-    return this.fromMoment(moment(input));
+  public static fromObject(input: object): Day 
+  {
+    throw new Error('fromObject is no longer supported');
   }
 
-  public static fromDate(input: Date): Day {
-    return this.fromMoment(moment(input));
+  public static fromArray(input: number[]): Day 
+  {
+    // tslint:disable-next-line: no-magic-numbers
+    return this.fromDate(new Date(input[0], input[1], input[2], input[3], input[4], input[5], input[6]));
   }
 
-  public static fromArray(input: number[]): Day {
-    return this.fromMoment(moment(input));
-  }
+  public static fromDayIdentifier(id: number): Day 
+  {
+    const DATE_MASK = 100;
+    const MONTH_MASK = 100;
+    const YEAR_OFFSET = 10000;
 
-  public static fromDayIdentifier(id: number): Day {
-    let date: number = id % 100;
-    let month: number = (Math.floor(id / 100) % 100) - 1;
-    let year: number = Math.floor(id / 10000);
+    const date: number = id % DATE_MASK;
+    const month: number = (Math.floor(id / DATE_MASK) % MONTH_MASK) - 1;
+    const year: number = Math.floor(id / YEAR_OFFSET);
 
     return this.build(year, month, date);
   }
@@ -765,87 +1120,7 @@ export class Day
     second: number = Constants.SECOND_MIN,
     millisecond: number = Constants.MILLIS_MIN): Day
   {
-    return new Day( moment({year, month, date, hour, minute, second, millisecond}) );
-  }
-
-
-
-
-
-
-
-
-  public static getWeekspanOfYear(date: moment.Moment): number
-  {
-    return Math.floor( (date.dayOfYear() - 1) / Constants.DAYS_IN_WEEK );
-  }
-
-  public static getLastWeekspanOfYear(date: moment.Moment): number
-  {
-    let lastOfYear = date.clone().endOf('year');
-    let daysInYear: number = lastOfYear.dayOfYear();
-
-    return Math.floor( (daysInYear - date.dayOfYear()) / Constants.DAYS_IN_WEEK );
-  }
-
-  public static getWeekOfYear(date: moment.Moment): number
-  {
-    let firstOfYear = date.clone().startOf('year');
-    let weeks: number = date.week();
-
-    return firstOfYear.day() > Constants.WEEK_OF_MONTH_MINIMUM_WEEKDAY ? weeks - 1 : weeks;
-  }
-
-  public static getFullWeekOfYear(date: moment.Moment): number
-  {
-    let firstOfYear = date.clone().startOf('year');
-    let weeks: number = date.week();
-
-    return firstOfYear.day() === Constants.WEEKDAY_MIN ? weeks : weeks - 1;
-  }
-
-  public static getLastFullWeekOfYear(date: moment.Moment): number
-  {
-    let firstOfYear = date.clone().startOf('year');
-    let weeks: number = date.week();
-    let weeksMax: number = date.weeksInYear();
-    let lastWeek: number = weeksMax - weeks;
-
-    return firstOfYear.day() === Constants.WEEKDAY_MIN ? lastWeek + 1 : lastWeek;
-  }
-
-  public static getWeekspanOfMonth(date: moment.Moment): number
-  {
-    return Math.floor((date.date() - 1) / Constants.DAYS_IN_WEEK);
-  }
-
-  public static getLastWeekspanOfMonth(date: moment.Moment): number
-  {
-    return Math.floor((date.daysInMonth() - date.date()) / Constants.DAYS_IN_WEEK);
-  }
-
-  public static getFullWeekOfMonth(date: moment.Moment): number
-  {
-    return Math.floor((date.date() - 1 - date.day() + Constants.DAYS_IN_WEEK) / Constants.DAYS_IN_WEEK);
-  }
-
-  public static getLastFullWeekOfMonth(date: moment.Moment): number
-  {
-    return Math.floor((date.daysInMonth() - date.date() - (Constants.WEEKDAY_MAX - date.day()) + Constants.DAYS_IN_WEEK) / Constants.DAYS_IN_WEEK);
-  }
-
-  public static getWeekOfMonth(date: moment.Moment): number
-  {
-    let dom = date.date();
-    let dow = date.day();
-    let sundayDate = dom - dow;
-
-    return Math.floor( ( sundayDate + Constants.WEEK_OF_MONTH_MINIMUM_WEEKDAY + 5 ) / Constants.DAYS_IN_WEEK );
-  }
-
-  public static getLastDayOfMonth(date: moment.Moment): number
-  {
-    return date.daysInMonth() - date.date() + 1;
+    return new Day(new Date(year, month, date, hour, minute, second, millisecond));
   }
 
 }

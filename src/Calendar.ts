@@ -1,17 +1,19 @@
 
-import { Functions as fn } from './Functions';
-import { Day, DayInput } from './Day';
-import { DaySpan } from './DaySpan';
-import { Schedule } from './Schedule';
-import { EventInput, Event } from './Event';
-import { Op } from './Operation';
-import { Units } from './Units';
-import { Parse } from './Parse';
-import { SortEvent } from './Sort';
-import { Constants } from './Constants';
+import { Iterate, IterateAction } from 'iteratez';
+
 import { CalendarDay } from './CalendarDay';
 import { CalendarEvent } from './CalendarEvent';
-import { Iterator, IteratorAction } from './Iterator';
+import { Constants } from './Constants';
+import { Day, DayInput } from './Day';
+import { DaySpan } from './DaySpan';
+import { Event, EventInput } from './Event';
+import { Functions as fn } from './Functions';
+import { Op } from './Operation';
+import { Parse } from './Parse';
+import { Schedule } from './Schedule';
+import { SortEvent } from './Sort';
+import { Units } from './Units';
+
 
 
 /**
@@ -98,11 +100,11 @@ export interface CalendarInput<T, M>
   /**
    * @see [[Calendar.parseMeta]]
    */
-  parseMeta?: (input: any) => M;
+  parseMeta?(input: any): M;
   /**
    * @see [[Calendar.parseData]]
    */
-  parseData?: (input: any) => T;
+  parseData?(input: any): T;
   /**
    * When morphing a calendar to a fewer number of days, do we want to keep
    * today in the calendar if it is already in the calendar?
@@ -136,6 +138,8 @@ export interface CalendarInput<T, M>
  */
 export class Calendar<T, M>
 {
+
+  public static readonly DEFAULT_FOCUS = 0.4999;
 
   /**
    * The span of days in the calendar.
@@ -242,7 +246,7 @@ export class Calendar<T, M>
    * @param input The input to parse.
    * @returns The meta parsed from the given input, if any.
    */
-  public parseMeta: (input: any) => M = (x => <M>x);
+  public parseMeta: (input: any) => M = (x => x);
 
   /**
    * A function to use when parsing meta input into the desired type.
@@ -250,7 +254,7 @@ export class Calendar<T, M>
    * @param input The input to parse.
    * @returns The meta parsed from the given input, if any.
    */
-  public parseData: (input: any) => T = (x => <T>x);
+  public parseData: (input: any) => T = (x => x);
 
   /**
    * A selection of days on the calendar. If no days are selected this is `null`.
@@ -340,26 +344,27 @@ export class Calendar<T, M>
   {
     type CTD = CalendarTypeDefinition;
 
-    let typeChange: boolean = fn.isDefined(input.type) && input.type !== this.type;
-    let sizeChange: boolean = fn.isDefined(input.size) && input.size !== this.size;
+    const typeChange: boolean = fn.isDefined(input.type) && input.type !== this.type;
+    const sizeChange: boolean = fn.isDefined(input.size) && input.size !== this.size;
 
     if (typeChange || sizeChange)
     {
-      let focus: number    = fn.coalesce( input.otherwiseFocus, 0.4999 );
-      let prefer: boolean  = fn.coalesce( input.preferToday, true );
-      let size: number     = fn.coalesce( input.size, this.size );
-      let type: Units      = fn.coalesce( input.type, this.type );
-      let around: DayInput = fn.coalesce( input.around, this.days[ Math.floor( (this.days.length - 1) * focus ) ] );
-      let today: Day       = Day.today();
+      const focus: number    = fn.coalesce( input.otherwiseFocus, Calendar.DEFAULT_FOCUS );
+      const prefer: boolean  = fn.coalesce( input.preferToday, true );
+      const size: number     = fn.coalesce( input.size, this.size );
+      const type: Units      = fn.coalesce( input.type, this.type );
+      const today: Day       = Day.today();
+      let around: DayInput   = fn.coalesce( input.around, this.days[ Math.floor( (this.days.length - 1) * focus ) ] );
+      
 
       if (!around || (prefer && this.span.matchesDay(today)))
       {
         around = today;
       }
 
-      let meta: CTD        = Calendar.TYPES[ type ];
-      let start: Day       = meta.getStart( Day.parse( around ), size, focus );
-      let end: Day         = meta.getEnd( start, size, focus );
+      const meta: CTD        = Calendar.TYPES[ type ];
+      const start: Day       = meta.getStart( Day.parse( around ), size, focus );
+      const end: Day         = meta.getEnd( start, size, focus );
 
       this.span.start = start;
       this.span.end = end;
@@ -370,13 +375,13 @@ export class Calendar<T, M>
     }
     else if (input.around)
     {
-      let focus: number    = fn.coalesce( input.otherwiseFocus, 0.4999 );
-      let around: Day      = Day.parse( input.around );
-      let type: Units      = this.type;
-      let size: number     = this.size;
-      let meta: CTD        = Calendar.TYPES[ type ];
-      let start: Day       = meta.getStart( around, size, focus );
-      let end: Day         = meta.getEnd( start, size, focus );
+      const focus: number    = fn.coalesce( input.otherwiseFocus, Calendar.DEFAULT_FOCUS );
+      const around: Day      = Day.parse( input.around );
+      const type: Units      = this.type;
+      const size: number     = this.size;
+      const meta: CTD        = Calendar.TYPES[ type ];
+      const start: Day       = meta.getStart( around, size, focus );
+      const end: Day         = meta.getEnd( start, size, focus );
 
       this.span.start = start;
       this.span.end = end;
@@ -543,18 +548,18 @@ export class Calendar<T, M>
    *    may cover more or less than this calendar covers.
    * @returns An iterator for the calendars produced.
    */
-  public split(by: number = 1): Iterator<Calendar<T, M>>
+  public split(by: number = 1): Iterate<Calendar<T, M>, number, Calendar<T, M>>
   {
-    return new Iterator<Calendar<T, M>>(iterator =>
+    return new Iterate<Calendar<T, M>, number, Calendar<T, M>>(iterator =>
     {
       let start: Day = this.start;
       let end: Day = this.moveEnd( this.end, by - this.size );
 
       for (let i = 0; i < this.size; i++)
       {
-        let calendar = new Calendar(start, end, this.type, by, this.moveStart, this.moveEnd, this);
+        const calendar = new Calendar(start, end, this.type, by, this.moveStart, this.moveEnd, this);
 
-        if (iterator.act(calendar) === IteratorAction.Stop)
+        if (iterator.act(calendar, i) === IterateAction.STOP)
         {
           return;
         }
@@ -603,11 +608,11 @@ export class Calendar<T, M>
   {
     this.resetFilled();
 
-    let days: CalendarDay<T, M>[] = this.days;
-    let filled: DaySpan = this.filled;
+    const days: CalendarDay<T, M>[] = this.days;
+    const filled: DaySpan = this.filled;
+    const daysBetween: number = filled.days(Op.UP);
+    const total: number = Math.max( this.minimumSize, daysBetween );
     let current: Day = filled.start;
-    let daysBetween: number = filled.days(Op.UP);
-    let total: number = Math.max( this.minimumSize, daysBetween );
 
     for (let i = 0; i < total; i++)
     {
@@ -645,8 +650,8 @@ export class Calendar<T, M>
    */
   public refreshVisible(): this
   {
-    let start: Day = this.filled.start;
-    let end: Day = this.filled.end;
+    const start: Day = this.filled.start;
+    const end: Day = this.filled.end;
 
     this.visible = this.events.filter(e =>
     {
@@ -663,10 +668,7 @@ export class Calendar<T, M>
    */
   public refreshCurrent(today: Day = Day.today()): this
   {
-    this.iterateDays().iterate(d =>
-    {
-      d.updateCurrent(today);
-    });
+    this.iterateDays().each(d => d.updateCurrent(today));
 
     return this;
   }
@@ -677,7 +679,7 @@ export class Calendar<T, M>
    */
   public refreshSelection(): this
   {
-    this.iterateDays().iterate(d =>
+    this.iterateDays().each(d =>
     {
       if (this.selection)
       {
@@ -705,7 +707,7 @@ export class Calendar<T, M>
    */
   public refreshEvents(): this
   {
-    this.iterateDays().iterate(d =>
+    this.iterateDays().each(d =>
     {
       if (d.inCalendar || this.eventsOutside)
       {
@@ -734,19 +736,19 @@ export class Calendar<T, M>
     type EventToRowMap = { [id: number]: number };
     type UsedMap = { [row: number]: boolean };
 
+    const onlyFullDay: boolean = this.listTimes;
     let eventToRow: EventToRowMap = {};
-    let onlyFullDay: boolean = this.listTimes;
 
-    this.iterateDays().iterate(d =>
+    this.iterateDays().each(d =>
     {
       if (d.dayOfWeek === 0)
       {
         eventToRow = {};
       }
 
-      let used: UsedMap = {};
+      const used: UsedMap = {};
 
-      for (let event of d.events)
+      for (const event of d.events)
       {
         if (onlyFullDay && !event.fullDay)
         {
@@ -761,7 +763,7 @@ export class Calendar<T, M>
 
       let rowIndex: number = 0;
 
-      for (let event of d.events)
+      for (const event of d.events)
       {
         if ((onlyFullDay && !event.fullDay) || event.id in eventToRow)
         {
@@ -794,24 +796,24 @@ export class Calendar<T, M>
       parent: Marker;
     }
 
-    this.iterateDays().iterate(d =>
+    this.iterateDays().each(d =>
     {
-      let markers: Marker[] = [];
+      const markers: Marker[] = [];
 
-      for (let event of d.events)
+      for (const event of d.events)
       {
         if (!event.fullDay)
         {
           markers.push({
+            event,
             time: event.time.start.time,
-            event: event,
             start: true,
             parent: null
           });
 
           markers.push({
+            event,
             time: event.time.end.time - 1,
-            event: event,
             start: false,
             parent: null
           });
@@ -825,7 +827,7 @@ export class Calendar<T, M>
 
       let parent = null;
 
-      for (let marker of markers)
+      for (const marker of markers)
       {
         if (marker.start)
         {
@@ -838,7 +840,7 @@ export class Calendar<T, M>
         }
       }
 
-      for (let marker of markers)
+      for (const marker of markers)
       {
         if (marker.start)
         {
@@ -859,11 +861,11 @@ export class Calendar<T, M>
    */
   public getDay(input: DayInput): CalendarDay<T, M>
   {
-    let parsed: Day = Day.parse( input );
+    const parsed: Day = Day.parse( input );
 
     if (parsed)
     {
-      let dayCount: number = parsed.start().daysBetween( this.days[ 0 ], Op.DOWN, false );
+      const dayCount: number = parsed.start().daysBetween( this.days[ 0 ], Op.DOWN, false );
 
       return this.days[ dayCount ];
     }
@@ -876,17 +878,17 @@ export class Calendar<T, M>
    *
    * @param iterator The function to pass [[CalendarDay]]s to.
    */
-  public iterateDays(): Iterator<CalendarDay<T, M>>
+  public iterateDays(): Iterate<CalendarDay<T, M>, number, Calendar<T, M>>
   {
-    return new Iterator<CalendarDay<T, M>>(iterator =>
+    return new Iterate<CalendarDay<T, M>, number, Calendar<T, M>>(iterator =>
     {
-      let days: CalendarDay<T, M>[] = this.days;
+      const days: CalendarDay<T, M>[] = this.days;
 
       for (let i = 0; i < days.length; i++)
       {
-        switch (iterator.act(days[ i ]))
+        switch (iterator.act(days[i], i))
         {
-          case IteratorAction.Stop:
+          case IterateAction.STOP:
             return;
         }
       }
@@ -908,17 +910,17 @@ export class Calendar<T, M>
    */
   public eventsForDay(day: Day, getTimes: boolean = true, covers: boolean = true, sorter: SortEvent<T, M> = this.eventSorter): CalendarEvent<T, M>[]
   {
-    let events: CalendarEvent<T, M>[] = [];
-    let entries: Event<T, M>[] = this.visible;
+    const events: CalendarEvent<T, M>[] = [];
+    const entries: Event<T, M>[] = this.visible;
 
     for (let entryIndex = 0; entryIndex < entries.length; entryIndex++)
     {
-      let entry: Event<T, M> = entries[ entryIndex ];
-      let schedule: Schedule<M> = entry.schedule;
-      let eventId: number = entryIndex * Constants.MAX_EVENTS_PER_DAY;
+      const entry: Event<T, M> = entries[ entryIndex ];
+      const schedule: Schedule<M> = entry.schedule;
+      const eventId: number = entryIndex * Constants.MAX_EVENTS_PER_DAY;
       let timeIndex: number = 0;
 
-      schedule.iterateSpans( day, covers ).iterate((span, iterator) =>
+      schedule.iterateSpans( day, covers ).each((span, key, iterator) =>
       {
         events.push(new CalendarEvent(eventId + timeIndex++, entry, span, day));
 
@@ -945,7 +947,7 @@ export class Calendar<T, M>
    */
   public findEvent(id: any): Event<T, M>
   {
-    for (let event of this.events)
+    for (const event of this.events)
     {
       if (event === id || event.schedule === id || event.data === id || event.id === id)
       {
@@ -971,7 +973,7 @@ export class Calendar<T, M>
   {
     if (events)
     {
-      for (let event of events)
+      for (const event of events)
       {
         this.removeEvent( event, true );
       }
@@ -1001,7 +1003,7 @@ export class Calendar<T, M>
    */
   public removeEvent(event: any, delayRefresh: boolean = false): this
   {
-    let found: Event<T, M> = this.findEvent(event);
+    const found: Event<T, M> = this.findEvent(event);
 
     if (found)
     {
@@ -1030,11 +1032,11 @@ export class Calendar<T, M>
    */
   public addEvent(event: EventInput<T, M>, allowDuplicates: boolean = false, delayRefresh: boolean = false): this
   {
-    let parsed: Event<T, M> = Parse.event<T, M>(event, this.parseData, this.parseMeta);
+    const parsed: Event<T, M> = Parse.event<T, M>(event, this.parseData, this.parseMeta);
 
     if (!allowDuplicates)
     {
-      let existing = this.findEvent(parsed);
+      const existing = this.findEvent(parsed);
 
       if (existing)
       {
@@ -1066,7 +1068,7 @@ export class Calendar<T, M>
    */
   public addEvents(events: EventInput<T, M>[], allowDuplicates: boolean = false, delayRefresh: boolean = false): this
   {
-    for (let event of events)
+    for (const event of events)
     {
       this.addEvent(event, allowDuplicates, true);
     }
@@ -1092,9 +1094,9 @@ export class Calendar<T, M>
   {
     const parsedEvents = [];
 
-    for (let i = 0; i < events.length; i++)
+    for (const event of events)
     {
-      let parsed: Event<T, M> = Parse.event<T, M>(events[i], this.parseData, this.parseMeta);
+      const parsed: Event<T, M> = Parse.event<T, M>(event, this.parseData, this.parseMeta);
 
       if (parsed)
       {
@@ -1204,7 +1206,7 @@ export class Calendar<T, M>
       plainData: (data: T) => any = d => d,
       plainMeta: (meta: M) => any = m => m): CalendarInput<T, M>
   {
-    let out: CalendarInput<T, M> = {};
+    const out: CalendarInput<T, M> = {};
 
     out.type = this.type;
     out.size = this.size;
@@ -1218,11 +1220,11 @@ export class Calendar<T, M>
     out.around = plain ? this.span.start.time : this.span.start;
     out.events = [];
 
-    for (let event of this.events)
+    for (const event of this.events)
     {
       if (plain)
       {
-        let plainEvent: any = {};
+        const plainEvent: any = {};
 
         if (fn.isDefined(event.id))
         {
@@ -1241,11 +1243,11 @@ export class Calendar<T, M>
 
         plainEvent.schedule = event.schedule.toInput();
 
-        let meta = plainEvent.schedule.meta;
+        const meta = plainEvent.schedule.meta;
 
         if (meta)
         {
-          for (let identifier in meta)
+          for (const identifier in meta)
           {
             meta[ identifier ] = plainMeta( meta[ identifier ] );
           }
@@ -1270,7 +1272,7 @@ export class Calendar<T, M>
    */
   public static fromInput<T, M>(input: CalendarInput<T, M>): Calendar<T, M>
   {
-    let initial: Day = Day.today();
+    const initial: Day = Day.today();
 
     return new Calendar(initial, initial, null, 1, null, null, input);
   }
@@ -1291,9 +1293,9 @@ export class Calendar<T, M>
    */
   public static forType<T, M>(type: Units, size: number = 1, around: Day = Day.today(), focus: number = 0.49999, input?: CalendarInput<T, M>): Calendar<T, M>
   {
-    let meta: CalendarTypeDefinition = this.TYPES[ type ];
-    let start: Day = meta.getStart( around, size, focus );
-    let end: Day = meta.getEnd( start, size, focus );
+    const meta: CalendarTypeDefinition = this.TYPES[ type ];
+    const start: Day = meta.getStart( around, size, focus );
+    const end: Day = meta.getEnd( start, size, focus );
 
     return new Calendar<T, M>(start, end, type, size, meta.moveStart, meta.moveEnd, input || meta.defaultInput);
   }
@@ -1391,7 +1393,7 @@ export class Calendar<T, M>
       moveEnd(day: Day, amount: number): Day {
         return day.relativeDays(amount);
       },
-      defaultInput: <any>undefined
+      defaultInput: undefined
     },
     [Units.WEEK]:
     {
@@ -1407,7 +1409,7 @@ export class Calendar<T, M>
       moveEnd(day: Day, amount: number): Day {
         return day.relativeWeeks(amount);
       },
-      defaultInput: <any>undefined
+      defaultInput: undefined
     },
     [Units.MONTH]:
     {

@@ -1,9 +1,10 @@
 
-import { Op } from './Operation';
+import { Iterate } from 'iteratez';
+
+import { CalendarEvent } from './CalendarEvent';
 import { Day } from './Day';
 import { DaySpan } from './DaySpan';
-import { CalendarEvent } from './CalendarEvent';
-import { Iterator } from './Iterator';
+import { Op } from './Operation';
 
 
 /**
@@ -83,9 +84,9 @@ export class CalendarDay<T, M> extends Day
    *
    * @returns The new iterator for the events on this day.
    */
-  public iterateEvents(): Iterator<CalendarEvent<T, M>>
+  public iterateEvents(): Iterate<CalendarEvent<T, M>, number, CalendarEvent<T, M>[]>
   {
-    return Iterator.forArray( this.events );
+    return Iterate.array( this.events );
   }
 
 

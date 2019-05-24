@@ -16,7 +16,7 @@
     // core ts-lint rules
     "await-promise": true,
     "no-unused-variable": true,
-    "forin": true,
+    "forin": false,
     "no-bitwise": true,
     "no-console": [
       true,
@@ -26,13 +26,14 @@
       "timeEnd",
       "trace"
     ],
+    "radix": false,
+    "no-use-before-declare": false,
+    "member-ordering": false,
     "no-construct": true,
     "no-debugger": true,
     "no-shadowed-variable": true,
     "no-string-literal": true,
-    "no-inferrable-types": [
-      true
-    ],
+    "no-inferrable-types": false,
     "no-unnecessary-initializer": true,
     "no-magic-numbers": true,
     "no-require-imports": true,
