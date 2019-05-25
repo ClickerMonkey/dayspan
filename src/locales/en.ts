@@ -10,7 +10,21 @@ const en: Locale =
 {
   weekStartsOn: 0,
 
-  firstWeekContainsDate: 1,
+  firstWeekContainsDate: 4,
+
+  am: 'am',
+  pm: 'pm',
+
+  formatLT: 'h:mm A',
+  formatLTS: 'h:mm:ss A',
+  formatL: 'MM/DD/Y',
+  formatl: 'M/D/Y',
+  formatLL: 'MMMM D, Y',
+  formatll: 'MMM D, Y',
+  formatLLL: 'MMMM D, Y h:mm A',
+  formatlll: 'MMM D, Y h:mm A',
+  formatLLLL: 'dddd, MMMM D, Y h:mm A',
+  formatllll: 'ddd, MMM D, Y h:mm A',
 
   suffix: (value: number) => {
     const TH_SPECIAL_MIN = 11;
@@ -108,6 +122,14 @@ const en: Locale =
     offset: (offset) => `starting on ${en.weekdays[0][offset]}`,
     // on Monday, Wednesday, and Friday
     oneOf: (values) => `on ${en.list(values.map(v => en.weekdays[0][v]))}`
+  },
+  ruleWeek: {
+    // every 3rd week of the year
+    every: (every) => `every ${en.suffix(every)} week of the year`,
+    // starting on the 2nd week of the year
+    offset: (offset) => `starting on the ${en.suffix(offset)} week of the year`,
+    // on the 1st, 2nd, and 3rd week of the year
+    oneOf: (values) => `on the ${en.list(values.map(en.suffix))} week of the year`
   },
   ruleWeekOfYear: {
     // every 3rd week of the year

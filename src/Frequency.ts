@@ -28,9 +28,14 @@ export interface FrequencyValueEvery
 export type FrequencyValueOneOf = number[];
 
 /**
+ * A frequency that occurs once.
+ */
+export type FrequencyValueEquals = number;
+
+/**
  * A frequency that occurs at a constant rate or only on specific values.
  */
-export type FrequencyValue = FrequencyValueEvery | FrequencyValueOneOf;
+export type FrequencyValue = FrequencyValueEvery | FrequencyValueOneOf | FrequencyValueEquals;
 
 /**
  * A function which takes a value and returns whether it coincides with the

@@ -126,9 +126,14 @@ export function getLastWeekspanOfYear(x: Date): number
   return Math.floor(fromEnd / Constants.DAYS_IN_WEEK);
 }
 
+export function getWeekOfYearISO(x: Date, options: LocaleOptions = Locales.current): number
+{
+  return getWeekISO(mutate(x, startOfYear), getDayOfYear(x), options);
+}
+
 export function getWeekOfYear(x: Date, options: LocaleOptions = Locales.current): number
 {
-  return getWeekOf(mutate(x, startOfYear), getDayOfYear(x), options);
+  return getWeek(mutate(x, startOfYear), getDayOfYear(x), options);
 }
 
 export function getWeekspanOfYear(x: Date): number
@@ -143,14 +148,14 @@ export function getFullWeekOfYear(x: Date, options: LocaleOptions = Locales.curr
 
 export function getWeeksInYear(x: Date, options: LocaleOptions = Locales.current): number
 {
-  return getWeekOfYear(mutate(x, endOfYear), options) + 1;
+  return getWeekOfYearISO(mutate(x, endOfYear), options) + 1;
 }
 
 export function getLastFullWeekOfYear(x: Date, options: LocaleOptions = Locales.current): number
 {
   const lastOfYear = mutate(x, endOfYear);
-  const week = getWeekOfYear(x, options);
-  const weekMax = getWeekOfYear(lastOfYear, options);
+  const week = getWeekOfYearISO(x, options);
+  const weekMax = getWeekOfYearISO(lastOfYear, options);
   const lastWeek = weekMax - week;
 
   return getDayOfWeek(lastOfYear, options) === Constants.WEEKDAY_MAX 
@@ -183,12 +188,17 @@ export function getLastFullWeekOfMonth(x: Date, options: LocaleOptions = Locales
   return Math.floor((fromEnd - invertedDayOfWeek + Constants.DAYS_IN_WEEK) / Constants.DAYS_IN_WEEK);
 }
 
-export function getWeekOfMonth(x: Date, options: LocaleOptions = Locales.current): number
+export function getWeekOfMonthISO(x: Date, options: LocaleOptions = Locales.current): number
 {
-  return getWeekOf(mutate(x, startOfMonth), x.getDate(), options);
+  return getWeekISO(mutate(x, startOfMonth), x.getDate(), options);
 }
 
-export function getWeekOf(start: Date, dayOfStart: number, options: LocaleOptions = Locales.current): number
+export function getWeekOfMonth(x: Date, options: LocaleOptions = Locales.current): number
+{
+  return getWeek(mutate(x, startOfMonth), x.getDate(), options);
+}
+
+export function getWeekISO(start: Date, dayOfStart: number, options: LocaleOptions = Locales.current): number
 {
   const { firstWeekContainsDate } = options;
   const dayOfWeekFirst = getDayOfWeek(start, options);
@@ -196,6 +206,14 @@ export function getWeekOf(start: Date, dayOfStart: number, options: LocaleOption
   const offset = hasWeekZero
     ? dayOfWeekFirst - 1
     : dayOfWeekFirst - 1 + Constants.DAYS_IN_WEEK;
+
+  return Math.floor((dayOfStart + offset) / Constants.DAYS_IN_WEEK);
+}
+
+export function getWeek(start: Date, dayOfStart: number, options: LocaleOptions): number
+{
+  const dayOfWeekFirst = getDayOfWeek(start, options);
+  const offset = dayOfWeekFirst - 1 + Constants.DAYS_IN_WEEK;
 
   return Math.floor((dayOfStart + offset) / Constants.DAYS_IN_WEEK);
 }
@@ -223,7 +241,7 @@ export function getDayOfWeek(x: Date, options: LocaleOptions = Locales.current):
 
 export function getDayOfYear(a: Date): number
 {
-  return Math.round(diffDays(mutate(a, startOfYear), a)) + 1;
+  return Math.round(diffDays(a, mutate(a, startOfYear))) + 1;
 }
 
 export function getDateOffset(x: Date): number

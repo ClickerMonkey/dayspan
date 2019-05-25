@@ -1,7 +1,7 @@
 
 import { Constants } from './Constants';
-import { Functions as fn } from './Functions';
 import { Parse } from './Parse';
+import { TimeFormat } from './TimeFormat';
 
 // tslint:disable: no-magic-numbers
 
@@ -67,66 +67,15 @@ export class Time
   }
 
   /**
-   * Formats this time into a string. The following list describes the available
-   * formatting patterns:
-   *
-   * ### Hour
-   * - H: 0-23
-   * - HH: 00-23
-   * - h: 12,1-12,1-11
-   * - hh: 12,01-12,01-11
-   * - k: 1-24
-   * - kk: 01-24
-   * - a: am,pm
-   * - A: AM,PM
-   * ### Minute
-   * - m: 0-59
-   * - mm: 00-59
-   * ### Second
-   * - s: 0-59
-   * - ss: 00-59
-   * ### Millisecond
-   * - S: 0-9
-   * - SS: 00-99
-   * - SSS: 000-999
-   *
+   * Formats this time into a string. 
+   * 
    * @param format The format to output.
    * @returns The formatted time.
+   * @see [[TimeFormat]]
    */
   public format(format: string): string
   {
-    const formatterEntries = Time.FORMATTERS;
-    let out: string = '';
-
-    for (let i = 0; i < format.length; i++)
-    {
-      let handled: boolean = false;
-
-      for (let k = 0; k < formatterEntries.length && !handled; k++)
-      {
-        const entry = formatterEntries[ k ];
-        const part: string = format.substring( i, i + entry.size );
-
-        if (part.length === entry.size)
-        {
-          const formatter = entry.formats[ part ];
-
-          if (formatter)
-          {
-            out += formatter(this);
-            i += entry.size - 1;
-            handled = true;
-          }
-        }
-      }
-
-      if (!handled)
-      {
-        out += format.charAt(i);
-      }
-    }
-
-    return out;
+    return TimeFormat.format(format, this);
   }
 
   /**
@@ -325,41 +274,5 @@ export class Time
   {
     return new Time(hour, minute, second, millisecond)
   }
-
-  /**
-   * A set of formatting functions keyed by their format string.
-   */
-  public static FORMATTERS = [
-    {
-      size: 3,
-      formats: {
-        SSS: (t: Time) => fn.padNumber(t.millisecond, 3)
-      }
-    },
-    {
-      size: 2,
-      formats: {
-        HH: (t: Time) => fn.padNumber(t.hour, 2),
-        hh: (t: Time) => fn.padNumber((t.hour % 12) || 12, 2),
-        kk: (t: Time) => fn.padNumber(t.hour + 1, 2),
-        mm: (t: Time) => fn.padNumber(t.minute, 2),
-        ss: (t: Time) => fn.padNumber(t.second, 2),
-        SS: (t: Time) => fn.padNumber(t.millisecond, 3, 2)
-      }
-    },
-    {
-      size: 1,
-      formats: {
-        A: (t: Time) => t.hour < 12 ? 'AM' : 'PM',
-        a: (t: Time) => t.hour < 12 ? 'am' : 'pm',
-        H: (t: Time) => t.hour + '',
-        h: (t: Time) => ((t.hour % 12) || 12) + '',
-        k: (t: Time) => (t.hour + 1) + '',
-        m: (t: Time) => t.minute + '',
-        s: (t: Time) => t.second + '',
-        S: (t: Time) => fn.padNumber(t.millisecond, 3, 1)
-      }
-    }
-  ];
 
 }

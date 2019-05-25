@@ -1,6 +1,6 @@
 
 import { Constants } from './Constants';
-import { Unit } from './DateFunctions';
+import { Unit } from './DayFunctions';
 import { Day, DayInput, DayProperty } from './Day';
 import { Event } from './Event';
 import { FrequencyCheck } from './Frequency';
@@ -53,6 +53,14 @@ export class Parse
 
       check = (value: number) => {
         return !!map[ value ];
+      };
+      check.given = true;
+    }
+
+    if (fn.isFrequencyValueEquals(input))
+    {
+      check = (value: number) => {
+        return value === input;
       };
       check.given = true;
     }
@@ -345,6 +353,7 @@ export class Parse
     out.month = this.frequency( input.month, 'month' );
     out.day = this.frequency( input.day, 'day' );
     out.quarter = this.frequency( input.quarter, 'quarter' );
+    out.week = this.frequency( input.week, 'week' );
     out.weekOfYear = this.frequency( input.weekOfYear, 'weekOfYear' );
     out.weekspanOfYear = this.frequency( input.weekspanOfYear, 'weekspanOfYear' );
     out.fullWeekOfYear = this.frequency( input.fullWeekOfYear, 'fullWeekOfYear' );

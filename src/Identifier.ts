@@ -175,7 +175,7 @@ export abstract class Identifier
   protected decompute(id: IdentifierInput): number[]
   {
     const scales: number[] = this.getScales();
-    let total: number = fn.isNumber(id) ? id : parseInt(id as string);
+    let total: number = fn.isNumber(id) ? id : parseInt(id);
     const values: number[] = [];
 
     for (let i = 0; i < scales.length - 1; i++)

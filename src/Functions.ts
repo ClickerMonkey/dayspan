@@ -1,4 +1,4 @@
-import { FrequencyValueEvery } from "./Frequency";
+import { FrequencyValueEvery, FrequencyValueOneOf, FrequencyValueEquals } from "./Frequency";
 
 
 /**
@@ -139,9 +139,30 @@ export class Functions
    * @returns `true` if the variable appears to be a [[FrequencyValueOneOf]],
    *    otherwise false.
    */
-  public static isFrequencyValueOneOf(input: any): input is number[]
+  public static isFrequencyValueOneOf(input: any): input is FrequencyValueOneOf
   {
     return this.isArray( input ) && input.length > 0;
+  }
+
+  /**
+   * Determines whether the given input appears to be a valid
+   * [[FrequencyValueEquals]].
+   * 
+   * ```typescript
+   * Functions.isFrequencyValueEquals({});    // false
+   * Functions.isFrequencyValueEquals([]);    // false
+   * Functions.isFrequencyValueEquals([1]);   // false
+   * Functions.isFrequencyValueEquals(null);  // false
+   * Functions.isFrequencyValueEquals(0);     // false
+   * ```
+   * 
+   * @param input The variable to test.
+   * @returns `true` if the variable appears to be a [[FrequencyValueOneOf]],
+   *    otherwise false.
+   */
+  public static isFrequencyValueEquals(input: any): input is FrequencyValueEquals
+  {
+    return typeof input === 'number' && isFinite(input);
   }
 
   /**

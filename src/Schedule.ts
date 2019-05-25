@@ -2,7 +2,7 @@
 import { Iterate, IterateAction } from 'iteratez';
 
 import { Constants } from './Constants';
-import { Unit, durations } from './DateFunctions';
+import { durations, Unit } from './DayFunctions';
 import { Day, DayInput, DayProperty } from './Day';
 import { DaySpan } from './DaySpan';
 import { FrequencyCheck, FrequencyValue } from './Frequency';
@@ -136,6 +136,11 @@ export interface ScheduleInput<M>
    * @see [[Schedule.dayOfYear]]
    */
   dayOfYear?: FrequencyValue;
+
+  /**
+   * @see [[Schedule.week]]
+   */
+  week?: FrequencyValue;
 
   /**
    * @see [[Schedule.weekOfYear]]
@@ -308,6 +313,11 @@ export class Schedule<M>
   public month: FrequencyCheck;
 
   /**
+   * How frequent the event occurs based on [[Day.week]].
+   */
+  public week: FrequencyCheck;
+
+  /**
    * How frequent the event occurs based on [[Day.weekOfYear]].
    */
   public weekOfYear: FrequencyCheck;
@@ -461,6 +471,7 @@ export class Schedule<M>
       this.month,
       this.day,
       this.quarter,
+      this.week, 
       this.weekOfYear,
       this.fullWeekOfYear,
       this.weekspanOfYear,
@@ -531,7 +542,7 @@ export class Schedule<M>
 
     if (fn.isFrequencyValueOneOf(this.year))
     {
-      const valueOfMax = this.year.reduce((a, b) => Math.max(a, b));
+      // const valueOfMax = this.year.reduce((a, b) => Math.max(a, b));
 
       
       return max - this.start.year + 1;
@@ -867,7 +878,7 @@ export class Schedule<M>
 
     for (const check of this.checks)
     {
-      if (!check( day[ check.property ] as number ))
+      if (!check( day[ check.property ] ))
       {
         return false;
       }
@@ -1538,11 +1549,13 @@ export class Schedule<M>
   /**
    * @returns `true` if this schedule produces events only in a specific day of
    *    the week.
+   * @see [[Schedule.day]]
    * @see [[Schedule.dayOfWeek]]
    */
   public isSingleDayOfWeek(): boolean
   {
-    return this.isSingleFrequency( this.dayOfWeek );
+    return this.isSingleFrequency( this.dayOfWeek ) ||
+      this.isSingleFrequency( this.day );
   }
 
   /**
@@ -1587,6 +1600,7 @@ export class Schedule<M>
   {
     return this.isSingleFrequency( this.weekspanOfYear ) ||
       this.isSingleFrequency( this.fullWeekOfYear ) ||
+      this.isSingleFrequency( this.week ) ||
       this.isSingleFrequency( this.weekOfYear ) ||
       this.isSingleFrequency( this.lastFullWeekOfYear ) ||
       this.isSingleFrequency( this.lastWeekspanOfYear );
@@ -1599,7 +1613,7 @@ export class Schedule<M>
    */
   public isSingleFrequency(frequency: FrequencyCheck): boolean
   {
-    return fn.isFrequencyValueOneOf(frequency) && frequency.length === 1;
+    return (fn.isFrequencyValueOneOf(frequency.input) && frequency.input.length === 1) || fn.isFrequencyValueEquals(frequency.input);
   }
 
   /**
@@ -1775,6 +1789,7 @@ export class Schedule<M>
     if (this.year.input) out.year = this.year.input;
     if (this.month.input) out.month = this.month.input;
     if (this.day.input) out.day = this.day.input;
+    if (this.week.input) out.week = this.week.input;
     if (this.weekOfYear.input) out.weekOfYear = this.weekOfYear.input;
     if (this.weekspanOfYear.input) out.weekspanOfYear = this.weekspanOfYear.input;
     if (this.fullWeekOfYear.input) out.fullWeekOfYear = this.fullWeekOfYear.input;
@@ -1846,6 +1861,7 @@ export class Schedule<M>
     out += this.describeRule( this.dayOfYear.input, lang.ruleDayOfYear );
     out += this.describeRule( this.year.input, lang.ruleYear );
     out += this.describeRule( this.month.input, lang.ruleMonth );
+    out += this.describeRule( this.week.input, lang.ruleWeek );
     out += this.describeRule( this.weekOfYear.input, lang.ruleWeekOfYear );
     out += this.describeRule( this.weekspanOfYear.input, lang.ruleWeekspanOfYear );
     out += this.describeRule( this.fullWeekOfYear.input, lang.ruleFullWeekOfYear );
@@ -1930,6 +1946,10 @@ export class Schedule<M>
       {
         out += ' ' + localeRule.oneOf(value);
       }
+    }
+    else if (fn.isFrequencyValueEquals(value))
+    {
+      out += ' ' + localeRule.oneOf([value]);
     }
 
     return out;

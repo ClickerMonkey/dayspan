@@ -1,22 +1,25 @@
 // import { describe, it, expect } from 'jest';
-import { ScheduleModifier } from '../ScheduleModifier';
-import { Time } from '../Time';
+
 import { Day } from '../Day';
 import { Identifier } from '../Identifier';
+import { ScheduleModifier } from '../ScheduleModifier';
+import { Time } from '../Time';
+
+// tslint:disable: no-magic-numbers
 
 
 describe('ScheduleModifier', () =>
 {
 
-  let d0 = Day.fromArray([2017, 2, 11, 8, 30]);
-  let d1 = Day.fromArray([2014, 5, 15, 16, 23]);
+  const d0 = Day.fromArray([2017, 2, 11, 8, 30]);
+  const d1 = Day.fromArray([2014, 5, 15, 16, 23]);
 
-  let t0 = Time.parse('08:30');
-  let t1 = Time.parse('09:45');
+  const t0 = Time.parse('08:30');
+  const t1 = Time.parse('09:45');
 
   it('moveTime', () =>
   {
-    let mod = new ScheduleModifier<boolean>();
+    const mod = new ScheduleModifier<boolean>();
 
     mod.set( d0, true, Identifier.Time );
     mod.set( d1, true, Identifier.Time );
@@ -36,7 +39,7 @@ describe('ScheduleModifier', () =>
 
   it('get time first', () =>
   {
-    let mod = new ScheduleModifier<number>();
+    const mod = new ScheduleModifier<number>();
 
     mod.set( d0, 1, Identifier.Time );
     mod.set( d0, 2, Identifier.Day );
@@ -47,7 +50,7 @@ describe('ScheduleModifier', () =>
 
   it('get all day', () =>
   {
-    let mod = new ScheduleModifier<number>();
+    const mod = new ScheduleModifier<number>();
 
     mod.set( d0, 1, Identifier.Time );
     mod.set( d0, 2, Identifier.Day );

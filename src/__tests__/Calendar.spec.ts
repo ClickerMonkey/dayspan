@@ -1,16 +1,19 @@
 // import { describe, it, expect } from 'jest';
+
+import { Calendar } from '../Calendar';
+import { Day } from '../Day';
+import { Month } from '../Month';
 import { Schedule } from '../Schedule';
 import { Weekday } from '../Weekday';
-import { Month } from '../Month';
-import { Day } from '../Day';
-import { Calendar } from '../Calendar';
 
+// tslint:disable: no-magic-numbers
 
 describe('Calendar', () => {
 
   it('days 1', () => {
-    let d = Day.build(2018, Month.APRIL, 11);
-    let c = Calendar.days<string, any>(1, d);
+
+    const d = Day.build(2018, Month.APRIL, 11);
+    const c = Calendar.days<string, any>(1, d);
 
     expect( c.length ).toBe( 1 );
     expect( c.days.length ).toBe( 1 );
@@ -27,8 +30,8 @@ describe('Calendar', () => {
   })
 
   it('days 3', () => {
-    let d = Day.build(2018, Month.APRIL, 11);
-    let c = Calendar.days<string, any>(3, d);
+    const d = Day.build(2018, Month.APRIL, 11);
+    const c = Calendar.days<string, any>(3, d);
 
     expect( c.length ).toBe( 3 );
     expect( c.days.length ).toBe( 3 );
@@ -58,9 +61,9 @@ describe('Calendar', () => {
 
   it('days 3 getDay', () => {
 
-    let d = Day.build(2018, Month.APRIL, 11);
-    let c = Calendar.days<string, any>(3, d);
-    let cd = c.getDay([2018, Month.APRIL, 11]);
+    const d = Day.build(2018, Month.APRIL, 11);
+    const c = Calendar.days<string, any>(3, d);
+    const cd = c.getDay([2018, Month.APRIL, 11]);
 
     expect( cd ).toBeDefined();
     expect( cd.dayIdentifier ).toBe( 20180411 );
@@ -68,15 +71,15 @@ describe('Calendar', () => {
 
   it('schedule', () =>
   {
-    let d = Day.build(2018, Month.MAY, 11);
-    let c = Calendar.months<string, any>(1, d);
+    const d = Day.build(2018, Month.MAY, 11);
+    const c = Calendar.months<string, any>(1, d);
     c.listTimes = true;
 
     // Every Monday 9:00 - 9:30
     c.addEvent({
       data: 'Weekly Meeting',
       schedule: new Schedule({
-        dayOfWeek: [Weekday.MONDAY],
+        day: [Weekday.MONDAY],
         times: [9],
         duration: 30,
         durationUnit: 'minutes'

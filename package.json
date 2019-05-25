@@ -1,11 +1,8 @@
 {
   "name": "dayspan",
-  "version": "0.12.5",
+  "version": "1.0.0",
   "description": "A date & schedule library to use for advanced calendars in TypeScript and JS",
-  "main": "umd/dayspan.js",
-  "mainName": "ds",
-  "module": "lib/index.js",
-  "es2015": "lib-esm/index.js",
+  "main": "dist/dayspan.js",
   "typings": "typings/index.d.ts",
   "repository": {
     "type": "git",
@@ -19,12 +16,14 @@
     "node": ">=6.9"
   },
   "scripts": {
-    "cleanup": "shx rm -rf umd lib lib-esm lib-fesm typings coverage ../dayspan-pages/docs",
+    "start": "webpack-dev-server --port 9000 --inline --progress --profile --colors --watch --content-base src/ --mode development",
+    "build": "webpack --config webpack.config.js --mode production && cp src/types.ts typings/types.d.ts",
+    "build.prod": "webpack --config webpack.config.js -p && cp src/types.ts typings/types.d.ts",
+    "cleanup": "shx rm -rf umd lib lib-esm lib-fesm typings coverage ../iteratez-pages/docs",
     "prebuild": "npm run cleanup && npm run verify",
-    "build": "tsc && tsc -p tsconfig.esm.json && webpack && webpack --env.prod",
-    "build:fesm:min": "uglifyjs lib-fesm/index.js --compress --mangle --source-map --output lib-fesm/index.min.js",
     "docs": "typedoc -p . --readme README.md --theme minimal --mode file --target 'es5' --excludeNotExported --excludePrivate --ignoreCompilerErrors --exclude \"**/src/**/__tests__/*.*\" --out ../dayspan-pages/docs src/ && cp -R examples ../dayspan-pages/ && cp -R umd ../dayspan-pages/ && cp -R node_modules/moment/min ../dayspan-pages/node_modules/moment/",
     "test": "jest",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "test:watch": "npm test -- --watch",
     "test:coverage": "npm test -- --coverage",
     "test:only-changed": "npm test -- --bail --onlyChanged",
@@ -51,72 +50,39 @@
       "git add"
     ]
   },
-  "jest": {
-    "testURL": "http://localhost/",
-    "roots": [
-      "<rootDir>/src"
-    ],
-    "transform": {
-      "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
-    },
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ],
-    "mapCoverage": true,
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/lib/",
-      "<rootDir>/lib-esm/",
-      "<rootDir>/umd/",
-      "<rootDir>/src/.*(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$"
-    ],
-    "globals": {
-      "ts-jest": {
-        "skipBabel": true
-      }
-    },
-    "coverageThreshold": {
-      "global": {
-        "branches": 80,
-        "functions": 80,
-        "lines": 80,
-        "statements": 85
-      }
-    }
-  },
   "devDependencies": {
-    "@types/jest": "20.0.2",
-    "@types/node": "7.0.31",
-    "awesome-typescript-loader": "3.2.1",
-    "commitizen": "2.9.6",
-    "cross-var": "1.0.3",
-    "cz-conventional-changelog": "2.0.0",
-    "gzip-size-cli": "2.0.0",
+    "@types/jest": "24.0.11",
+    "@types/node": "11.13.4",
+    "awesome-typescript-loader": "5.2.1",
+    "commitizen": "3.0.7",
+    "cross-var": "1.1.0",
+    "cz-conventional-changelog": "2.1.0",
+    "gzip-size-cli": "3.0.0",
     "irish-pub": "0.2.0",
-    "jest": "20.0.4",
-    "jest-cli": "22.4.3",
-    "lint-staged": "4.0.0",
-    "prettier": "1.5.2",
-    "shx": "0.2.2",
-    "standard-version": "4.2.0",
+    "jest": "24.7.1",
+    "jest-cli": "24.7.1",
+    "lint-staged": "8.1.5",
+    "prettier": "1.17.0",
+    "shx": "0.3.2",
+    "standard-version": "5.0.2",
     "strip-json-comments-cli": "1.0.1",
-    "ts-jest": "20.0.6",
-    "tslint": "5.4.3",
-    "tslint-config-prettier": "1.1.0",
-    "tslint-config-standard": "6.0.1",
-    "tslint-react": "3.0.0",
-    "typedoc": "0.7.1",
-    "typescript": "2.4.1",
-    "uglify-js": "git://github.com/mishoo/UglifyJS2.git#harmony-v2.8.22",
-    "uglifyjs-webpack-plugin": "0.4.5",
-    "validate-commit-msg": "2.12.2",
-    "webpack": "3.0.0",
-    "webpack-config-utils": "2.3.0"
+    "ts-jest": "24.0.2",
+    "tslint": "5.16.0",
+    "tslint-config-prettier": "1.18.0",
+    "tslint-config-standard": "8.0.1",
+    "tslint-loader": "3.5.4",
+    "tslint-react": "4.0.0",
+    "typedoc": "0.14.2",
+    "typescript": "3.4.3",
+    "uglify-js": "3.5.4",
+    "uglifyjs-webpack-plugin": "2.1.2",
+    "validate-commit-msg": "2.14.0",
+    "webpack": "4.30.0",
+    "webpack-cli": "3.3.0",
+    "webpack-config-utils": "2.3.1",
+    "webpack-dev-server": "3.1.4"
   },
   "dependencies": {
-    "iteratez": "1.2.1"
+    "iteratez": "1.2.2"
   }
 }

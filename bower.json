@@ -5,7 +5,7 @@
     "Philip Diffenderfer <pdiffenderfer@gmail.com>"
   ],
   "description": "A date & schedule library to use for advanced calendars in TypeScript and JS",
-  "main": "umd/dayspan.js",
+  "main": "dist/dayspan.js",
   "keywords": [
     "javascript",
     "typescript",
@@ -28,6 +28,5 @@
     "*.tgz",
     "package"
   ],
-  "dependencies": {
-  }
+  "dependencies": {}
 }

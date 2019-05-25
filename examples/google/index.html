@@ -1,149 +1,131 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
-    <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-    <script src="https://unpkg.com/vue/dist/vue.js"></script>
-    <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
-    <script src="../../node_modules/moment/min/moment-with-locales.js"></script>
-    <script src="../../umd/dayspan.js"></script>
-    <style> [v-cloak] { display: none; } </style>
-  </head>
-  <body>
 
-    <!-- TODO
+<head>
+  <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+  <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+  <script src="../../dist/dayspan.js"></script>
+  <style>
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TODO
     - [ ] handling changing of times or allDay flag with include, exclude, cancel, and meta
     - [ ] dragging existing events
     - [ ] dragging to create events
     -->
 
-    <v-app id="dayspan" v-cloak>
-      <v-navigation-drawer :clipped="$vuetify.breakpoint.lgAndUp" v-model="drawer" fixed app>
-        <div class="pa-3" v-if="calendar">
-          <ds-day-picker :span="calendar.span" @picked="rebuild"></ds-day-picker>
-        </div>
-      </v-navigation-drawer>
-      <v-toolbar :clipped-left="$vuetify.breakpoint.lgAndUp" color="white" app flat fixed>
+  <v-app id="dayspan" v-cloak>
+    <v-navigation-drawer :clipped="$vuetify.breakpoint.lgAndUp" v-model="drawer" fixed app>
+      <div class="pa-3" v-if="calendar">
+        <ds-day-picker :span="calendar.span" @picked="rebuild"></ds-day-picker>
+      </div>
+    </v-navigation-drawer>
+    <v-toolbar :clipped-left="$vuetify.breakpoint.lgAndUp" color="white" app flat fixed>
 
-        <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
-          <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-          <span class="hidden-sm-and-down">DaySpan</span>
-        </v-toolbar-title>
+      <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
+        <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+        <span class="hidden-sm-and-down">DaySpan</span>
+      </v-toolbar-title>
 
-        <v-tooltip bottom>
-          <v-btn depressed @click="setToday" slot="activator">TODAY</v-btn>
-          <span>{{ todayDate }}</span>
-        </v-tooltip>
+      <v-tooltip bottom>
+        <v-btn depressed @click="setToday" slot="activator">TODAY</v-btn>
+        <span>{{ todayDate }}</span>
+      </v-tooltip>
 
-        <v-tooltip bottom>
-          <v-btn slot="activator" icon depressed @click="prev" class="grey--text text--darken-1">
-            <v-icon>keyboard_arrow_left</v-icon>
-          </v-btn>
-          <span>{{ prevLabel }}</span>
-        </v-tooltip>
-        <v-tooltip bottom>
-          <v-btn slot="activator" icon depressed @click="next" class="grey--text text--darken-1">
-            <v-icon>keyboard_arrow_right</v-icon>
-          </v-btn>
-          <span>{{ nextLabel }}</span>
-        </v-tooltip>
-
-        <h1 class="title grey--text text--darken-1">
-          {{ summary }}
-        </h1>
-
-        <v-spacer></v-spacer>
-        <v-menu>
-          <v-btn flat slot="activator">
-            {{ currentType.label }}
-            <v-icon>arrow_drop_down</v-icon>
-          </v-btn>
-          <v-list>
-            <v-list-tile v-for="type in types"
-              :key="type.id"
-              @click="currentType = type">
-              <v-list-tile-content>
-                <v-list-tile-title>{{ type.label }}</v-list-tile-title>
-              </v-list-tile-content>
-              <v-list-tile-action>{{ type.shortcut }}</v-list-tile-action>
-            </v-list-tile>
-          </v-list>
-        </v-menu>
-        <v-btn icon large href="https://github.com/ClickerMonkey/dayspan" target="_blank">
-          <v-avatar size="32px" tile>
-            <img src="https://simpleicons.org/icons/github.svg" alt="Github">
-          </v-avatar>
+      <v-tooltip bottom>
+        <v-btn slot="activator" icon depressed @click="prev" class="grey--text text--darken-1">
+          <v-icon>keyboard_arrow_left</v-icon>
         </v-btn>
-      </v-toolbar>
-      <v-content>
-        <v-container fluid fill-height class="ds-calendar-container">
+        <span>{{ prevLabel }}</span>
+      </v-tooltip>
+      <v-tooltip bottom>
+        <v-btn slot="activator" icon depressed @click="next" class="grey--text text--darken-1">
+          <v-icon>keyboard_arrow_right</v-icon>
+        </v-btn>
+        <span>{{ nextLabel }}</span>
+      </v-tooltip>
 
-          <div v-if="isMonth || isYear" class="ds-expand ds-month-view"
-            :class="{ 'ds-year-view': isYear }">
-            <div class="ds-month ds-expand">
-              <div class="ds-week-header">
-                <div class="ds-week-header-day grey--text text--darken-1 pa-1"
-                  v-for="weekday in weekdayCodes" :key="weekday">
-                  {{ weekday }}
-                </div>
+      <h1 class="title grey--text text--darken-1">
+        {{ summary }}
+      </h1>
+
+      <v-spacer></v-spacer>
+      <v-menu>
+        <v-btn flat slot="activator">
+          {{ currentType.label }}
+          <v-icon>arrow_drop_down</v-icon>
+        </v-btn>
+        <v-list>
+          <v-list-tile v-for="type in types" :key="type.id" @click="currentType = type">
+            <v-list-tile-content>
+              <v-list-tile-title>{{ type.label }}</v-list-tile-title>
+            </v-list-tile-content>
+            <v-list-tile-action>{{ type.shortcut }}</v-list-tile-action>
+          </v-list-tile>
+        </v-list>
+      </v-menu>
+      <v-btn icon large href="https://github.com/ClickerMonkey/dayspan" target="_blank">
+        <v-avatar size="32px" tile>
+          <img src="https://simpleicons.org/icons/github.svg" alt="Github">
+        </v-avatar>
+      </v-btn>
+    </v-toolbar>
+    <v-content>
+      <v-container fluid fill-height class="ds-calendar-container">
+
+        <div v-if="isMonth || isYear" class="ds-expand ds-month-view" :class="{ 'ds-year-view': isYear }">
+          <div class="ds-month ds-expand">
+            <div class="ds-week-header">
+              <div class="ds-week-header-day grey--text text--darken-1 pa-1" v-for="weekday in weekdayCodes"
+                :key="weekday">
+                {{ weekday }}
               </div>
-              <ds-day-row
-                v-for="i in rows"
-                :key="i"
-                :days="daysAtRow( i, 7 )"
-                :calendar="calendar"
-                @edit="edit"
-                @add="add"
-              ></ds-day-row>
             </div>
+            <ds-day-row v-for="i in rows" :key="i" :days="daysAtRow( i, 7 )" :calendar="calendar" @edit="edit"
+              @add="add"></ds-day-row>
           </div>
+        </div>
 
-          <div v-if="isWeek || isDay" class="ds-week-view">
-            <div class="ds-week-view-container">
-              <ds-week-header
-                :calendar="calendar"
-                :days="calendar.days"
-                @add="add"
-                @edit="edit"
-              ></ds-week-header>
-              <div class="ds-week-view-bottom">
-                <div class="ds-week-view-scrollable">
-                  <div class="ds-week-view-pane">
-                    <div class="ds-week ds-expand">
-                      <div class="ds-hour-list">
-                        <div v-for="hour in hours" class="ds-hour">
-                          <div class="ds-hour-text">{{ hour }}</div>
-                        </div>
+        <div v-if="isWeek || isDay" class="ds-week-view">
+          <div class="ds-week-view-container">
+            <ds-week-header :calendar="calendar" :days="calendar.days" @add="add" @edit="edit"></ds-week-header>
+            <div class="ds-week-view-bottom">
+              <div class="ds-week-view-scrollable">
+                <div class="ds-week-view-pane">
+                  <div class="ds-week ds-expand">
+                    <div class="ds-hour-list">
+                      <div v-for="hour in hours" class="ds-hour">
+                        <div class="ds-hour-text">{{ hour }}</div>
                       </div>
-                      <template v-for="day in calendar.days">
-                        <ds-day-times
-                          :key="day.dayIdentifier"
-                          :day="day"
-                          :calendar="calendar"
-                          @edit="edit"
-                          @add-at="addAt"
-                        ></ds-day-times>
-                      </template>
                     </div>
+                    <template v-for="day in calendar.days">
+                      <ds-day-times :key="day.dayIdentifier" :day="day" :calendar="calendar" @edit="edit"
+                        @add-at="addAt"></ds-day-times>
+                    </template>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <ds-scheduler ref="scheduler"
-            @save="eventSave"
-            @remove="eventRemove"
-            @exclude="eventRemoveOccurrence"
-            @cancel="eventCancel"
-            @move="eventMove"></ds-scheduler>
+        <ds-scheduler ref="scheduler" @save="eventSave" @remove="eventRemove" @exclude="eventRemoveOccurrence"
+          @cancel="eventCancel" @move="eventMove"></ds-scheduler>
 
-        </v-container>
-      </v-content>
-    </v-app>
+      </v-container>
+    </v-content>
+  </v-app>
 
-    <script type="text/template" id="template_scheduler">
+  <script type="text/template" id="template_scheduler">
       <v-dialog v-model="open" max-width="700px" persistent lazy>
         <v-card>
           <v-card-text>
@@ -456,7 +438,7 @@
       </v-dialog>
     </script>
 
-    <script type="text/template" id="template_day">
+  <script type="text/template" id="template_day">
       <div class="ds-day pa-1" @click.stop="add"
          :class="{
            'ds-today': day.currentDay,
@@ -483,7 +465,7 @@
       </div>
     </script>
 
-    <script type="text/template" id="template_day_row">
+  <script type="text/template" id="template_day_row">
       <div class="ds-week">
         <template v-for="(day, i) in days">
           <ds-day :key="i" :day="day" :calendar="calendar" @edit="edit" @add="add"></ds-day>
@@ -491,7 +473,7 @@
       </div>
     </script>
 
-    <script type="text/template" id="template_event">
+  <script type="text/template" id="template_event">
       <div class="ds-event" :style="style" @click.stop="edit">
         <span v-if="showName">
           <span v-if="hasPrefix">
@@ -507,7 +489,7 @@
       </div>
     </script>
 
-    <script type="text/template" id="template_event_time">
+  <script type="text/template" id="template_event_time">
       <div class="ds-event" :style="style" @click.stop="edit">
         <strong v-if="showName">
           {{ calendarEvent.event.data.name }}
@@ -515,7 +497,7 @@
       </div>
     </script>
 
-    <script type="text/template" id="template_day_picker">
+  <script type="text/template" id="template_day_picker">
       <div class="ds-day-picker">
         <div class="ds-week-header mb-2">
           <div class="subtitle grey--text text--darken-1 py-1 pl-2">
@@ -558,7 +540,7 @@
       </div>
     </script>
 
-    <script type="text/template" id="template_week_day_header">
+  <script type="text/template" id="template_week_day_header">
       <div class="ds-day pa-1" @click.stop="add"
         :class="{ 'ds-today': day.currentDay }">
         <div class="ds-week-weekday">{{ day.format('ddd') }}</div>
@@ -578,7 +560,7 @@
       </div>
     </script>
 
-    <script type="text/template" id="template_week_header">
+  <script type="text/template" id="template_week_header">
       <div class="ds-week-view-top ds-week">
         <div class="ds-hour-list"></div>
         <template v-for="day in days">
@@ -592,7 +574,7 @@
       </div>
     </script>
 
-    <script type="text/template" id="template_day_times">
+  <script type="text/template" id="template_day_times">
       <div class="ds-day" :class="{'ds-today': day.currentDay}">
         <div class="ds-hour" v-for="h in 24" @click.stop="addAt( h )"></div>
         <template v-for="(event, i) in day.events">
@@ -608,1385 +590,1425 @@
       </div>
     </script>
 
-    <script>
+  <script>
 
-      var fn = ds.Functions;
-      var Store = {
-        Watcher: function(name, deep) {
-          return {
-            deep: !!deep,
-            handler: function(newValue) {
-              localStorage.setItem(name, JSON.stringify(newValue));
-            }
-          };
-        },
-        Load: function(name, defaultValue, parser) {
-          var oldValue = localStorage.getItem(name);
-          if (!oldValue) {
-            return defaultValue;
+    var fn = ds.Functions;
+    var Store = {
+      Watcher: function ( name, deep ) {
+        return {
+          deep: !!deep,
+          handler: function ( newValue ) {
+            localStorage.setItem( name, JSON.stringify( newValue ) );
           }
-          var parsedValue = JSON.parse(oldValue);
-          if (parser) {
-            parsedValue = parser( parsedValue );
-          }
-          return parsedValue;
+        };
+      },
+      Load: function ( name, defaultValue, parser ) {
+        var oldValue = localStorage.getItem( name );
+        if ( !oldValue ) {
+          return defaultValue;
         }
-      };
-
-      Vue.component('dsScheduler', {
-        template: '#template_scheduler',
-        data: function() {
-          return {
-            open: false,
-            event: null,
-            color: null,
-            title: '',
-            input: {},
-            day: null,
-            type: '',
-            startMenu: false,
-            endMenu: false,
-            editCustom: false,
-            currentTab: 'appearance',
-            forecastSize: 10,
-            customWeekTypeCache: null,
-            customDayTypeCache: null,
-            colors: [
-              { text: 'Red', value: '#F44336' },
-              { text: 'Pink', value: '#E91E63' },
-              { text: 'Purple', value: '#9C27B0' },
-              { text: 'Deep Purple', value: '#673AB7' },
-              { text: 'Indigo', value: '#3F51B5' },
-              { text: 'Blue', value: '#2196F3' },
-              { text: 'Light Blue', value: '#03A9F4' },
-              { text: 'Cyan', value: '#00BCD4' },
-              { text: 'Teal', value: '#009688' },
-              { text: 'Green', value: '#4CAF50' },
-              { text: 'Light Green', value: '#8BC34A' },
-              { text: 'Lime', value: '#CDDC39' },
-              { text: 'Yellow', value: '#FFEB3B' },
-              { text: 'Amber', value: '#FFC107' },
-              { text: 'Orange', value: '#FF9800' },
-              { text: 'Deep Orange', value: '#FF5722' },
-              { text: 'Brown', value: '#795548' },
-              { text: 'Blue Gray', value: '#607D8B' },
-              { text: 'Gray', value: '#9E9E9E' },
-              { text: 'Black', value: '#000000' }
-            ],
-
-            yearOptions: [
-              { text: 'Any year', value: 'any'},
-              { text: 'On the following years...', value: 'oneof'},
-              { text: 'Every _ years starting on _', value: 'every'}
-            ],
-            monthOptions: [
-              { text: 'Any month', value: 'any'},
-              { text: 'On the following months...', value: 'oneof'},
-              { text: 'Every _ months starting on _', value: 'every'}
-            ],
-            weekTypes: [
-              { text: 'Week of the month (first week has a Thursday)', property: 'weekOfMonth', max: 6 },
-              { text: 'Weekspan of the month (starts on first day of month)', property: 'weekspanOfMonth', max: 7, min: 1, offset: -1 },
-              { text: 'Full week of the month (0th = the week before if any)', property: 'fullWeekOfMonth', max: 6 },
-              { text: 'Last weekspan of the month (starts on last day of month)', property: 'lastWeekspanOfMonth', max: 7, min: 1, offset: -1 },
-              { text: 'Last full week of the month (0th = the week after if any)', property: 'lastFullWeekOfMonth', max: 6 },
-              { text: 'Week of the year (first week has a Thursday)', property: 'weekOfYear', max: 54 },
-              { text: 'Weekspan of the year (starts on first day of year)', property: 'weekspanOfYear', max: 53, min: 1, offset: -1 },
-              { text: 'Full week of the year (0th = the week before if any)', property: 'fullWeekOfYear', max: 54 },
-              { text: 'Last weekspan of the year (starts on last day of year)', property: 'lastWeekspanOfYear', max: 53, min: 1, offset: -1 },
-              { text: 'Last full week of the year (0th = the week after if any)', property: 'lastFullWeekOfYear', max: 54 }
-            ],
-            weekOptions: [
-              { text: 'Any week', value: 'any'},
-              { text: 'On the following weeks...', value: 'oneof'},
-              { text: 'Every _ weeks starting on _', value: 'every'}
-            ],
-            weekdayOptions: [
-              { text: 'Any day of the week', value: 'any'},
-              { text: 'On the following days of the week...', value: 'oneof'},
-              { text: 'Every _ weekday starting on _', value: 'every'},
-              { text: 'Weekends', value: 'weekend'},
-              { text: 'Weekdays', value: 'weekday'}
-            ],
-            dayTypes: [
-              { text: 'Day of the month', property: 'dayOfMonth', max: 32, min: 1 },
-              { text: 'Last day of the month', property: 'lastDayOfMonth', max: 32, min: 1 },
-              { text: 'Day of the year', property: 'dayOfYear', max: 367, min: 1, offset: -1 }
-            ],
-            dayOptions: [
-              { text: 'Any day', value: 'any'},
-              { text: 'On the following days...', value: 'oneof'},
-              { text: 'Every _ days starting on _', value: 'every'}
-            ]
-          };
-        },
-        computed: {
-          // Custom Dropdown Options
-          yearOneOfs: function() {
-            var currentYear = this.input.start || this.day;
-            var min = currentYear.year - 5;
-            var max = currentYear.year + 20;
-            var oneof = [];
-            for (var i = min; i <= max; i++) {
-              oneof.push({
-                text: i,
-                value: i
-              });
-            }
-            return oneof;
-          },
-          yearOffsets: function() {
-            var max = this.input.year.every;
-            var currentYear = this.input.start || this.day;
-            var offsets = [];
-            for (var i = 0; i < max; i++) {
-              offsets.push({
-                text: currentYear.year + i,
-                value: i
-              });
-            }
-            return offsets;
-          },
-          monthOneOfs: function() {
-            return moment.months().map(function(name, i) {
-              return {
-                text: name,
-                value: i
-              };
-            });
-          },
-          monthOffsets: function() {
-            return this.customOffsets( this.input.month.every, moment.months() );
-          },
-          weekdayOneOfs: function() {
-            return moment.weekdays().map(function(name, i) {
-              return {
-                text: name,
-                value: i
-              };
-            });
-          },
-          weekdayOffsets: function() {
-            return this.customOffsets( this.input.dayOfWeek.every, moment.weekdays() );
-          },
-          dayOneOfs: function() {
-            var opt = this.customDayType;
-            return this.customOffsets( opt.max, ds.Suffix.CACHE, opt.min, opt.offset );
-          },
-          dayOffsets: function() {
-            var opt = this.customDayType;
-            return this.customOffsets( this.input[ opt.property ].every + 1, ds.Suffix.CACHE, opt.min, opt.offset );
-          },
-          weekOneOfs: function() {
-            var opt = this.customWeekType;
-            return this.customOffsets( opt.max, ds.Suffix.CACHE, opt.min, opt.offset  );
-          },
-          weekOffsets: function() {
-            var opt = this.customWeekType;
-            return this.customOffsets( this.input[ opt.property ].every + 1, ds.Suffix.CACHE );
-          },
-
-          // Custom Options
-          customYear: {
-            get: function() {
-              return this.customGet(this.input.year);
-            },
-            set: function(value) {
-              this.customSet('year', value);
-            }
-          },
-          customMonth: {
-            get: function() {
-              return this.customGet(this.input.month);
-            },
-            set: function(value) {
-              this.customSet('month', value);
-            }
-          },
-          customWeekType: {
-            get: function() {
-              if (!this.customWeekTypeCache) {
-                this.customWeekTypeCache = this.customFindType(this.weekTypes);
-              }
-              return this.customWeekTypeCache;
-            },
-            set: function(newType) {
-              this.customWeekTypeCache = this.customApplyType(newType, [], this.customWeekTypeCache);
-            }
-          },
-          customWeek: {
-            get: function() {
-              return this.customGet(this.input[ this.customWeekType.property ]);
-            },
-            set: function(value) {
-              this.customSet(this.customWeekType.property, value);
-            }
-          },
-          customWeekday: {
-            get: function() {
-              var x = this.input.dayOfWeek;
-              if (x && fn.isArrayEquals(x, ds.Weekday.WEEK)) return 'weekday';
-              if (x && fn.isArrayEquals(x, ds.Weekday.ENDS)) return 'weekend';
-              return this.customGet(x);
-            },
-            set: function(value) {
-              switch (value) {
-                case 'weekday':
-                  this.input.dayOfWeek = ds.Weekday.WEEK;
-                  break;
-                case 'weekend':
-                  this.input.dayOfWeek = ds.Weekday.ENDS;
-                  break;
-                default:
-                  this.customSet('dayOfWeek', value, true);
-                  break;
-              }
-              this.updateInput();
-            }
-          },
-          customDayType: {
-            get: function() {
-              if (!this.customDayTypeCache) {
-                this.customDayTypeCache = this.customFindType(this.dayTypes);
-              }
-              return this.customDayTypeCache;
-            },
-            set: function(newType) {
-              this.customDayTypeCache = this.customApplyType(newType, [], this.customDayTypeCache);
-            }
-          },
-          customDay: {
-            get: function() {
-              return this.customGet(this.input[ this.customDayType.property ]);
-            },
-            set: function(value) {
-              this.customSet(this.customDayType.property, value);
-            }
-          },
-
-          durationOptions: function() {
-            var suffix = this.input.duration === 1 ? '' : 's';
-            var duringDay = [
-              { text: 'minute' + suffix, value: 'minutes' },
-              { text: 'hour' + suffix, value: 'hours' }
-            ];
-            var allDay = [
-              { text: 'day' + suffix, value: 'days' },
-              { text: 'week' + suffix, value: 'weeks' },
-              { text: 'month' + suffix, value: 'months' }
-            ];
-            return this.allDay ? allDay : duringDay.concat( allDay );
-          },
-
-          forecast: function()
-          {
-            var days = [];
-
-            if (this.day)
-            {
-              var schedule = new ds.Schedule(this.input);
-              var size = parseInt(this.forecastSize) || 1;
-
-              days = days.concat( schedule.prevDays( this.day, size + 1, true ) );
-              days.reverse();
-              days = days.concat( schedule.nextDays( this.day, size, false ) );
-            }
-
-            return days;
-          },
-
-          typeHint: function() {
-            return this.type === 'custom' ? new ds.Schedule(this.input).describe('event', false, false, false, false) : '';
-          },
-          canSave: function() {
-            return !!this.title;
-          },
-          header: function() {
-            return this.event ? 'Edit Event' : 'Add Event';
-          },
-          canRemove: function() {
-            return !!this.event;
-          },
-          canExclude: function() {
-            return !!this.event && this.repeats;
-          },
-          canCancel: function() {
-            return this.event && !this.event.cancelled;
-          },
-          canUncancel: function() {
-            return this.event && this.event.cancelled;
-          },
-          types: function() {
-            if (!this.day) {
-              return [];
-            }
-            var day = this.day;
-            return ds.Patterns.map(function(pattern) {
-              return {
-                label: pattern.describe( day ),
-                value: pattern.name
-              }
-            });
-          },
-          startSpan: function() {
-            return ds.DaySpan.point((this.input ? this.input.start : null) || this.day);
-          },
-          startText: function() {
-            return this.input && this.input.start ? this.input.start.format('MMMM Do, YYYY') : 'Beginning of Time';
-          },
-          endSpan: function() {
-            return ds.DaySpan.point((this.input ? this.input.end : null) || this.day);
-          },
-          endText: function() {
-            return this.input && this.input.end ? this.input.end.format('MMMM Do, YYYY') : 'End of Time';
-          },
-
-          repeats: function() {
-            return this.type !== 'none';
-          },
-          allDay: {
-            set: function(allDay) {
-              if (allDay) {
-                delete this.input.times;
-                this.input.duration = 1;
-                this.input.durationUnit = 'days';
-              } else {
-                this.input.times = ['08:00'];
-                this.input.duration = 1;
-                this.input.durationUnit = 'hours';
-              }
-              this.updateInput();
-            },
-            get: function() {
-              return this.input && (!this.input.times || this.input.times.length === 0);
-            }
-          }
-        },
-        mounted: function() {
-          window.Scheduler = this;
-        },
-        watch: {
-          type: 'updateType'
-        },
-        methods: {
-          add: function(day) {
-            this.day = day;
-            this.event = null;
-            this.title = '';
-            this.color = this.colors[Math.floor(this.colors.length * Math.random())].value;
-            this.input = {};
-            this.finishOpen('none');
-          },
-          addAt: function(day, hour) {
-            this.day = day;
-            this.event = null;
-            this.title = '';
-            this.color = this.colors[Math.floor(this.colors.length * Math.random())].value;
-            this.input = {
-              times: [ds.Time.parse(hour).format('HH:mm')],
-              duration: 1,
-              durationUnit: 'hours'
-            };
-            this.finishOpen('none');
-          },
-          edit: function(onDay, calendarEvent) {
-            this.day = onDay;
-            this.event = calendarEvent;
-            this.title = calendarEvent.event.data.name;
-            this.color = calendarEvent.event.data.color;
-            this.input = this.readInput( calendarEvent.event.schedule );
-            this.finishOpen(this.determineType());
-          },
-          readInput: function(schedule) {
-            return schedule.toInput(true, false, 'HH:mm', true);
-          },
-          finishOpen: function(type) {
-            this.forceType(type);
-            this.forecastSize = 5;
-            this.currentTab = 'appearance';
-            this.startMenu = false;
-            this.endMenu = false;
-            this.editCustom = false;
-            this.open = true;
-          },
-          openCustom: function() {
-            this.customWeekTypeCache = null;
-            this.customDayTypeCache = null;
-            this.editCustom = true;
-          },
-          remove: function() {
-            this.open = false;
-            this.$emit('remove', this.event);
-          },
-          exclude: function() {
-            this.open = false;
-            this.$emit('exclude', {
-              event: this.event,
-              day: this.day
-            });
-          },
-          discard: function() {
-            this.open = false;
-            this.$emit('discard');
-          },
-          cancel: function() {
-            this.open = false;
-            this.$emit('cancel', {
-              event: this.event,
-              cancel: true,
-              day: this.day
-            });
-          },
-          uncancel: function() {
-            this.open = false;
-            this.$emit('cancel', {
-              event: this.event,
-              cancel: false,
-              day: this.day
-            });
-          },
-          writeInput: function() {
-            return this.copyShallow(this.input);
-          },
-          save: function() {
-            this.open = false;
-            this.$emit('save', {
-              name: this.title,
-              color: this.color,
-              schedule: this.writeInput(),
-              event: this.event
-            });
-          },
-          addExclusion: function(day) {
-            if (day) {
-              if (!this.input.exclude) {
-                this.input.exclude = [];
-                this.updateInput();
-              }
-              if (this.allDay) {
-                this.input.exclude.push( ds.Identifier.Day.get( day ) );
-              } else {
-                this.input.exclude.push( ds.Identifier.Time.get( day ) );
-              }
-            }
-          },
-          describeExclusion: function(identifier) {
-            var type = ds.Identifier.find(identifier);
-            return type ? type.describe(identifier) : identifier;
-          },
-          removeExclusion: function(identifier) {
-            if (identifier) {
-              var exclude = this.input.exclude;
-              var i = exclude.indexOf(identifier);
-              if (i !== -1) {
-                exclude.splice(i, 1);
-              }
-            }
-          },
-          customGet: function(value) {
-            if (!value) return 'any';
-            if (fn.isArray(value)) return 'oneof';
-            if (fn.isFrequencyValueEvery(value)) return 'every';
-            return 'unknown';
-          },
-          customSet: function(prop, newValue, delayUpdate) {
-            switch (newValue) {
-              case 'any':
-                delete this.input[ prop ];
-                break;
-              case 'oneof':
-                if (!fn.isArray(this.input[ prop ])) {
-                  this.input[ prop ] = [];
-                }
-                break;
-              case 'every':
-                if (!fn.isFrequencyValueEvery(this.input[ prop ])) {
-                  this.input[ prop ] = { every: 2 };
-                }
-                break;
-            }
-            if (!delayUpdate) {
-              this.updateInput();
-            }
-          },
-          customOffsets: function(max, array, start, valueOffset) {
-            var offsets = [];
-            var min = start || 0;
-            var offset = valueOffset || 0;
-            for (var i = min; i < max; i++) {
-              offsets.push({
-                text: array[ i ],
-                value: i + offset
-              });
-            }
-            return offsets;
-          },
-          customFindType: function(types) {
-            for (var i = 0; i < types.length; i++) {
-              var type = types[ i ];
-              if (this.input[ type.property ]) {
-                return type;
-              }
-            }
-            return types[0];
-          },
-          customApplyType: function(newType, newValue, oldType) {
-            if (oldType) {
-              var oldValue = this.input[ oldType.property ];
-              if (oldValue) {
-                newValue = oldValue;
-              }
-              delete this.input[ oldType.property ];
-            }
-            this.input[ newType.property ] = newValue;
-            this.updateInput();
-            return newType;
-          },
-          setStart: function(start) {
-            this.input.start = start;
-            this.updateInput();
-            this.startMenu = false;
-          },
-          setEnd: function(end) {
-            this.input.end = end;
-            this.updateInput();
-            this.endMenu = false;
-          },
-          forceType: function(type) {
-            if (this.type === type) {
-              this.updateType('', type);
-              this.updateType(type, '');
-            } else {
-              this.type = type;
-            }
-          },
-          updateType: function(newType, oldType) {
-            var inputChanged = false;
-            var input = this.input;
-            if (oldType === 'none') {
-              delete input.end;
-              inputChanged = true;
-            }
-            if (newType) {
-              var pattern = ds.Pattern.withName(newType);
-              if (pattern) {
-                pattern.apply(input, this.day);
-                inputChanged = true;
-              }
-            }
-            if (newType === 'none') {
-              input.start = this.day.start();
-              input.end = this.day.end();
-              if (!input.times) {
-                if (!input.duration) {
-                  input.duration = 1;
-                }
-                if (!input.durationUnit) {
-                  input.durationUnit = 'days';
-                }
-              }
-              if (input.times && input.duration && input.durationUnit) {
-                var lastTime = null;
-                input.times.forEach(function(rawTime) {
-                  var time = ds.Time.parse(rawTime);
-                  if (time && (!lastTime || time.toMilliseconds() > lastTime.toMilliseconds())) {
-                    lastTime = time;
-                  }
-                });
-                if (lastTime) {
-                  input.end = this.day.withTime(lastTime).add(input.duration, input.durationUnit);
-                }
-              }
-              inputChanged = true;
-            }
-            if (inputChanged) {
-              this.updateInput();
-            }
-          },
-          determineType: function() {
-            var pattern = ds.Pattern.findMatch(this.input);
-            return pattern ? pattern.name : 'custom';
-          },
-          copyShallow: function(x) {
-            var out = {};
-            for (var prop in x) {
-              out[ prop ] = x[ prop ];
-            }
-            return out;
-          },
-          updateInput: function() {
-            this.input = this.copyShallow(this.input);
-          }
+        var parsedValue = JSON.parse( oldValue );
+        if ( parser ) {
+          parsedValue = parser( parsedValue );
         }
-      });
+        return parsedValue;
+      }
+    };
 
-      Vue.component('dsEvent', {
-        props: ['calendarEvent', 'index', 'calendar'],
-        template: '#template_event',
-        computed: {
-          style: function() {
-
-            var calendarEvent = this.calendarEvent;
-            var now = this.$root.today;
-            var past = calendarEvent.time.start.isBefore(now);
-            var cancelled = calendarEvent.cancelled;
-            var originalColor = calendarEvent.event.data.color;
-            var color = originalColor;
-            if (past || cancelled) {
-              color = brighten(color);
-            }
-
-            return {
-              position: 'relative',
-              top: ((calendarEvent.row - (this.index || 0)) * 19) + 'px',
-              backgroundColor: color,
-              marginLeft: calendarEvent.starting ? 0 : '-5px',
-              marginRight: calendarEvent.ending ? 0 : '-5px',
-              textDecoration: cancelled ? 'line-through' : 'inherit',
-              textDecorationColor: cancelled ? originalColor : 'inherit'
-            };
-          },
-          sameDayEvents: function() {
-            return this.calendarEvent.event.schedule.iterateSpans(this.calendarEvent.day, true).list();
-          },
-          hasPrefix: function() {
-            return !this.calendarEvent.event.schedule.isFullDay() && this.sameDayEvents.length > 0;
-          },
-          getPrefix: function() {
-            var same = this.sameDayEvents;
-            return same.length === 1 ?
-              same[0].start.format('ha') :
-              '(' + same.length + ')';
-          },
-          showName: function() {
-            return this.calendarEvent.starting || (this.calendar && !this.calendar.filled.contains( this.calendarEvent.time.start ));
-          }
-        },
-        methods: {
-          edit: function() {
-            this.$emit('edit', this.calendarEvent);
-          }
-        }
-      });
-
-      Vue.component('dsEventTime', {
-        props: ['calendarEvent', 'calendar'],
-        template: '#template_event_time',
-        computed: {
-          style: function() {
-            var HEIGHT = 960;
-            var COLUMN_OFFSET = 14;
-
-            var calendarEvent = this.calendarEvent;
-            var bounds = calendarEvent.getTimeBounds(HEIGHT, 1, COLUMN_OFFSET);
-            var now = this.$root.now;
-            var past = calendarEvent.time.end.isBefore(now);
-            var cancelled = calendarEvent.cancelled;
-            var originalColor = calendarEvent.event.data.color;
-            var color = originalColor;
-            if (past || cancelled) {
-              color = brighten(color);
-            }
-
-            return {
-              position: 'absolute',
-              top: bounds.top + 'px',
-              height: bounds.height + 'px',
-              left: bounds.left + 'px',
-              right: '0px',
-              backgroundColor: color,
-              marginLeft: calendarEvent.starting ? 0 : '-5px',
-              marginRight: calendarEvent.ending ? 0 : '-5px',
-              textDecoration: cancelled ? 'line-through' : 'inherit',
-              textDecorationColor: cancelled ? originalColor : 'inherit'
-            };
-          },
-          showName: function() {
-            return this.calendarEvent.starting || (this.calendar && !this.calendar.span.contains( this.calendarEvent.time.start ));
-          }
-        },
-        methods: {
-          edit: function() {
-            this.$emit('edit', this.calendarEvent);
-          }
-        }
-      });
-
-      Vue.component('dsDayRow', {
-        props: ['days', 'calendar'],
-        template: '#template_day_row',
-        methods: {
-          edit: function(eventDay) {
-            this.$emit('edit', eventDay);
-          },
-          add: function(day) {
-            this.$emit('add', day);
-          }
-        }
-      });
-
-      Vue.component('dsWeekHeader', {
-        props: ['days', 'calendar'],
-        template: '#template_week_header',
-        methods: {
-          add: function(day) {
-            this.$emit('add', day);
-          },
-          edit: function(eventDay) {
-            this.$emit('edit', eventDay);
-          }
-        }
-      });
-
-      Vue.component('dsWeekDayHeader', {
-        props: ['day', 'calendar'],
-        template: '#template_week_day_header',
-        methods: {
-          add: function() {
-            this.$emit('add', this.day);
-          },
-          edit: function(event) {
-            this.$emit('edit', {
-              day: this.day,
-              event: event
-            });
-          }
-        }
-      });
-
-      Vue.component('dsDay', {
-        props: ['day', 'calendar'],
-        template: '#template_day',
-        methods: {
-          add: function() {
-            this.$emit('add', this.day);
-          },
-          edit: function(event) {
-            this.$emit('edit', {
-              event: event,
-              day: this.day
-            });
-          }
-        }
-      });
-
-      Vue.component('dsDayPicker', {
-        props: ['span', 'highlightSpan'],
-        template: '#template_day_picker',
-        data: function() {
-          return {
-            month: this.getMonth(),
-            weekdays: moment.weekdays()
-          };
-        },
-        computed: {
-          summary: function() {
-            return this.month ? this.month.summary(false, false, false, false) : '';
-          }
-        },
-        watch: {
-          span: {
-            deep: true,
-            handler: function(span) {
-              if (!span.matchesMonth(this.month.start)) {
-                this.month = this.getMonth();
-              }
-            }
-          }
-        },
-        methods: {
-          isHighlighted: function(day) {
-            return this.highlightSpan && this.span.matchesDay(day);
-          },
-          getMonthStart: function() {
-            return this.span && this.span.start ? this.span.start : this.$root.today;
-          },
-          getMonth: function() {
-            return ds.Calendar.months(1, this.getMonthStart(), 0, {fill: true, minimumSize: 42});
-          },
-          pick: function(day) {
-            this.$emit('picked', day);
-          },
-          prev: function() {
-            this.month.prev();
-            this.$emit('prev', this.month);
-          },
-          next: function() {
-            this.month.next();
-            this.$emit('next', this.month);
-          }
-        }
-      });
-
-      Vue.component('dsDayTimes', {
-        props: ['day', 'calendar'],
-        template: '#template_day_times',
-        computed: {
-          nowLine: function() {
-            var now = this.$root.now.asTime().toMilliseconds();
-            var delta = now / ds.Constants.MILLIS_IN_DAY;
-            var top = delta * 960;
-
-            return {
-              position: 'absolute',
-              left: '0px',
-              right: '-1px',
-              top: (top - 1) + 'px',
-              borderTop: '#db4437 solid 2px'
-            };
-          }
-        },
-        methods: {
-          edit: function(event) {
-            this.$emit('edit', {
-              day: this.day,
-              event: event
-            });
-          },
-          addAt: function(hour) {
-            this.$emit('add-at', {
-              day: this.day,
-              hour: hour - 1
-            });
-          }
-        }
-      });
-
-      new Vue({
-        el: '#dayspan',
-        props: ['source'],
-        data: {
-          drawer: null,
-          calendar: null,
-          dayProperty: Store.Load('dayProperty', 'dayOfMonth'),
-          currentType: null,
-          loading: false,
-          today: ds.Day.today(),
-          tomorrow: ds.Day.tomorrow(),
-          now: ds.Day.now(),
-          types: [
-            {id: 'D', label: 'Day', shortcut: 'D', type: ds.Units.DAY, size: 1},
-            {id: 'W', label: 'Week', shortcut: 'W', type: ds.Units.WEEK, size: 1},
-            {id: 'M', label: 'Month', shortcut: 'M', type: ds.Units.MONTH, size: 1},
-            {id: 'Y', label: 'Year', shortcut: 'Y', type: ds.Units.YEAR, size: 1},
-            {id: 'X', label: '4 days', shortcut: 'X', type: ds.Units.DAY, size: 4}
+    Vue.component( 'dsScheduler', {
+      template: '#template_scheduler',
+      data: function () {
+        return {
+          open: false,
+          event: null,
+          color: null,
+          title: '',
+          input: {},
+          day: null,
+          type: '',
+          startMenu: false,
+          endMenu: false,
+          editCustom: false,
+          currentTab: 'appearance',
+          forecastSize: 10,
+          customWeekTypeCache: null,
+          customDayTypeCache: null,
+          colors: [
+            { text: 'Red', value: '#F44336' },
+            { text: 'Pink', value: '#E91E63' },
+            { text: 'Purple', value: '#9C27B0' },
+            { text: 'Deep Purple', value: '#673AB7' },
+            { text: 'Indigo', value: '#3F51B5' },
+            { text: 'Blue', value: '#2196F3' },
+            { text: 'Light Blue', value: '#03A9F4' },
+            { text: 'Cyan', value: '#00BCD4' },
+            { text: 'Teal', value: '#009688' },
+            { text: 'Green', value: '#4CAF50' },
+            { text: 'Light Green', value: '#8BC34A' },
+            { text: 'Lime', value: '#CDDC39' },
+            { text: 'Yellow', value: '#FFEB3B' },
+            { text: 'Amber', value: '#FFC107' },
+            { text: 'Orange', value: '#FF9800' },
+            { text: 'Deep Orange', value: '#FF5722' },
+            { text: 'Brown', value: '#795548' },
+            { text: 'Blue Gray', value: '#607D8B' },
+            { text: 'Gray', value: '#9E9E9E' },
+            { text: 'Black', value: '#000000' }
           ],
-          hours: [
-            '    ', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am', '10am', '11am',
-            '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm'
+
+          yearOptions: [
+            { text: 'Any year', value: 'any' },
+            { text: 'On the following years...', value: 'oneof' },
+            { text: 'Every _ years starting on _', value: 'every' }
           ],
-          selectionStart: null,
-          dayProperties: {
-            'Day Of Week': 'dayOfWeek',
-            'Day Of Month': 'dayOfMonth',
-            'Last Day Of Month': 'lastDayOfMonth',
-            'Day Of Year': 'dayOfYear',
-            'Week': 'week',
-            'Week Of Year': 'weekOfYear',
-            'Weekspan Of Year': 'weekspanOfYear',
-            'Full Week Of Year': 'fullWeekOfYear',
-            'Last Weekspan Of Year': 'lastWeekspanOfYear',
-            'Last Full Week Of Year': 'lastFullWeekOfYear',
-            'Week Of Month': 'weekOfMonth',
-            'Weekspan Of Month': 'weekspanOfMonth',
-            'Full Week Of Month': 'fullWeekOfMonth',
-            'Last Weekspan Of Month': 'lastWeekspanOfMonth',
-            'Last Full Week Of Month': 'lastFullWeekOfMonth'
-          },
-          weekdays: moment.weekdays(),
-          weekdayCodes: moment.weekdaysShort(),
-          defaultEvents: [
-            {
-              data: {name: 'Weekly Meeting', color: '#3F51B5'},
-              schedule: {
-                dayOfWeek: [ds.Weekday.MONDAY],
-                times: [9],
-                duration: 30,
-                durationUnit: 'minutes'
-              }
-            },
-            {
-              data: {name: 'Mother\'s Day', color: '#2196F3'},
-              schedule: {
-                month: [ds.Month.MAY],
-                dayOfWeek: [ds.Weekday.SUNDAY],
-                weekspanOfMonth: [1]
-              }
-            },
-            {
-              data: {name: 'First Weekend', color: '#4CAF50'},
-              schedule: {
-                weekspanOfMonth: [0],
-                dayOfWeek: [ds.Weekday.FRIDAY],
-                duration: 3,
-                durationUnit: 'days'
-              }
-            }
+          monthOptions: [
+            { text: 'Any month', value: 'any' },
+            { text: 'On the following months...', value: 'oneof' },
+            { text: 'Every _ months starting on _', value: 'every' }
+          ],
+          weekTypes: [
+            { text: 'Week of the month (first week has a Thursday)', property: 'weekOfMonth', max: 6 },
+            { text: 'Weekspan of the month (starts on first day of month)', property: 'weekspanOfMonth', max: 7, min: 1, offset: -1 },
+            { text: 'Full week of the month (0th = the week before if any)', property: 'fullWeekOfMonth', max: 6 },
+            { text: 'Last weekspan of the month (starts on last day of month)', property: 'lastWeekspanOfMonth', max: 7, min: 1, offset: -1 },
+            { text: 'Last full week of the month (0th = the week after if any)', property: 'lastFullWeekOfMonth', max: 6 },
+            { text: 'Week of the year (first week has a Thursday)', property: 'weekOfYear', max: 54 },
+            { text: 'Weekspan of the year (starts on first day of year)', property: 'weekspanOfYear', max: 53, min: 1, offset: -1 },
+            { text: 'Full week of the year (0th = the week before if any)', property: 'fullWeekOfYear', max: 54 },
+            { text: 'Last weekspan of the year (starts on last day of year)', property: 'lastWeekspanOfYear', max: 53, min: 1, offset: -1 },
+            { text: 'Last full week of the year (0th = the week after if any)', property: 'lastFullWeekOfYear', max: 54 }
+          ],
+          weekOptions: [
+            { text: 'Any week', value: 'any' },
+            { text: 'On the following weeks...', value: 'oneof' },
+            { text: 'Every _ weeks starting on _', value: 'every' }
+          ],
+          weekdayOptions: [
+            { text: 'Any day of the week', value: 'any' },
+            { text: 'On the following days of the week...', value: 'oneof' },
+            { text: 'Every _ weekday starting on _', value: 'every' },
+            { text: 'Weekends', value: 'weekend' },
+            { text: 'Weekdays', value: 'weekday' }
+          ],
+          dayTypes: [
+            { text: 'Day of the month', property: 'dayOfMonth', max: 32, min: 1 },
+            { text: 'Last day of the month', property: 'lastDayOfMonth', max: 32, min: 1 },
+            { text: 'Day of the year', property: 'dayOfYear', max: 367, min: 1, offset: -1 }
+          ],
+          dayOptions: [
+            { text: 'Any day', value: 'any' },
+            { text: 'On the following days...', value: 'oneof' },
+            { text: 'Every _ days starting on _', value: 'every' }
           ]
-        },
-        watch: {
-          currentType: function() {
-            if (!this.loading) {
-              this.rebuild();
-            }
+        };
+      },
+      computed: {
+        // Custom Dropdown Options
+        yearOneOfs: function () {
+          var currentYear = this.input.start || this.day;
+          var min = currentYear.year - 5;
+          var max = currentYear.year + 20;
+          var oneof = [];
+          for ( var i = min; i <= max; i++ ) {
+            oneof.push( {
+              text: i,
+              value: i
+            } );
           }
+          return oneof;
         },
-        computed: {
-          summary: function() {
-            return this.calendar ? this.calendar.summary(false, false, false, false) : '';
-          },
-          todayDate: function() {
-            return this.$root.today.format('dddd, MMMM D');
-          },
-          rows: function() {
-            return Math.floor( this.calendar.days.length / 7 );
-          },
-          isDay: function() {
-            return this.calendar && this.calendar.type === ds.Units.DAY;
-          },
-          isWeek: function() {
-            return this.calendar && this.calendar.type === ds.Units.WEEK;
-          },
-          isMonth: function() {
-            return this.calendar && this.calendar.type === ds.Units.MONTH;
-          },
-          isYear: function() {
-            return this.calendar && this.calendar.type === ds.Units.YEAR;
-          },
-          nextLabel: function() {
-            return this.currentType ? 'Next ' + this.currentType.label.toLowerCase() : 'Next';
-          },
-          prevLabel: function() {
-            return this.currentType ? 'Previous ' + this.currentType.label.toLowerCase() : 'Previous';
+        yearOffsets: function () {
+          var max = this.input.year.every;
+          var currentYear = this.input.start || this.day;
+          var offsets = [];
+          for ( var i = 0; i < max; i++ ) {
+            offsets.push( {
+              text: currentYear.year + i,
+              value: i
+            } );
           }
+          return offsets;
         },
-        created: function() {
-          // Initialize types
-          if (!this.currentType) {
-            this.currentType = this.types[2];
-          }
-
-          // Export
-          window.app = this;
-
-          // Update Times
-          setInterval(this.updateTimes, ds.Constants.MILLIS_IN_MINUTE);
-        },
-        mounted: function() {
-          this.loadState();
-        },
-        methods: {
-          saveState: function() {
-            localStorage.setItem('dayspanState', JSON.stringify(
-              this.calendar.toInput(true)
-            ));
-          },
-          loadState: function() {
-            var state = JSON.parse(localStorage.getItem('dayspanState'));
-            this.loading = true;
-            if (state) {
-              this.currentType = this.types.find(function(type) {
-                return type.type === state.type && type.size === state.size;
-              });
-              state.eventSorter = state.listTimes ? ds.Sorts.List([ds.Sorts.FullDay, ds.Sorts.Start]) : ds.Sorts.Start;
-              this.calendar = ds.Calendar.fromInput(state);
-            } else {
-              this.rebuild(ds.Day.today(), this.defaultEvents);
-            }
-            this.loading = false;
-          },
-          updateTimes: function() {
-            this.today = ds.Day.today();
-            this.now = ds.Day.now();
-            this.tomorrow = ds.Day.tomorrow();
-          },
-          rebuild: function(aroundDay, events) {
-            var cal = this.calendar;
-            var type = this.currentType || this.types[ 2 ];
-
-            if (cal &&
-                cal.type === type.type &&
-                cal.size === type.size) {
-              return;
-            }
-
-            var listTimes = type.type === ds.Units.DAY || type.type === ds.Units.WEEK;
-            var input = {
-              type: type.type,
-              size: type.size,
-              around: aroundDay,
-              eventsOutside: true,
-              listTimes: listTimes,
-              updateRows: true,
-              updateColumns: listTimes,
-              fill: !listTimes,
-              eventSorter: listTimes ? ds.Sorts.List([ds.Sorts.FullDay, ds.Sorts.Start]) : ds.Sorts.Start,
-              events: events
+        monthOneOfs: function () {
+          return ds.Locales.current.months[0].map( function ( name, i ) {
+            return {
+              text: name,
+              value: i
             };
+          } );
+        },
+        monthOffsets: function () {
+          return this.customOffsets( this.input.month.every, ds.Locales.current.months[0] );
+        },
+        weekdayOneOfs: function () {
+          return ds.Locales.current.weekdays[0].map( function ( name, i ) {
+            return {
+              text: name,
+              value: i
+            };
+          } );
+        },
+        weekdayOffsets: function () {
+          return this.customOffsets( this.input.dayOfWeek.every, ds.Locales.current.weekdays[0] );
+        },
+        dayOneOfs: function () {
+          var opt = this.customDayType;
+          return this.customOffsets( opt.max, ds.Suffix.CACHE, opt.min, opt.offset );
+        },
+        dayOffsets: function () {
+          var opt = this.customDayType;
+          return this.customOffsets( this.input[opt.property].every + 1, ds.Suffix.CACHE, opt.min, opt.offset );
+        },
+        weekOneOfs: function () {
+          var opt = this.customWeekType;
+          return this.customOffsets( opt.max, ds.Suffix.CACHE, opt.min, opt.offset );
+        },
+        weekOffsets: function () {
+          var opt = this.customWeekType;
+          return this.customOffsets( this.input[opt.property].every + 1, ds.Suffix.CACHE );
+        },
 
-            if (cal) {
-              cal.set(input);
+        // Custom Options
+        customYear: {
+          get: function () {
+            return this.customGet( this.input.year );
+          },
+          set: function ( value ) {
+            this.customSet( 'year', value );
+          }
+        },
+        customMonth: {
+          get: function () {
+            return this.customGet( this.input.month );
+          },
+          set: function ( value ) {
+            this.customSet( 'month', value );
+          }
+        },
+        customWeekType: {
+          get: function () {
+            if ( !this.customWeekTypeCache ) {
+              this.customWeekTypeCache = this.customFindType( this.weekTypes );
+            }
+            return this.customWeekTypeCache;
+          },
+          set: function ( newType ) {
+            this.customWeekTypeCache = this.customApplyType( newType, [], this.customWeekTypeCache );
+          }
+        },
+        customWeek: {
+          get: function () {
+            return this.customGet( this.input[this.customWeekType.property] );
+          },
+          set: function ( value ) {
+            this.customSet( this.customWeekType.property, value );
+          }
+        },
+        customWeekday: {
+          get: function () {
+            var x = this.input.dayOfWeek;
+            if ( x && fn.isArrayEquals( x, ds.Weekday.WEEK ) ) return 'weekday';
+            if ( x && fn.isArrayEquals( x, ds.Weekday.ENDS ) ) return 'weekend';
+            return this.customGet( x );
+          },
+          set: function ( value ) {
+            switch ( value ) {
+              case 'weekday':
+                this.input.dayOfWeek = ds.Weekday.WEEK;
+                break;
+              case 'weekend':
+                this.input.dayOfWeek = ds.Weekday.ENDS;
+                break;
+              default:
+                this.customSet( 'dayOfWeek', value, true );
+                break;
+            }
+            this.updateInput();
+          }
+        },
+        customDayType: {
+          get: function () {
+            if ( !this.customDayTypeCache ) {
+              this.customDayTypeCache = this.customFindType( this.dayTypes );
+            }
+            return this.customDayTypeCache;
+          },
+          set: function ( newType ) {
+            this.customDayTypeCache = this.customApplyType( newType, [], this.customDayTypeCache );
+          }
+        },
+        customDay: {
+          get: function () {
+            return this.customGet( this.input[this.customDayType.property] );
+          },
+          set: function ( value ) {
+            this.customSet( this.customDayType.property, value );
+          }
+        },
+
+        durationOptions: function () {
+          var suffix = this.input.duration === 1 ? '' : 's';
+          var duringDay = [
+            { text: 'minute' + suffix, value: 'minutes' },
+            { text: 'hour' + suffix, value: 'hours' }
+          ];
+          var allDay = [
+            { text: 'day' + suffix, value: 'days' },
+            { text: 'week' + suffix, value: 'weeks' },
+            { text: 'month' + suffix, value: 'months' }
+          ];
+          return this.allDay ? allDay : duringDay.concat( allDay );
+        },
+
+        forecast: function () {
+          var days = [];
+
+          if ( this.day ) {
+            var schedule = new ds.Schedule( this.input );
+            var size = parseInt( this.forecastSize ) || 1;
+
+            days = days.concat( schedule.prevDays( this.day, size + 1, true ) );
+            days.reverse();
+            days = days.concat( schedule.nextDays( this.day, size, false ) );
+          }
+
+          return days;
+        },
+
+        typeHint: function () {
+          return this.type === 'custom' ? new ds.Schedule( this.input ).describe( 'event', false, false, false, false ) : '';
+        },
+        canSave: function () {
+          return !!this.title;
+        },
+        header: function () {
+          return this.event ? 'Edit Event' : 'Add Event';
+        },
+        canRemove: function () {
+          return !!this.event;
+        },
+        canExclude: function () {
+          return !!this.event && this.repeats;
+        },
+        canCancel: function () {
+          return this.event && !this.event.cancelled;
+        },
+        canUncancel: function () {
+          return this.event && this.event.cancelled;
+        },
+        types: function () {
+          if ( !this.day ) {
+            return [];
+          }
+          var day = this.day;
+          return ds.Patterns.map( function ( pattern ) {
+            return {
+              label: pattern.describe( day ),
+              value: pattern.name
+            }
+          } );
+        },
+        startSpan: function () {
+          return ds.DaySpan.point( ( this.input ? this.input.start : null ) || this.day );
+        },
+        startText: function () {
+          return this.input && this.input.start ? this.input.start.format( 'MMMM Do, YYYY' ) : 'Beginning of Time';
+        },
+        endSpan: function () {
+          return ds.DaySpan.point( ( this.input ? this.input.end : null ) || this.day );
+        },
+        endText: function () {
+          return this.input && this.input.end ? this.input.end.format( 'MMMM Do, YYYY' ) : 'End of Time';
+        },
+
+        repeats: function () {
+          return this.type !== 'none';
+        },
+        allDay: {
+          set: function ( allDay ) {
+            if ( allDay ) {
+              delete this.input.times;
+              this.input.duration = 1;
+              this.input.durationUnit = 'days';
             } else {
-              this.calendar = ds.Calendar.fromInput(input);
+              this.input.times = ['08:00'];
+              this.input.duration = 1;
+              this.input.durationUnit = 'hours';
             }
-
-            this.saveState();
+            this.updateInput();
           },
-          selectStart: function(day) {
-            this.selectionStart = day;
-          },
-          selectMove: function(day) {
-            if (!this.selectionStart) {
-              return;
-            }
-            var existing = this.calendar.selection;
-            if (existing && existing.isPoint && existing.matchesDay( day ) && day.sameDay( this.selectionStart )) {
-              this.calendar.unselect();
-            } else {
-              var min = day.min( this.selectionStart );
-              var max = day.max( this.selectionStart );
-              this.calendar.select(min, max);
-            }
-          },
-          selectEnd: function(day) {
-            this.selectMove( day );
-            this.selectionStart = null;
-          },
-          next: function() {
-            this.calendar.unselect().next();
-            this.saveState();
-          },
-          prev: function() {
-            this.calendar.unselect().prev();
-            this.saveState();
-          },
-          setToday: function() {
-            this.rebuild(this.today);
-          },
-          dayAtIndex: function(row, cell) {
-            return this.calendar.days[ (row - 1) * 7 + (cell - 1) ];
-          },
-          daysAtRow: function(row, rowSize) {
-            var start = (row - 1) * rowSize;
-            return this.calendar.days.slice( start, start + rowSize );
-          },
-          edit: function(eventDay) {
-            this.$refs.scheduler.edit(eventDay.day, eventDay.event);
-          },
-          add: function(day) {
-            this.$refs.scheduler.add(day);
-          },
-          addAt: function(dayHour) {
-            this.$refs.scheduler.addAt(dayHour.day, dayHour.hour);
-          },
-          eventsIndex: function(data) {
-            var events = this.events;
-            for (var i = events.length - 1; i >= 0; i--) {
-              if (events[ i ].data === data) {
-                return i;
-              }
-            }
-            return -1;
-          },
-          eventSave: function(data) {
-            var calendarEvent = data.event;
-            if (calendarEvent) {
-              var event = calendarEvent.event;
-              event.data.name = data.name;
-              event.data.color = data.color;
-              event.schedule.set( data.schedule );
-
-              this.calendar.refreshEvents();
-            } else {
-              this.calendar.addEvent({
-                data: { name: data.name, color: data.color },
-                schedule: data.schedule
-              });
-            }
-
-            this.saveState();
-            this.$forceUpdate();
-          },
-          eventRemove: function(calendarEvent) {
-            this.calendar.removeEvent( calendarEvent.event );
-            this.saveState();
-            this.$forceUpdate();
-          },
-          eventRemoveOccurrence: function(data) {
-            data.event.exclude();
-            this.eventsRefresh();
-          },
-          eventCancel: function(data) {
-            data.event.cancel(data.cancel);
-            this.eventsRefresh();
-          },
-          eventMove: function(data) {
-            data.event.move(data.moveTo);
-            this.eventsRefresh();
-          },
-          eventsRefresh: function() {
-            this.calendar.refreshEvents();
-            this.saveState();
-            this.$forceUpdate();
+          get: function () {
+            return this.input && ( !this.input.times || this.input.times.length === 0 );
           }
         }
-      });
+      },
+      mounted: function () {
+        window.Scheduler = this;
+      },
+      watch: {
+        type: 'updateType'
+      },
+      methods: {
+        add: function ( day ) {
+          this.day = day;
+          this.event = null;
+          this.title = '';
+          this.color = this.colors[Math.floor( this.colors.length * Math.random() )].value;
+          this.input = {};
+          this.finishOpen( 'none' );
+        },
+        addAt: function ( day, hour ) {
+          this.day = day;
+          this.event = null;
+          this.title = '';
+          this.color = this.colors[Math.floor( this.colors.length * Math.random() )].value;
+          this.input = {
+            times: [ds.Time.parse( hour ).format( 'HH:mm' )],
+            duration: 1,
+            durationUnit: 'hours'
+          };
+          this.finishOpen( 'none' );
+        },
+        edit: function ( onDay, calendarEvent ) {
+          this.day = onDay;
+          this.event = calendarEvent;
+          this.title = calendarEvent.event.data.name;
+          this.color = calendarEvent.event.data.color;
+          this.input = this.readInput( calendarEvent.event.schedule );
+          this.finishOpen( this.determineType() );
+        },
+        readInput: function ( schedule ) {
+          return schedule.toInput( true, false, 'HH:mm', true );
+        },
+        finishOpen: function ( type ) {
+          this.forceType( type );
+          this.forecastSize = 5;
+          this.currentTab = 'appearance';
+          this.startMenu = false;
+          this.endMenu = false;
+          this.editCustom = false;
+          this.open = true;
+        },
+        openCustom: function () {
+          this.customWeekTypeCache = null;
+          this.customDayTypeCache = null;
+          this.editCustom = true;
+        },
+        remove: function () {
+          this.open = false;
+          this.$emit( 'remove', this.event );
+        },
+        exclude: function () {
+          this.open = false;
+          this.$emit( 'exclude', {
+            event: this.event,
+            day: this.day
+          } );
+        },
+        discard: function () {
+          this.open = false;
+          this.$emit( 'discard' );
+        },
+        cancel: function () {
+          this.open = false;
+          this.$emit( 'cancel', {
+            event: this.event,
+            cancel: true,
+            day: this.day
+          } );
+        },
+        uncancel: function () {
+          this.open = false;
+          this.$emit( 'cancel', {
+            event: this.event,
+            cancel: false,
+            day: this.day
+          } );
+        },
+        writeInput: function () {
+          return this.copyShallow( this.input );
+        },
+        save: function () {
+          this.open = false;
+          this.$emit( 'save', {
+            name: this.title,
+            color: this.color,
+            schedule: this.writeInput(),
+            event: this.event
+          } );
+        },
+        addExclusion: function ( day ) {
+          if ( day ) {
+            if ( !this.input.exclude ) {
+              this.input.exclude = [];
+              this.updateInput();
+            }
+            if ( this.allDay ) {
+              this.input.exclude.push( ds.Identifier.Day.get( day ) );
+            } else {
+              this.input.exclude.push( ds.Identifier.Time.get( day ) );
+            }
+          }
+        },
+        describeExclusion: function ( identifier ) {
+          var type = ds.Identifier.find( identifier );
+          return type ? type.describe( identifier ) : identifier;
+        },
+        removeExclusion: function ( identifier ) {
+          if ( identifier ) {
+            var exclude = this.input.exclude;
+            var i = exclude.indexOf( identifier );
+            if ( i !== -1 ) {
+              exclude.splice( i, 1 );
+            }
+          }
+        },
+        customGet: function ( value ) {
+          if ( !value ) return 'any';
+          if ( fn.isArray( value ) ) return 'oneof';
+          if ( fn.isFrequencyValueEvery( value ) ) return 'every';
+          return 'unknown';
+        },
+        customSet: function ( prop, newValue, delayUpdate ) {
+          switch ( newValue ) {
+            case 'any':
+              delete this.input[prop];
+              break;
+            case 'oneof':
+              if ( !fn.isArray( this.input[prop] ) ) {
+                this.input[prop] = [];
+              }
+              break;
+            case 'every':
+              if ( !fn.isFrequencyValueEvery( this.input[prop] ) ) {
+                this.input[prop] = { every: 2 };
+              }
+              break;
+          }
+          if ( !delayUpdate ) {
+            this.updateInput();
+          }
+        },
+        customOffsets: function ( max, array, start, valueOffset ) {
+          var offsets = [];
+          var min = start || 0;
+          var offset = valueOffset || 0;
+          for ( var i = min; i < max; i++ ) {
+            offsets.push( {
+              text: array[i],
+              value: i + offset
+            } );
+          }
+          return offsets;
+        },
+        customFindType: function ( types ) {
+          for ( var i = 0; i < types.length; i++ ) {
+            var type = types[i];
+            if ( this.input[type.property] ) {
+              return type;
+            }
+          }
+          return types[0];
+        },
+        customApplyType: function ( newType, newValue, oldType ) {
+          if ( oldType ) {
+            var oldValue = this.input[oldType.property];
+            if ( oldValue ) {
+              newValue = oldValue;
+            }
+            delete this.input[oldType.property];
+          }
+          this.input[newType.property] = newValue;
+          this.updateInput();
+          return newType;
+        },
+        setStart: function ( start ) {
+          this.input.start = start;
+          this.updateInput();
+          this.startMenu = false;
+        },
+        setEnd: function ( end ) {
+          this.input.end = end;
+          this.updateInput();
+          this.endMenu = false;
+        },
+        forceType: function ( type ) {
+          if ( this.type === type ) {
+            this.updateType( '', type );
+            this.updateType( type, '' );
+          } else {
+            this.type = type;
+          }
+        },
+        updateType: function ( newType, oldType ) {
+          var inputChanged = false;
+          var input = this.input;
+          if ( oldType === 'none' ) {
+            delete input.end;
+            inputChanged = true;
+          }
+          if ( newType ) {
+            var pattern = ds.Pattern.withName( newType );
+            if ( pattern ) {
+              pattern.apply( input, this.day );
+              inputChanged = true;
+            }
+          }
+          if ( newType === 'none' ) {
+            input.start = this.day.start();
+            input.end = this.day.end();
+            if ( !input.times ) {
+              if ( !input.duration ) {
+                input.duration = 1;
+              }
+              if ( !input.durationUnit ) {
+                input.durationUnit = 'days';
+              }
+            }
+            if ( input.times && input.duration && input.durationUnit ) {
+              var lastTime = null;
+              input.times.forEach( function ( rawTime ) {
+                var time = ds.Time.parse( rawTime );
+                if ( time && ( !lastTime || time.toMilliseconds() > lastTime.toMilliseconds() ) ) {
+                  lastTime = time;
+                }
+              } );
+              if ( lastTime ) {
+                input.end = this.day.withTime( lastTime ).add( input.duration, input.durationUnit );
+              }
+            }
+            inputChanged = true;
+          }
+          if ( inputChanged ) {
+            this.updateInput();
+          }
+        },
+        determineType: function () {
+          var pattern = ds.Pattern.findMatch( this.input );
+          return pattern ? pattern.name : 'custom';
+        },
+        copyShallow: function ( x ) {
+          var out = {};
+          for ( var prop in x ) {
+            out[prop] = x[prop];
+          }
+          return out;
+        },
+        updateInput: function () {
+          this.input = this.copyShallow( this.input );
+        }
+      }
+    } );
 
-      function brighten(color)
-      {
-        var match = /#(\w\w)(\w\w)(\w\w)/.exec(color);
+    Vue.component( 'dsEvent', {
+      props: ['calendarEvent', 'index', 'calendar'],
+      template: '#template_event',
+      computed: {
+        style: function () {
 
-        var pr = parseInt( match[1], 16 );
-        var pg = parseInt( match[2], 16 );
-        var pb = parseInt( match[3], 16 );
+          var calendarEvent = this.calendarEvent;
+          var now = this.$root.today;
+          var past = calendarEvent.time.start.isBefore( now );
+          var cancelled = calendarEvent.cancelled;
+          var originalColor = calendarEvent.event.data.color;
+          var color = originalColor;
+          if ( past || cancelled ) {
+            color = brighten( color );
+          }
 
-        var opacity = 0.5;
+          return {
+            position: 'relative',
+            top: ( ( calendarEvent.row - ( this.index || 0 ) ) * 19 ) + 'px',
+            backgroundColor: color,
+            marginLeft: calendarEvent.starting ? 0 : '-5px',
+            marginRight: calendarEvent.ending ? 0 : '-5px',
+            textDecoration: cancelled ? 'line-through' : 'inherit',
+            textDecorationColor: cancelled ? originalColor : 'inherit'
+          };
+        },
+        sameDayEvents: function () {
+          return this.calendarEvent.event.schedule.iterateSpans( this.calendarEvent.day, true ).list();
+        },
+        hasPrefix: function () {
+          return !this.calendarEvent.event.schedule.isFullDay() && this.sameDayEvents.length > 0;
+        },
+        getPrefix: function () {
+          var same = this.sameDayEvents;
+          return same.length === 1 ?
+            same[0].start.format( 'ha' ) :
+            '(' + same.length + ')';
+        },
+        showName: function () {
+          return this.calendarEvent.starting || ( this.calendar && !this.calendar.filled.contains( this.calendarEvent.time.start ) );
+        }
+      },
+      methods: {
+        edit: function () {
+          this.$emit( 'edit', this.calendarEvent );
+        }
+      }
+    } );
 
-        var ar = 255;
-        var ag = 255;
-        var ab = 255;
+    Vue.component( 'dsEventTime', {
+      props: ['calendarEvent', 'calendar'],
+      template: '#template_event_time',
+      computed: {
+        style: function () {
+          var HEIGHT = 960;
+          var COLUMN_OFFSET = 14;
 
-        var r = ar + (pr - ar) * opacity;
-        var g = ag + (pg - ag) * opacity;
-        var b = ab + (pb - ab) * opacity;
+          var calendarEvent = this.calendarEvent;
+          var bounds = calendarEvent.getTimeBounds( HEIGHT, 1, COLUMN_OFFSET );
+          var now = this.$root.now;
+          var past = calendarEvent.time.end.isBefore( now );
+          var cancelled = calendarEvent.cancelled;
+          var originalColor = calendarEvent.event.data.color;
+          var color = originalColor;
+          if ( past || cancelled ) {
+            color = brighten( color );
+          }
 
-        var hr = Math.min( 255, Math.floor(r) ).toString(16);
-        var hg = Math.min( 255, Math.floor(g) ).toString(16);
-        var hb = Math.min( 255, Math.floor(b) ).toString(16);
+          return {
+            position: 'absolute',
+            top: bounds.top + 'px',
+            height: bounds.height + 'px',
+            left: bounds.left + 'px',
+            right: '0px',
+            backgroundColor: color,
+            marginLeft: calendarEvent.starting ? 0 : '-5px',
+            marginRight: calendarEvent.ending ? 0 : '-5px',
+            textDecoration: cancelled ? 'line-through' : 'inherit',
+            textDecorationColor: cancelled ? originalColor : 'inherit'
+          };
+        },
+        showName: function () {
+          return this.calendarEvent.starting || ( this.calendar && !this.calendar.span.contains( this.calendarEvent.time.start ) );
+        }
+      },
+      methods: {
+        edit: function () {
+          this.$emit( 'edit', this.calendarEvent );
+        }
+      }
+    } );
 
-        return '#' +
-          (hr.length === 1 ? '0' + hr : hr) +
-          (hg.length === 1 ? '0' + hg : hg) +
-          (hb.length === 1 ? '0' + hb : hb);
+    Vue.component( 'dsDayRow', {
+      props: ['days', 'calendar'],
+      template: '#template_day_row',
+      methods: {
+        edit: function ( eventDay ) {
+          this.$emit( 'edit', eventDay );
+        },
+        add: function ( day ) {
+          this.$emit( 'add', day );
+        }
       }
+    } );
 
-    </script>
+    Vue.component( 'dsWeekHeader', {
+      props: ['days', 'calendar'],
+      template: '#template_week_header',
+      methods: {
+        add: function ( day ) {
+          this.$emit( 'add', day );
+        },
+        edit: function ( eventDay ) {
+          this.$emit( 'edit', eventDay );
+        }
+      }
+    } );
 
-    <style>
-      nav.toolbar .toolbar__content {
-        border-bottom: 1px solid rgb(224, 224, 224);
+    Vue.component( 'dsWeekDayHeader', {
+      props: ['day', 'calendar'],
+      template: '#template_week_day_header',
+      methods: {
+        add: function () {
+          this.$emit( 'add', this.day );
+        },
+        edit: function ( event ) {
+          this.$emit( 'edit', {
+            day: this.day,
+            event: event
+          } );
+        }
       }
-      .ds-expand {
-        width: 100%;
-        height: 100%;
+    } );
+
+    Vue.component( 'dsDay', {
+      props: ['day', 'calendar'],
+      template: '#template_day',
+      methods: {
+        add: function () {
+          this.$emit( 'add', this.day );
+        },
+        edit: function ( event ) {
+          this.$emit( 'edit', {
+            event: event,
+            day: this.day
+          } );
+        }
       }
-      .ds-month {
-        display: flex;
-        flex-direction: column;
-        background-color: white;
+    } );
+
+    Vue.component( 'dsDayPicker', {
+      props: ['span', 'highlightSpan'],
+      template: '#template_day_picker',
+      data: function () {
+        return {
+          month: this.getMonth(),
+          weekdays: ds.Locales.current.weekdays[0]
+        };
+      },
+      computed: {
+        summary: function () {
+          return this.month ? this.month.summary( false, false, false, false ) : '';
+        }
+      },
+      watch: {
+        span: {
+          deep: true,
+          handler: function ( span ) {
+            if ( !span.matchesMonth( this.month.start ) ) {
+              this.month = this.getMonth();
+            }
+          }
+        }
+      },
+      methods: {
+        isHighlighted: function ( day ) {
+          return this.highlightSpan && this.span.matchesDay( day );
+        },
+        getMonthStart: function () {
+          return this.span && this.span.start ? this.span.start : this.$root.today;
+        },
+        getMonth: function () {
+          return ds.Calendar.months( 1, this.getMonthStart(), 0, { fill: true, minimumSize: 42 } );
+        },
+        pick: function ( day ) {
+          this.$emit( 'picked', day );
+        },
+        prev: function () {
+          this.month.prev();
+          this.$emit( 'prev', this.month );
+        },
+        next: function () {
+          this.month.next();
+          this.$emit( 'next', this.month );
+        }
       }
-      .ds-week-header {
-        display: flex;
+    } );
+
+    Vue.component( 'dsDayTimes', {
+      props: ['day', 'calendar'],
+      template: '#template_day_times',
+      computed: {
+        nowLine: function () {
+          var now = this.$root.now.asTime().toMilliseconds();
+          var delta = now / ds.Constants.MILLIS_IN_DAY;
+          var top = delta * 960;
+
+          return {
+            position: 'absolute',
+            left: '0px',
+            right: '-1px',
+            top: ( top - 1 ) + 'px',
+            borderTop: '#db4437 solid 2px'
+          };
+        }
+      },
+      methods: {
+        edit: function ( event ) {
+          this.$emit( 'edit', {
+            day: this.day,
+            event: event
+          } );
+        },
+        addAt: function ( hour ) {
+          this.$emit( 'add-at', {
+            day: this.day,
+            hour: hour - 1
+          } );
+        }
       }
-      .ds-week-header-day {
-        flex: 1 0 20px;
-        border-right: #e0e0e0 1px solid;
+    } );
+
+    new Vue( {
+      el: '#dayspan',
+      props: ['source'],
+      data: {
+        drawer: null,
+        calendar: null,
+        dayProperty: Store.Load( 'dayProperty', 'dayOfMonth' ),
+        currentType: null,
+        loading: false,
+        today: ds.Day.today(),
+        tomorrow: ds.Day.tomorrow(),
+        now: ds.Day.now(),
+        types: [
+          { id: 'D', label: 'Day', shortcut: 'D', type: ds.Units.DAY, size: 1 },
+          { id: 'W', label: 'Week', shortcut: 'W', type: ds.Units.WEEK, size: 1 },
+          { id: 'M', label: 'Month', shortcut: 'M', type: ds.Units.MONTH, size: 1 },
+          { id: 'Y', label: 'Year', shortcut: 'Y', type: ds.Units.YEAR, size: 1 },
+          { id: 'X', label: '4 days', shortcut: 'X', type: ds.Units.DAY, size: 4 }
+        ],
+        hours: [
+          '    ', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am', '10am', '11am',
+          '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm'
+        ],
+        selectionStart: null,
+        dayProperties: {
+          'Day': 'day',
+          'Day Of Week': 'dayOfWeek',
+          'Day Of Month': 'dayOfMonth',
+          'Last Day Of Month': 'lastDayOfMonth',
+          'Day Of Year': 'dayOfYear',
+          'Week': 'week',
+          'Week Of Year': 'weekOfYear',
+          'Weekspan Of Year': 'weekspanOfYear',
+          'Full Week Of Year': 'fullWeekOfYear',
+          'Last Weekspan Of Year': 'lastWeekspanOfYear',
+          'Last Full Week Of Year': 'lastFullWeekOfYear',
+          'Week Of Month': 'weekOfMonth',
+          'Weekspan Of Month': 'weekspanOfMonth',
+          'Full Week Of Month': 'fullWeekOfMonth',
+          'Last Weekspan Of Month': 'lastWeekspanOfMonth',
+          'Last Full Week Of Month': 'lastFullWeekOfMonth'
+        },
+        weekdays: ds.Locales.current.weekdays[0],
+        weekdayCodes: ds.Locales.current.weekdays[2],
+        defaultEvents: [
+          {
+            data: { name: 'Weekly Meeting', color: '#3F51B5' },
+            schedule: {
+              day: [ds.Weekday.MONDAY],
+              times: [9],
+              duration: 30,
+              durationUnit: 'minutes'
+            }
+          },
+          {
+            data: { name: 'Mother\'s Day', color: '#2196F3' },
+            schedule: {
+              month: [ds.Month.MAY],
+              day: [ds.Weekday.SUNDAY],
+              weekspanOfMonth: [1]
+            }
+          },
+          {
+            data: { name: 'First Weekend', color: '#4CAF50' },
+            schedule: {
+              weekspanOfMonth: [0],
+              day: [ds.Weekday.FRIDAY],
+              duration: 3,
+              durationUnit: 'days'
+            }
+          }
+        ]
+      },
+      watch: {
+        currentType: function () {
+          if ( !this.loading ) {
+            this.rebuild();
+          }
+        }
+      },
+      computed: {
+        summary: function () {
+          return this.calendar ? this.calendar.summary( false, false, false, false ) : '';
+        },
+        todayDate: function () {
+          return this.$root.today.format( 'dddd, MMMM D' );
+        },
+        rows: function () {
+          return Math.floor( this.calendar.days.length / 7 );
+        },
+        isDay: function () {
+          return this.calendar && this.calendar.type === ds.Units.DAY;
+        },
+        isWeek: function () {
+          return this.calendar && this.calendar.type === ds.Units.WEEK;
+        },
+        isMonth: function () {
+          return this.calendar && this.calendar.type === ds.Units.MONTH;
+        },
+        isYear: function () {
+          return this.calendar && this.calendar.type === ds.Units.YEAR;
+        },
+        nextLabel: function () {
+          return this.currentType ? 'Next ' + this.currentType.label.toLowerCase() : 'Next';
+        },
+        prevLabel: function () {
+          return this.currentType ? 'Previous ' + this.currentType.label.toLowerCase() : 'Previous';
+        }
+      },
+      created: function () {
+        // Initialize types
+        if ( !this.currentType ) {
+          this.currentType = this.types[2];
+        }
+
+        // Export
+        window.app = this;
+
+        // Update Times
+        setInterval( this.updateTimes, ds.Constants.MILLIS_IN_MINUTE );
+      },
+      mounted: function () {
+        this.loadState();
+      },
+      methods: {
+        saveState: function () {
+          localStorage.setItem( 'dayspanState', JSON.stringify(
+            this.calendar.toInput( true )
+          ) );
+        },
+        loadState: function () {
+          var state = JSON.parse( localStorage.getItem( 'dayspanState' ) );
+          this.loading = true;
+          if ( state ) {
+            this.currentType = this.types.find( function ( type ) {
+              return type.type === state.type && type.size === state.size;
+            } );
+            state.eventSorter = state.listTimes ? ds.Sorts.List( [ds.Sorts.FullDay, ds.Sorts.Start] ) : ds.Sorts.Start;
+            this.calendar = ds.Calendar.fromInput( state );
+          } else {
+            this.rebuild( ds.Day.today(), this.defaultEvents );
+          }
+          this.loading = false;
+        },
+        updateTimes: function () {
+          this.today = ds.Day.today();
+          this.now = ds.Day.now();
+          this.tomorrow = ds.Day.tomorrow();
+        },
+        rebuild: function ( aroundDay, events ) {
+          var cal = this.calendar;
+          var type = this.currentType || this.types[2];
+
+          if ( cal &&
+            cal.type === type.type &&
+            cal.size === type.size ) {
+            return;
+          }
+
+          var listTimes = type.type === ds.Units.DAY || type.type === ds.Units.WEEK;
+          var input = {
+            type: type.type,
+            size: type.size,
+            around: aroundDay,
+            eventsOutside: true,
+            listTimes: listTimes,
+            updateRows: true,
+            updateColumns: listTimes,
+            fill: !listTimes,
+            eventSorter: listTimes ? ds.Sorts.List( [ds.Sorts.FullDay, ds.Sorts.Start] ) : ds.Sorts.Start,
+            events: events
+          };
+
+          if ( cal ) {
+            cal.set( input );
+          } else {
+            this.calendar = ds.Calendar.fromInput( input );
+          }
+
+          this.saveState();
+        },
+        selectStart: function ( day ) {
+          this.selectionStart = day;
+        },
+        selectMove: function ( day ) {
+          if ( !this.selectionStart ) {
+            return;
+          }
+          var existing = this.calendar.selection;
+          if ( existing && existing.isPoint && existing.matchesDay( day ) && day.sameDay( this.selectionStart ) ) {
+            this.calendar.unselect();
+          } else {
+            var min = day.min( this.selectionStart );
+            var max = day.max( this.selectionStart );
+            this.calendar.select( min, max );
+          }
+        },
+        selectEnd: function ( day ) {
+          this.selectMove( day );
+          this.selectionStart = null;
+        },
+        next: function () {
+          this.calendar.unselect().next();
+          this.saveState();
+        },
+        prev: function () {
+          this.calendar.unselect().prev();
+          this.saveState();
+        },
+        setToday: function () {
+          this.rebuild( this.today );
+        },
+        dayAtIndex: function ( row, cell ) {
+          return this.calendar.days[( row - 1 ) * 7 + ( cell - 1 )];
+        },
+        daysAtRow: function ( row, rowSize ) {
+          var start = ( row - 1 ) * rowSize;
+          return this.calendar.days.slice( start, start + rowSize );
+        },
+        edit: function ( eventDay ) {
+          this.$refs.scheduler.edit( eventDay.day, eventDay.event );
+        },
+        add: function ( day ) {
+          this.$refs.scheduler.add( day );
+        },
+        addAt: function ( dayHour ) {
+          this.$refs.scheduler.addAt( dayHour.day, dayHour.hour );
+        },
+        eventsIndex: function ( data ) {
+          var events = this.events;
+          for ( var i = events.length - 1; i >= 0; i-- ) {
+            if ( events[i].data === data ) {
+              return i;
+            }
+          }
+          return -1;
+        },
+        eventSave: function ( data ) {
+          var calendarEvent = data.event;
+          if ( calendarEvent ) {
+            var event = calendarEvent.event;
+            event.data.name = data.name;
+            event.data.color = data.color;
+            event.schedule.set( data.schedule );
+
+            this.calendar.refreshEvents();
+          } else {
+            this.calendar.addEvent( {
+              data: { name: data.name, color: data.color },
+              schedule: data.schedule
+            } );
+          }
+
+          this.saveState();
+          this.$forceUpdate();
+        },
+        eventRemove: function ( calendarEvent ) {
+          this.calendar.removeEvent( calendarEvent.event );
+          this.saveState();
+          this.$forceUpdate();
+        },
+        eventRemoveOccurrence: function ( data ) {
+          data.event.exclude();
+          this.eventsRefresh();
+        },
+        eventCancel: function ( data ) {
+          data.event.cancel( data.cancel );
+          this.eventsRefresh();
+        },
+        eventMove: function ( data ) {
+          data.event.move( data.moveTo );
+          this.eventsRefresh();
+        },
+        eventsRefresh: function () {
+          this.calendar.refreshEvents();
+          this.saveState();
+          this.$forceUpdate();
+        }
       }
-      .ds-week {
-        display: flex;
-        flex: 1;
-      }
-      .ds-day {
-        flex: 1;
-        width: 0;
-        border-right: #e0e0e0 1px solid;
-        border-bottom: #e0e0e0 1px solid;
-      }
-      .ds-day .ds-today-dom {
-        margin: -7px;
-        padding: 10px;
-        border-radius: 20px;
-        background-color: #4285f4;
-        color: white;
-        width: 36px;
-        height: 36px;
-        display: block;
-        text-align: center;
-        line-height: 16px;
-        position: relative;
-        z-index: 1;
-        top: -4px;
-      }
-      .ds-event {
-        margin: 1px;
-        color: white;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        padding-left: 0.5em;
-        font-size: 12px;
-        cursor: pointer;
-      }
-      .ds-day-picker .ds-week-header {
-        display: flex;
-      }
-      .ds-day-picker .ds-week-header > div {
-        flex: 1;
-      }
-      .ds-day-picker .ds-week-header .subtitle {
-        flex: 5;
-      }
-      .ds-day-picker .ds-week-subheader {
-        display: flex;
-        text-align: center
-      }
-      .ds-day-picker .ds-week {
-        display: flex;
-        text-align: center;
-        flex-direction: row;
-        flex-wrap: wrap;
-      }
-      .ds-day-picker .ds-weekday {
-        flex: 1;
-      }
-      .ds-day-picker .ds-day-pick {
-        flex: 1 0 14%;
-      }
-      .ds-color-option {
-        width: 100%;
-        color: white;
-        padding: 4px;
-      }
-      .ds-gray-textfield .input-group__input input,
-      .ds-gray-select .input-group__input {
-        background-color: #f5f5f5;
-        box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);
-        height: 40px;
-        padding: 10px;
-      }
-      .ds-gray-textfield > label {
-        margin-top: -8px;
-        margin-left: 8px;
-      }
-      .ds-gray-textfield .input-group__details::before,
-      .ds-gray-select .input-group__details::before {
-        background-color: #f5f5f5 !important;
-      }
-      .ds-font-18,
-      .ds-font-18 input {
-        font-size: 18px;
-      }
-      .ds-gray-button {
-        background-color: #f5f5f5 !important;
-        height: 40px;
-      }
-      .ds-gray-day-dropdown {
-        width: 260px;
-        background-color: white;
-        padding: 10px;
-      }
-      .ds-inline-textfield {
-        width: auto;
-        display: inline-block !important;
-        margin-left: 6px;
-        margin-right: 6px;
-        top: 14px;
-        padding-top: 0px;
-        margin-top: -14px;
-      }
-      .ds-inline-textfield.small {
-        width: 60px;
-      }
-      .ds-calendar-container {
-        padding: 0px;
-        position: relative;
-      }
-      .ds-month-view .ds-today {
-        background-color: rgba(0,0,0,0.04);
-      }
+    } );
+
+    function brighten( color ) {
+      var match = /#(\w\w)(\w\w)(\w\w)/.exec( color );
+
+      var pr = parseInt( match[1], 16 );
+      var pg = parseInt( match[2], 16 );
+      var pb = parseInt( match[3], 16 );
+
+      var opacity = 0.5;
+
+      var ar = 255;
+      var ag = 255;
+      var ab = 255;
+
+      var r = ar + ( pr - ar ) * opacity;
+      var g = ag + ( pg - ag ) * opacity;
+      var b = ab + ( pb - ab ) * opacity;
+
+      var hr = Math.min( 255, Math.floor( r ) ).toString( 16 );
+      var hg = Math.min( 255, Math.floor( g ) ).toString( 16 );
+      var hb = Math.min( 255, Math.floor( b ) ).toString( 16 );
+
+      return '#' +
+        ( hr.length === 1 ? '0' + hr : hr ) +
+        ( hg.length === 1 ? '0' + hg : hg ) +
+        ( hb.length === 1 ? '0' + hb : hb );
+    }
+
+  </script>
+
+  <style>
+    nav.toolbar .toolbar__content {
+      border-bottom: 1px solid rgb(224, 224, 224);
+    }
+
+    .ds-expand {
+      width: 100%;
+      height: 100%;
+    }
+
+    .ds-month {
+      display: flex;
+      flex-direction: column;
+      background-color: white;
+    }
+
+    .ds-week-header {
+      display: flex;
+    }
+
+    .ds-week-header-day {
+      flex: 1 0 20px;
+      border-right: #e0e0e0 1px solid;
+    }
+
+    .ds-week {
+      display: flex;
+      flex: 1;
+    }
+
+    .ds-day {
+      flex: 1;
+      width: 0;
+      border-right: #e0e0e0 1px solid;
+      border-bottom: #e0e0e0 1px solid;
+    }
+
+    .ds-day .ds-today-dom {
+      margin: -7px;
+      padding: 10px;
+      border-radius: 20px;
+      background-color: #4285f4;
+      color: white;
+      width: 36px;
+      height: 36px;
+      display: block;
+      text-align: center;
+      line-height: 16px;
+      position: relative;
+      z-index: 1;
+      top: -4px;
+    }
+
+    .ds-event {
+      margin: 1px;
+      color: white;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding-left: 0.5em;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .ds-day-picker .ds-week-header {
+      display: flex;
+    }
+
+    .ds-day-picker .ds-week-header>div {
+      flex: 1;
+    }
+
+    .ds-day-picker .ds-week-header .subtitle {
+      flex: 5;
+    }
+
+    .ds-day-picker .ds-week-subheader {
+      display: flex;
+      text-align: center
+    }
+
+    .ds-day-picker .ds-week {
+      display: flex;
+      text-align: center;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    .ds-day-picker .ds-weekday {
+      flex: 1;
+    }
+
+    .ds-day-picker .ds-day-pick {
+      flex: 1 0 14%;
+    }
+
+    .ds-color-option {
+      width: 100%;
+      color: white;
+      padding: 4px;
+    }
+
+    .ds-gray-textfield .input-group__input input,
+    .ds-gray-select .input-group__input {
+      background-color: #f5f5f5;
+      box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12);
+      height: 40px;
+      padding: 10px;
+    }
+
+    .ds-gray-textfield>label {
+      margin-top: -8px;
+      margin-left: 8px;
+    }
+
+    .ds-gray-textfield .input-group__details::before,
+    .ds-gray-select .input-group__details::before {
+      background-color: #f5f5f5 !important;
+    }
+
+    .ds-font-18,
+    .ds-font-18 input {
+      font-size: 18px;
+    }
+
+    .ds-gray-button {
+      background-color: #f5f5f5 !important;
+      height: 40px;
+    }
+
+    .ds-gray-day-dropdown {
+      width: 260px;
+      background-color: white;
+      padding: 10px;
+    }
+
+    .ds-inline-textfield {
+      width: auto;
+      display: inline-block !important;
+      margin-left: 6px;
+      margin-right: 6px;
+      top: 14px;
+      padding-top: 0px;
+      margin-top: -14px;
+    }
+
+    .ds-inline-textfield.small {
+      width: 60px;
+    }
+
+    .ds-calendar-container {
+      padding: 0px;
+      position: relative;
+    }
+
+    .ds-month-view .ds-today {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
 
 
-      .ds-week-view {
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        overflow-y: auto;
-        outline: none;
-        background-color: white;
-      }
-      .ds-week-view-container {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        height: 100%;
-      }
-      .ds-week-view-top {
-        flex: none;
-        display: flex;
-      }
-      .ds-week-view-bottom {
-        flex: 1 1 60%;
-        overflow: hidden;
-        display: flex;
-        position: relative;
-        flex-direction: column;
-      }
-      .ds-week-view-scrollable {
-        overflow-y: scroll;
-        flex: 1 1 auto;
-        display: flex;
-        align-items: flex-start;
-      }
-      .ds-week-view-pane {
-        height: 960px;
-        width: 100%;
-        overflow-y: hidden;
-        flex: none;
-        display: flex;
-        align-items: flex-start;
-      }
-      .ds-hour {
-        height: 40px;
-        border-bottom: #e0e0e0 1px solid;
-      }
-      .ds-hour-text {
-        display: block;
-        position: relative;
-        top: -6px;
-        font-size: 10px;
-        color: #212121;
-      }
-      .ds-hour-list {
-        flex: none;
-        width: 44px;
-        border-right: #e0e0e0 1px solid;
-      }
-      .ds-hour-list .ds-hour {
-        text-align: center;
-        border-bottom: none;
-      }
-      .ds-week-weekday {
-        color: black;
-        padding-left: 8px;
-      }
-      .ds-week-date {
-        font-size: 40px;
-        line-height: 44px;
-        color: black;
-        padding-left: 8px;
-      }
-      .ds-week-view .ds-today {
-        background-color: rgba(0,0,0,0.04);
-      }
-      .ds-today .ds-week-weekday,
-      .ds-today .ds-week-date {
-        color: #4285f4;
-      }
-      .ds-week-view-pane .ds-day {
-        position: relative;
-      }
+    .ds-week-view {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      overflow-y: auto;
+      outline: none;
+      background-color: white;
+    }
+
+    .ds-week-view-container {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    .ds-week-view-top {
+      flex: none;
+      display: flex;
+    }
+
+    .ds-week-view-bottom {
+      flex: 1 1 60%;
+      overflow: hidden;
+      display: flex;
+      position: relative;
+      flex-direction: column;
+    }
+
+    .ds-week-view-scrollable {
+      overflow-y: scroll;
+      flex: 1 1 auto;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .ds-week-view-pane {
+      height: 960px;
+      width: 100%;
+      overflow-y: hidden;
+      flex: none;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .ds-hour {
+      height: 40px;
+      border-bottom: #e0e0e0 1px solid;
+    }
+
+    .ds-hour-text {
+      display: block;
+      position: relative;
+      top: -6px;
+      font-size: 10px;
+      color: #212121;
+    }
+
+    .ds-hour-list {
+      flex: none;
+      width: 44px;
+      border-right: #e0e0e0 1px solid;
+    }
+
+    .ds-hour-list .ds-hour {
+      text-align: center;
+      border-bottom: none;
+    }
+
+    .ds-week-weekday {
+      color: black;
+      padding-left: 8px;
+    }
+
+    .ds-week-date {
+      font-size: 40px;
+      line-height: 44px;
+      color: black;
+      padding-left: 8px;
+    }
+
+    .ds-week-view .ds-today {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    .ds-today .ds-week-weekday,
+    .ds-today .ds-week-date {
+      color: #4285f4;
+    }
+
+    .ds-week-view-pane .ds-day {
+      position: relative;
+    }
 
 
-      .ds-year-view .ds-first-day {
-        font-weight: bold;
-      }
-      .ds-year-view .ds-first-day-day {
-        background-color: rgba(0,0,0,0.08);
-      }
-    </style>
+    .ds-year-view .ds-first-day {
+      font-weight: bold;
+    }
+
+    .ds-year-view .ds-first-day-day {
+      background-color: rgba(0, 0, 0, 0.08);
+    }
+  </style>
 
 
-  </body>
+</body>
+
 </html>
