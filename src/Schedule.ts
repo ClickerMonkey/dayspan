@@ -2,13 +2,14 @@
 import { Iterate, IterateAction } from 'iteratez';
 
 import { Constants } from './Constants';
-import { durations, Unit } from './DayFunctions';
 import { Day, DayInput, DayProperty } from './Day';
+import { durations, Unit } from './DayFunctions';
 import { DaySpan } from './DaySpan';
 import { FrequencyCheck, FrequencyValue } from './Frequency';
 import { Functions as fn } from './Functions';
 import { Identifier, IdentifierInput } from './Identifier';
 import { LocaleRule, Locales } from './Locale';
+import { Op } from './Operation';
 import { Parse } from './Parse';
 import { ScheduleModifier, ScheduleModifierSpan } from './ScheduleModifier';
 import { Time, TimeInput } from './Time';
@@ -24,6 +25,9 @@ import { Units } from './Units';
 export type ScheduleEventTuple = [DaySpan, Day, IdentifierInput];
 
 
+/**
+ * A shortcut for the most common type of iterators a Schedule returns.
+ */
 type Iter<M, T = Day> = Iterate<T, number, Schedule<M>>;
 
 
@@ -219,13 +223,29 @@ export class Schedule<M>
    */
   public end: Day;
 
+  // Private variable maxOccurrences.
+  private _maxOccurrences: number;
+
   /**
    * The maximum number of occurrences allowed in the Schedule. 
    * [[Schedule.start]] is required and [[Schedule.end]] is ignored and 
    * overwritten. This is an expensive check and should be avoided if 
    * possible. If this value is less than 1 it is ignored.
    */
-  public maxOccurrences: number;
+  public get maxOccurrences(): number 
+  { 
+    return this._maxOccurrences;
+  }
+
+  public set maxOccurrences(value: number) 
+  { 
+    this._maxOccurrences = value;
+
+    if (this.checks) 
+    {
+      this.updateEnd();
+    }
+  }
 
   /**
    * The length of events in this schedule.
@@ -501,66 +521,81 @@ export class Schedule<M>
       // Clear so it's not used in calculating maximum years.
       this.end = null;
 
-      const maximumYears = this.getMaximumYears();
+      const maximumYears = this.getMaximum('year') - this.start.year + 1;
       const lookahead = maximumYears * Constants.DAYS_IN_YEAR;
-      const [lastSpan] = this.forecast(this.start, false, this.maxOccurrences, 0, true, lookahead).last();
+      const previousOccurrences = this.include.spans().where(({ span }) => span.start.isBefore(this.start)).count();
+      const occurrences = this.maxOccurrences - previousOccurrences;
+      const last = this.forecast(this.start, false, occurrences, 0, true, lookahead).last();
 
-      this.end = lastSpan.end;
+      if (last)
+      {
+        this.end = last[0].end;
+      }
     }
 
     return this;
   }
 
   /**
-   * Estimates the maximum number of years from the start date that events 
+   * Estimates the maximum number of `prop` from the start date that events 
    * could be happening. If the start date is not specified -1 will be 
-   * returned representing potentially infinite years. If specific years
-   * are specified the difference between the maximum year and the start year
+   * returned representing potentially infinite `prop`s. If specific `prop`s
+   * are specified the difference between the maximum `prop` and the start `prop`
    * will be returned. After that if [[Schedule.maxOccurrences]] is not 
    * specified -1 will be returned unless the end date is specified. In that
-   * case the years between the start and end are returned. Otherwise
-   * if events occur every X years then that calculation is used taking into
+   * case the `prop`s between the start and end are returned. Otherwise
+   * if events occur every X `prop`s then that calculation is used taking into
    * account [[Schedule.maxOccurrences]]. Finally no year rule is specified
    * so worst case is assumed, [[Schedule.maxOccurrences]].
    * 
    * The returned value is always rounded up, so if the first and last 
-   * occurrence happens the same year 1 will be returned.
+   * occurrence happens the same `prop` 1 will be returned.
    */
-  public getMaximumYears(): number
+  public getMaximum (prop: DayProperty): number
   {
     if (!this.start)
     {
       return -1;
     }
 
-    let max = 0;
-
     if (this.end)
     {
-      max = this.end.year - this.start.year + 1;
+      return this.end[prop];
     }
 
-    if (fn.isFrequencyValueOneOf(this.year))
+    const occurs = this.maxOccurrences;
+    const start = this.start[prop];
+    const frequency = this[prop];
+
+    if (frequency)
     {
-      // const valueOfMax = this.year.reduce((a, b) => Math.max(a, b));
+      const input = frequency.input;
 
-      
-      return max - this.start.year + 1;
+      if (fn.isFrequencyValueEquals(input))
+      {
+        return input;
+      }
+      else if (fn.isFrequencyValueOneOf(input))
+      {
+        let max: number = input[0];
+
+        for (let i = 1; i < input.length; i++)
+        {
+          if (input[i] > max) max = input[i];
+        }
+
+        return max;
+      }
+
+      if (occurs > 0 && fn.isFrequencyValueEvery(input))
+      {
+        const { every, offset } = input;
+
+        return start + (offset || 0) + every * occurs;
+      }
     }
 
-    if (this.maxOccurrences <= 0)
-    {
-      return -1;
-    }
-
-    if (fn.isFrequencyValueEvery(this.year))
-    {
-      const { every, offset } = this.year;
-
-      return this.start.year + (offset || 0) + every * this.maxOccurrences + 1;
-    }
-
-    return this.maxOccurrences;
+    return occurs <= 0 ? -1 : start + occurs - 1;
   }
 
   /**
@@ -639,6 +674,42 @@ export class Schedule<M>
     }
 
     return { start, end }
+  }
+
+  /**
+   * Returns an iterator for all occurrences in this schedule. If a finite 
+   * list of occurrences is not possible to generate, an empty iterator will 
+   * be returned. A finite set of occurrences can be determine when a start
+   * and end date are specified. 
+   */
+  public getOccurrences(): Iterate<DaySpan, IdentifierInput, Schedule<M> | ScheduleModifier<M>>
+  {
+    const start = this.getStart();
+    const end = this.getEnd();
+
+    if (!start || !end)
+    {
+      return Iterate.empty();
+    }
+
+    const daysBetween = start.daysBetween(end, Op.CEIL, true);
+
+    const beforeStart = this.include
+      .spans()
+      .where(({span}) => span.start.isBefore(start))
+      .sorted((a, b) => a.span.start.time - b.span.start.time)
+      .transform(({span}) => span);
+
+    const afterStart = this.forecast(start, false, daysBetween)
+      .transform(([span]) => span);
+
+    const afterEnd = this.include
+      .spans()
+      .where(({span}) => span.start.isAfter(end))
+      .sorted((a, b) => a.span.start.time - b.span.start.time)
+      .transform(({span}) => span);
+
+    return Iterate.join(beforeStart, afterStart, afterEnd);
   }
 
   /**

@@ -1,8 +1,32 @@
 
+import { UnitRecord } from '../DayFunctions';
 import { Functions as fn } from '../Functions';
 import { Locale, Locales } from '../Locale';
 
 
+const unitToWordSingular: UnitRecord<string> = {
+  millis: 'Millisekunde',
+  second: 'Sekunde',
+  minute: 'Minute',
+  hour: 'Stunde',
+  day: 'Tag',
+  week: 'Woche',
+  month: 'Monat',
+  quarter: 'Quartal',
+  year: 'Jahr'
+};
+
+const unitToWordPlural: UnitRecord<string> = {
+  millis: 'Millisekunden',
+  second: 'Sekunden',
+  minute: 'Minuten',
+  hour: 'Stunden',
+  day: 'Tage',
+  week: 'Wochen',
+  month: 'Monate',
+  quarter: 'Viertel',
+  year: 'Jahre'
+};
 
 const de: Locale = 
 {
@@ -28,10 +52,10 @@ const de: Locale =
 
   identifierTime: (short) => short ? 'lll' : 'LLL',
   identifierDay: (short) => short ? 'll' : 'LL',
-  identifierWeek: (short) => 'wo [Woche in] YYYY',
-  identifierMonth: (short) => short ? 'MMM YYYY' : 'MMMM YYYY',
-  identifierQuarter: (short) => short ? 'Qo [Quartal] YYYY' : 'Qo [Quartal] YYYY',
-  identifierYear: (short) => 'YYYY',
+  identifierWeek: (short) => 'wo [Woche in] Y',
+  identifierMonth: (short) => short ? 'MMM Y' : 'MMMM Y',
+  identifierQuarter: (short) => 'Qo [Quartal] Y',
+  identifierYear: (short) => 'Y',
 
   patternNone: () => `Nicht wiederholend`,
   patternDaily: () => `Täglich`,
@@ -55,7 +79,7 @@ const de: Locale =
 
   scheduleAtTimes: ' um ',
 
-  scheduleDuration: (duration, unit) => ' mit einer Dauer von ' + duration + ' ' + (unit ? unit + ' ' : ''),
+  scheduleDuration: (duration, unit) => ' mit einer Dauer von ' + duration + ' ' + (unit ? (duration !== 1 ? unitToWordPlural[unit] : unitToWordSingular[unit]) + ' ' : ''),
 
   scheduleExcludes: ' mit Ausnahme vom ',
   scheduleIncludes: ' mit Einnahme vom ',
@@ -206,8 +230,8 @@ const de: Locale =
     oneOf: (values) => `am ${de.list(values.map(x => de.suffix(x + 1)))} letzten Wochenspanne des Monats`
   },
 
-  summaryDay: (short, dayOfWeek, year) => (dayOfWeek ? (short ? 'ddd, ' : 'dddd, ') : '') + (short ? 'MMM ' : 'MMMM ') + 'Do' + (year ? ' YYYY' : ''),
-  summaryWeek: (short, dayOfWeek, year) => (dayOfWeek ? (short ? 'ddd, ' : 'dddd, ') : '') + (short ? 'MMM ' : 'MMMM ') + 'Do' + (year ? ' YYYY' : ''),
+  summaryDay: (short, dayOfWeek, year) => (dayOfWeek ? (short ? 'ddd, ' : 'dddd, ') : '') + (short ? 'MMM ' : 'MMMM ') + 'Do' + (year ? ' Y' : ''),
+  summaryWeek: (short, dayOfWeek, year) => (dayOfWeek ? (short ? 'ddd, ' : 'dddd, ') : '') + (short ? 'MMM ' : 'MMMM ') + 'Do' + (year ? ' Y' : ''),
   summaryMonth: (short, dayOfWeek, year) => (short ? 'MMM' : 'MMMM') + (year ? ' YYYY' : ''),
   summaryYear: (short, dayOfWeek, year) => (year ? 'YYYY' : ''),
 

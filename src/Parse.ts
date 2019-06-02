@@ -1,7 +1,7 @@
 
 import { Constants } from './Constants';
-import { Unit } from './DayFunctions';
 import { Day, DayInput, DayProperty } from './Day';
+import { Unit } from './DayFunctions';
 import { Event } from './Event';
 import { FrequencyCheck } from './Frequency';
 import { Functions as fn } from './Functions';

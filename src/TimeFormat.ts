@@ -31,21 +31,21 @@ import { Time } from './Time';
  * - SSS: 000-999
  */
 export const TimeFormat = new Format<Time>({
-  A: (t: Time) => Locales.current[t.hour < 12 ? 'am' : 'pm'].toUpperCase(),
-  a: (t: Time) => Locales.current[t.hour < 12 ? 'am' : 'pm'],
-  H: (t: Time) => t.hour + '',
-  h: (t: Time) => ((t.hour % 12) || 12) + '',
-  k: (t: Time) => (t.hour + 1) + '',
-  m: (t: Time) => t.minute + '',
-  s: (t: Time) => t.second + '',
-  S: (t: Time) => fn.padNumber(t.millisecond, 3, 1),
-  HH: (t: Time) => fn.padNumber(t.hour, 2),
-  hh: (t: Time) => fn.padNumber((t.hour % 12) || 12, 2),
-  kk: (t: Time) => fn.padNumber(t.hour + 1, 2),
-  mm: (t: Time) => fn.padNumber(t.minute, 2),
-  ss: (t: Time) => fn.padNumber(t.second, 2),
-  SS: (t: Time) => fn.padNumber(t.millisecond, 3, 2),
-  SSS: (t: Time) => fn.padNumber(t.millisecond, 3)
+  A:    (t: Time) => Locales.current[t.hour < 12 ? 'am' : 'pm'].toUpperCase(),
+  a:    (t: Time) => Locales.current[t.hour < 12 ? 'am' : 'pm'],
+  H:    (t: Time) => t.hour + '',
+  h:    (t: Time) => ((t.hour % 12) || 12) + '',
+  k:    (t: Time) => (t.hour + 1) + '',
+  m:    (t: Time) => t.minute + '',
+  s:    (t: Time) => t.second + '',
+  S:    (t: Time) => fn.padNumber(t.millisecond, 3, 1),
+  HH:   (t: Time) => fn.padNumber(t.hour, 2),
+  hh:   (t: Time) => fn.padNumber((t.hour % 12) || 12, 2),
+  kk:   (t: Time) => fn.padNumber(t.hour + 1, 2),
+  mm:   (t: Time) => fn.padNumber(t.minute, 2),
+  ss:   (t: Time) => fn.padNumber(t.second, 2),
+  SS:   (t: Time) => fn.padNumber(t.millisecond, 3, 2),
+  SSS:  (t: Time) => fn.padNumber(t.millisecond, 3)
 }, {
   '[': {
     start: '[',

@@ -2,6 +2,7 @@
 
 import { Constants as cs } from '../Constants';
 import { Day } from '../Day';
+import { Locales } from '../Locale';
 import { Month } from '../Month';
 import { Weekday } from '../Weekday';
 
@@ -214,6 +215,40 @@ describe('Day', () => {
     expect( Day.build(2016, 2, 1).setLocale('de').day ).toEqual(2);
     expect( Day.build(2016, 3, 1).setLocale('de').day ).toEqual(5);
     expect( Day.build(2016, 4, 1).setLocale('de').day ).toEqual(0);
-  })
+  });
+
+  it('locales', () => {
+    const d = Day.build(2016, 0, 1);
+
+    expect( d.format('dddd') ).toEqual('Friday');
+
+    Locales.set('de');
+
+    expect( d.format('dddd') ).toEqual('Freitag');
+
+    Locales.set('en');
+
+    expect( d.format('dddd') ).toEqual('Friday');
+
+    d.setLocale('de');
+
+    expect( d.format('dddd') ).toEqual('Freitag');
+
+    Locales.set('de');
+
+    expect( d.format('dddd') ).toEqual('Freitag');
+
+    Locales.set('en');
+
+    expect( d.format('dddd') ).toEqual('Freitag');
+
+    d.clearLocale();
+
+    expect( d.format('dddd') ).toEqual('Friday');
+
+    Locales.set('de');
+
+    expect( d.format('dddd') ).toEqual('Freitag');
+  });
 
 })

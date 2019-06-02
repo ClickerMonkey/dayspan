@@ -530,4 +530,25 @@ describe('Schedule', () =>
     expect( s1.times[1].format('HH:mm') ).toBe( '15:00' );
   });
 
+  it('maxOccurrences', () => {
+    const s1 = new Schedule({
+      start: Day.build(2019, 5, 1),
+      maxOccurrences: 3,
+      day: Weekday.SUNDAY
+    });
+
+    const a1 = s1
+      .getOccurrences()
+      .transform(({start}) => start.format('Y-MM-DD dddd'))
+      .array();
+
+    expect( a1 ).toEqual([
+      '2019-06-02 Sunday',
+      '2019-06-09 Sunday',
+      '2019-06-16 Sunday'
+    ]);
+
+    expect( s1.end.format('Y-MM-DD HH:mm') ).toEqual( '2019-06-17 00:00' );
+  });
+
 })

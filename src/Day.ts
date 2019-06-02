@@ -476,6 +476,21 @@ export class Day implements DayFrequency
   }
 
   /**
+   * Sets the locale of this Day instance to the global locale.
+   */
+  public clearLocale (): void
+  {
+    const locale = Locales.current;
+
+    if (locale !== this._locale.value)
+    {
+      this._locale = Locales.ref;
+
+      this.resetLocaleCache();
+    }
+  }
+
+  /**
    * Resets all locale-based caches on this Day instance.
    */
   public resetLocaleCache (): void
