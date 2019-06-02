@@ -2,7 +2,7 @@
 
 import { Day } from './Day';
 import { Functions as fn } from './Functions';
-import en from './locales/en';
+import { default as en } from './locales/en';
 import { Ref } from './Ref';
 
 
