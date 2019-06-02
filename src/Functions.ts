@@ -1,4 +1,4 @@
-import { FrequencyValueEvery, FrequencyValueOneOf, FrequencyValueEquals } from "./Frequency";
+import { FrequencyValueEquals, FrequencyValueEvery, FrequencyValueOneOf } from "./Frequency";
 
 
 /**

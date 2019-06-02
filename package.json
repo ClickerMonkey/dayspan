@@ -1,6 +1,6 @@
 {
   "name": "dayspan",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A date & schedule library to use for advanced calendars in TypeScript and JS",
   "main": "dist/dayspan.js",
   "typings": "typings/index.d.ts",
@@ -17,8 +17,8 @@
   },
   "scripts": {
     "start": "webpack-dev-server --port 9000 --inline --progress --profile --colors --watch --content-base src/ --mode development",
-    "build": "webpack --config webpack.config.js --mode production && cp src/types.ts typings/types.d.ts",
-    "build.prod": "webpack --config webpack.config.js -p && cp src/types.ts typings/types.d.ts",
+    "build": "webpack --config webpack.config.js --mode production",
+    "build.prod": "webpack --config webpack.config.js -p",
     "cleanup": "shx rm -rf umd lib lib-esm lib-fesm typings coverage ../iteratez-pages/docs",
     "prebuild": "npm run cleanup && npm run verify",
     "docs": "typedoc -p . --readme README.md --theme minimal --mode file --target 'es5' --excludeNotExported --excludePrivate --ignoreCompilerErrors --exclude \"**/src/**/__tests__/*.*\" --out ../dayspan-pages/docs src/ && cp -R examples ../dayspan-pages/ && cp -R umd ../dayspan-pages/ && cp -R node_modules/moment/min ../dayspan-pages/node_modules/moment/",
@@ -64,6 +64,7 @@
     "lint-staged": "8.1.5",
     "prettier": "1.17.0",
     "shx": "0.3.2",
+    "source-map-loader": "0.2.4",
     "standard-version": "5.0.2",
     "strip-json-comments-cli": "1.0.1",
     "ts-jest": "24.0.2",
