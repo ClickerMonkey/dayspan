@@ -1,6 +1,7 @@
 
 import { Locale } from '../Locale';
 
+// tslint:disable: no-magic-numbers
 
 const MAP: string[] = [
   'th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'

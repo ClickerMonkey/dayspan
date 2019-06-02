@@ -1,6 +1,6 @@
 {
   "name": "dayspan",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A date & schedule library to use for advanced calendars in TypeScript and JS",
   "main": "dist/dayspan.js",
   "typings": "typings/index.d.ts",

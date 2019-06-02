@@ -3,6 +3,7 @@ import { UnitRecord } from '../DayFunctions';
 import { Functions as fn } from '../Functions';
 import { Locale, Locales } from '../Locale';
 
+// tslint:disable: no-magic-numbers
 
 const unitToWordSingular: UnitRecord<string> = {
   millis: 'Millisekunde',

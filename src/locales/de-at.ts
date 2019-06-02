@@ -2,6 +2,8 @@
 import { Locale, Locales } from '../Locale';
 import de from './de';
 
+// tslint:disable: no-magic-numbers
+
 const deAt: Locale = 
 {
   ...de,

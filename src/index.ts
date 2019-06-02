@@ -24,3 +24,9 @@ export * from './Time';
 export * from './TimeFormat';
 export * from './Units';
 export * from './Weekday';
+
+export { default as en } from './locales/en';
+export { default as fr } from './locales/fr';
+export { default as nl } from './locales/nl';
+export { default as de } from './locales/de';
+export { default as deAt } from './locales/de-at';
