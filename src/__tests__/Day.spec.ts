@@ -59,8 +59,8 @@ describe('Day', () => {
   it('relativeDays', () => {
 
     const d0 = Day.build(2018, Month.APRIL, 1);
-    const d1 = d0.relativeDays(-3);
-    const d2 = d0.relativeDays(+3);
+    const d1 = d0.add('day', -3);
+    const d2 = d0.add('day', +3);
 
     expect( d0.daysBetween(d1) ).toBe( 3 );
     expect( d0.daysBetween(d2) ).toBe( 3 );

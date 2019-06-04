@@ -252,7 +252,7 @@ const de: Locale =
   },
 
   months: [
-    ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktoboer', 'November', 'Dezember'],
+    ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
     ['Jan', 'Feb', 'Mrz', 'Apr', 'Mai', 'Juni', 'Juli', 'Aug', 'Sept', 'Okt', 'Nov', 'Dez'],
     ['Jan', 'Feb', 'Mrz', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
     ['J', 'F', 'Mä', 'A', 'Ma', 'Ju', 'Jl', 'Ag', 'S', 'O', 'N', 'D']

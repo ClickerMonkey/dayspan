@@ -286,6 +286,7 @@ export function getDaysInMonth(x: Date): number
 {
   return daysInMonth[isLeapYear(x) ? 1 : 0][x.getMonth()];
 }
+
 export function getAbsoluteTimestamp(a: Date): number
 {
   return a.getTime() - getTimezoneOffsetInMilliseconds(a);
@@ -480,11 +481,8 @@ export function diffHours(a: Date, b: Date): number
 
 export function diffDays(a: Date, b: Date): number 
 {
-  const left = mutate(a, startOfDay);
-  const right = mutate(b, startOfDay);
-
-  const leftTimestamp = getAbsoluteTimestamp(left);
-  const rightTimestamp = getAbsoluteTimestamp(right);
+  const leftTimestamp = getAbsoluteTimestamp(a);
+  const rightTimestamp = getAbsoluteTimestamp(b);
 
   return (leftTimestamp - rightTimestamp) / Constants.MILLIS_IN_DAY;
 }

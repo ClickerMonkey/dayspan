@@ -332,8 +332,8 @@ export class Parse
 
     if (on)
     {
-      input.start = on.start();
-      input.end = on.end();
+      input.start = on.startOf('day');
+      input.end = on.endOf('day');
       input.year = [on.year];
       input.month = [on.month];
       input.dayOfMonth = [on.dayOfMonth];

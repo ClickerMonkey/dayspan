@@ -885,8 +885,8 @@ export class Schedule<M>
 
     if (single && (addSpan || (this.start && this.end)))
     {
-      this.start = single.start.start();
-      this.end = single.end.end();
+      this.start = single.start.startOf('day');
+      this.end = single.end.endOf('day');
     }
 
     return this;
@@ -901,8 +901,8 @@ export class Schedule<M>
    */
   public getFullSpan(day: Day): DaySpan
   {
-    const start: Day = day.start();
-    const end: Day = start.add( this.duration, this.durationUnit );
+    const start: Day = day.startOf('day');
+    const end: Day = start.add(this.durationUnit, this.duration);
 
     return new DaySpan( start, end );
   }
@@ -918,7 +918,7 @@ export class Schedule<M>
   public getTimeSpan(day: Day, time: Time): DaySpan
   {
     const start: Day = day.withTime( time );
-    const end: Day = start.add( this.duration, this.durationUnit );
+    const end: Day = start.add(this.durationUnit, this.duration);
 
     return new DaySpan( start, end );
   }
@@ -1486,12 +1486,12 @@ export class Schedule<M>
 
     if (this.start)
     {
-      this.start = span.start.start();
+      this.start = span.start.startOf('day');
     }
 
     if (this.end)
     {
-      this.end = span.end.end();
+      this.end = span.end.endOf('day');
     }
 
     this.updateEnd();

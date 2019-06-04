@@ -595,8 +595,8 @@ export class Calendar<T, M>
    */
   public resetFilled(): this
   {
-    this.filled.start = this.fill ? this.start.startOfWeek() : this.start;
-    this.filled.end = this.fill ? this.end.endOfWeek() : this.end;
+    this.filled.start = this.fill ? this.start.startOf('week') : this.start;
+    this.filled.end = this.fill ? this.end.endOf('week') : this.end;
 
     return this;
   }
@@ -865,7 +865,7 @@ export class Calendar<T, M>
 
     if (parsed)
     {
-      const dayCount: number = parsed.start().daysBetween( this.days[ 0 ], Op.DOWN, false );
+      const dayCount: number = parsed.startOf('day').daysBetween( this.days[ 0 ], Op.DOWN, false );
 
       return this.days[ dayCount ];
     }
@@ -1382,64 +1382,64 @@ export class Calendar<T, M>
     [Units.DAY]:
     {
       getStart(around: Day, size: number, focus: number): Day {
-        return around.start().relativeDays( -Math.floor( size * focus ) )
+        return around.startOf('day').add('day', -Math.floor( size * focus ))
       },
       getEnd(start: Day, size: number, focus: number): Day {
-        return start.relativeDays( size - 1 ).end();
+        return start.add('day', size - 1).endOf('day');
       },
       moveStart(day: Day, amount: number): Day {
-        return day.relativeDays(amount);
+        return day.add('day', amount);
       },
       moveEnd(day: Day, amount: number): Day {
-        return day.relativeDays(amount);
+        return day.add('day', amount);
       },
       defaultInput: undefined
     },
     [Units.WEEK]:
     {
       getStart(around: Day, size: number, focus: number): Day {
-        return around.start().startOfWeek().relativeWeeks( -Math.floor( size * focus ) );
+        return around.startOf('week').add('week', -Math.floor( size * focus ));
       },
       getEnd(start: Day, size: number, focus: number): Day {
-        return start.relativeWeeks( size - 1 ).endOfWeek();
+        return start.add('week', size - 1).endOf('week');
       },
       moveStart(day: Day, amount: number): Day {
-        return day.relativeWeeks(amount);
+        return day.add('week', amount);
       },
       moveEnd(day: Day, amount: number): Day {
-        return day.relativeWeeks(amount);
+        return day.add('week', amount);
       },
       defaultInput: undefined
     },
     [Units.MONTH]:
     {
       getStart(around: Day, size: number, focus: number): Day {
-        return around.start().startOfMonth().relativeMonths( -Math.floor( size * focus ) );
+        return around.startOf('month').add('month', -Math.floor( size * focus ) );
       },
       getEnd(start: Day, size: number, focus: number): Day {
-        return start.relativeMonths( size - 1 ).endOfMonth();
+        return start.add('month', size - 1).endOf('month');
       },
       moveStart(day: Day, amount: number): Day {
-        return day.relativeMonths(amount);
+        return day.add('month', amount);
       },
       moveEnd(day: Day, amount: number): Day {
-        return day.startOfMonth().relativeMonths(amount).endOfMonth();
+        return day.startOf('month').add('month', amount).endOf('month');
       },
       defaultInput: { fill: true }
     },
     [Units.YEAR]:
     {
       getStart(around: Day, size: number, focus: number): Day {
-        return around.start().startOfYear().relativeYears( -Math.floor( size * focus ) );
+        return around.startOf('year').add('year', -Math.floor( size * focus ));
       },
       getEnd(start: Day, size: number, focus: number): Day {
-        return start.relativeYears( size - 1 ).endOfYear();
+        return start.add('year', size - 1).endOf('year');
       },
       moveStart(day: Day, amount: number): Day {
-        return day.relativeYears(amount);
+        return day.add('year', amount);
       },
       moveEnd(day: Day, amount: number): Day {
-        return day.relativeYears(amount);
+        return day.add('year', amount);
       },
       defaultInput: { fill: true }
     }

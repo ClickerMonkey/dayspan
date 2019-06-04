@@ -312,7 +312,7 @@ class IdentifierTime extends Identifier
   public span(id: IdentifierInput, endInclusive: boolean = false): DaySpan
   {
     const start: Day = this.start( id );
-    const end: Day = start.endOfHour( endInclusive );
+    const end: Day = start.endOf( 'hour', endInclusive );
 
     return new DaySpan(start, end);
   }
@@ -390,7 +390,7 @@ class IdentifierDay extends Identifier
   public span(id: IdentifierInput, endInclusive: boolean = false): DaySpan
   {
     const start: Day = this.start( id );
-    const end: Day = start.end( endInclusive );
+    const end: Day = start.endOf( 'day', endInclusive );
 
     return new DaySpan(start, end);
   }
@@ -464,7 +464,7 @@ class IdentifierWeek extends Identifier
   public span(id: IdentifierInput, endInclusive: boolean = false): DaySpan
   {
     const start: Day = this.start( id );
-    const end: Day = start.endOfWeek( endInclusive );
+    const end: Day = start.endOf( 'week', endInclusive );
 
     return new DaySpan(start, end);
   }
@@ -537,7 +537,7 @@ class IdentifierMonth extends Identifier
   public span(id: IdentifierInput, endInclusive: boolean = false): DaySpan
   {
     const start: Day = this.start( id );
-    const end: Day = start.endOfMonth( endInclusive );
+    const end: Day = start.endOf( 'month', endInclusive );
 
     return new DaySpan(start, end);
   }
@@ -610,7 +610,7 @@ class IdentifierQuarter extends Identifier
   public span(id: IdentifierInput, endInclusive: boolean = false): DaySpan
   {
     const start: Day = this.start( id );
-    const end: Day = start.relativeMonths( 3 ).endOfMonth( endInclusive );
+    const end: Day = start.add('month', 3).endOf('month', endInclusive);
 
     return new DaySpan(start, end);
   }
@@ -681,7 +681,7 @@ class IdentifierYear extends Identifier
   public span(id: IdentifierInput, endInclusive: boolean = false): DaySpan
   {
     const start: Day = this.start( id );
-    const end: Day = start.endOfYear( endInclusive );
+    const end: Day = start.endOf( 'year', endInclusive );
 
     return new DaySpan(start, end);
   }

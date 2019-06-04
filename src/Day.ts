@@ -725,31 +725,26 @@ export class Day implements DayFrequency
       : new Day(d);
   }
 
-  public add(amount: number, unit: Unit = 'millis'): Day 
+  public add(unit: Unit, amount: number = 1): Day 
   {
     return this.mutate(d => add[unit](d, amount));
   }
 
   public relative(millis: number): Day 
   {
-    return this.add(millis);
+    return this.add('millis', millis);
   }
 
   // Days
 
-  public relativeDays(days: number): Day 
-  {
-    return this.add(days, 'day');
-  }
-
   public prev(days: number = 1): Day 
   {
-    return this.relativeDays(-days);
+    return this.add('day', -days);
   }
 
   public next(days: number = 1): Day 
   {
-    return this.relativeDays(days);
+    return this.add('day', days);
   }
 
   public withDayOfMonth(day: number): Day 
@@ -759,17 +754,17 @@ export class Day implements DayFrequency
 
   public withDay(day: number): Day 
   {
-    return this.mutate(d => d.setDate(d.getDate() + (day - this.date.getDay())));
+    return this.add('day', day - this.date.getDay());
   }
 
   public withDayOfWeek(dayOfWeek: number): Day 
   {
-    return this.mutate(d => d.setDate(d.getDate() + (dayOfWeek - getDayOfWeek(this.date, this.getLocale()))));
+    return this.add('day', dayOfWeek - getDayOfWeek(this.date, this.getLocale()));
   }
 
   public withDayOfYear(dayOfYear: number): Day 
   {
-    return this.mutate(d => d.setDate(d.getDate() + (dayOfYear - getDayOfYear(this.date))));
+    return this.add('day', dayOfYear - getDayOfYear(this.date));
   }
 
   // Month
@@ -779,26 +774,11 @@ export class Day implements DayFrequency
     return this.mutate(d => d.setMonth(month));
   }
 
-  public relativeMonths(months: number): Day 
-  {
-    return this.add(months, 'month');
-  }
-
-  public prevMonth(months: number = 1): Day 
-  {
-    return this.relativeMonths( -months );
-  }
-
-  public nextMonth(months: number = 1): Day 
-  {
-    return this.relativeMonths( months );
-  }
-
   // Week Of Year
 
   protected withWeek(week: number, relativeWeek: number): Day 
   {
-    return this.add((week - relativeWeek) * Constants.DAYS_IN_WEEK, 'day');
+    return this.add('day', (week - relativeWeek) * Constants.DAYS_IN_WEEK);
   }
 
   public withWeekOfYear(week: number): Day 
@@ -831,21 +811,6 @@ export class Day implements DayFrequency
     return this.withWeek(week, this.fullWeekOfMonth);
   }
 
-  public relativeWeeks(weeks: number): Day 
-  {
-    return this.add(weeks, 'week');
-  }
-
-  public prevWeek(weeks: number = 1): Day 
-  {
-    return this.relativeWeeks( -weeks );
-  }
-
-  public nextWeek(weeks: number = 1): Day 
-  {
-    return this.relativeWeeks( weeks );
-  }
-
   // Year
 
   public withYear(year: number): Day 
@@ -853,41 +818,11 @@ export class Day implements DayFrequency
     return this.mutate(d => d.setFullYear(year));
   }
 
-  public relativeYears(years: number): Day 
-  {
-    return this.add(years, 'year');
-  }
-
-  public prevYear(years: number = 1): Day 
-  {
-    return this.relativeYears( -years );
-  }
-
-  public nextYear(years: number = 1): Day 
-  {
-    return this.relativeYears( years );
-  }
-
   // Hour
 
   public withHour(hour: number): Day 
   {
     return this.mutate(d => d.setHours(hour));
-  }
-
-  public relativeHours(hours: number): Day 
-  {
-    return this.add(hours, 'hour');
-  }
-
-  public prevHour(hours: number = 1): Day 
-  {
-    return this.relativeHours( -hours );
-  }
-
-  public nextHour(hours: number = 1): Day 
-  {
-    return this.relativeHours( hours );
   }
 
   // Time
@@ -918,132 +853,21 @@ export class Day implements DayFrequency
     return this.mutate(d => startOf[unit](d, this.getLocale()));
   }
 
-  public endOf(unit: Unit, inclusive: boolean = false): Day
+  public isStartOf(unit: Unit): boolean
+  {
+    return this.startOf(unit).date.getTime() === this.time;
+  }
+
+  public endOf(unit: Unit, inclusive: boolean = true): Day
   {
     return inclusive
-      ? this.mutate(d => { startOf[unit](d, this.getLocale());  add[unit](d, 1); })
-      : this.mutate(d => endOf[unit](d, this.getLocale()));
+      ? this.mutate(d => endOf[unit](d, this.getLocale()))
+      : this.mutate(d => { startOf[unit](d, this.getLocale());  add[unit](d, 1); });
   }
 
-  // Time
-
-  public start(): Day 
+  public isEndOf(unit: Unit, inclusive: boolean = true): boolean
   {
-    return this.startOf('day');
-  }
-
-  public isStart(): boolean 
-  {
-    return this.hour === Constants.HOUR_MIN &&
-      this.minute === Constants.MINUTE_MIN &&
-      this.seconds === Constants.SECOND_MIN &&
-      this.millis === Constants.MILLIS_MIN;
-  }
-
-  public end(inclusive: boolean = true): Day 
-  {
-    return this.endOf('day', inclusive);
-  }
-
-  public isEnd(): boolean {
-    return this.hour === Constants.HOUR_MAX &&
-      this.minute === Constants.MINUTE_MAX &&
-      this.seconds === Constants.SECOND_MAX &&
-      this.millis === Constants.MILLIS_MAX;
-  }
-
-  // Hour
-
-  public startOfHour(): Day 
-  {
-    return this.startOf('hour');
-  }
-
-  public isStartOfHour(): boolean 
-  {
-    return this.minute === Constants.MINUTE_MIN &&
-      this.seconds === Constants.SECOND_MIN &&
-      this.millis === Constants.MILLIS_MIN;
-  }
-
-  public endOfHour(inclusive: boolean = true): Day 
-  {
-    return this.endOf('hour', inclusive);
-  }
-
-  public isEndOfHour(): boolean 
-  {
-    return this.minute === Constants.MINUTE_MAX &&
-      this.seconds === Constants.SECOND_MAX &&
-      this.millis === Constants.MILLIS_MAX;
-  }
-
-  // Week
-
-  public startOfWeek(): Day 
-  {
-    return this.startOf('week');
-  }
-
-  public isStartOfWeek(): boolean 
-  {
-    return this.dayOfWeek === Constants.WEEKDAY_MIN;
-  }
-
-  public endOfWeek(inclusive: boolean = true): Day 
-  {
-    return this.endOf('week', inclusive);
-  }
-
-  public isEndOfWeek(): boolean 
-  {
-    return this.dayOfWeek === Constants.WEEKDAY_MAX;
-  }
-
-  // Month
-
-  public startOfMonth(): Day 
-  {
-    return this.startOf('month');
-  }
-
-  public isStartOfMonth(): boolean 
-  {
-    return this.dayOfMonth === Constants.DAY_MIN;
-  }
-
-  public endOfMonth(inclusive: boolean = true): Day 
-  {
-    return this.endOf('month', inclusive);
-  }
-
-  public isEndOfMonth(): boolean 
-  {
-    return this.dayOfMonth === this.daysInMonth();
-  }
-
-  // Year
-
-  public startOfYear(): Day 
-  {
-    return this.startOf('year');
-  }
-
-  public isStartOfYear(): boolean 
-  {
-    return this.month === Constants.MONTH_MIN && 
-      this.dayOfMonth === Constants.DAY_MIN;
-  }
-
-  public endOfYear(inclusive: boolean = true): Day 
-  {
-    return this.endOf('year', inclusive);
-  }
-
-  public isEndOfYear(): boolean 
-  {
-    return this.month === Constants.MONTH_MAX && 
-      this.dayOfMonth === Constants.DAY_MAX;
+    return this.endOf(unit, inclusive).date.getTime() === this.time;
   }
 
   // Days In X
@@ -1132,7 +956,7 @@ export class Day implements DayFrequency
 
   public static today(): Day 
   {
-    return this.now().start();
+    return this.now().startOf('day');
   }
 
   public static tomorrow(): Day 

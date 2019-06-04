@@ -422,14 +422,14 @@ export let Patterns: Pattern[] = [
     }
   ),
   new Pattern(
-    'lastDay', false,
+    'lastDay', true,
     (day) => Locales.current.patternLastDay(day),
     {
       lastDayOfMonth: [1]
     }
   ),
   new Pattern(
-    'lastDayOfMonth', false,
+    'lastDayOfMonth', true,
     (day) => Locales.current.patternLastDayOfMonth(day),
     {
       month: 1,
@@ -437,7 +437,7 @@ export let Patterns: Pattern[] = [
     }
   ),
   new Pattern(
-    'lastWeekday', false,
+    'lastWeekday', true,
     (day) => Locales.current.patternLastWeekday(day),
     {
       lastWeekspanOfMonth: [0],
