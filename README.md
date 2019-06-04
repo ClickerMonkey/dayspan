@@ -31,8 +31,8 @@ let cal = Calendar.months<string, any>();
 cal.addEvent({
   data: 'Weekly Meeting',
   schedule: {
-    dayOfWeek: [Weekday.MONDAY],
-    times: [9],
+    dayOfWeek: Weekday.MONDAY,
+    times: 9,
     duration: 30,
     durationUnit: 'minutes'
   }
@@ -52,9 +52,9 @@ cal.addEvent({
   id: 'someUserProvidedId',
   data: "Mother's Day",
   schedule: new Schedule({
-    weekspanOfMonth: [1],         // 2nd
-    dayOfWeek: [Weekday.SUNDAY],  // Sunday
-    month: [Month.MAY]            // of May
+    weekspanOfMonth: 1,         // 2nd
+    dayOfWeek: Weekday.SUNDAY,  // Sunday
+    month: Month.MAY            // of May
   })
 });
 
@@ -93,7 +93,7 @@ cal.addEvent({
   data: 'Weekly Meeting',
   schedule: {
     dayOfWeek: [ds.Weekday.MONDAY],
-    times: [9],
+    times: 9,
     duration: 30,
     durationUnit: 'minutes'
   }
