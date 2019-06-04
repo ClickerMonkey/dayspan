@@ -928,9 +928,6 @@ img { max-width: 100%; }
 					<a href="time.html#second" class="tsd-kind-icon">second</a>
 				</li>
 				<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static">
-					<a href="time.html#formatters" class="tsd-kind-icon">FORMATTERS</a>
-				</li>
-				<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static">
 					<a href="time.html#regex" class="tsd-kind-icon">REGEX</a>
 				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -1013,7 +1010,6 @@ img { max-width: 100%; }
 							<li class="tsd-kind-property tsd-parent-kind-class"><a href="time.html#millisecond" class="tsd-kind-icon">millisecond</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-class"><a href="time.html#minute" class="tsd-kind-icon">minute</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-class"><a href="time.html#second" class="tsd-kind-icon">second</a></li>
-							<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="time.html#formatters" class="tsd-kind-icon">FORMATTERS</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="time.html#regex" class="tsd-kind-icon">REGEX</a></li>
 						</ul>
 					</section>
@@ -1051,7 +1047,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L48">Time.ts:48</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L49">Time.ts:49</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1108,7 +1104,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">hour<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L33">Time.ts:33</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L34">Time.ts:34</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -1123,7 +1119,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">millisecond<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L48">Time.ts:48</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L49">Time.ts:49</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -1138,7 +1134,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">minute<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L38">Time.ts:38</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L39">Time.ts:39</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -1153,7 +1149,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">second<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L43">Time.ts:43</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L44">Time.ts:44</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -1163,27 +1159,12 @@ img { max-width: 100%; }
 				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static">
-				<a name="formatters" class="tsd-anchor"></a>
-				<h3><span class="tsd-flag ts-flagStatic">Static</span> FORMATTERS</h3>
-				<div class="tsd-signature tsd-kind-icon">FORMATTERS<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[{size: 3,formats: {SSS: (t: Time) &#x3D;&gt; fn.padNumber(t.millisecond, 3)}},{size: 2,formats: {HH: (t: Time) &#x3D;&gt; fn.padNumber(t.hour, 2),hh: (t: Time) &#x3D;&gt; fn.padNumber((t.hour % 12) || 12, 2),kk: (t: Time) &#x3D;&gt; fn.padNumber(t.hour + 1, 2),mm: (t: Time) &#x3D;&gt; fn.padNumber(t.minute, 2),ss: (t: Time) &#x3D;&gt; fn.padNumber(t.second, 2),SS: (t: Time) &#x3D;&gt; fn.padNumber(t.millisecond, 3, 2)}},{size: 1,formats: {A: (t: Time) &#x3D;&gt; t.hour &lt; 12 ? &#x27;AM&#x27; : &#x27;PM&#x27;,a: (t: Time) &#x3D;&gt; t.hour &lt; 12 ? &#x27;am&#x27; : &#x27;pm&#x27;,H: (t: Time) &#x3D;&gt; t.hour + &#x27;&#x27;,h: (t: Time) &#x3D;&gt; ((t.hour % 12) || 12) + &#x27;&#x27;,k: (t: Time) &#x3D;&gt; (t.hour + 1) + &#x27;&#x27;,m: (t: Time) &#x3D;&gt; t.minute + &#x27;&#x27;,s: (t: Time) &#x3D;&gt; t.second + &#x27;&#x27;,S: (t: Time) &#x3D;&gt; fn.padNumber(t.millisecond, 3, 1)}}]</span></div>
-				<aside class="tsd-sources">
-					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L331">Time.ts:331</a></li>
-					</ul>
-				</aside>
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>A set of formatting functions keyed by their format string.</p>
-					</div>
-				</div>
-			</section>
-			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static">
 				<a name="regex" class="tsd-anchor"></a>
 				<h3><span class="tsd-flag ts-flagStatic">Static</span> REGEX</h3>
 				<div class="tsd-signature tsd-kind-icon">REGEX<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">RegExp</span><span class="tsd-signature-symbol"> =&nbsp;/^(\d\d?):?(\d\d)?:?(\d\d)?\.?(\d\d\d)?$/</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L28">Time.ts:28</a></li>
+						<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L29">Time.ts:29</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -1212,35 +1193,18 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L95">Time.ts:95</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L76">Time.ts:76</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 							<div class="lead">
-								<p>Formats this time into a string. The following list describes the available
-								formatting patterns:</p>
+								<p>Formats this time into a string.</p>
 							</div>
-							<h3 id="hour">Hour</h3>
-							<ul>
-								<li>H: 0-23</li>
-								<li>HH: 00-23</li>
-								<li>h: 12,1-12,1-11</li>
-								<li>hh: 12,01-12,01-11</li>
-								<li>k: 1-24</li>
-								<li>kk: 01-24</li>
-								<li>a: am,pm</li>
-								<li>A: AM,PM<h3 id="minute">Minute</h3>
-								</li>
-								<li>m: 0-59</li>
-								<li>mm: 00-59<h3 id="second">Second</h3>
-								</li>
-								<li>s: 0-59</li>
-								<li>ss: 00-59<h3 id="millisecond">Millisecond</h3>
-								</li>
-								<li>S: 0-9</li>
-								<li>SS: 00-99</li>
-								<li>SSS: 000-999</li>
-							</ul>
+							<dl class="tsd-comment-tags">
+								<dt>see</dt>
+								<dd><p><a href="../globals.html#timeformat">TimeFormat</a></p>
+								</dd>
+							</dl>
 						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
@@ -1266,7 +1230,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L137">Time.ts:137</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L87">Time.ts:87</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1298,7 +1262,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L151">Time.ts:151</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L101">Time.ts:101</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1330,7 +1294,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L162">Time.ts:162</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L112">Time.ts:112</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1362,7 +1326,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L176">Time.ts:176</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L126">Time.ts:126</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1396,7 +1360,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L189">Time.ts:189</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L139">Time.ts:139</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1428,7 +1392,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L234">Time.ts:234</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L184">Time.ts:184</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1449,7 +1413,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L209">Time.ts:209</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L159">Time.ts:159</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1470,7 +1434,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L246">Time.ts:246</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L196">Time.ts:196</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1491,7 +1455,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L221">Time.ts:221</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L171">Time.ts:171</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1512,7 +1476,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L323">Time.ts:323</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L273">Time.ts:273</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1563,7 +1527,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L303">Time.ts:303</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L253">Time.ts:253</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1596,7 +1560,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L279">Time.ts:279</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L229">Time.ts:229</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1634,7 +1598,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/99bf0ef/src/Time.ts#L266">Time.ts:266</a></li>
+								<li>Defined in <a href="https://github.com/ClickerMonkey/dayspan/blob/7169b7f/src/Time.ts#L216">Time.ts:216</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
