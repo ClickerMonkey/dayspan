@@ -248,9 +248,9 @@ export class Pattern
       // Must be an array of the same size
       if (fn.isNumber(rule))
       {
-        if (fn.isArray(curr) && (curr as number[]).length === rule)
+        if (fn.isArray(curr) && curr.length === rule)
         {
-          if (exactly && (curr as number[]).indexOf( exactlyWith[ prop ] as number ) === -1)
+          if (exactly && curr.indexOf( exactlyWith[ prop ] ) === -1)
           {
             return false;
           }
@@ -269,7 +269,7 @@ export class Pattern
           return false;
         }
 
-        if (rule.length !== (curr as number[]).length)
+        if (rule.length !== curr.length)
         {
           return false;
         }
@@ -304,7 +304,7 @@ export class Pattern
           return false;
         }
 
-        if (exactly && ((exactlyWith[ prop ] as number) % rule.every) !== ruleOffset)
+        if (exactly && (exactlyWith[ prop ] % rule.every) !== ruleOffset)
         {
           return false;
         }
