@@ -65,7 +65,7 @@
     "prettier": "1.17.0",
     "shx": "0.3.2",
     "source-map-loader": "0.2.4",
-    "standard-version": "5.0.2",
+    "standard-version": "8.0.1",
     "strip-json-comments-cli": "1.0.1",
     "ts-jest": "24.0.2",
     "tslint": "5.16.0",
