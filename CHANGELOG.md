@@ -34,6 +34,9 @@ behaviour changes below are bug fixes.
 - **Moved and included days keep their own time in timed schedules.** A `Day` with a time in `include`, `exclude`,
   `cancel` or `meta` of a timed schedule became a whole-day identifier, so an included 7:30 pm showed at the
   schedule's own time. It now names that time. A `Day` at midnight still names the whole day.
+- **A moved or extra occurrence at another time of a day on the schedule shows.** Moving Tuesday 6:00 pm to 7:30 pm
+  the same Tuesday (or adding a 10:00 am that Tuesday) listed nothing for it: only the schedule's own times were
+  looked at on days that match the schedule.
 - **`describe()` leaves out undone changes.** Exclusions, inclusions and cancellations set back to `false` (an undo,
   or what `moveInstance` leaves behind) were listed as if they still applied.
 - **`maxOccurrences` counts the start day once.** When the start day was itself an occurrence, the schedule ended

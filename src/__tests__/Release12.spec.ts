@@ -99,6 +99,15 @@ describe('dayspan 1.2', () =>
 
     expect( days(s, start, 3) ).toEqual( [ '2026-11-04 19:30', '2026-11-09 18:00', '2026-11-16 18:00' ] );
 
+    // Moved to another time of the same day (a day on the schedule).
+    const u = new Schedule({ start, dayOfWeek: [Weekday.MONDAY], times: ['18:00'] });
+    u.moveInstance(Day.build(2026, Month.NOVEMBER, 2, 18, 0), Day.build(2026, Month.NOVEMBER, 2, 19, 30));
+    expect( days(u, start, 2) ).toEqual( [ '2026-11-02 19:30', '2026-11-09 18:00' ] );
+
+    // An extra time on a day on the schedule.
+    const w = new Schedule({ start, dayOfWeek: [Weekday.MONDAY], times: ['18:00'], include: [202611021000, 202611021800] });
+    expect( days(w, start, 3) ).toEqual( [ '2026-11-02 18:00', '2026-11-02 10:00', '2026-11-09 18:00' ] );
+
     // A Day at midnight still names the whole day.
     const t = new Schedule({ start, dayOfWeek: [Weekday.MONDAY], times: ['18:00'], exclude: [Day.build(2026, Month.NOVEMBER, 2)] });
     expect( days(t, start, 1) ).toEqual( [ '2026-11-09 18:00' ] );

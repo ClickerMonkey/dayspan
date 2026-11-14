@@ -1266,6 +1266,31 @@ export class Schedule<M>
                 }
               }
             }
+
+            // Occurrences moved to (or added at) another time of a day that is
+            // on the schedule: those at one of the schedule's own times were
+            // just listed.
+            const ownTime = (span: DaySpan) => this.times.some(time => time.hour === span.start.hour && time.minute === span.start.minute);
+
+            this.iterateIncludeTimes(current, day).each((span, i, timeIterator) =>
+            {
+              if (ownTime(span))
+              {
+                return;
+              }
+
+              switch (iterator.act( span, key++ ))
+              {
+                case IterateAction.STOP:
+                  timeIterator.stop();
+                  break;
+              }
+            })
+
+            if (iterator.action === IterateAction.STOP)
+            {
+              return;
+            }
           }
           else
           {
