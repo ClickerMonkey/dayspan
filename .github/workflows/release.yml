@@ -1,0 +1,61 @@
+# Publishes dayspan to npm on every push to master whose package.json version isn't on npm yet (bump the version to
+# release; other commits publish nothing). Trusted publishing (OIDC, no stored token): set up on npmjs.com under the
+# package's Settings → Trusted publishing (ClickerMonkey/dayspan, workflow release.yml, environment npm).
+# Run it by hand from the Actions tab too (dry run: pack and check without publishing).
+name: Release
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Build, test and pack, but don't publish
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write # trusted publishing and provenance
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # GitHub-hosted on purpose: npm's trusted publishing only accepts a cloud runner's OIDC token.
+    runs-on: ubuntu-latest
+    environment: npm
+    env:
+      # webpack 4 uses an md4 hash Node 17+ only offers with the legacy OpenSSL provider.
+      NODE_OPTIONS: --openssl-legacy-provider
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - name: Is this version new?
+        id: version
+        run: |
+          v=$(node -p "require('./package.json').version")
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          if npm view "dayspan@$v" version >/dev/null 2>&1; then
+            echo "dayspan@$v is already on npm: nothing to publish."
+            echo "new=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "new=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.version.outputs.new == 'true' || inputs.dry_run
+        run: npm install -g npm@^11.5.1
+      - if: steps.version.outputs.new == 'true' || inputs.dry_run
+        run: npm ci
+      - name: Build (runs the tests first)
+        if: steps.version.outputs.new == 'true' || inputs.dry_run
+        run: npm run build
+      - if: steps.version.outputs.new == 'true' || inputs.dry_run
+        run: npm pack --dry-run
+      - name: Publish
+        if: steps.version.outputs.new == 'true' && !inputs.dry_run
+        run: npm publish --provenance --access public
