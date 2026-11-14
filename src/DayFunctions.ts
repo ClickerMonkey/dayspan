@@ -239,6 +239,38 @@ export function getDayOfWeek(x: Date, options: LocaleOptions = Locales.current):
     : day - weekStartsOn;
 }
 
+/**
+ * The number of whole local days from January 1st, 1970 to the given date
+ * (negative before it). Daylight saving time doesn't change it: it counts
+ * calendar days, not 24 hour periods.
+ */
+export function getDaysSinceEpoch(x: Date): number
+{
+  return Math.round(Date.UTC(x.getFullYear(), x.getMonth(), x.getDate()) / Constants.MILLIS_IN_DAY);
+}
+
+/**
+ * The number of whole weeks from the week containing January 1st, 1970 to the
+ * week containing the given date. Weeks start on [[Locale.weekStartsOn]].
+ */
+export function getWeeksSinceEpoch(x: Date, options: LocaleOptions = Locales.current): number
+{
+  // January 1st, 1970 was a Thursday.
+  // tslint:disable-next-line: no-magic-numbers
+  const epochDayOfWeek = (4 - options.weekStartsOn + Constants.DAYS_IN_WEEK) % Constants.DAYS_IN_WEEK;
+
+  return Math.floor((getDaysSinceEpoch(x) + epochDayOfWeek) / Constants.DAYS_IN_WEEK);
+}
+
+/**
+ * The number of whole months from January 1970 to the month of the given date.
+ */
+export function getMonthsSinceEpoch(x: Date): number
+{
+  // tslint:disable-next-line: no-magic-numbers
+  return (x.getFullYear() - 1970) * 12 + x.getMonth();
+}
+
 export function getDayOfYear(a: Date): number
 {
   return Math.round(diffDays(a, mutate(a, startOfYear))) + 1;

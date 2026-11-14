@@ -9,6 +9,7 @@ import { FrequencyCheck, FrequencyValue } from './Frequency';
 import { Functions as fn } from './Functions';
 import { Identifier, IdentifierInput } from './Identifier';
 import { LocaleRule, Locales } from './Locale';
+import { default as en } from './locales/en';
 import { Op } from './Operation';
 import { Parse } from './Parse';
 import { ScheduleModifier, ScheduleModifierSpan } from './ScheduleModifier';
@@ -195,6 +196,21 @@ export interface ScheduleInput<M>
    * @see [[Schedule.lastFullWeekOfMonth]]
    */
   lastFullWeekOfMonth?: FrequencyValue;
+
+  /**
+   * @see [[Schedule.daysSinceEpoch]]
+   */
+  daysSinceEpoch?: FrequencyValue;
+
+  /**
+   * @see [[Schedule.weeksSinceEpoch]]
+   */
+  weeksSinceEpoch?: FrequencyValue;
+
+  /**
+   * @see [[Schedule.monthsSinceEpoch]]
+   */
+  monthsSinceEpoch?: FrequencyValue;
 
   /**
    * The function to parse metadata with.
@@ -388,6 +404,28 @@ export class Schedule<M>
   public lastFullWeekOfMonth: FrequencyCheck;
 
   /**
+   * How frequent the event occurs based on [[Day.daysSinceEpoch]]. An
+   * `{ every, offset }` value counts from [[Schedule.start]] when there is
+   * one: `{ every: 3 }` is every 3 days starting on the start day, and an
+   * offset moves the first one later by that many days.
+   */
+  public daysSinceEpoch: FrequencyCheck;
+
+  /**
+   * How frequent the event occurs based on [[Day.weeksSinceEpoch]]. An
+   * `{ every, offset }` value counts from the week of [[Schedule.start]] when
+   * there is one: `{ every: 2 }` is every other week starting that week.
+   */
+  public weeksSinceEpoch: FrequencyCheck;
+
+  /**
+   * How frequent the event occurs based on [[Day.monthsSinceEpoch]]. An
+   * `{ every, offset }` value counts from the month of [[Schedule.start]]
+   * when there is one: `{ every: 3 }` is every third month starting then.
+   */
+  public monthsSinceEpoch: FrequencyCheck;
+
+  /**
    * How frequent the event occurs based on [[Day.year]].
    */
   public year: FrequencyCheck;
@@ -505,10 +543,47 @@ export class Schedule<M>
       this.dayOfWeek,
       this.dayOfMonth,
       this.lastDayOfMonth,
-      this.dayOfYear
+      this.dayOfYear,
+      this.anchored( this.daysSinceEpoch ),
+      this.anchored( this.weeksSinceEpoch ),
+      this.anchored( this.monthsSinceEpoch )
     ]);
 
     return this;
+  }
+
+  /**
+   * The check for a "since epoch" frequency as a schedule uses it: an
+   * `{ every, offset }` value counts from the schedule's start (when it has
+   * one), so "every 2 weeks" means every other week from the first one.
+   * Lists and single values are absolute and stay as they are.
+   *
+   * @param check The check for the property.
+   * @returns The check to use in [[Schedule.checks]].
+   */
+  private anchored(check: FrequencyCheck): FrequencyCheck
+  {
+    if (!check || !check.given || !fn.isFrequencyValueEvery(check.input))
+    {
+      return check;
+    }
+
+    const property = check.property;
+    const every: number = check.input.every;
+    const offset: number = check.input.offset || 0;
+
+    const anchoredCheck: FrequencyCheck = (value: number) => {
+      const base: number = this.start ? this.start[ property ] : 0;
+      const delta: number = value - base - offset;
+
+      return ((delta % every) + every) % every === 0;
+    };
+
+    anchoredCheck.given = true;
+    anchoredCheck.input = check.input;
+    anchoredCheck.property = property;
+
+    return anchoredCheck;
   }
 
   /**
@@ -525,7 +600,12 @@ export class Schedule<M>
       const lookahead = maximumYears * Constants.DAYS_IN_YEAR;
       const previousOccurrences = this.include.spans().where(({ span }) => span.start.isBefore(this.start)).count();
       const occurrences = this.maxOccurrences - previousOccurrences;
-      const last = this.forecast(this.start, false, occurrences, 0, true, lookahead).last();
+      // The forecast also returns what happens on the start day itself (and
+      // included ones before it, already counted above): count from the start.
+      const last = this.forecast(this.start, false, occurrences, 0, true, lookahead)
+        .where(([span]) => !span.start.isBefore(this.start))
+        .take(occurrences)
+        .last();
 
       if (last)
       {
@@ -1871,6 +1951,9 @@ export class Schedule<M>
     if (this.fullWeekOfMonth.input) out.fullWeekOfMonth = this.fullWeekOfMonth.input;
     if (this.lastWeekspanOfMonth.input) out.lastWeekspanOfMonth = this.lastWeekspanOfMonth.input;
     if (this.lastFullWeekOfMonth.input) out.lastFullWeekOfMonth = this.lastFullWeekOfMonth.input;
+    if (this.daysSinceEpoch && this.daysSinceEpoch.input) out.daysSinceEpoch = this.daysSinceEpoch.input;
+    if (this.weeksSinceEpoch && this.weeksSinceEpoch.input) out.weeksSinceEpoch = this.weeksSinceEpoch.input;
+    if (this.monthsSinceEpoch && this.monthsSinceEpoch.input) out.monthsSinceEpoch = this.monthsSinceEpoch.input;
 
     return out;
   }
@@ -1943,11 +2026,14 @@ export class Schedule<M>
     out += this.describeRule( this.weekspanOfMonth.input, lang.ruleWeekspanOfMonth );
     out += this.describeRule( this.lastFullWeekOfMonth.input, lang.ruleLastFullWeekOfMonth );
     out += this.describeRule( this.lastWeekspanOfMonth.input, lang.ruleLastWeekspanOfMonth );
+    out += this.describeRule( this.daysSinceEpoch && this.daysSinceEpoch.input, lang.ruleDaysSinceEpoch || en.ruleDaysSinceEpoch );
+    out += this.describeRule( this.weeksSinceEpoch && this.weeksSinceEpoch.input, lang.ruleWeeksSinceEpoch || en.ruleWeeksSinceEpoch );
+    out += this.describeRule( this.monthsSinceEpoch && this.monthsSinceEpoch.input, lang.ruleMonthsSinceEpoch || en.ruleMonthsSinceEpoch );
 
     if (includeTimes && this.times.length)
     {
       out += lang.scheduleAtTimes;
-      out += this.describeArray( this.times, x => x.format('hh:mm a') );
+      out += this.describeArray( this.times, x => x.format(lang.scheduleTimeFormat || 'hh:mm a') );
     }
 
     if (includeDuration && this.duration !== Constants.DURATION_DEFAULT)
@@ -1957,7 +2043,8 @@ export class Schedule<M>
 
     if (includeExcludes)
     {
-      const excludes: ScheduleModifierSpan<boolean>[] = this.exclude.spans().array();
+      // Undone changes (false values) are not changes: they're left out.
+      const excludes: ScheduleModifierSpan<boolean>[] = this.exclude.spans().where(x => !!x.value).array();
 
       if (excludes.length)
       {
@@ -1968,7 +2055,7 @@ export class Schedule<M>
 
     if (includeIncludes)
     {
-      const includes: ScheduleModifierSpan<boolean>[] = this.include.spans().array();
+      const includes: ScheduleModifierSpan<boolean>[] = this.include.spans().where(x => !!x.value).array();
 
       if (includes.length)
       {
@@ -1979,7 +2066,7 @@ export class Schedule<M>
 
     if (includeCancels)
     {
-      const cancels: ScheduleModifierSpan<boolean>[] = this.cancel.spans().array();
+      const cancels: ScheduleModifierSpan<boolean>[] = this.cancel.spans().where(x => !!x.value).array();
 
       if (cancels.length)
       {

@@ -1,6 +1,6 @@
 {
   "name": "dayspan",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A date & schedule library to use for advanced calendars in TypeScript and JS",
   "main": "dist/dayspan.js",
   "typings": "typings/index.d.ts",
@@ -17,7 +17,7 @@
   },
   "scripts": {
     "start": "webpack-dev-server --port 9000 --inline --progress --profile --colors --watch --content-base src/ --mode development",
-    "build": "webpack --config webpack.config.js --mode production",
+    "build": "webpack --config webpack.config.js --mode production && npm run typings",
     "build.prod": "webpack --config webpack.config.js -p",
     "cleanup": "shx rm -rf umd lib lib-esm lib-fesm typings coverage ../iteratez-pages/docs",
     "prebuild": "npm run cleanup && npm run verify",
@@ -32,7 +32,8 @@
     "release:npm": "npm publish",
     "release:preflight": "irish-pub",
     "release:preflight:package": "npm pack",
-    "size": "shx echo \"Gzipped Size:\" && cross-var strip-json-comments --no-whitespace $npm_package_main | gzip-size"
+    "size": "shx echo \"Gzipped Size:\" && cross-var strip-json-comments --no-whitespace $npm_package_main | gzip-size",
+    "typings": "tsc -p tsconfig.typings.json"
   },
   "config": {
     "commitizen": {

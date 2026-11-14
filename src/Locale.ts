@@ -3,6 +3,7 @@
 import { Day } from './Day';
 import { Functions as fn } from './Functions';
 import { default as en } from './locales/en';
+import { default as enPlain } from './locales/en-plain';
 import { Ref } from './Ref';
 
 
@@ -81,6 +82,16 @@ export interface Locale extends LocaleOptions
   patternLastDay (day: Day): string;
   patternLastDayOfMonth (day: Day): string;
   patternLastWeekday (day: Day): string;
+
+  /**
+   * "Monthly on the last Friday". Optional: English is used when missing.
+   */
+  patternLastWeekdayOfMonth? (day: Day): string;
+
+  /**
+   * "Every other week on Friday". Optional: English is used when missing.
+   */
+  patternEveryOtherWeek? (day: Day): string;
   patternCustom (day: Day): string;
 
   scheduleStartingOn (start: Day): string;
@@ -88,6 +99,11 @@ export interface Locale extends LocaleOptions
   scheduleEndsOn (end: Day): string;
   scheduleThing (thing: string, start: boolean): string;
   scheduleAtTimes: string;
+
+  /**
+   * How times are written in [[Schedule.describe]] (`hh:mm a` when missing).
+   */
+  scheduleTimeFormat?: string;
   scheduleDuration (duration: number, unit?: string): string;
   scheduleExcludes: string;
   scheduleIncludes: string;
@@ -111,6 +127,21 @@ export interface Locale extends LocaleOptions
   ruleWeekspanOfMonth: LocaleRule;
   ruleLastFullWeekOfMonth: LocaleRule;
   ruleLastWeekspanOfMonth: LocaleRule;
+
+  /**
+   * Every N days, counted from the schedule's start. Optional: English is used when missing.
+   */
+  ruleDaysSinceEpoch?: LocaleRule;
+
+  /**
+   * Every N weeks, counted from the schedule's start. Optional: English is used when missing.
+   */
+  ruleWeeksSinceEpoch?: LocaleRule;
+
+  /**
+   * Every N months, counted from the schedule's start. Optional: English is used when missing.
+   */
+  ruleMonthsSinceEpoch?: LocaleRule;
 
   summaryDay (short: boolean, dayOfWeek: boolean, year: boolean): string;
   summaryWeek (short: boolean, dayOfWeek: boolean, year: boolean): string;
@@ -145,7 +176,7 @@ export class Locales
   /**
    * The map of locales available.
    */
-  public static map: { [key: string]: Locale } = { en };
+  public static map: { [key: string]: Locale } = { en, 'en-plain': enPlain };
 
   /**
    * The reference to the current locale.

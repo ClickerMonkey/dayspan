@@ -26,6 +26,7 @@ export * from './Units';
 export * from './Weekday';
 
 export { default as en } from './locales/en';
+export { default as enPlain } from './locales/en-plain';
 export { default as fr } from './locales/fr';
 export { default as nl } from './locales/nl';
 export { default as de } from './locales/de';

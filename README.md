@@ -20,6 +20,9 @@ A date & schedule library to use for advanced calendars in TypeScript and JS.
 - Describe a schedule in a human friendly string
 - Export and import schedules and calendars to plain objects for easy saving and loading
 - Provides logic to help display intersecting events on a calendar
+- Every N days, weeks or months counted from the start (`daysSinceEpoch`, `weeksSinceEpoch`, `monthsSinceEpoch` with `{ every }`)
+- A plain-English locale (`en-plain`) for descriptions people read
+- See [CHANGELOG.md](CHANGELOG.md) for what changed in each version
 
 ### TypeScript Example
 

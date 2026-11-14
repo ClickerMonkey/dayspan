@@ -53,6 +53,8 @@ const lc: Locale =
   patternLastDay: (day) => 'Last day of the month',
   patternLastDayOfMonth: (day) => 'Last day of ' + day.format('MMMM'),
   patternLastWeekday: (day) => 'Last ' + day.format('dddd') + ' in ' + day.format('MMMM'),
+  patternLastWeekdayOfMonth: (day) => 'Monthly on the last ' + day.format('dddd'),
+  patternEveryOtherWeek: (day) => 'Every other week on ' + day.format('dddd'),
   patternCustom: (day) => 'Custom...',
 
   scheduleStartingOn: (start) => 'Starting on ' + start.format('MMMM Do, YYYY'),
@@ -203,6 +205,30 @@ const lc: Locale =
     offset: (offset) => `starting on the ${lc.suffix(offset)} last full week of the month`,
     // on the 1st, 2nd, and 3rd full week of the month
     oneOf: (values) => `on the ${lc.list(values.map(lc.suffix))} last full week of the month`
+  },
+  ruleDaysSinceEpoch: {
+    // every 3 days
+    every: (every) => every === 1 ? 'every day' : `every ${every} days`,
+    // starting 2 days after the start
+    offset: (offset) => `starting ${offset} ${offset === 1 ? 'day' : 'days'} after the start`,
+    // on these days (since January 1st, 1970)
+    oneOf: (values) => `on ${values.length === 1 ? 'one chosen day' : `${values.length} chosen days`}`
+  },
+  ruleWeeksSinceEpoch: {
+    // every 2 weeks
+    every: (every) => every === 1 ? 'every week' : `every ${every} weeks`,
+    // starting 1 week after the start
+    offset: (offset) => `starting ${offset} ${offset === 1 ? 'week' : 'weeks'} after the start`,
+    // in these weeks (since the week of January 1st, 1970)
+    oneOf: (values) => `in ${values.length === 1 ? 'one chosen week' : `${values.length} chosen weeks`}`
+  },
+  ruleMonthsSinceEpoch: {
+    // every 3 months
+    every: (every) => every === 1 ? 'every month' : `every ${every} months`,
+    // starting 1 month after the start
+    offset: (offset) => `starting ${offset} ${offset === 1 ? 'month' : 'months'} after the start`,
+    // in these months (since January 1970)
+    oneOf: (values) => `in ${values.length === 1 ? 'one chosen month' : `${values.length} chosen months`}`
   },
   ruleLastWeekspanOfMonth: {
     // every 3rd last weekspan of the month

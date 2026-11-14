@@ -1,7 +1,7 @@
 
 import { Constants } from './Constants';
 import { DayFormat } from './DayFormat';
-import { add, compare, diff, endOf, getDateOffset, getDayOfWeek, getDayOfYear, getDaysInMonth, getDaysInYear, getFullWeekOfMonth, getFullWeekOfYear, getLastDayOfMonth, getLastFullWeekOfMonth, getLastFullWeekOfYear, getLastWeekspanOfMonth, getLastWeekspanOfYear, getQuarter, getWeekOfMonthISO, getWeekOfYear, getWeekOfYearISO, getWeeksInYear, getWeekspanOfMonth, getWeekspanOfYear, isDaylightSavingTime, isLeapYear, startOf, Unit } from './DayFunctions';
+import { add, compare, diff, endOf, getDateOffset, getDayOfWeek, getDayOfYear, getDaysInMonth, getDaysInYear, getDaysSinceEpoch, getFullWeekOfMonth, getFullWeekOfYear, getLastDayOfMonth, getLastFullWeekOfMonth, getLastFullWeekOfYear, getLastWeekspanOfMonth, getLastWeekspanOfYear, getMonthsSinceEpoch, getQuarter, getWeekOfMonthISO, getWeekOfYear, getWeekOfYearISO, getWeeksInYear, getWeekspanOfMonth, getWeekspanOfYear, getWeeksSinceEpoch, isDaylightSavingTime, isLeapYear, startOf, Unit } from './DayFunctions';
 import { Functions as fn } from './Functions';
 import { Identifier, IdentifierInput } from './Identifier';
 import { Locale, LocaleOptions, Locales } from './Locale';
@@ -58,6 +58,9 @@ export interface DayFrequency
   fullWeekOfMonth: number;
   lastFullWeekOfMonth: number;
   lastWeekspanOfMonth: number;
+  daysSinceEpoch: number;
+  weeksSinceEpoch: number;
+  monthsSinceEpoch: number;
 }
 
 /**
@@ -343,6 +346,45 @@ export class Day implements DayFrequency
   public _lastFullWeekOfMonth: number = null;
 
   /**
+   * The number of days since January 1st, 1970 (local calendar days). A
+   * schedule with `daysSinceEpoch: { every: 3 }` happens every 3 days counted
+   * from its start, across months and years.
+   */
+  public get daysSinceEpoch(): number
+  {
+    return this.getValue('_daysSinceEpoch', getDaysSinceEpoch);
+  }
+
+  public _daysSinceEpoch: number = null;
+
+  /**
+   * The number of weeks since the week of January 1st, 1970. Weeks start on
+   * [[Locale.weekStartsOn]]. A schedule with `weeksSinceEpoch: { every: 2 }`
+   * happens every other week counted from its start, across years (unlike
+   * `weekOfYear`, which restarts every year).
+   *
+   * This is dependent on the locale of the instance (or global locale).
+   */
+  public get weeksSinceEpoch(): number
+  {
+    return this.getLocaleValue('_weeksSinceEpoch', getWeeksSinceEpoch);
+  }
+
+  public _weeksSinceEpoch: number = null;
+
+  /**
+   * The number of months since January 1970. A schedule with
+   * `monthsSinceEpoch: { every: 5 }` happens every 5 months counted from its
+   * start (unlike `month`, which restarts every year).
+   */
+  public get monthsSinceEpoch(): number
+  {
+    return this.getValue('_monthsSinceEpoch', getMonthsSinceEpoch);
+  }
+
+  public _monthsSinceEpoch: number = null;
+
+  /**
    * The identifier which stores in a simple form the date and time of this Day.
    */
   public get timeIdentifier(): IdentifierInput
@@ -502,6 +544,7 @@ export class Day implements DayFrequency
     this._weekOfMonth = null;
     this._fullWeekOfMonth = null;
     this._lastFullWeekOfMonth = null;
+    this._weeksSinceEpoch = null;
   }
 
   // Same
@@ -986,6 +1029,16 @@ export class Day implements DayFrequency
 
   public static fromString(input: string): Day 
   {
+    // A date without a time ("2018-04-05") is that day in local time. Date
+    // parses it as UTC midnight, which is the day before west of Greenwich.
+    const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(input);
+
+    if (dateOnly)
+    {
+      // tslint:disable-next-line: no-magic-numbers
+      return this.build(parseInt(dateOnly[1], 10), parseInt(dateOnly[2], 10) - 1, parseInt(dateOnly[3], 10));
+    }
+
     return this.fromDate(new Date(input));
   }
 

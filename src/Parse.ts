@@ -210,7 +210,8 @@ export class Parse
    */
   public static modifier<T>(input: any, value: T,
     parseMeta: (input: any) => T = (x => x),
-    out: ScheduleModifier<T> = new ScheduleModifier<T>()): ScheduleModifier<T>
+    out: ScheduleModifier<T> = new ScheduleModifier<T>(),
+    timed: boolean = false): ScheduleModifier<T>
   {
     const map = {};
 
@@ -220,7 +221,11 @@ export class Parse
       {
         if (identifier instanceof Day)
         {
-          map[ identifier.dayIdentifier ] = value;
+          // In a timed schedule a Day with a time names that one time (a moved
+          // occurrence keeps its new time); a Day at midnight names the whole day.
+          const hasTime = identifier.hour !== 0 || identifier.minute !== 0;
+
+          map[ timed && hasTime ? identifier.timeIdentifier : identifier.dayIdentifier ] = value;
         }
         else if (fn.isNumber(identifier))
         {
@@ -326,6 +331,10 @@ export class Parse
       return input;
     }
 
+    // Work on a copy: `on` fills in the start, end and date rules, and the
+    // caller's input should stay as it was given.
+    input = fn.extend( {}, input );
+
     const on: Day = this.day( input.on );
     const times: Time[] = this.times( input.times );
     const fullDay: boolean = times.length === 0;
@@ -345,10 +354,10 @@ export class Parse
     out.start = this.day( input.start );
     out.end = this.day( input.end );
     out.maxOccurrences = fn.coalesce( input.maxOccurrences, 0 );
-    out.exclude = this.modifier( input.exclude, true, undefined, out.exclude );
-    out.include = this.modifier( input.include, true, undefined, out.include );
-    out.cancel = this.modifier( input.cancel, true, undefined, out.cancel );
-    out.meta = this.modifier( input.meta, null, parseMeta, out.meta );
+    out.exclude = this.modifier( input.exclude, true, undefined, out.exclude, !fullDay );
+    out.include = this.modifier( input.include, true, undefined, out.include, !fullDay );
+    out.cancel = this.modifier( input.cancel, true, undefined, out.cancel, !fullDay );
+    out.meta = this.modifier( input.meta, null, parseMeta, out.meta, !fullDay );
     out.year = this.frequency( input.year, 'year' );
     out.month = this.frequency( input.month, 'month' );
     out.day = this.frequency( input.day, 'day' );
@@ -368,6 +377,9 @@ export class Parse
     out.dayOfMonth = this.frequency( input.dayOfMonth, 'dayOfMonth' );
     out.lastDayOfMonth = this.frequency( input.lastDayOfMonth, 'lastDayOfMonth' );
     out.dayOfYear = this.frequency( input.dayOfYear, 'dayOfYear' );
+    out.daysSinceEpoch = this.frequency( input.daysSinceEpoch, 'daysSinceEpoch' );
+    out.weeksSinceEpoch = this.frequency( input.weeksSinceEpoch, 'weeksSinceEpoch' );
+    out.monthsSinceEpoch = this.frequency( input.monthsSinceEpoch, 'monthsSinceEpoch' );
     out.updateDurationInDays();
     out.updateChecks();
     out.updateEnd();

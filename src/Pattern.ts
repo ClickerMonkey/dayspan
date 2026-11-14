@@ -3,6 +3,7 @@ import { Day, DayProperty } from './Day';
 import { FrequencyValue, FrequencyValueEvery } from './Frequency';
 import { Functions as fn } from './Functions';
 import { Locales } from './Locale';
+import { default as en } from './locales/en';
 import { Schedule, ScheduleInput } from './Schedule';
 import { Weekday } from './Weekday';
 
@@ -55,6 +56,9 @@ export interface PatternRules
   fullWeekOfMonth?: PatternRule;
   lastWeekspanOfMonth?: PatternRule;
   lastFullWeekOfMonth?: PatternRule;
+  daysSinceEpoch?: PatternRule;
+  weeksSinceEpoch?: PatternRule;
+  monthsSinceEpoch?: PatternRule;
 }
 
 
@@ -73,7 +77,8 @@ export class Pattern
     'dayOfWeek', 'dayOfMonth', 'lastDayOfMonth', 'dayOfYear',
     'month', 'week', 'year',
     'weekOfYear', 'weekspanOfYear', 'fullWeekOfYear', 'lastWeekspanOfYear', 'lastFullWeekOfYear',
-    'weekOfMonth', 'weekspanOfMonth', 'fullWeekOfMonth', 'lastWeekspanOfMonth', 'lastFullWeekOfMonth'
+    'weekOfMonth', 'weekspanOfMonth', 'fullWeekOfMonth', 'lastWeekspanOfMonth', 'lastFullWeekOfMonth',
+    'daysSinceEpoch', 'weeksSinceEpoch', 'monthsSinceEpoch'
   ];
 
   /**
@@ -176,6 +181,13 @@ export class Pattern
       if (fn.isArray(rule))
       {
         setFrequency( prop, rule );
+      }
+
+      // Repeats every so often (counted from the schedule's start for the
+      // "since epoch" properties)
+      if (fn.isFrequencyValueEvery(rule))
+      {
+        setFrequency( prop, fn.isDefined(rule.offset) ? { every: rule.every, offset: rule.offset } : { every: rule.every } );
       }
 
       // Must not be present
@@ -296,15 +308,15 @@ export class Pattern
           return false;
         }
 
-        const ruleOffset = rule.offset || 0;
         const currOffset = curr.offset || 0;
 
-        if (currOffset !== ruleOffset || curr.every !== rule.every)
+        // A rule without an offset matches any offset.
+        if (curr.every !== rule.every || (fn.isDefined(rule.offset) && currOffset !== rule.offset))
         {
           return false;
         }
 
-        if (exactly && (exactlyWith[ prop ] % rule.every) !== ruleOffset)
+        if (exactly && fn.isDefined(rule.offset) && (exactlyWith[ prop ] % rule.every) !== rule.offset)
         {
           return false;
         }
@@ -383,6 +395,14 @@ export let Patterns: Pattern[] = [
     }
   ),
   new Pattern(
+    'everyOtherWeek', true,
+    (day) => (Locales.current.patternEveryOtherWeek || en.patternEveryOtherWeek)(day),
+    {
+      dayOfWeek: 1,
+      weeksSinceEpoch: { every: 2 }
+    }
+  ),
+  new Pattern(
     'monthlyWeek', true,
     (day) => Locales.current.patternMonthlyWeek(day),
     {
@@ -446,6 +466,14 @@ export let Patterns: Pattern[] = [
     }
   ),
   new Pattern(
+    'lastWeekdayOfMonth', true,
+    (day) => (Locales.current.patternLastWeekdayOfMonth || en.patternLastWeekdayOfMonth)(day),
+    {
+      lastWeekspanOfMonth: [0],
+      dayOfWeek: 1
+    }
+  ),
+  new Pattern(
     'custom', true,
     (day) => Locales.current.patternCustom(day),
     {
@@ -465,7 +493,10 @@ export let Patterns: Pattern[] = [
       weekspanOfMonth: false,
       fullWeekOfMonth: false,
       lastWeekspanOfMonth: false,
-      lastFullWeekOfMonth: false
+      lastFullWeekOfMonth: false,
+      daysSinceEpoch: false,
+      weeksSinceEpoch: false,
+      monthsSinceEpoch: false
     }
   )
 ];
