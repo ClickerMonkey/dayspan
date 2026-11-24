@@ -22,6 +22,7 @@ export * from './ScheduleModifier';
 export * from './Sort';
 export * from './Time';
 export * from './TimeFormat';
+export * from './TimeZone';
 export * from './Units';
 export * from './Weekday';
 

@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.3.0
+
+### Added
+
+- **Instants in a time zone (`TimeZone`).** A schedule's days and times are a wall clock; `TimeZone` says which
+  instant that wall clock reads in an IANA zone, across daylight saving, whatever zone the computer is in (it uses
+  the engine's `Intl`; no zone data is shipped). Shared by Oryoli's reminders and the harness schedule system.
+  - `TimeZone.instant(day, minute, zone)`: the UNIX time (ms) a local `YYYY-MM-DD` and minute of that day happen.
+    A time that doesn't happen (02:30 when clocks go forward at 02:00) is that many minutes past the jump (03:30); a
+    time that happens twice (01:30 when clocks go back at 02:00) is the first.
+  - `TimeZone.local(at, zone)`: the local `{ day, minute }` at an instant.
+  - `TimeZone.offset(at, zone)`: minutes ahead of UTC (New York in winter: `-300`).
+  - `TimeZone.localString(at, zone)`: `2026-11-30T09:00:00-05:00`.
+  - `TimeZone.wall(at, zone)`: the wall clock read as UTC (ms).
+  - `TimeZone.isValid(zone)`: a named IANA zone the engine knows (`America/New_York`, `UTC`); offsets such as
+    `+05:00` and made-up names are not. The others throw a `RangeError` for an unknown zone.
+
+  Both of the rule's cases hold east of Greenwich too (London, Berlin, Sydney, Lord Howe's half-hour jump,
+  Chatham): the code Oryoli copied matched it only where offsets are negative (the Americas), and east of
+  Greenwich took the hour before a spring-forward gap (00:30 for London's 01:30) and the second of a repeated time.
+
 ## 1.2.0
 
 Fixes and additions found while building a family calendar on dayspan. Everything from 1.1 keeps working; the

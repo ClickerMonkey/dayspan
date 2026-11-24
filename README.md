@@ -22,6 +22,7 @@ A date & schedule library to use for advanced calendars in TypeScript and JS.
 - Provides logic to help display intersecting events on a calendar
 - Every N days, weeks or months counted from the start (`daysSinceEpoch`, `weeksSinceEpoch`, `monthsSinceEpoch` with `{ every }`)
 - A plain-English locale (`en-plain`) for descriptions people read
+- Instants of local times in any IANA time zone across daylight saving (`TimeZone`)
 - See [CHANGELOG.md](CHANGELOG.md) for what changed in each version
 
 ### TypeScript Example
@@ -82,6 +83,29 @@ Calendar.days<string, any>(3);
 // A daily calendar covering 3 days starting with given date
 Calendar.days<string, any>(3, Day.build(2018, Month.JUNE, 15), 0);
 ```
+
+### Time zones
+
+A `Day` is in the computer's own zone. To run a schedule in another zone (a server sending reminders for a family
+in New York), read its days and times as a wall clock there with `TimeZone`. It uses the engine's `Intl`, so the
+server and the browser work out the same instants.
+
+```typescript
+const NY = 'America/New_York';
+
+TimeZone.isValid(NY);                        // true ('+05:00' and 'Mars/Olympus' are false)
+TimeZone.instant('2026-11-30', 9 * 60, NY);  // Date.UTC(2026, 10, 30, 14, 0): 9:00 am EST
+TimeZone.local(Date.UTC(2026, 10, 30, 14), NY);       // { day: '2026-11-30', minute: 540 }
+TimeZone.offset(Date.UTC(2026, 10, 30, 14), NY);      // -300 (minutes ahead of UTC)
+TimeZone.localString(Date.UTC(2026, 10, 30, 14), NY); // '2026-11-30T09:00:00-05:00'
+
+// Clocks go forward at 02:00 on 2026-03-08: 02:30 doesn't happen, so it's 03:30 EDT.
+TimeZone.localString(TimeZone.instant('2026-03-08', 150, NY), NY); // '2026-03-08T03:30:00-04:00'
+// Clocks go back at 02:00 on 2026-11-01: 01:30 happens twice, so it's the first (EDT).
+TimeZone.localString(TimeZone.instant('2026-11-01', 90, NY), NY);  // '2026-11-01T01:30:00-04:00'
+```
+
+Every function but `isValid` throws a `RangeError` for a zone the engine doesn't know.
 
 ### JS Example
 
